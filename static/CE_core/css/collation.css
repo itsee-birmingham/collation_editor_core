@@ -355,6 +355,11 @@ table#saved_collations td,  table#saved_collations th {
 	border: solid 1px silver;
 }
 
+table#saved_collations td.added, table#saved_collations td.removed, table#saved_collations td.both {
+  	color: red;
+}
+
+
 li.highlighted > div {
     background: #FFBB55;
 }

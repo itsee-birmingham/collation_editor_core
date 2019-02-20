@@ -71,7 +71,7 @@ CL = (function() {
    _disableEventPropagation, _showCollationSettings, _checkWitnesses, _getScrollPosition,
    _getMousePosition, _displayWitnessesHover, _getWitnessesForReading,
    _findStandoffWitness, _findReadingPosById, _getPreStageChecks, _makeRegDecisionsStandoff,
-   _contextInputOnload;
+   _contextInputOnload, _checkWitnessesAgainstProject;
 
 
   //*********  public functions *********
@@ -2725,7 +2725,9 @@ CL = (function() {
     context = _getContextFromInputForm();
     if (context) {
       CL.services.getSavedCollations(context, undefined, function(collations) {
-        _showSavedVersions(collations, context);
+        CL.services.getCurrentEditingProject(function(project) {
+          _showSavedVersions(collations, project.witnesses, context);
+        });
       });
     } else {
       SPN.remove_loading_overlay();
@@ -2768,7 +2770,7 @@ CL = (function() {
     }
   };
 
-  _showSavedVersions = function(data, context) {
+  _showSavedVersions = function(data, projectWitnesses, context) {
     var by_user, users, user, i, status, date, minutes, datestring, approved;
     by_user = {};
     users = [];
@@ -2803,15 +2805,24 @@ CL = (function() {
           users.push(user);
         }
         if (data[i].status === 'regularised') {
-          by_user[user].regularised = _getSavedRadio(data[i].id, datestring);
+          by_user[user].regularised = {};
+          by_user[user].regularised.radio_button = _getSavedRadio(data[i].id, datestring);
+          by_user[user].regularised.witness_comparison = _checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
         } else if (data[i].status === 'set') {
-          by_user[user].set = _getSavedRadio(data[i].id, datestring);
+          by_user[user].set = {};
+          by_user[user].set.radio_button = _getSavedRadio(data[i].id, datestring);
+          by_user[user].set.witness_comparison = _checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
         } else if (data[i].status === 'ordered') {
-          by_user[user].ordered = _getSavedRadio(data[i].id, datestring);
+          by_user[user].ordered = {};
+          by_user[user].ordered.radio_button = _getSavedRadio(data[i].id, datestring);
+          by_user[user].ordered.witness_comparison = _checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
+        } else if (data[i].status === 'approved') {
+          approved = {};
+          approved.radio_button = _getSavedRadio(data[i].id, datestring);
+          approved.witness_comparison = _checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
         }
-        else if (data[i].status === 'approved') {
-          approved = _getSavedRadio(data[i].id, datestring);
-        }
+        console.log(by_user)
+        console.log(approved)
       }
     } else {
       document.getElementById('witnesses').innerHTML = '<p>There are no saved collations of this verse</p>';
@@ -2835,12 +2846,37 @@ CL = (function() {
     });
   };
 
+  _checkWitnessesAgainstProject = function(dataWitnesses, projectWitnesses) {
+    var dataWits = dataWitnesses.slice();
+    var projectWits = projectWitnesses.slice();
+    var extraWits = [];
+    for (let i=0; i < dataWits.length; i+=1) {
+      if (projectWits.indexOf(dataWits[i]) !== -1) {
+        projectWits.splice(projectWits.indexOf(dataWits[i]), 1);
+      } else {
+        extraWits.push(dataWits[i]);
+      }
+    }
+    if (extraWits.length === 0 && projectWits.length === 0) {
+      return [true];
+    }
+    if (extraWits.length > 0 && projectWits.length > 0) {
+      return [false, 'both'];
+    }
+    if (extraWits.length === 0 && projectWits.length > 0) {
+      return [false, 'removed'];
+    }
+    if (extraWits.length > 0 && projectWits.length === 0) {
+      return [false, 'added'];
+    }
+  };
+
   _getSavedRadio = function(id, datestring) {
     return '<input type="radio" name="saved_collation" value="' + id + '">' + datestring + '</input>';
   };
 
   _makeSavedCollationTable = function(by_user, approved, users, context) {
-    var html, i, user_map, user, userCount, firstRow;
+    var html, i, user_map, user, userCount, firstRow, witnessComparisonClass, hoveroverText;
     html = [];
     html.push('<form id="saved_collation_form">');
     html.push('<table id="saved_collations">');
@@ -2861,22 +2897,73 @@ CL = (function() {
           html.push('<tr><td>' + user + '</td>');
         }
         if (by_user[user].hasOwnProperty('regularised')) {
-          html.push('<td>' + by_user[user].regularised + '</td>');
+          if (by_user[user].regularised.witness_comparison[0] === false) {
+            witnessComparisonClass = by_user[user].regularised.witness_comparison[1];
+            if (witnessComparisonClass === 'added') {
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added.';
+            } else if (witnessComparisonClass === 'removed') {
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed.';
+            } else if (witnessComparisonClass === 'both') {
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added.';
+            }
+          } else {
+            witnessComparisonClass = 'same';
+            hoveroverText = ''
+          }
+          html.push('<td title="' + hoveroverText + '" class="' + witnessComparisonClass + '">' + by_user[user].regularised.radio_button + '</td>');
         } else {
           html.push('<td></td>');
         }
         if (by_user[user].hasOwnProperty('set')) {
-          html.push('<td>' + by_user[user].set + '</td>');
+          if (by_user[user].set.witness_comparison[0] === false) {
+            witnessComparisonClass = by_user[user].set.witness_comparison[1];
+            if (witnessComparisonClass === 'added') {
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added.';
+            } else if (witnessComparisonClass === 'removed') {
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed.';
+            } else if (witnessComparisonClass === 'both') {
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added.';
+            }
+          } else {
+            witnessComparisonClass = 'same';
+            hoveroverText = ''
+          }
+          html.push('<td title="' + hoveroverText + '" class="' + witnessComparisonClass + '">' + by_user[user].set.radio_button + '</td>');
         } else {
           html.push('<td></td>');
         }
         if (by_user[user].hasOwnProperty('ordered')) {
-          html.push('<td>' + by_user[user].ordered + '</td>');
+          if (by_user[user].ordered.witness_comparison[0] === false) {
+            witnessComparisonClass = by_user[user].ordered.witness_comparison[1];
+            if (witnessComparisonClass === 'added') {
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added.';
+            } else if (witnessComparisonClass === 'removed') {
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed.';
+            } else if (witnessComparisonClass === 'both') {
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added.';
+            }
+          } else {
+            witnessComparisonClass = 'same';
+          }
+          html.push('<td title="' + hoveroverText + '" class="' + witnessComparisonClass + '">' + by_user[user].ordered.radio_button + '</td>');
         } else {
           html.push('<td></td>');
         }
         if (firstRow === true && approved !== undefined) {
-          html.push('<td valign="middle" rowspan="' + userCount +'">' +approved + '</td>');
+          if (approved.witness_comparison[0] === false) {
+            witnessComparisonClass = approved.witness_comparison[1];
+            if (witnessComparisonClass === 'added') {
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added.';
+            } else if (witnessComparisonClass === 'removed') {
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed.';
+            } else if (witnessComparisonClass === 'both') {
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added.';
+            }
+          } else {
+            witnessComparisonClass = 'same';
+            hoveroverText = ''
+          }
+          html.push('<td title="' + hoveroverText + '" class="' + witnessComparisonClass + '" rowspan="' + userCount +'">' + approved.radio_button + '</td>');
           firstRow = false;
         }
         html.push('</tr>');

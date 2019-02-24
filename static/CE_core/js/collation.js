@@ -51,7 +51,8 @@ CL = (function() {
   getSpecifiedAncestor, hideTooltip, addHoverEvents, markReading, showSplitWitnessMenu,
   markStandoffReading, findUnitPosById, findReadingById, applyPreStageChecks,
   makeStandoffReading, doMakeStandoffReading, makeMainReading, getOrderedAppLines,
-  loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses;
+  loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
+  calculatePosition;
 
   //private function declarations
   let _initialiseEditor, _initialiseProject, _setProjectConfig, _setDisplaySettings,
@@ -68,7 +69,7 @@ CL = (function() {
    _addNavEvent, _findLatestStageVerse, _loadLatestStageVerse, _removeOverlappedReadings,
    _applySettings, _getApprovalSettings, _compareReadings,
    _disableEventPropagation, _showCollationSettings, _checkWitnesses, _getScrollPosition,
-   _getMousePosition, _calculatePosition, _displayWitnessesHover, _getWitnessesForReading,
+   _getMousePosition, _displayWitnessesHover, _getWitnessesForReading,
    _findStandoffWitness, _findReadingPosById, _getPreStageChecks, _makeRegDecisionsStandoff,
    _contextInputOnload;
 
@@ -688,7 +689,7 @@ CL = (function() {
         }
         i += 1;
       } else if (i === unit_index) { //we do have a variant for this word
-        if (unit.readings.length > 1 ||
+        if (unit.readings.length > 0 ||
           //this is now set to always show units regardless of whether they have variation
           //the unused logic is left in incase we want to revert to the old way sometime
           (format === 'reorder') ||
@@ -1409,7 +1410,7 @@ CL = (function() {
 
   makeVerseLinks = function() {
     var verse, ok;
-    if (document.getElementById('previous_verse')) {
+    if (document.getElementById('previous_verse') && CL.services.hasOwnProperty('getAdjoiningVerse')) {
       CL.services.getAdjoiningVerse(CL.context, true, function(verse) { // previous
         if (verse) {
           $('#previous_verse').on('click', function() {
@@ -1429,7 +1430,7 @@ CL = (function() {
         }
       });
     }
-    if (document.getElementById('next_verse')) {
+    if (document.getElementById('next_verse') && CL.services.hasOwnProperty('getAdjoiningVerse')) {
       CL.services.getAdjoiningVerse(CL.context, false, function(verse) { // next
         if (verse) {
           $('#next_verse').on('click', function() {
@@ -2547,10 +2548,8 @@ CL = (function() {
   };
 
   _setProjectConfig = function(project) {
-    CL.project = {
-      //'ruleClasses': project.ruleClasses,
-      'book_name': project.book_name,
-    };
+    CL.project = {};
+
     //TODO DEPRECATE _id (for id) and project (for name) in future release
     if (project.hasOwnProperty('_id')) {
       CL.project.id = project._id;
@@ -2565,6 +2564,9 @@ CL = (function() {
       CL.project.name = project.name;
     }
     //end deprecation
+    if (project.hasOwnProperty('book_name')) {
+      CL.project.book_name = project.book_name;
+    }
     if (project.hasOwnProperty('witnessSort')) {
       CL.project.witnessSort = project.witnessSort;
     }
@@ -2655,7 +2657,7 @@ CL = (function() {
     //It is set separately because we do not want to have to add it to all projects
     //that need to override some of the local functions
     if (project.hasOwnProperty('localCollationFunction')) {
-      CL.localPythonFunctions.local_collation_function = project.localCollationCunction;
+      CL.localPythonFunctions.local_collation_function = project.localCollationFunction;
     } else if (CL.services.hasOwnProperty('localCollationFunction')) {
       CL.localPythonFunctions.local_collation_function = CL.services.localCollationFunction;
     }
@@ -2767,7 +2769,7 @@ CL = (function() {
   };
 
   _showSavedVersions = function(data, context) {
-    var by_user, users, user, i, status, date, minutes, datestring;
+    var by_user, users, user, i, status, date, minutes, datestring, approved;
     by_user = {};
     users = [];
     if (data.length > 0) {
@@ -2807,6 +2809,9 @@ CL = (function() {
         } else if (data[i].status === 'ordered') {
           by_user[user].ordered = _getSavedRadio(data[i].id, datestring);
         }
+        else if (data[i].status === 'approved') {
+          approved = _getSavedRadio(data[i].id, datestring);
+        }
       }
     } else {
       document.getElementById('witnesses').innerHTML = '<p>There are no saved collations of this verse</p>';
@@ -2822,9 +2827,9 @@ CL = (function() {
             user_names[user_info[k].id] = user_info[k].id;
           }
         }
-        _makeSavedCollationTable(by_user, user_names, context);
+        _makeSavedCollationTable(by_user, approved, user_names, context);
       } else {
-        _makeSavedCollationTable(by_user, undefined, context);
+        _makeSavedCollationTable(by_user, approved, undefined, context);
       }
       SPN.remove_loading_overlay();
     });
@@ -2834,12 +2839,14 @@ CL = (function() {
     return '<input type="radio" name="saved_collation" value="' + id + '">' + datestring + '</input>';
   };
 
-  _makeSavedCollationTable = function(by_user, users, context) {
-    var html, i, user_map, user;
+  _makeSavedCollationTable = function(by_user, approved, users, context) {
+    var html, i, user_map, user, userCount, firstRow;
     html = [];
     html.push('<form id="saved_collation_form">');
     html.push('<table id="saved_collations">');
-    html.push('<th>User</th><th>Regularised</th><th>Variants Set</th><th>Ordered</th>');
+    html.push('<th>User</th><th>Regularised</th><th>Variants Set</th><th>Ordered</th><th>Approved</th>');
+    userCount = Object.keys(by_user).length;
+    firstRow = true;
     for (user in by_user) {
       if (by_user.hasOwnProperty(user)) {
         if (users !== undefined) {
@@ -2867,6 +2874,10 @@ CL = (function() {
           html.push('<td>' + by_user[user].ordered + '</td>');
         } else {
           html.push('<td></td>');
+        }
+        if (firstRow === true && approved !== undefined) {
+          html.push('<td valign="middle" rowspan="' + userCount +'">' +approved + '</td>');
+          firstRow = false;
         }
         html.push('</tr>');
       }
@@ -4158,7 +4169,7 @@ CL = (function() {
     return position;
   };
 
-  _calculatePosition = function(e, element) {
+  calculatePosition = function(e, element) {
     var width, position, scroll_position;
     element.style.left = '-1000px';
     element.style.top = '-1000px';
@@ -4192,7 +4203,7 @@ CL = (function() {
     } else {
       return;
     }
-    _calculatePosition(event, element);
+    calculatePosition(event, element);
     element.style.display = "block";
     event.stopPropagation();
   };
@@ -4402,6 +4413,7 @@ CL = (function() {
     collateData: collateData,
     context: context,
     data: data,
+    calculatePosition: calculatePosition,
 
     setServiceProvider: setServiceProvider,
     expandFillPageClients: expandFillPageClients,

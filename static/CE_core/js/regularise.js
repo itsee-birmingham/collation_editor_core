@@ -166,7 +166,7 @@ RG = (function() {
                 if (_hasDeletionScheduled(key)) {
                   reg_class += 'deleted ';
                 }
-		reg_class += 'regclass_'+id_dict[key].class + ' ';
+		            reg_class += 'regclass_'+id_dict[key].class + ' ';
                 highlighted = '';
                 if (id_dict[key].witnesses.length > 1) {
                   id_dict[key].witnesses = CL.sortWitnesses(id_dict[key].witnesses);
@@ -244,7 +244,8 @@ RG = (function() {
 
   showVerseCollation = function(data, context, container, options) {
     var html, i, last_row, tr, temp, event_rows, row, triangles, bk, ch, v, nextCh, nextV, prevCh, prevV,
-      header, unit_events, key, global_exceptions_html, show_hide_regularisations_button_text;
+      header, unit_events, key, global_exceptions_html, show_hide_regularisations_button_text,
+      remove_wits_form, wits;
     console.log(JSON.parse(JSON.stringify(data)));
 
     if (typeof options === 'undefined') {
@@ -270,6 +271,33 @@ RG = (function() {
     SimpleContextMenu.attach('regularisation_staged', function() {
       return _makeMenu('regularisation_staged');
     });
+    if (document.getElementById('remove_witnesses_div')) {
+      document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
+    }
+
+    if (CL.witnessEditingMode === true) {
+      wits = CL.checkWitnessesAgainstProject(CL.dataSettings.witness_list, CL.project.witnesses);
+      if (wits[0] === false) {
+        if ((wits[1] === 'removed' || wits[1] === 'both') && CL.witnessRemovingMode === true) {
+          console.log('******** remove option needed');
+          $.get(staticUrl + 'CE_core/html_fragments/remove_witnesses_form.html', function(html) {
+            if (!document.getElementById('remove_witnesses_div')) {
+              remove_wits_form = document.createElement('div');
+            } else {
+              remove_wits_form = document.getElementById('remove_witnesses_div');
+            }
+            remove_wits_form.setAttribute('id', 'remove_witnesses_div');
+            remove_wits_form.setAttribute('class', 'dragdiv remove_witnesses_div dialogue_form');
+            remove_wits_form.innerHTML = html;
+            document.getElementsByTagName('body')[0].appendChild(remove_wits_form);
+            CL.setUpRemoveWitnessesForm(wits[2], data);
+          }, 'text');
+        }
+        if ((wits[1] === 'added' || wits[1] === 'both') && CL.witnessAddingMode === true) {
+          console.log('******** add option needed');
+        }
+      }
+    }
 
     CL.lacOmFix();
     temp = CL.getUnitLayout(CL.data.apparatus, 1, 'regularise', options);
@@ -409,6 +437,8 @@ RG = (function() {
       }
     }
   };
+
+
 
   allRuleStacksEmpty = function() {
     if (!$.isEmptyObject(_rules) || _forDeletion.length > 0 || _forGlobalExceptions.length > 0) {

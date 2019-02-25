@@ -28,7 +28,10 @@ CL = (function() {
       project = {},
       collateData = {},
       context = '',
-      data = {};
+      data = {},
+      witnessEditingMode = false,
+      witnessAddingMode = false,
+      witnessRemovingMode = false;
 
 
   //private variable declarations
@@ -52,7 +55,8 @@ CL = (function() {
   markStandoffReading, findUnitPosById, findReadingById, applyPreStageChecks,
   makeStandoffReading, doMakeStandoffReading, makeMainReading, getOrderedAppLines,
   loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
-  calculatePosition;
+  calculatePosition, removeWitness, checkWitnessesAgainstProject, setUpRemoveWitnessesForm,
+  removeWitnesses;
 
   //private function declarations
   let _initialiseEditor, _initialiseProject, _setProjectConfig, _setDisplaySettings,
@@ -71,7 +75,7 @@ CL = (function() {
    _disableEventPropagation, _showCollationSettings, _checkWitnesses, _getScrollPosition,
    _getMousePosition, _displayWitnessesHover, _getWitnessesForReading,
    _findStandoffWitness, _findReadingPosById, _getPreStageChecks, _makeRegDecisionsStandoff,
-   _contextInputOnload, _checkWitnessesAgainstProject;
+   _contextInputOnload, _removeWitnessFromUnit;
 
 
   //*********  public functions *********
@@ -2262,6 +2266,111 @@ CL = (function() {
     return app_ids;
   };
 
+  //TODO: add SR_text removal
+  _removeWitnessFromUnit = function(unit, hand) {
+    var reading;
+    for (let i=0; i<unit.readings.length; i+=1) {
+      reading = unit.readings[i];
+      if (reading.witnesses.indexOf(hand) !== -1) {
+        reading.witnesses.splice(reading.witnesses.indexOf(hand), 1);
+        if (reading.witnesses.length === 0) {
+          unit.readings[i] = null;
+        } else {
+          for (let j=0; j<reading.text.length; j+=1) {
+            delete reading.text[j][hand];
+            if (reading.text[j].reading.indexOf(hand) !== -1) {
+              reading.text[j].reading.splice(reading.text[j].reading.indexOf(hand), 1);
+            }
+          }
+        }
+      }
+    }
+    removeNullItems(unit.readings);
+    return true;
+  };
+
+  setUpRemoveWitnessesForm = function(wits, data) {
+    var html;
+    html = [];
+    for (let i=0; i<wits.length; i+=1) {
+      for (let key in data.hand_id_map) {
+        if ( data.hand_id_map.hasOwnProperty(key) && data.hand_id_map[key] === wits[i]) {
+          html.push('<input class="boolean" type="checkbox" id="' + key + '" name="' + key + '"/><label>' + key + '</label><br/>');
+        }
+      }
+    }
+    document.getElementById('witness_checkboxes').innerHTML = html.join('');
+    DND.InitDragDrop('remove_witnesses_div', true, true);
+    $('#remove_selected_button').on('click', function () {
+      var data, handsToRemove;
+      handsToRemove = [];
+      data = cforms.serialiseForm('remove_witnesses_form');
+      for (let key in data) {
+        if (data.hasOwnProperty(key) && data[key] === true) {
+          handsToRemove.push(key);
+        }
+      }
+      removeWitnesses(handsToRemove);
+    });
+  };
+
+  removeWitnesses = function(hands) {
+    console.log('^^^^^^^^^^ remove witnesses')
+    var success, i, dataCopy, witnessListCopy;
+    SPN.show_loading_overlay();
+
+    dataCopy = JSON.parse(JSON.stringify(CL.data));
+    witnessListCopy = CL.dataSettings.witness_list.slice(0);
+    success = true;
+    i = 0;
+    while (success === true && i < hands.length) {
+      success = removeWitness(hands[i]);
+      i+=1;
+    }
+    if (success === false) {
+      CL.dataSettings.witness_list = witnessListCopy.slice(0);
+      CL.data = JSON.parse(JSON.stringify(dataCopy));
+    }
+    RG.showVerseCollation(CL.data, CL.context, CL.container);
+    SPN.remove_loading_overlay();
+  };
+
+  //TODO: think about how to remove overlapped units if you delete the last entry
+  //also how to remove normal units if you delete the last entry in the last reading
+  removeWitness = function(hand) {
+    var documentId;
+    //check it isn't the overtext which cannot be remved
+    if (hand === CL.data.overtext_name) {
+      alert('The basetext cannot be removed. This verse must be recollated with a new basetext.');
+      return false;
+    }
+    //apparatuses
+    for (let key in CL.data) {
+      if (CL.data.hasOwnProperty(key)) {
+        if (key.indexOf('apparatus') !== -1) {
+          for (let i=0; i<CL.data[key].length; i+=1) {
+            _removeWitnessFromUnit(CL.data[key][i], hand);
+          }
+        }
+      }
+    }
+    //lac readings
+    if (CL.data.lac_readings.indexOf(hand) !== -1) {
+      CL.data.lac_readings.splice(CL.data.lac_readings.indexOf(hand), 1);
+    }
+    //om readings
+    if (CL.data.om_readings.indexOf(hand) !== -1) {
+      CL.data.om_readings.splice(CL.data.om_readings.indexOf(hand), 1);
+    }
+    //hand id map
+    documentId = CL.data.hand_id_map[hand];
+    delete CL.data.hand_id_map[hand];
+    if (CL.dataSettings.witness_list.indexOf(documentId) !== -1) {
+      CL.dataSettings.witness_list.splice(CL.dataSettings.witness_list.indexOf(documentId), 1);
+    }
+    return true;
+  };
+
   /* Menu Loading */
   //optionally called by initialise editor in services if they want to set up the page using js
   //alternatively services can control this themselves but instead must call addIndexHandlers in the initialisation function
@@ -2564,6 +2673,11 @@ CL = (function() {
       CL.project.name = project.name;
     }
     //end deprecation
+    //TODO: this is hard coded for convenience and testing but needs to be in the
+    //services and project settings before releasing
+    CL.project.allowWitnessChanges = true;
+
+    CL.project.witnesses = project.witnesses;
     if (project.hasOwnProperty('book_name')) {
       CL.project.book_name = project.book_name;
     }
@@ -2719,10 +2833,12 @@ CL = (function() {
   };
 
   /* Initial page load functions */
-  _findSaved = function() {
+  _findSaved = function(context) {
     var context;
     SPN.show_loading_overlay();
-    context = _getContextFromInputForm();
+    if (context === undefined) {
+      context = _getContextFromInputForm();
+    }
     if (context) {
       CL.services.getSavedCollations(context, undefined, function(collations) {
         CL.services.getCurrentEditingProject(function(project) {
@@ -2806,23 +2922,21 @@ CL = (function() {
         }
         if (data[i].status === 'regularised') {
           by_user[user].regularised = {};
-          by_user[user].regularised.radio_button = _getSavedRadio(data[i].id, datestring);
-          by_user[user].regularised.witness_comparison = _checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
+          by_user[user].regularised.witness_comparison = checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
+          by_user[user].regularised.radio_button = _getSavedRadio(data[i].id, by_user[user].regularised.witness_comparison[1], datestring);
         } else if (data[i].status === 'set') {
           by_user[user].set = {};
-          by_user[user].set.radio_button = _getSavedRadio(data[i].id, datestring);
-          by_user[user].set.witness_comparison = _checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
+          by_user[user].set.witness_comparison = checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
+          by_user[user].set.radio_button = _getSavedRadio(data[i].id, by_user[user].set.witness_comparison[1], datestring);
         } else if (data[i].status === 'ordered') {
           by_user[user].ordered = {};
-          by_user[user].ordered.radio_button = _getSavedRadio(data[i].id, datestring);
-          by_user[user].ordered.witness_comparison = _checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
+          by_user[user].ordered.witness_comparison = checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
+          by_user[user].ordered.radio_button = _getSavedRadio(data[i].id, by_user[user].ordered.witness_comparison[1], datestring);
         } else if (data[i].status === 'approved') {
           approved = {};
-          approved.radio_button = _getSavedRadio(data[i].id, datestring);
-          approved.witness_comparison = _checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
+          approved.witness_comparison = checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
+          approved.radio_button = _getSavedRadio(data[i].id, approved.witness_comparison[1], datestring);
         }
-        console.log(by_user)
-        console.log(approved)
       }
     } else {
       document.getElementById('witnesses').innerHTML = '<p>There are no saved collations of this verse</p>';
@@ -2846,7 +2960,7 @@ CL = (function() {
     });
   };
 
-  _checkWitnessesAgainstProject = function(dataWitnesses, projectWitnesses) {
+  checkWitnessesAgainstProject = function(dataWitnesses, projectWitnesses) {
     var dataWits = dataWitnesses.slice();
     var projectWits = projectWitnesses.slice();
     var extraWits = [];
@@ -2858,26 +2972,30 @@ CL = (function() {
       }
     }
     if (extraWits.length === 0 && projectWits.length === 0) {
-      return [true];
+      return [true, 'same'];
     }
     if (extraWits.length > 0 && projectWits.length > 0) {
-      return [false, 'both'];
+      return [false, 'both', extraWits, projectWits];
     }
     if (extraWits.length === 0 && projectWits.length > 0) {
-      return [false, 'removed'];
+      return [false, 'added', extraWits, projectWits];
     }
     if (extraWits.length > 0 && projectWits.length === 0) {
-      return [false, 'added'];
+      return [false, 'removed', extraWits, projectWits];
     }
   };
 
-  _getSavedRadio = function(id, datestring) {
-    return '<input type="radio" name="saved_collation" value="' + id + '">' + datestring + '</input>';
+  _getSavedRadio = function(id,  witnessComparison, datestring) {
+    return '<input class="' + witnessComparison + '" type="radio" name="saved_collation" value="' + id + '">' + datestring + '</input>';
   };
 
   _makeSavedCollationTable = function(by_user, approved, users, context) {
-    var html, i, user_map, user, userCount, firstRow, witnessComparisonClass, hoveroverText;
+    var html, i, user_map, user, userCount, firstRow, witnessComparisonClass, hoveroverText, footerHtml,
+    hasCollationsWithWitsToAdd, hasCollationsWithWitsToRemove;
+    hasCollationsWithWitsToRemove = false;
+    hasCollationsWithWitsToAdd = false;
     html = [];
+    document.getElementById('collation_form').style.display = 'none';
     html.push('<form id="saved_collation_form">');
     html.push('<table id="saved_collations">');
     html.push('<th>User</th><th>Regularised</th><th>Variants Set</th><th>Ordered</th><th>Approved</th>');
@@ -2900,10 +3018,14 @@ CL = (function() {
           if (by_user[user].regularised.witness_comparison[0] === false) {
             witnessComparisonClass = by_user[user].regularised.witness_comparison[1];
             if (witnessComparisonClass === 'added') {
+              hasCollationsWithWitsToAdd = true;
               hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added.';
             } else if (witnessComparisonClass === 'removed') {
+              hasCollationsWithWitsToRemove = true;
               hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed.';
             } else if (witnessComparisonClass === 'both') {
+              hasCollationsWithWitsToRemove = true;
+              hasCollationsWithWitsToAdd = true;
               hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added.';
             }
           } else {
@@ -2918,10 +3040,14 @@ CL = (function() {
           if (by_user[user].set.witness_comparison[0] === false) {
             witnessComparisonClass = by_user[user].set.witness_comparison[1];
             if (witnessComparisonClass === 'added') {
+              hasCollationsWithWitsToAdd = true;
               hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added.';
             } else if (witnessComparisonClass === 'removed') {
+              hasCollationsWithWitsToRemove = true;
               hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed.';
             } else if (witnessComparisonClass === 'both') {
+              hasCollationsWithWitsToRemove = true;
+              hasCollationsWithWitsToAdd = true;
               hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added.';
             }
           } else {
@@ -2936,14 +3062,17 @@ CL = (function() {
           if (by_user[user].ordered.witness_comparison[0] === false) {
             witnessComparisonClass = by_user[user].ordered.witness_comparison[1];
             if (witnessComparisonClass === 'added') {
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added.';
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added they must be added at a previous stage and this stage must be completed again.';
             } else if (witnessComparisonClass === 'removed') {
+              hasCollationsWithWitsToRemove = true;
               hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed.';
             } else if (witnessComparisonClass === 'both') {
+              hasCollationsWithWitsToRemove = true;
               hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added.';
             }
           } else {
             witnessComparisonClass = 'same';
+            hoveroverText = ''
           }
           html.push('<td title="' + hoveroverText + '" class="' + witnessComparisonClass + '">' + by_user[user].ordered.radio_button + '</td>');
         } else {
@@ -2953,10 +3082,12 @@ CL = (function() {
           if (approved.witness_comparison[0] === false) {
             witnessComparisonClass = approved.witness_comparison[1];
             if (witnessComparisonClass === 'added') {
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added.';
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added they must be added at a previous stage and this stage must be completed again.';
             } else if (witnessComparisonClass === 'removed') {
+              hasCollationsWithWitsToRemove = true;
               hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed.';
             } else if (witnessComparisonClass === 'both') {
+              hasCollationsWithWitsToRemove = true;
               hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added.';
             }
           } else {
@@ -2977,14 +3108,52 @@ CL = (function() {
     if (CL.services.hasOwnProperty('showLoginStatus')) {
       CL.services.showLoginStatus();
     }
-    document.getElementById('footer').innerHTML = '<input class="pure-button right_foot" id="load_saved_button" type="button" value="Load collation"/>';
+    $(':radio').on('click', function() {
+      if ($(this).is(':checked')) {
+        if ($(this).hasClass('added') || $(this).hasClass('both')) {
+          $('#load_saved_add_button').removeClass('pure-button-disabled');
+        } else {
+          $('#load_saved_add_button').addClass('pure-button-disabled');
+        }
+        if ($(this).hasClass('removed') || $(this).hasClass('both')) {
+          $('#load_saved_remove_button').removeClass('pure-button-disabled');
+        } else {
+          $('#load_saved_remove_button').addClass('pure-button-disabled');
+        }
+      }
+    });
+    footerHtml = [];
+    footerHtml.push('<input class="pure-button right_foot" id="load_saved_button" type="button" value="Load collation"/>');
+    if (hasCollationsWithWitsToAdd === true) {
+      footerHtml.push('<input class="pure-button pure-button-disabled right_foot" id="load_saved_add_button" type="button" value="Load collation and add witnesses"/>');
+    }
+    if (hasCollationsWithWitsToRemove === true) {
+      footerHtml.push('<input class="pure-button pure-button-disabled right_foot" id="load_saved_remove_button" type="button" value="Load collation and remove witnesses"/>');
+    }
+    document.getElementById('footer').innerHTML = footerHtml.join('');
     $('#load_saved_button').on('click', function(event) {
+      CL.witnessEditingMode = false;
+      CL.witnessAddingMode = false;
+      CL.witnessRemovingMode = false;
+      _loadSavedCollation();
+    });
+    $('#load_saved_add_button').on('click', function(event) {
+      CL.witnessEditingMode = true;
+      CL.witnessAddingMode = true;
+      CL.witnessRemovingMode = false;
+      _loadSavedCollation();
+    });
+    $('#load_saved_remove_button').on('click', function(event) {
+      CL.witnessEditingMode = true;
+      CL.witnessAddingMode = false;
+      CL.witnessRemovingMode = true;
       _loadSavedCollation();
     });
   };
 
   _loadSavedCollation = function(id) {
-    var i, value, bk, data, coll_id;
+    var i, value, bk, data, coll_id, temp, witnessStatus;
+    console.log('loading saved')
     SPN.show_loading_overlay();
     if (id === undefined) {
       data = cforms.serialiseForm('saved_collation_form');
@@ -2993,6 +3162,7 @@ CL = (function() {
       coll_id = id;
     }
     CL.services.loadSavedCollation(coll_id, function(collation) {
+      var temp, witsToRemove, witsToAdd, options;
       if (collation) {
         CL.context = collation.context;
         CL.data = collation.structure;
@@ -3003,8 +3173,25 @@ CL = (function() {
         CL.dataSettings = collation.data_settings;
         CL.algorithmSettings = collation.algorithm_settings;
         CL.container = document.getElementById('container');
+
+        options = {};
+        // //This should only happen  if we are loading from the table view
+        // //if we are not then witnessStatus should be undefined
+        // if (witnessStatus !== undefined && witnessStatus !== 'same') {
+        //   temp = checkWitnessesAgainstProject(CL.dataSettings.witness_list, CL.project.witnesses);
+        //   if (witnessStatus !== temp[1]) {
+        //     //then something must have changed and best to reload the table
+        //     //TODO: put in an alert to explain why this has happens
+        //     alert('The data seems to have changed')
+        //     _findSaved(CL.context);
+        //     return;
+        //   }
+        //   options.witsToRemove = temp[2];
+        //   options.witsToAdd = temp[3];
+        // }
+
         if (collation.status === 'regularised') {
-          RG.showVerseCollation(CL.data, CL.context, CL.container);
+          RG.showVerseCollation(CL.data, CL.context, CL.container, options);
         } else if (collation.status === 'set') {
           //if anything that should have an _id attribute doesn't have one then
           //add them
@@ -3012,24 +3199,21 @@ CL = (function() {
             addUnitAndReadingIds();
           }
           SV.checkBugStatus('loaded', 'saved version');
-          SV.showSetVariants({
-            'container': CL.container
-          });
+          options.container = CL.container;
+          SV.showSetVariants(options);
         } else if (collation.status === 'ordered') {
           SR.loseSubreadings();
           SR.findSubreadings({
             'rule_classes': getRuleClasses('subreading', true, 'value', ['identifier', 'subreading'])
           });
-          OR.showOrderReadings({
-            'container': CL.container
-          });
+          options.container = CL.container;
+          OR.showOrderReadings(options);
         } else if (collation.status === 'approved') {
           //we do not do lose and find subreading here as all the saved versions are already correct
           //and if we lose them and find them on display we lose the suffixes list we generated
           //that is needed for output
-          OR.showApprovedVersion({
-            'container': CL.container
-          });
+          options.container = CL.container;
+          OR.showApprovedVersion(options);
         }
       } else {
         SPN.remove_loading_overlay();
@@ -4501,6 +4685,9 @@ CL = (function() {
     context: context,
     data: data,
     calculatePosition: calculatePosition,
+    witnessEditingMode: witnessEditingMode,
+    witnessRemovingMode: witnessRemovingMode,
+    witnessAddingMode: witnessAddingMode,
 
     setServiceProvider: setServiceProvider,
     expandFillPageClients: expandFillPageClients,
@@ -4560,6 +4747,10 @@ CL = (function() {
     getHandsAndSigla: getHandsAndSigla,
     createNewReading: createNewReading,
     getReadingWitnesses: getReadingWitnesses,
+    removeWitness: removeWitness,
+    setUpRemoveWitnessesForm: setUpRemoveWitnessesForm,
+    removeWitnesses: removeWitnesses,
+    checkWitnessesAgainstProject: checkWitnessesAgainstProject,
 
     //deprecated function mapping for calls from older services
     set_service_provider: setServiceProvider,

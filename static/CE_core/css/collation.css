@@ -433,6 +433,12 @@ div.highlighted_unit {
   vertical-align: middle;
 }
 
+#remove_witnesses_div {
+  top: 30px;
+  font-size: 15px;
+
+}
+
 .reg_form {
  	top: 30px;
   font-size: 15px;

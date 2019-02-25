@@ -171,7 +171,8 @@ SV = (function () {
 	};
 
 	showSetVariantsData = function (options) {
-		var temp, header, html, i, app_ids, num, overlaps, overlap_options, new_overlap_options, error_panel_html, event_rows, row;
+		var temp, header, html, i, app_ids, num, overlaps, overlap_options,
+		new_overlap_options, error_panel_html, event_rows, row, wits, remove_wits_form;
 		//sort out options and get layout
 		if (typeof options === 'undefined') {
 			options = {};
@@ -180,6 +181,30 @@ SV = (function () {
 			options.highlighted_wit = CL.highlighted;
 		}
 		options.sort = true;
+
+		if (CL.witnessEditingMode === true) {
+      wits = CL.checkWitnessesAgainstProject(CL.dataSettings.witness_list, CL.project.witnesses);
+      if (wits[0] === false) {
+        if ((wits[1] === 'removed' || wits[1] === 'both') && CL.witnessRemovingMode === true) {
+          console.log('******** remove option needed');
+          $.get(staticUrl + 'CE_core/html_fragments/remove_witnesses_form.html', function(html) {
+            if (!document.getElementById('remove_witnesses_div')) {
+              remove_wits_form = document.createElement('div');
+            } else {
+              remove_wits_form = document.getElementById('remove_witnesses_div');
+            }
+            remove_wits_form.setAttribute('id', 'remove_witnesses_div');
+            remove_wits_form.setAttribute('class', 'dragdiv remove_witnesses_div dialogue_form');
+            remove_wits_form.innerHTML = html;
+            document.getElementsByTagName('body')[0].appendChild(remove_wits_form);
+            setUpSVRemoveWitnessesForm(wits[2], CL.data); //this uses a special SV one because we need to prepare and unprepare
+          }, 'text');
+        }
+        if ((wits[1] === 'added' || wits[1] === 'both') && CL.witnessAddingMode === true) {
+          console.log('******** add option needed');
+        }
+      }
+    }
 
 		prepareForOperation();
 		CL.lacOmFix(); //also does extra gaps
@@ -242,6 +267,33 @@ SV = (function () {
 		}
 		CL.expandFillPageClients(); //this has to be at the end so the message panel is in the right place
 	};
+
+	setUpSVRemoveWitnessesForm = function(wits, data) {
+    var html;
+    html = [];
+    for (let i=0; i<wits.length; i+=1) {
+      for (let key in data.hand_id_map) {
+        if ( data.hand_id_map.hasOwnProperty(key) && data.hand_id_map[key] === wits[i]) {
+          html.push('<input class="boolean" type="checkbox" id="' + key + '" name="' + key + '"/><label>' + key + '</label><br/>');
+        }
+      }
+    }
+    document.getElementById('witness_checkboxes').innerHTML = html.join('');
+    DND.InitDragDrop('remove_witnesses_div', true, true);
+    $('#remove_selected_button').on('click', function () {
+      var data, handsToRemove;
+      handsToRemove = [];
+      data = cforms.serialiseForm('remove_witnesses_form');
+      for (let key in data) {
+        if (data.hasOwnProperty(key) && data[key] === true) {
+          handsToRemove.push(key);
+        }
+      }
+			prepareForOperation();
+      removeWitnesses(handsToRemove);
+			unprepareForOperation();
+    });
+  };
 
 	calculateUnitLengths = function (app_id, options) {
 		var i, j, app, top_line, id, start, first_hit, gap_before, last_end, length, gap_counts, highest_gap, gap_after,

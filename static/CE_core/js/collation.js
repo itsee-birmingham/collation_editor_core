@@ -56,14 +56,14 @@ CL = (function() {
   makeStandoffReading, doMakeStandoffReading, makeMainReading, getOrderedAppLines,
   loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
   calculatePosition, removeWitness, checkWitnessesAgainstProject, setUpRemoveWitnessesForm,
-  removeWitnesses;
+  removeWitnesses, loadSavedCollation, findSaved;
 
   //private function declarations
   let _initialiseEditor, _initialiseProject, _setProjectConfig, _setDisplaySettings,
    _setLocalPythonFunctions, _setRuleClasses, _setRuleConditions, _setOverlappedOptions,
-   _includeJavascript, _prepareCollation, _findSaved, _getContextFromInputForm,
+   _includeJavascript, _prepareCollation, _getContextFromInputForm,
    _getWitnessesFromInputForm, _showSavedVersions, _getSavedRadio, _makeSavedCollationTable,
-   _loadSavedCollation, _getSubreadingWitnessData, _findStandoffRegularisationText,
+   _getSubreadingWitnessData, _findStandoffRegularisationText,
    _collapseUnit, _expandUnit, _expandAll, _collapseAll, _getEmptyCell, _mergeDicts,
    _getUnitData, _hasGapBefore, _hasGapAfter, _getAllEmptyReadingWitnesses, _containsEmptyReading,
    _isOverlapped, _removeLacOmVerseWitnesses, _cleanExtraGaps, _getOverlapUnitReadings,
@@ -109,6 +109,13 @@ CL = (function() {
 
   getHeaderHtml = function(stage, context) {
     var html;
+    if (['Regulariser', 'Set Variants'].indexOf(stage) !== -1 && CL.witnessEditingMode === true) {
+      if (CL.witnessAddingMode === true) {
+        stage += ' - Witness Adding Mode';
+      } else if (CL.witnessRemovingMode === true) {
+        stage += ' - Witness Removing Mode';
+      }
+    }
     html = '<h1 id="stage_id">' + stage + '</h1>' +
       '<h1 id="verse_ref">' + context +
       '</h1><h1 id="project_name">';
@@ -1405,9 +1412,11 @@ CL = (function() {
       }
 
     }
-    document.getElementById('extra_buttons').innerHTML = html.join('');
-    if (CL.services.hasOwnProperty('addExtraFooterFunctions')) {
-      CL.services.addExtraFooterFunctions();
+    if (document.getElementById('extra_buttons')) {
+      document.getElementById('extra_buttons').innerHTML = html.join('');
+      if (CL.services.hasOwnProperty('addExtraFooterFunctions')) {
+        CL.services.addExtraFooterFunctions();
+      }
     }
     return null;
   };
@@ -2284,37 +2293,64 @@ CL = (function() {
           }
         }
       }
+      if (reading.hasOwnProperty('SR_text') && reading.SR_text.hasOwnProperty(hand)) {
+        delete reading.SR_text[hand];
+      }
+      if (reading.hasOwnProperty('SR_text') && $.isEmptyObject(reading.SR_text)) {
+        delete reading['SR_text'];
+      }
     }
     removeNullItems(unit.readings);
     return true;
   };
 
-  setUpRemoveWitnessesForm = function(wits, data) {
+  setUpRemoveWitnessesForm = function(wits, data, stage, removeFunction) {
     var html;
+    document.getElementById('remove_witnesses_div').style.left = document.getElementById('scroller').offsetWidth - document.getElementById('remove_witnesses_div').offsetWidth - 15 + 'px';
     html = [];
+    //add a select all option
+    html.push('<input class="boolean" type="checkbox" id="select_all" name="select_all"/><label>Select all</label><br/>')
     for (let i=0; i<wits.length; i+=1) {
       for (let key in data.hand_id_map) {
         if ( data.hand_id_map.hasOwnProperty(key) && data.hand_id_map[key] === wits[i]) {
-          html.push('<input class="boolean" type="checkbox" id="' + key + '" name="' + key + '"/><label>' + key + '</label><br/>');
+          html.push('<input class="boolean witness_select" type="checkbox" id="' + key + '" name="' + key + '"/><label>' + key + '</label><br/>');
         }
       }
     }
     document.getElementById('witness_checkboxes').innerHTML = html.join('');
     DND.InitDragDrop('remove_witnesses_div', true, true);
-    $('#remove_selected_button').on('click', function () {
-      var data, handsToRemove;
-      handsToRemove = [];
-      data = cforms.serialiseForm('remove_witnesses_form');
-      for (let key in data) {
-        if (data.hasOwnProperty(key) && data[key] === true) {
-          handsToRemove.push(key);
-        }
+    $('#select_all').on('click', function () {
+      if ($(this).is(':checked')) {
+        $('.witness_select').each(function() {
+          $(this).prop('checked', true);
+        })
       }
-      removeWitnesses(handsToRemove);
     });
+    $('.witness_select').on('click', function () {
+      if (!$(this).is(':checked')) {
+        $('#select_all').prop('checked', false);
+      }
+      //TODO: maybe you could improve this and if all are selected automatically click the select all box - look at the old code for witness selection for doing this
+    });
+    if (removeFunction !== undefined) {
+      $('#remove_selected_button').on('click', removeFunction);
+    } else {
+      $('#remove_selected_button').on('click', function () {
+        var data, handsToRemove;
+        handsToRemove = [];
+        data = cforms.serialiseForm('remove_witnesses_form');
+        for (let key in data) {
+          if (data.hasOwnProperty(key) && data[key] === true && key !== 'select_all') {
+            handsToRemove.push(key);
+          }
+        }
+        removeWitnesses(handsToRemove, stage);
+      });
+    }
+
   };
 
-  removeWitnesses = function(hands) {
+  removeWitnesses = function(hands, stage) {
     console.log('^^^^^^^^^^ remove witnesses')
     var success, i, dataCopy, witnessListCopy;
     SPN.show_loading_overlay();
@@ -2331,7 +2367,11 @@ CL = (function() {
       CL.dataSettings.witness_list = witnessListCopy.slice(0);
       CL.data = JSON.parse(JSON.stringify(dataCopy));
     }
-    RG.showVerseCollation(CL.data, CL.context, CL.container);
+    if (stage === 'regularised') {
+      RG.showVerseCollation(CL.data, CL.context, CL.container);
+    } else if (stage === 'set') {
+      SV.showSetVariantsData();
+    }
     SPN.remove_loading_overlay();
   };
 
@@ -2368,7 +2408,7 @@ CL = (function() {
     if (CL.dataSettings.witness_list.indexOf(documentId) !== -1) {
       CL.dataSettings.witness_list.splice(CL.dataSettings.witness_list.indexOf(documentId), 1);
     }
-    return true;
+    return SV.areAllUnitsComplete();
   };
 
   /* Menu Loading */
@@ -2436,7 +2476,7 @@ CL = (function() {
         if (document.getElementById('settings')) {
           document.getElementById('settings').parentNode.removeChild(document.getElementById('settings'));
         }
-        _findSaved();
+        findSaved();
       });
     }
   };
@@ -2833,7 +2873,7 @@ CL = (function() {
   };
 
   /* Initial page load functions */
-  _findSaved = function(context) {
+  findSaved = function(context) {
     var context;
     SPN.show_loading_overlay();
     if (context === undefined) {
@@ -2995,7 +3035,9 @@ CL = (function() {
     hasCollationsWithWitsToRemove = false;
     hasCollationsWithWitsToAdd = false;
     html = [];
-    document.getElementById('collation_form').style.display = 'none';
+    if (document.getElementById('collation_form')) {
+      document.getElementById('collation_form').style.display = 'none';
+    }
     html.push('<form id="saved_collation_form">');
     html.push('<table id="saved_collations">');
     html.push('<th>User</th><th>Regularised</th><th>Variants Set</th><th>Ordered</th><th>Approved</th>');
@@ -3102,9 +3144,13 @@ CL = (function() {
     }
     html.push('</table>');
     html.push('</form>');
-    document.getElementById('witnesses').innerHTML = '';
+    if (document.getElementById('witnesses')) {
+      document.getElementById('witnesses').innerHTML = '';
+    }
     document.getElementById('saved_collations_div').innerHTML = html.join('');
     document.getElementById('header').innerHTML = getHeaderHtml('Collation', context);
+    document.getElementById('header').className = '';
+
     if (CL.services.hasOwnProperty('showLoginStatus')) {
       CL.services.showLoginStatus();
     }
@@ -3135,23 +3181,23 @@ CL = (function() {
       CL.witnessEditingMode = false;
       CL.witnessAddingMode = false;
       CL.witnessRemovingMode = false;
-      _loadSavedCollation();
+      loadSavedCollation();
     });
     $('#load_saved_add_button').on('click', function(event) {
       CL.witnessEditingMode = true;
       CL.witnessAddingMode = true;
       CL.witnessRemovingMode = false;
-      _loadSavedCollation();
+      loadSavedCollation();
     });
     $('#load_saved_remove_button').on('click', function(event) {
       CL.witnessEditingMode = true;
       CL.witnessAddingMode = false;
       CL.witnessRemovingMode = true;
-      _loadSavedCollation();
+      loadSavedCollation();
     });
   };
 
-  _loadSavedCollation = function(id) {
+  loadSavedCollation = function(id) {
     var i, value, bk, data, coll_id, temp, witnessStatus;
     console.log('loading saved')
     SPN.show_loading_overlay();
@@ -3175,20 +3221,6 @@ CL = (function() {
         CL.container = document.getElementById('container');
 
         options = {};
-        // //This should only happen  if we are loading from the table view
-        // //if we are not then witnessStatus should be undefined
-        // if (witnessStatus !== undefined && witnessStatus !== 'same') {
-        //   temp = checkWitnessesAgainstProject(CL.dataSettings.witness_list, CL.project.witnesses);
-        //   if (witnessStatus !== temp[1]) {
-        //     //then something must have changed and best to reload the table
-        //     //TODO: put in an alert to explain why this has happens
-        //     alert('The data seems to have changed')
-        //     _findSaved(CL.context);
-        //     return;
-        //   }
-        //   options.witsToRemove = temp[2];
-        //   options.witsToAdd = temp[3];
-        // }
 
         if (collation.status === 'regularised') {
           RG.showVerseCollation(CL.data, CL.context, CL.container, options);
@@ -4080,7 +4112,7 @@ CL = (function() {
 
   _addNavEvent = function(elemId, collId) {
     $('#' + elemId).on('click', function() {
-      _loadSavedCollation(collId);
+      loadSavedCollation(collId);
     });
   };
 
@@ -4751,6 +4783,8 @@ CL = (function() {
     setUpRemoveWitnessesForm: setUpRemoveWitnessesForm,
     removeWitnesses: removeWitnesses,
     checkWitnessesAgainstProject: checkWitnessesAgainstProject,
+    loadSavedCollation: loadSavedCollation,
+    findSaved: findSaved,
 
     //deprecated function mapping for calls from older services
     set_service_provider: setServiceProvider,

@@ -22,7 +22,7 @@ RG = (function() {
   _setUpRuleMenu, _getRuleScopes, _getSuffix, _makeMenu, _redipsInitRegularise,
   _getAncestorRow, _showGlobalExceptions, _removeGlobalExceptions, _scheduleAddGlobalException,
   _scheduleRuleDeletion, _deleteUnappliedRule, _addContextMenuHandlers, _showCollationTable,
-  _scheduleSelectedRulesDeletion;
+  _scheduleSelectedRulesDeletion, _addFooterFunctions;
 
   //*********  public functions *********
 
@@ -215,7 +215,9 @@ RG = (function() {
     html.push('<table class="variant_unit" id="variant_unit_' + id + '">');
     html.push(rows.join('').replace(/MX_LN/g, String(max_length + 1)));
     //html.push(utils.TEMPLATE.replace_all(rows.join(''), 'MX_LN', String(max_length + 1)));
-    html.push('<tr><td class="mark" colspan="' + (max_length + 1) + '"><span id="add_reading_' + id + '">+</span></td></tr>');
+    if (CL.witnessEditingMode === false) {
+      html.push('<tr><td class="mark" colspan="' + (max_length + 1) + '"><span id="add_reading_' + id + '">+</span></td></tr>');
+    }
     html.push('</table>');
     html.push('</div></td>');
     return [html, row_list, events];
@@ -245,7 +247,7 @@ RG = (function() {
   showVerseCollation = function(data, context, container, options) {
     var html, i, last_row, tr, temp, event_rows, row, triangles, bk, ch, v, nextCh, nextV, prevCh, prevV,
       header, unit_events, key, global_exceptions_html, show_hide_regularisations_button_text,
-      remove_wits_form, wits;
+      remove_wits_form, wits, footerHtml;
     console.log(JSON.parse(JSON.stringify(data)));
 
     if (typeof options === 'undefined') {
@@ -259,27 +261,28 @@ RG = (function() {
       'preventDefault': true,
       'preventForms': false
     });
-    SimpleContextMenu.attach('ui-selected', function() {
-      return _makeMenu('group_delete');
-    });
-    SimpleContextMenu.attach('regularised', function() {
-      return _makeMenu('regularised');
-    });
-    SimpleContextMenu.attach('regularised_global', function() {
-      return _makeMenu('regularised_global');
-    });
-    SimpleContextMenu.attach('regularisation_staged', function() {
-      return _makeMenu('regularisation_staged');
-    });
+    if (CL.witnessEditingMode === false || CL.witnessAddingMode === true) {
+      SimpleContextMenu.attach('ui-selected', function() {
+        return _makeMenu('group_delete');
+      });
+      SimpleContextMenu.attach('regularised', function() {
+        return _makeMenu('regularised');
+      });
+      SimpleContextMenu.attach('regularised_global', function() {
+        return _makeMenu('regularised_global');
+      });
+      SimpleContextMenu.attach('regularisation_staged', function() {
+        return _makeMenu('regularisation_staged');
+      });
+    }
+    //remove the witness removal window if shown
     if (document.getElementById('remove_witnesses_div')) {
       document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
     }
-
     if (CL.witnessEditingMode === true) {
       wits = CL.checkWitnessesAgainstProject(CL.dataSettings.witness_list, CL.project.witnesses);
       if (wits[0] === false) {
         if ((wits[1] === 'removed' || wits[1] === 'both') && CL.witnessRemovingMode === true) {
-          console.log('******** remove option needed');
           $.get(staticUrl + 'CE_core/html_fragments/remove_witnesses_form.html', function(html) {
             if (!document.getElementById('remove_witnesses_div')) {
               remove_wits_form = document.createElement('div');
@@ -290,7 +293,7 @@ RG = (function() {
             remove_wits_form.setAttribute('class', 'dragdiv remove_witnesses_div dialogue_form');
             remove_wits_form.innerHTML = html;
             document.getElementsByTagName('body')[0].appendChild(remove_wits_form);
-            CL.setUpRemoveWitnessesForm(wits[2], data);
+            CL.setUpRemoveWitnessesForm(wits[2], data, 'regularised');
           }, 'text');
         }
         if ((wits[1] === 'added' || wits[1] === 'both') && CL.witnessAddingMode === true) {
@@ -329,19 +332,93 @@ RG = (function() {
       show_hide_regularisations_button_text = 'show regularisations';
     }
     $('#footer').addClass('pure-form'); //this does the styling of the select elements in the footer using pure (they cannot be styled individually)
-    document.getElementById('footer').innerHTML = '<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>' +
-      '<button class="pure-button left_foot" id="show_hide_regularisations_button">' + show_hide_regularisations_button_text + '</button>' +
-      '<span id="stage_links"></span>' +
-      '<span id="extra_buttons"></span>' +
-      '<button class="pure-button right_foot" id="go_to_sv_button">move to set variants</button>' +
-      '<button class="pure-button right_foot" id="save_button">save</button>' +
-      '<button class="pure-button right_foot" id="recollate_button" type="button">recollate</button>' +
-      '<button class="pure-button right_foot" id="settings_button">settings</button>' +
-      '<select class="right_foot" id="highlighted" name="highlighted"></select>';
+    footerHtml = [];
+    //TODO: collapse button is used so infrequently make it a services or project setting
+    footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+    if (CL.witnessEditingMode === false || CL.witnessAddingMode === true) {
+      footerHtml.push('<button class="pure-button left_foot" id="show_hide_regularisations_button">' + show_hide_regularisations_button_text + '</button>');
+    }
+    if (CL.witnessEditingMode === false) {
+      footerHtml.push('<span id="stage_links"></span>');
+      footerHtml.push('<span id="extra_buttons"></span>');
+    }
+    if (CL.witnessEditingMode === true) {
+      footerHtml.push('<button class="pure-button right_foot" id="return_to_saved_table_button">return to summary table</button>');
+    } else {
+      footerHtml.push('<button class="pure-button right_foot" id="go_to_sv_button">move to set variants</button>');
+    }
+    footerHtml.push('<button class="pure-button right_foot" id="save_button">save</button>');
+    if (CL.witnessEditingMode === false) {
+      footerHtml.push('<button class="pure-button right_foot" id="recollate_button" type="button">recollate</button>');
+      footerHtml.push('<button class="pure-button right_foot" id="settings_button">settings</button>');
+    }
+    footerHtml.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
+    document.getElementById('footer').innerHTML = footerHtml.join('');
 
     SPN.remove_loading_overlay();
     CL.addExtraFooterButtons('regularised');
     CL.addStageLinks();
+    _addFooterFunctions();
+
+    CL.addTriangleFunctions('table');
+    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected':options.highlighted_wit});
+    //TODO: probably better in for loop
+    if (CL.witnessEditingMode === false) {
+      i = 0;
+      while (i <= temp[4]) {
+        if (document.getElementById('drag' + i) !== null) {
+          _redipsInitRegularise('drag' + i);
+        }
+        if (document.getElementById('add_reading_' + i) !== null) {
+          _addNewToken(document.getElementById('add_reading_' + i));
+        }
+        i += 1;
+      }
+    }
+    $('.selectable').selectable({
+      'cancel': 'regularised_global',
+      selected: function(event, ui) {$(ui.selected).removeClass('regularised');},
+      unselected: function(event, ui) {$(ui.unselected).addClass('regularised');}
+    });
+    $('#highlighted').on('change', function(event) {
+      _highlightWitness(event.target.value);
+    });
+    _showRegularisations();
+
+    CL.makeVerseLinks();
+
+    event_rows = temp[2];
+    for (i = 0; i < event_rows.length; i += 1) {
+      row = document.getElementById(event_rows[i]);
+      if (row !== null) {
+        CL.addHoverEvents(row);
+      }
+    }
+    unit_events = temp[3];
+    for (key in unit_events) {
+      if (unit_events.hasOwnProperty(key)) {
+        row = document.getElementById(key);
+        if (row) {
+          CL.addHoverEvents(row, unit_events[key]);
+        }
+      }
+    }
+  };
+
+  _addFooterFunctions = function () {
+    $('#return_to_saved_table_button').on('click', function(){
+      //save warning - it might be worth having a saved flag which is set to false when a removal is successful and true on save
+      //so we can accurate warnings
+
+      //return to Table
+      //remove the witness removal window if shown
+  		if (document.getElementById('remove_witnesses_div')) {
+        document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
+      }
+      document.getElementById('container').innerHTML = '<div id="saved_collations_div"></div>'
+      CL.findSaved(CL.context);
+
+    });
     $('#go_to_sv_button').on('click',
       function(event) {
         var extra_results;
@@ -395,47 +472,53 @@ RG = (function() {
       function(event) {
         CL.saveCollation('regularised');
       });
-    CL.addTriangleFunctions('table');
-    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected':options.highlighted_wit});
-    //TODO: probably better in for loop
-    i = 0;
-    while (i <= temp[4]) {
-      if (document.getElementById('drag' + i) !== null) {
-        _redipsInitRegularise('drag' + i);
-      }
-      if (document.getElementById('add_reading_' + i) !== null) {
-        _addNewToken(document.getElementById('add_reading_' + i));
-      }
-      i += 1;
-    }
-    $('.selectable').selectable({
-      'cancel': 'regularised_global',
-      selected: function(event, ui) {$(ui.selected).removeClass('regularised');},
-      unselected: function(event, ui) {$(ui.unselected).addClass('regularised');}
-    });
-    $('#highlighted').on('change', function(event) {
-      _highlightWitness(event.target.value);
-    });
-    _showRegularisations();
-
-    CL.makeVerseLinks();
-
-    event_rows = temp[2];
-    for (i = 0; i < event_rows.length; i += 1) {
-      row = document.getElementById(event_rows[i]);
-      if (row !== null) {
-        CL.addHoverEvents(row);
-      }
-    }
-    unit_events = temp[3];
-    for (key in unit_events) {
-      if (unit_events.hasOwnProperty(key)) {
-        row = document.getElementById(key);
-        if (row) {
-          CL.addHoverEvents(row, unit_events[key]);
-        }
-      }
-    }
+      // $('#go_to_sv_with_remove_button').on('click',
+      //   function(event) {
+      //     var collId;
+      //     SPN.show_loading_overlay();
+      //     if (document.getElementById('remove_witnesses_div')) {
+      //       document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
+      //     }
+      //     CL.services.getUserInfo(function(user) {
+      //       if (user) {
+      //         CL.services.getSavedCollations(CL.context, user.id, function (collations) {
+      //           //TODO: consider some kind of save warning if last save not within a few minutes.
+      //           //we have the save time in the collation data returned
+      //           //None of the checks usually made are needed because no genuine editing has been done
+      //           //and we have already checked all units are complete
+      //           //Need to load saved SV for this user
+      //           for (let i=0; i<collations.length; i+=1) {
+      //             if (collations[i].status === 'set' && collations[i].user === user.id) {
+      //               collId = collations[i].id;
+      //             }
+      //           }
+      //           //NB: Any case where the same action (i.e. remove/add) does not need to happen at the
+      //           //next stage will alert the user and reload the table.
+      //           //This is a special mode and to break out of the mode you must go back.
+      //           //This could be changed later but let's keep it locked down for now until we see how stable it is.
+      //           if (collId === undefined) {
+      //             //then there is no saved version at set variants so alert and go back to the table
+      //
+      //
+      //             return;
+      //           }
+      //           //get the collation and check the witnesses against the project
+      //           CL.services.loadSavedCollation(collId, function (collation) {
+      //             var wits;
+      //             CL.services.getCurrentEditingProject(function(project) {
+      //               wits = CL.checkWitnessesAgainstProject(collation.data_settings.witness_list, project.witnesses);
+      //               if (wits[0] === true) {
+      //
+      //               }
+      //             });
+      //           });
+      //           CL.loadSavedCollation(collId);
+      //         });
+      //       } else {
+      //         console.log('User not found - is user still logged in?');
+      //       }
+      //     });
+      //   });
   };
 
 

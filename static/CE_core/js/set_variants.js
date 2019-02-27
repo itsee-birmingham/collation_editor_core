@@ -56,7 +56,7 @@ SV = (function () {
   _addToUndoStack,
 	_undo, _removeSplits, _checkTAndNPresence, _checkForStandoffReading, _checkSiglaProblems,
 	_checkIndexesPresent, _checkUniqueWitnesses, _getAllUnitWitnesses, _compareIndexStrings,
-	_compareIndexes, _compareFirstWordIndexes;
+	_compareIndexes, _compareFirstWordIndexes, _setUpSVRemoveWitnessesForm;
 
 
 	//*********  public functions *********
@@ -172,7 +172,8 @@ SV = (function () {
 
 	showSetVariantsData = function (options) {
 		var temp, header, html, i, app_ids, num, overlaps, overlap_options,
-		new_overlap_options, error_panel_html, event_rows, row, wits, remove_wits_form;
+		new_overlap_options, error_panel_html, event_rows, row, wits, remove_wits_form,
+		removeFunction;
 		//sort out options and get layout
 		if (typeof options === 'undefined') {
 			options = {};
@@ -181,7 +182,10 @@ SV = (function () {
 			options.highlighted_wit = CL.highlighted;
 		}
 		options.sort = true;
-
+		//remove the witness removal window if shown
+		if (document.getElementById('remove_witnesses_div')) {
+      document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
+    }
 		if (CL.witnessEditingMode === true) {
       wits = CL.checkWitnessesAgainstProject(CL.dataSettings.witness_list, CL.project.witnesses);
       if (wits[0] === false) {
@@ -197,7 +201,23 @@ SV = (function () {
             remove_wits_form.setAttribute('class', 'dragdiv remove_witnesses_div dialogue_form');
             remove_wits_form.innerHTML = html;
             document.getElementsByTagName('body')[0].appendChild(remove_wits_form);
-            setUpSVRemoveWitnessesForm(wits[2], CL.data); //this uses a special SV one because we need to prepare and unprepare
+						removeFunction = function () {
+					      var data, handsToRemove;
+					      handsToRemove = [];
+					      data = cforms.serialiseForm('remove_witnesses_form');
+					      for (let key in data) {
+					        if (data.hasOwnProperty(key) && data[key] === true) {
+					          handsToRemove.push(key);
+					        }
+					      }
+								prepareForOperation();
+					      CL.removeWitnesses(handsToRemove, 'set');
+								//clear undo stack so you can't go back to a point with the witnesses still present.
+								SV.undoStack = [];
+								unprepareForOperation();
+					    };
+						CL.setUpRemoveWitnessesForm(wits[2], CL.data, 'set', removeFunction);
+            //_setUpSVRemoveWitnessesForm(wits[2], CL.data); //this uses a special SV one because we need to prepare and unprepare
           }, 'text');
         }
         if ((wits[1] === 'added' || wits[1] === 'both') && CL.witnessAddingMode === true) {
@@ -268,8 +288,9 @@ SV = (function () {
 		CL.expandFillPageClients(); //this has to be at the end so the message panel is in the right place
 	};
 
-	setUpSVRemoveWitnessesForm = function(wits, data) {
+	_setUpSVRemoveWitnessesForm = function(wits, data) {
     var html;
+		document.getElementById('remove_witnesses_div').style.left = document.getElementById('scroller').offsetWidth - document.getElementById('remove_witnesses_div').offsetWidth - 15 + 'px';
     html = [];
     for (let i=0; i<wits.length; i+=1) {
       for (let key in data.hand_id_map) {
@@ -290,7 +311,9 @@ SV = (function () {
         }
       }
 			prepareForOperation();
-      removeWitnesses(handsToRemove);
+      CL.removeWitnesses(handsToRemove, 'set');
+			//clear undo stack so you can't go back to a point with the witnesses still present.
+			SV.undoStack = [];
 			unprepareForOperation();
     });
   };
@@ -985,6 +1008,10 @@ SV = (function () {
 					CL.data.event_list.push('moved to order readings');
 				}
 				SR.findSubreadings({'rule_classes': CL.getRuleClasses('subreading', true, 'value', ['identifier', 'subreading'])}); //only show the subreadings when there class is labelled as subreading in the project)))
+				//remove the remove witnesses menu if it is still hanging about
+				if (document.getElementById('remove_witnesses_div')) {
+					document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
+				}
 				OR.showOrderReadings({'container': container});
 			} else {
 				if (CL.showSubreadings === true) {

@@ -29,6 +29,7 @@ CL = (function() {
       collateData = {},
       context = '',
       data = {},
+      isDirty = false, //this is currently only used for witnessEditingMode but could be expanded maybe on a project setting
       witnessEditingMode = false,
       witnessAddingMode = false,
       witnessRemovingMode = false;
@@ -56,7 +57,7 @@ CL = (function() {
   makeStandoffReading, doMakeStandoffReading, makeMainReading, getOrderedAppLines,
   loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
   calculatePosition, removeWitness, checkWitnessesAgainstProject, setUpRemoveWitnessesForm,
-  removeWitnesses, loadSavedCollation, findSaved;
+  removeWitnesses, loadSavedCollation, returnToSummaryTable;
 
   //private function declarations
   let _initialiseEditor, _initialiseProject, _setProjectConfig, _setDisplaySettings,
@@ -75,7 +76,7 @@ CL = (function() {
    _disableEventPropagation, _showCollationSettings, _checkWitnesses, _getScrollPosition,
    _getMousePosition, _displayWitnessesHover, _getWitnessesForReading,
    _findStandoffWitness, _findReadingPosById, _getPreStageChecks, _makeRegDecisionsStandoff,
-   _contextInputOnload, _removeWitnessFromUnit;
+   _contextInputOnload, _removeWitnessFromUnit, _findSaved;
 
 
   //*********  public functions *********
@@ -1569,6 +1570,7 @@ CL = (function() {
         CL.services.saveCollation(CL.context, collation, confirm_message, approval_settings[0], approval_settings[1], function(saved_successful) {
           document.getElementById('message_panel').innerHTML = saved_successful ? success_message : '';
           if (saved_successful) { //only run success callback if successful!
+            CL.isDirty = false;
             if (typeof success_callback !== 'undefined') {
               success_callback();
             }
@@ -2275,16 +2277,16 @@ CL = (function() {
     return app_ids;
   };
 
-  //TODO: add SR_text removal
+
   _removeWitnessFromUnit = function(unit, hand) {
     var reading;
     for (let i=0; i<unit.readings.length; i+=1) {
       reading = unit.readings[i];
       if (reading.witnesses.indexOf(hand) !== -1) {
         reading.witnesses.splice(reading.witnesses.indexOf(hand), 1);
-        if (reading.witnesses.length === 0) {
+        if (reading.witnesses.length === 0) { //this was the only witness so remove the whole reading
           unit.readings[i] = null;
-        } else {
+        } else { // we are not removing the whole reading so we need to remove the data from each word in 'text'
           for (let j=0; j<reading.text.length; j+=1) {
             delete reading.text[j][hand];
             if (reading.text[j].reading.indexOf(hand) !== -1) {
@@ -2347,7 +2349,6 @@ CL = (function() {
         removeWitnesses(handsToRemove, stage);
       });
     }
-
   };
 
   removeWitnesses = function(hands, stage) {
@@ -2366,6 +2367,8 @@ CL = (function() {
     if (success === false) {
       CL.dataSettings.witness_list = witnessListCopy.slice(0);
       CL.data = JSON.parse(JSON.stringify(dataCopy));
+    } else {
+      CL.isDirty = true;
     }
     if (stage === 'regularised') {
       RG.showVerseCollation(CL.data, CL.context, CL.container);
@@ -2375,10 +2378,29 @@ CL = (function() {
     SPN.remove_loading_overlay();
   };
 
-  //TODO: think about how to remove overlapped units if you delete the last entry
-  //also how to remove normal units if you delete the last entry in the last reading
+  returnToSummaryTable = function () {
+    var ok;
+    //save warning
+    if (CL.isDirty) {
+      ok = confirm('Changes have been made to the witnesses since this collation was last saved.\nThese changes will be lost if you return to the summary table.\n\nAre you sure you want to return to the summary table?');
+    } else {
+      ok = true;
+    }
+    if (ok) {
+      //return to Table
+      //remove the witness removal window if shown
+      if (document.getElementById('remove_witnesses_div')) {
+        document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
+      }
+      document.getElementById('container').innerHTML = '<div id="saved_collations_div"></div>';
+      _findSaved(CL.context);
+    }
+  }
+
+
+  //NB: special all gap pop up units will sort themselves out in the display phase
   removeWitness = function(hand) {
-    var documentId;
+    var documentId, genuineReadingFound;
     //check it isn't the overtext which cannot be remved
     if (hand === CL.data.overtext_name) {
       alert('The basetext cannot be removed. This verse must be recollated with a new basetext.');
@@ -2390,7 +2412,23 @@ CL = (function() {
         if (key.indexOf('apparatus') !== -1) {
           for (let i=0; i<CL.data[key].length; i+=1) {
             _removeWitnessFromUnit(CL.data[key][i], hand);
+            if (key === 'apparatus') { //this is a main apparatus unit so delete if only om and lac readings remain
+              genuineReadingFound = false;
+              for (let j=0; j<CL.data[key][i].readings.length; j+=1) {
+                if (CL.data[key][i].readings[j].text.length > 0 || CL.data[key][i].readings[j].hasOwnProperty('SR_text')) {
+                  genuineReadingFound = true;
+                }
+              }
+              if (genuineReadingFound === false) {
+                CL.data[key][i] = null;
+              }
+            } else { //this is an overlapped unit so if only one reading remains delete it
+              if (CL.data[key][i].readings.length === 1) {
+                CL.data[key][i] = null;
+              }
+            }
           }
+          CL.removeNullItems(CL.data[key]);
         }
       }
     }
@@ -2476,7 +2514,7 @@ CL = (function() {
         if (document.getElementById('settings')) {
           document.getElementById('settings').parentNode.removeChild(document.getElementById('settings'));
         }
-        findSaved();
+        _findSaved();
       });
     }
   };
@@ -2873,7 +2911,7 @@ CL = (function() {
   };
 
   /* Initial page load functions */
-  findSaved = function(context) {
+  _findSaved = function(context) {
     var context;
     SPN.show_loading_overlay();
     if (context === undefined) {
@@ -3074,7 +3112,7 @@ CL = (function() {
             witnessComparisonClass = 'same';
             hoveroverText = ''
           }
-          html.push('<td title="' + hoveroverText + '" class="' + witnessComparisonClass + '">' + by_user[user].regularised.radio_button + '</td>');
+          html.push('<td title="' + hoveroverText + '" class="regularised ' + witnessComparisonClass + '">' + by_user[user].regularised.radio_button + '</td>');
         } else {
           html.push('<td></td>');
         }
@@ -3096,7 +3134,7 @@ CL = (function() {
             witnessComparisonClass = 'same';
             hoveroverText = ''
           }
-          html.push('<td title="' + hoveroverText + '" class="' + witnessComparisonClass + '">' + by_user[user].set.radio_button + '</td>');
+          html.push('<td title="' + hoveroverText + '" class="set ' + witnessComparisonClass + '">' + by_user[user].set.radio_button + '</td>');
         } else {
           html.push('<td></td>');
         }
@@ -3104,19 +3142,19 @@ CL = (function() {
           if (by_user[user].ordered.witness_comparison[0] === false) {
             witnessComparisonClass = by_user[user].ordered.witness_comparison[1];
             if (witnessComparisonClass === 'added') {
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added they must be added at a previous stage and this stage must be completed again.';
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added. This cannot be fixed at the order readings stage. The witnesses must be added at a previous stage and this stage must be completed again.';
             } else if (witnessComparisonClass === 'removed') {
               hasCollationsWithWitsToRemove = true;
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed.';
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed. This cannot be fixed at the order readings stage. The witnesses must be removed at a previous stage and this stage must be completed again.';
             } else if (witnessComparisonClass === 'both') {
               hasCollationsWithWitsToRemove = true;
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added.';
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added. This cannot be fixed at the order readings stage. The witnesses must be removed at a previous stage and this stage must be completed again.';
             }
           } else {
             witnessComparisonClass = 'same';
             hoveroverText = ''
           }
-          html.push('<td title="' + hoveroverText + '" class="' + witnessComparisonClass + '">' + by_user[user].ordered.radio_button + '</td>');
+          html.push('<td title="' + hoveroverText + '" class="ordered ' + witnessComparisonClass + '">' + by_user[user].ordered.radio_button + '</td>');
         } else {
           html.push('<td></td>');
         }
@@ -3124,19 +3162,19 @@ CL = (function() {
           if (approved.witness_comparison[0] === false) {
             witnessComparisonClass = approved.witness_comparison[1];
             if (witnessComparisonClass === 'added') {
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added they must be added at a previous stage and this stage must be completed again.';
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added. This cannot be fixed in an approved collation. The witnesses must be added at a previous stage, order readings redone and then the new version must be approved.';
             } else if (witnessComparisonClass === 'removed') {
               hasCollationsWithWitsToRemove = true;
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed.';
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed. This cannot be fixed in an approved collation. The witnesses must be removed at a previous stage, order readings redone and then the new version must be approved.';
             } else if (witnessComparisonClass === 'both') {
               hasCollationsWithWitsToRemove = true;
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added.';
+              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added. This cannot be fixed in an approved collation. The witnesses must be removed and added at a previous stage, order readings redone and then the new version must be approved.';
             }
           } else {
             witnessComparisonClass = 'same';
             hoveroverText = ''
           }
-          html.push('<td title="' + hoveroverText + '" class="' + witnessComparisonClass + '" rowspan="' + userCount +'">' + approved.radio_button + '</td>');
+          html.push('<td title="' + hoveroverText + '" class="approved ' + witnessComparisonClass + '" rowspan="' + userCount +'">' + approved.radio_button + '</td>');
           firstRow = false;
         }
         html.push('</tr>');
@@ -3156,12 +3194,13 @@ CL = (function() {
     }
     $(':radio').on('click', function() {
       if ($(this).is(':checked')) {
-        if ($(this).hasClass('added') || $(this).hasClass('both')) {
+
+        if ( ( $(this).parent().hasClass('regularised') || $(this).parent().hasClass('set') ) && ( $(this).hasClass('added') || $(this).hasClass('both')) ) {
           $('#load_saved_add_button').removeClass('pure-button-disabled');
         } else {
           $('#load_saved_add_button').addClass('pure-button-disabled');
         }
-        if ($(this).hasClass('removed') || $(this).hasClass('both')) {
+        if ( ( $(this).parent().hasClass('regularised') || $(this).parent().hasClass('set') ) && ( $(this).hasClass('removed') || $(this).hasClass('both') ) ) {
           $('#load_saved_remove_button').removeClass('pure-button-disabled');
         } else {
           $('#load_saved_remove_button').addClass('pure-button-disabled');
@@ -3200,6 +3239,7 @@ CL = (function() {
   loadSavedCollation = function(id) {
     var i, value, bk, data, coll_id, temp, witnessStatus;
     console.log('loading saved')
+    CL.isDirty = false;
     SPN.show_loading_overlay();
     if (id === undefined) {
       data = cforms.serialiseForm('saved_collation_form');
@@ -4784,7 +4824,7 @@ CL = (function() {
     removeWitnesses: removeWitnesses,
     checkWitnessesAgainstProject: checkWitnessesAgainstProject,
     loadSavedCollation: loadSavedCollation,
-    findSaved: findSaved,
+    returnToSummaryTable: returnToSummaryTable,
 
     //deprecated function mapping for calls from older services
     set_service_provider: setServiceProvider,

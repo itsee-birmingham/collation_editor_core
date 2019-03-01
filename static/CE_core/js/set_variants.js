@@ -86,18 +86,19 @@ SV = (function () {
 		} else {
 			container = document.getElementsByTagName('body')[0];
 		}
-
-		//attach right click menus
-		SimpleContextMenu.setup({'preventDefault' : true, 'preventForms' : false});
-		SimpleContextMenu.attach('unit', function () {return _makeMenu('unit');});
-		SimpleContextMenu.attach('overlap_unit', function () {return _makeMenu('overlap_unit');});
-		SimpleContextMenu.attach('split_unit_a', function () {return _makeMenu('split_unit_a');});
-		SimpleContextMenu.attach('split_unit', function () {return _makeMenu('split_unit');});
-		SimpleContextMenu.attach('overlap_split_unit_a', function () {return _makeMenu('overlap_split_unit_a');});
-		SimpleContextMenu.attach('overlap_split_unit', function () {return _makeMenu('overlap_split_unit');});
-		SimpleContextMenu.attach('split_omlac_unit', function () {return _makeMenu('split_omlac_unit');});
-		SimpleContextMenu.attach('split_duplicate_unit', function () {return _makeMenu('split_duplicate_unit');});
-		SimpleContextMenu.attach('subreading', function () {return _makeMenu('subreading');});
+		if (CL.witnessEditingMode === false) {
+			//attach right click menus
+			SimpleContextMenu.setup({'preventDefault' : true, 'preventForms' : false});
+			SimpleContextMenu.attach('unit', function () {return _makeMenu('unit');});
+			SimpleContextMenu.attach('overlap_unit', function () {return _makeMenu('overlap_unit');});
+			SimpleContextMenu.attach('split_unit_a', function () {return _makeMenu('split_unit_a');});
+			SimpleContextMenu.attach('split_unit', function () {return _makeMenu('split_unit');});
+			SimpleContextMenu.attach('overlap_split_unit_a', function () {return _makeMenu('overlap_split_unit_a');});
+			SimpleContextMenu.attach('overlap_split_unit', function () {return _makeMenu('overlap_split_unit');});
+			SimpleContextMenu.attach('split_omlac_unit', function () {return _makeMenu('split_omlac_unit');});
+			SimpleContextMenu.attach('split_duplicate_unit', function () {return _makeMenu('split_duplicate_unit');});
+			SimpleContextMenu.attach('subreading', function () {return _makeMenu('subreading');});
+		}
 
 		//sort out header and main page
 		document.getElementById('header').innerHTML = CL.getHeaderHtml('Set Variants', CL.context);
@@ -112,11 +113,16 @@ SV = (function () {
 		footer_html = [];
 		footer_html.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
 		footer_html.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">show subreadings</button>');
-		footer_html.push('<span id="extra_buttons"></span>');
-		footer_html.push('<span id="stage_links"></span>');
-		footer_html.push('<button class="pure-button right_foot" id="move_to_reorder_button">Move to Reorder Variants</button>');
+		if (CL.witnessEditingMode === false) {
+			footer_html.push('<span id="extra_buttons"></span>');
+			footer_html.push('<span id="stage_links"></span>');
+		}
+		if (CL.witnessEditingMode === true) {
+      footer_html.push('<button class="pure-button right_foot" id="return_to_saved_table_button">Return to summary table</button>');
+    } else {
+			footer_html.push('<button class="pure-button right_foot" id="move_to_reorder_button">Move to Reorder Variants</button>');
+		}
 		footer_html.push('<button class="pure-button right_foot" id="save">Save</button>');
-		//footer_html.push('<button class="pure-button right_foot" id="show_hide_shared_units">Show Shared Units</button>');
 		footer_html.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
 		footer_html.push('<button class="pure-button right_foot" id="undo_button" style="display:none">undo</button>');
 		$('#footer').addClass('pure-form'); //this does the styling of the select elements in the footer using pure (they cannot be styled individually)
@@ -159,6 +165,11 @@ SV = (function () {
 			SR.loseSubreadings();
 			CL.saveCollation('set');
 		});
+
+		//TODO: this code is repeated in RG - put in function?
+		$('#return_to_saved_table_button').on('click', function() {
+			CL.returnToSummaryTable();
+    });
 
 		$('#highlighted').on('change', function (event) {_highlightWitness(event.target.value);});
 		if (document.getElementById('undo_button')) {
@@ -217,7 +228,6 @@ SV = (function () {
 								unprepareForOperation();
 					    };
 						CL.setUpRemoveWitnessesForm(wits[2], CL.data, 'set', removeFunction);
-            //_setUpSVRemoveWitnessesForm(wits[2], CL.data); //this uses a special SV one because we need to prepare and unprepare
           }, 'text');
         }
         if ((wits[1] === 'added' || wits[1] === 'both') && CL.witnessAddingMode === true) {
@@ -260,8 +270,10 @@ SV = (function () {
 			CL.addHoverEvents(row);
 		}
 		SPN.remove_loading_overlay();
-		//initialise DnD
-		_redipsInitSV(CL.data.apparatus.length);
+		if (CL.witnessEditingMode === false) {
+			//initialise DnD
+			_redipsInitSV(CL.data.apparatus.length);
+		}
 
 		if (SV.undoStack.length > 0) {
 			document.getElementById("undo_button").style.display = 'inline';

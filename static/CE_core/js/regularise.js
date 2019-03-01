@@ -301,7 +301,6 @@ RG = (function() {
         }
       }
     }
-
     CL.lacOmFix();
     temp = CL.getUnitLayout(CL.data.apparatus, 1, 'regularise', options);
     header = CL.getCollationHeader(CL.data, temp[1], false);
@@ -343,7 +342,7 @@ RG = (function() {
       footerHtml.push('<span id="extra_buttons"></span>');
     }
     if (CL.witnessEditingMode === true) {
-      footerHtml.push('<button class="pure-button right_foot" id="return_to_saved_table_button">return to summary table</button>');
+      footerHtml.push('<button class="pure-button right_foot" id="return_to_saved_table_button">Return to summary table</button>');
     } else {
       footerHtml.push('<button class="pure-button right_foot" id="go_to_sv_button">move to set variants</button>');
     }
@@ -354,7 +353,7 @@ RG = (function() {
     }
     footerHtml.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
     document.getElementById('footer').innerHTML = footerHtml.join('');
-
+    
     SPN.remove_loading_overlay();
     CL.addExtraFooterButtons('regularised');
     CL.addStageLinks();
@@ -406,18 +405,9 @@ RG = (function() {
   };
 
   _addFooterFunctions = function () {
-    $('#return_to_saved_table_button').on('click', function(){
-      //save warning - it might be worth having a saved flag which is set to false when a removal is successful and true on save
-      //so we can accurate warnings
-
-      //return to Table
-      //remove the witness removal window if shown
-  		if (document.getElementById('remove_witnesses_div')) {
-        document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
-      }
-      document.getElementById('container').innerHTML = '<div id="saved_collations_div"></div>'
-      CL.findSaved(CL.context);
-
+    //TODO: this code is repeated in SV - put in function?
+    $('#return_to_saved_table_button').on('click', function() {
+      	CL.returnToSummaryTable();
     });
     $('#go_to_sv_button').on('click',
       function(event) {

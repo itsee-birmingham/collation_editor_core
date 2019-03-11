@@ -3144,10 +3144,10 @@ CL = (function() {
             if (witnessComparisonClass === 'added') {
               hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added. This cannot be fixed at the order readings stage. The witnesses must be added at a previous stage and this stage must be completed again.';
             } else if (witnessComparisonClass === 'removed') {
-              hasCollationsWithWitsToRemove = true;
+              //hasCollationsWithWitsToRemove = true;
               hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed. This cannot be fixed at the order readings stage. The witnesses must be removed at a previous stage and this stage must be completed again.';
             } else if (witnessComparisonClass === 'both') {
-              hasCollationsWithWitsToRemove = true;
+              //hasCollationsWithWitsToRemove = true;
               hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added. This cannot be fixed at the order readings stage. The witnesses must be removed at a previous stage and this stage must be completed again.';
             }
           } else {
@@ -3164,10 +3164,10 @@ CL = (function() {
             if (witnessComparisonClass === 'added') {
               hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added. This cannot be fixed in an approved collation. The witnesses must be added at a previous stage, order readings redone and then the new version must be approved.';
             } else if (witnessComparisonClass === 'removed') {
-              hasCollationsWithWitsToRemove = true;
+              //hasCollationsWithWitsToRemove = true;
               hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed. This cannot be fixed in an approved collation. The witnesses must be removed at a previous stage, order readings redone and then the new version must be approved.';
             } else if (witnessComparisonClass === 'both') {
-              hasCollationsWithWitsToRemove = true;
+              //hasCollationsWithWitsToRemove = true;
               hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added. This cannot be fixed in an approved collation. The witnesses must be removed and added at a previous stage, order readings redone and then the new version must be approved.';
             }
           } else {

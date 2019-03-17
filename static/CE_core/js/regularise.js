@@ -12,11 +12,11 @@ RG = (function() {
       _forGlobalExceptions = [];
 
   //public function declarations
-  let getCollationData, getUnitData, recollate, showVerseCollation, allRuleStacksEmpty;
+  let getCollationData, getUnitData, recollate, runCollation, showVerseCollation, allRuleStacksEmpty;
 
   //private function declarations
   let _calculateLacWits, _hasRuleApplied, _getDisplayClasses, _getToken, _getWordTokenForWitness,
-  _hasDeletionScheduled, _getRegWitsAsString, _runCollation, _integrateLacOmReadings,
+  _hasDeletionScheduled, _getRegWitsAsString, _integrateLacOmReadings,
   _doRunCollation, _showSettings, _fetchRules, _removeUnrequiredData, _showRegularisations,
   _highlightWitness, _addNewToken, _getWordIndexForWitness, _createRule, _getDisplaySettingValue,
   _setUpRuleMenu, _getRuleScopes, _getSuffix, _makeMenu, _redipsInitRegularise,
@@ -43,7 +43,7 @@ RG = (function() {
             if (typeof callback !== 'undefined') {
               callback();
             } else {
-              _runCollation(CL.collateData, output, scroll_offset);
+              runCollation(CL.collateData, output, scroll_offset);
             }
           });
         });
@@ -237,10 +237,10 @@ RG = (function() {
     }
     if ($.isEmptyObject(CL.collateData)) {
       getCollationData('units', scroll_offset, function() {
-        _runCollation(CL.collateData, 'units', scroll_offset);
+        runCollation(CL.collateData, 'units', scroll_offset);
       }); //collation_source, output, scroll_offset, callback
     } else {
-      _runCollation(CL.collateData, 'units', scroll_offset);
+      runCollation(CL.collateData, 'units', scroll_offset);
     }
   };
 
@@ -353,7 +353,7 @@ RG = (function() {
     }
     footerHtml.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
     document.getElementById('footer').innerHTML = footerHtml.join('');
-    
+
     SPN.remove_loading_overlay();
     CL.addExtraFooterButtons('regularised');
     CL.addStageLinks();
@@ -605,9 +605,9 @@ RG = (function() {
     return new_wits.join(', ');
   };
 
-  _runCollation = function(collation_data, output, scroll_offset) {
+  runCollation = function(collation_data, output, scroll_offset, callback) {
     var rule_list;
-    //put all the rules in a sinlge list
+    //put all the rules in a single list
     rule_list = [];
     for (let key in _rules) {
       if (_rules.hasOwnProperty(key)) {
@@ -619,7 +619,7 @@ RG = (function() {
       _forGlobalExceptions = [];
       _rules = {};
       _fetchRules(collation_data, function(rules) {
-        _doRunCollation(collation_data, rules, output, scroll_offset);
+        _doRunCollation(collation_data, rules, output, scroll_offset, callback);
       });
     });
   };
@@ -668,7 +668,7 @@ RG = (function() {
     return data;
   };
 
-  _doRunCollation = function(collation_data, rules, output, scroll_offset) {
+  _doRunCollation = function(collation_data, rules, output, scroll_offset, callback) {
     var options, setting, result_callback, data_settings,
       algorithm_settings, displaySettings;
     options = {};
@@ -709,6 +709,11 @@ RG = (function() {
       }
     }
     options.algorithm_settings = algorithm_settings;
+
+    if (output === 'add_witnesses') {
+      result_callback = function(data) {
+        callback(data);
+      }
     //TODO: this needs deleting or moving to services
     // if (output === 'table') {
     //   if (document.getElementById('book').value !== 'none' &&
@@ -728,7 +733,7 @@ RG = (function() {
     //     return;
     //   }
     //
-    // } else {
+    } else {
       result_callback = function(data) {
         if (data === null) {
           alert(CL.context + ' does not collate.');
@@ -745,11 +750,7 @@ RG = (function() {
           document.getElementById('scroller').scrollTop = scroll_offset[1];
         }
       };
-    // }
-    // options.error = function() {
-    //   alert(CL.context + ' does not collate.');
-    //   SPN.remove_loading_overlay();
-    // };
+    }
     CL.services.doCollation(CL.context, options, result_callback);
   };
 
@@ -1470,6 +1471,7 @@ RG = (function() {
   return {
 
     showRegularisations: showRegularisations,
+    runCollation: runCollation,
 
     getCollationData: getCollationData,
     getUnitData: getUnitData,

@@ -76,7 +76,9 @@ CL = (function() {
    _disableEventPropagation, _showCollationSettings, _checkWitnesses, _getScrollPosition,
    _getMousePosition, _displayWitnessesHover, _getWitnessesForReading,
    _findStandoffWitness, _findReadingPosById, _getPreStageChecks, _makeRegDecisionsStandoff,
-   _contextInputOnload, _removeWitnessFromUnit, _findSaved;
+   _contextInputOnload, _removeWitnessFromUnit, _findSaved, _addToSavedCollation,
+   _prepareAdditionalCollation, _displaySavedCollation, _mergeCollationObjects,
+   _getUnitByStartIndex;
 
 
   //*********  public functions *********
@@ -2898,7 +2900,7 @@ CL = (function() {
   };
 
   _prepareCollation = function(output) {
-    var language, base_text, options, context;
+    var language, base_text, context;
     SPN.show_loading_overlay();
     CL.dataSettings.language = document.getElementById('language').value;
     CL.dataSettings.base_text = document.getElementById('base_text').value;
@@ -3226,7 +3228,7 @@ CL = (function() {
       CL.witnessEditingMode = true;
       CL.witnessAddingMode = true;
       CL.witnessRemovingMode = false;
-      loadSavedCollation();
+      _addToSavedCollation();
     });
     $('#load_saved_remove_button').on('click', function(event) {
       CL.witnessEditingMode = true;
@@ -3234,6 +3236,187 @@ CL = (function() {
       CL.witnessRemovingMode = true;
       loadSavedCollation();
     });
+  };
+
+  _addToSavedCollation = function(id) {
+    var data, coll_id;
+    console.log('loading saved');
+    if (id === undefined) {
+      data = cforms.serialiseForm('saved_collation_form');
+      coll_id = data.saved_collation;
+    } else {
+      coll_id = id;
+    }
+    CL.services.loadSavedCollation(coll_id, function(collation) {
+      CL.services.getCurrentEditingProject(function(project) {
+        var temp, witsToAdd;
+        if (collation) {
+          temp = checkWitnessesAgainstProject(collation.data_settings.witness_list, project.witnesses);
+          witsToAdd = temp[3];
+          if (temp[3].length === 0) {
+            alert('No witnesses were found to add') //should never happen but just in case - TODO: it should then reload the table
+            return;
+          }
+          _prepareAdditionalCollation(collation, witsToAdd);
+        }
+      });
+    });
+  };
+
+  _prepareAdditionalCollation = function(existing_collation, witsToAdd) {
+    var context;
+    SPN.show_loading_overlay();
+    CL.dataSettings.language = document.getElementById('language').value;
+    CL.dataSettings.base_text = document.getElementById('base_text').value;
+    context = existing_collation.context;
+    if (context && CL.dataSettings.base_text !== 'none') {
+      CL.context = context;
+      CL.dataSettings.witness_list = witsToAdd;
+      CL.dataSettings.witness_list.push(CL.dataSettings.base_text);
+      RG.getCollationData('add_witnesses', 0, function () {
+        //TODO: when running the collation is must use the display settings from the existing collation at least when loading into SV - will need to think carefully about RG
+          RG.runCollation(CL.collateData, 'add_witnesses', 0, function (data) {
+            var mergedCollation;
+            console.log('This is your collation data');
+            console.log(data);
+            console.log('this is your existing collation');
+            console.log(existing_collation);
+            if (CL.context === existing_collation.context) { //assume CL.context agrees with the new data since it was used to fetch it
+              if (data.overtext_name === existing_collation.structure.overtext_name) { //check we have basetext agreement
+                mergedCollation = _mergeCollationObjects(JSON.parse(JSON.stringify(existing_collation)), data, witsToAdd);
+                _displaySavedCollation(mergedCollation)
+
+                //merge collation objects-
+                //set CL data stuff correctly unless this is done as part of the load which I think it probably is.
+                //remember the witnesses that were added (you should show the list somewhere probably)
+                //add button to highlight all readings with added witnesses (this will need support in the show... functions which currently only allows for 1)
+
+
+              } else {
+                alert('The new witnesses could not be added this time due to a problem with the basetexts, please try again.');
+                //TODO: reload summary page?
+                SPN.remove_loading_overlay();
+              }
+            } else {
+              alert('The new witnesses could not be added this time due to a problem with the context selected, please try again.');
+              //TODO: reload summary page?
+              SPN.remove_loading_overlay();
+            }
+          });
+      });
+    }
+  };
+
+  _mergeCollationObjects = function (mainCollation, newData, addedWits) {
+    var unit, index, newUnit, existingUnit;
+    //add the witnesses to data_settings.witness_list
+    for (let i=0; i<addedWits.length; i+=1) {
+      if (mainCollation.data_settings.witness_list.indexOf(addedWits[i]) === -1) {
+        mainCollation.data_settings.witness_list.push(addedWits[i]);
+      }
+    }
+    //add any new lac readings
+    for (let i=0; i<newData.lac_readings.length; i+=1) {
+      if (mainCollation.structure.lac_readings.indexOf(newData.lac_readings[i]) === -1) {
+        mainCollation.structure.lac_readings.push(newData.lac_readings[i]);
+      }
+    }
+    //add any new om readings
+    for (let i=0; i<newData.om_readings.length; i+=1) {
+      if (mainCollation.structure.om_readings.indexOf(newData.om_readings[i]) === -1) {
+        mainCollation.structure.om_readings.push(newData.om_readings[i]);
+      }
+    }
+    //update hand_id_map
+    for (let key in newData.hand_id_map) {
+      if (newData.hand_id_map.hasOwnProperty(key)) {
+        if (!mainCollation.structure.hand_id_map.hasOwnProperty(key)) {
+          mainCollation.structure.hand_id_map[key] = newData.hand_id_map[key];
+        }
+      }
+    }
+    //should move index point by index point - check what we have in each list
+    //if in existing and not new add new as om/lac verse/om_verse
+    //if in new and not existing all existing needs to be om lac verse/om verse
+    //make reading for any combined or shared units and check against existing readings
+    index = 1; //this refers to the position indicated by numbers under the basetext
+    while (index<=(newData.overtext[0].tokens.length*2)+1) {
+      console.log(index);
+      //if new data has one then
+      newUnit = _getUnitByStartIndex(index, newData.apparatus);
+      existingUnit = _getUnitByStartIndex(index, mainCollation.structure.apparatus);
+      if (newUnit === null && existingUnit === null) {
+        console.log('no units found');
+        index += 1;
+      } else {
+        console.log('new unit found: ');
+        console.log(newUnit);
+        console.log('existing unit found: ');
+        console.log(existingUnit);
+        if (newUnit === null) {
+          console.log('om must be added to exsiting for new witnesses');
+          index += 1;
+        } else if (existingUnit === null) {
+          console.log('we must add a new unit');
+          index += 1;
+        } else {
+          if (newUnit.end == existingUnit.end) {
+            console.log('we agree on ends so just merge');
+            if (index !== newUnit.end) {
+              index = newUnit.end;
+            } else {
+              index += 1;
+            }
+
+          } else {
+            console.log('we disagree on ends so more needs to be done!')
+            if (index !== existingUnit.end) {
+              index = existingUnit.end;
+            } else {
+              index += 1;
+            }
+            //index = existingUnit.end; //assuming that will be the larger one for now - needs to be better
+            
+          }
+
+        }
+      }
+    }
+
+    // for (let i=0; i<mainCollation.structure.apparatus.length; i+=1) {
+    //   unit = mainCollation.structure.apparatus[i];
+    //   for (let j=0; j<unit.readings.length; j+=1) {
+    //     //Here need to consider how new readings are added if no lac_verse or om_verse to add to.
+    //     //om_verse could also check for an overlapped om_verse
+    //     //(but be wary of the top line changes which will also be needed - should just add as duplicate and let user decide)
+    //     if (unit.readings[j].hasOwnProperty('type')) {
+    //       if (unit.readings[j].type === 'lac_verse' && newData.lac_readings.length > 0) {
+    //         for (let k=0; k<newData.lac_readings.length; k+=1) {
+    //           if (unit.readings[j].witnesses.indexOf(newData.lac_readings[k]) === -1) {
+    //             unit.readings[j].witnesses.push(newData.lac_readings[k]);
+    //           }
+    //         }
+    //         //untested but same code as above
+    //       } else if (unit.readings[j].type === 'om_verse' && newData.om_readings.length > 0) {
+    //         for (let k=0; k<newData.om_readings.length; k+=1) {
+    //           if (unit.readings[j].witnesses.indexOf(newData.om_readings[k]) === -1) {
+    //             unit.readings[j].witnesses.push(newData.om_readings[k]);
+    //           }
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
+    return mainCollation;
+  };
+
+  _getUnitByStartIndex = function (startIndex, unitList) {
+    for (let i=0; i<unitList.length; i+=1) {
+      if (unitList[i].start == startIndex) {
+        return unitList[i];
+      }
+    }
+    return null;
   };
 
   loadSavedCollation = function(id) {
@@ -3247,8 +3430,13 @@ CL = (function() {
     } else {
       coll_id = id;
     }
-    CL.services.loadSavedCollation(coll_id, function(collation) {
-      var temp, witsToRemove, witsToAdd, options;
+    CL.services.loadSavedCollation(coll_id, function (collation) {
+      _displaySavedCollation(collation);
+    });
+  };
+
+  _displaySavedCollation = function (collation) {
+      var options;
       if (collation) {
         CL.context = collation.context;
         CL.data = collation.structure;
@@ -3290,7 +3478,6 @@ CL = (function() {
       } else {
         SPN.remove_loading_overlay();
       }
-    });
   };
 
   _getSubreadingWitnessData = function(reading, witness) {

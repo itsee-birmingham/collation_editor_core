@@ -61,7 +61,7 @@ class PreProcessor(Regulariser):
             #if this matches and either the duplicate_pos key is not present or it is present and === 1 then we have a base text.
             #it is not clear how the NTVMR will supply duplicate verses because I don't think they have thought about it yet so this may not work accurately for their stuff
             #however it shouldn't break it just might not always select the first occurrence.
-            if transcription_verse['transcription'] == basetext_transcription:
+            if transcription_verse['transcription'] == basetext_transcription or transcription_verse['transcription_identifier'] == basetext_transcription:
                 if verse == None and ('duplicate_position' not in transcription_verse
                                         or transcription_verse['duplicate_position'] == None
                                         or transcription_verse['duplicate_position'] == 1):
@@ -220,7 +220,7 @@ class PreProcessor(Regulariser):
             rule_conditions_config=self.rule_conds_config
             )
         try:
-            output = pp.produce_variant_units()            
+            output = pp.produce_variant_units()
         except DataInputException :
             raise DataInputException
         return output

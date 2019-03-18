@@ -74,7 +74,7 @@ SV = (function () {
 	showSetVariants = function (options) {
 		var html, i, unit_button, temp, header, event_rows, num, key, overlaps, app_ids,
 		error_panel_html, row, hands, result, undo_button, footer_html, overlap_options, new_overlap_options;
-		//console.log(CL.data);
+		console.log(CL.data);
 		if (typeof options === 'undefined') {
 			options = {};
 		}
@@ -86,7 +86,7 @@ SV = (function () {
 		} else {
 			container = document.getElementsByTagName('body')[0];
 		}
-		if (CL.witnessEditingMode === false) {
+		//if (CL.witnessEditingMode === false) {
 			//attach right click menus
 			SimpleContextMenu.setup({'preventDefault' : true, 'preventForms' : false});
 			SimpleContextMenu.attach('unit', function () {return _makeMenu('unit');});
@@ -98,7 +98,7 @@ SV = (function () {
 			SimpleContextMenu.attach('split_omlac_unit', function () {return _makeMenu('split_omlac_unit');});
 			SimpleContextMenu.attach('split_duplicate_unit', function () {return _makeMenu('split_duplicate_unit');});
 			SimpleContextMenu.attach('subreading', function () {return _makeMenu('subreading');});
-		}
+		//}
 
 		//sort out header and main page
 		document.getElementById('header').innerHTML = CL.getHeaderHtml('Set Variants', CL.context);
@@ -237,7 +237,11 @@ SV = (function () {
     }
 
 		prepareForOperation();
+		console.log('pre-lacom fix');
+		console.log(JSON.parse(JSON.stringify(CL.data)));
 		CL.lacOmFix(); //also does extra gaps
+		console.log('ran lacom fix')
+		console.log(JSON.parse(JSON.stringify(CL.data)));
 		unprepareForOperation();
 
 		temp = CL.getUnitLayout(CL.data.apparatus, 1, 'set_variants', options);
@@ -270,10 +274,10 @@ SV = (function () {
 			CL.addHoverEvents(row);
 		}
 		SPN.remove_loading_overlay();
-		if (CL.witnessEditingMode === false) {
+		//if (CL.witnessEditingMode === false) {
 			//initialise DnD
 			_redipsInitSV(CL.data.apparatus.length);
-		}
+		//}
 
 		if (SV.undoStack.length > 0) {
 			document.getElementById("undo_button").style.display = 'inline';
@@ -4678,6 +4682,9 @@ SV = (function () {
 		checkBugStatus: checkBugStatus,
 		checkStandoffReadingProblems: checkStandoffReadingProblems,
 		areAllUnitsComplete: areAllUnitsComplete,
+
+		//TODO: properly make this public!
+		_combineReadings: _combineReadings,
 
 	};
 }());

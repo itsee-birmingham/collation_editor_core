@@ -78,7 +78,7 @@ CL = (function() {
    _findStandoffWitness, _findReadingPosById, _getPreStageChecks, _makeRegDecisionsStandoff,
    _contextInputOnload, _removeWitnessFromUnit, _findSaved, _addToSavedCollation,
    _prepareAdditionalCollation, _displaySavedCollation, _mergeCollationObjects,
-   _getUnitByStartIndex;
+   _getUnitByStartIndex, _mergeNewLacOmVerseReadings, _mergeNewReading;
 
 
   //*********  public functions *********
@@ -3277,12 +3277,17 @@ CL = (function() {
         //TODO: when running the collation is must use the display settings from the existing collation at least when loading into SV - will need to think carefully about RG
           RG.runCollation(CL.collateData, 'add_witnesses', 0, function (data) {
             var mergedCollation;
+            CL.data = data; //temporary assignment to allow all the cleaning functions to work
+            lacOmFix();
+            data = JSON.parse(JSON.stringify(CL.data)); //copy so we can change CL.data without screwing this up
             console.log('This is your collation data');
-            console.log(data);
+            console.log(JSON.parse(JSON.stringify(data)));
             console.log('this is your existing collation');
             console.log(existing_collation);
             if (CL.context === existing_collation.context) { //assume CL.context agrees with the new data since it was used to fetch it
               if (data.overtext_name === existing_collation.structure.overtext_name) { //check we have basetext agreement
+                // console.log('*********************')
+                // console.log(JSON.parse(JSON.stringify(data)))
                 mergedCollation = _mergeCollationObjects(JSON.parse(JSON.stringify(existing_collation)), data, witsToAdd);
                 _displaySavedCollation(mergedCollation)
 
@@ -3308,7 +3313,11 @@ CL = (function() {
   };
 
   _mergeCollationObjects = function (mainCollation, newData, addedWits) {
-    var unit, index, newUnit, existingUnit;
+    var unit, index, newUnit, existingUnit, newReadingText, matchingReadingFound,
+    unitQueue, nextUnit, unit1, unit2, tempUnit, omReading;
+    //console.log('+++++++++++++++');
+    //console.log(JSON.parse(JSON.stringify(newData)));
+    //console.log(newData.apparatus)
     //add the witnesses to data_settings.witness_list
     for (let i=0; i<addedWits.length; i+=1) {
       if (mainCollation.data_settings.witness_list.indexOf(addedWits[i]) === -1) {
@@ -3341,73 +3350,151 @@ CL = (function() {
     //make reading for any combined or shared units and check against existing readings
     index = 1; //this refers to the position indicated by numbers under the basetext
     while (index<=(newData.overtext[0].tokens.length*2)+1) {
-      console.log(index);
       //if new data has one then
       newUnit = _getUnitByStartIndex(index, newData.apparatus);
       existingUnit = _getUnitByStartIndex(index, mainCollation.structure.apparatus);
+      if (existingUnit !== null && (newData.lac_readings.length > 0 || newData.om_readings.length > 0)) {
+        _mergeNewLacOmVerseReadings(existingUnit, newData);
+      }
       if (newUnit === null && existingUnit === null) {
-        console.log('no units found');
         index += 1;
       } else {
-        console.log('new unit found: ');
-        console.log(newUnit);
-        console.log('existing unit found: ');
-        console.log(existingUnit);
+        if (index === 2) {
+          console.log('new unit found: ');
+          console.log(JSON.parse(JSON.stringify(newUnit)));
+          console.log('existing unit found: ');
+          console.log(existingUnit);
+        }
+
+
+//adedd Wits give identifier not siglum so doesn't work properly. Basetext also
+//needs to be checked for but can probably assume that it is in the om reading for this scenario
+//so once you added wits list is hands you should be able to fix this.
         if (newUnit === null) {
-          console.log('om must be added to exsiting for new witnesses');
+          console.log('om must be added to existing for new witnesses');
+          console.log(addedWits)
+          for (let i=0; i<existingUnit.readings.length; i+=1) {
+            if (existingUnit.readings[i].hasOwnProperty('type') && existingUnit.readings[i].type == 'om') {
+              omReading = existingUnit.readings[i];
+              console.log('OMreading found');
+              console.log(newData.lac_readings)
+            }
+          }
+          for (let i=0; i<addedWits.length; i+=1) {
+
+            if (newData.lac_readings.indexOf(addedWits[i]) === -1 && newData.om_readings.indexOf(addedWits[i]) === -1 ) {
+              console.log('adding witness  ' + addedWits[i])
+              omReading.witnesses.push(addedWits[i]);
+            }
+          }
           index += 1;
         } else if (existingUnit === null) {
-          console.log('we must add a new unit');
+          if (index === 2) {
+            console.log('we must add a new unit');
+          }
           index += 1;
         } else {
           if (newUnit.end == existingUnit.end) {
-            console.log('we agree on ends so just merge');
-            if (index !== newUnit.end) {
-              index = newUnit.end;
-            } else {
-              index += 1;
+            if (index === 2) {
+              console.log('we agree on start and end so just merge')
             }
-
+            for (let j=0; j<newUnit.readings.length; j+=1) {
+              matchingReadingFound = false;
+              newReadingText = extractWitnessText(newUnit.readings[j]);
+              if (index === 2) {
+                console.log(newReadingText)
+              }
+              for (let k=0; k<existingUnit.readings.length; k+=1) {
+                if (extractWitnessText(existingUnit.readings[k]) === newReadingText) {
+                  matchingReadingFound = true;
+                  _mergeNewReading(existingUnit.readings[k], newUnit.readings[j]);
+                }
+              }
+              if (matchingReadingFound === false) {
+                if (index === 2) {
+                  console.log('reading must be added')
+                  console.log(JSON.parse(JSON.stringify(newUnit.readings[j])))
+                }
+                //the basetext will always have a matching reading as it is in the existing collation so don't need to worry about removing it from any added readings
+                existingUnit.readings.push(newUnit.readings[j]);
+                if (index === 2) {
+                  console.log(JSON.parse(JSON.stringify(existingUnit.readings)))
+                }
+              }
+            }
+            index = newUnit.end + 1;
           } else {
-            console.log('we disagree on ends so more needs to be done!')
-            if (index !== existingUnit.end) {
-              index = existingUnit.end;
-            } else {
-              index += 1;
+            //collect all the units covered in a stack
+            unitQueue = [newUnit];
+            for (let i=newUnit.end+1; i<=existingUnit.end; i+=1) {
+              nextUnit = _getUnitByStartIndex(i, newData.apparatus);
+              if (nextUnit !== null) {
+                unitQueue.unshift(nextUnit);
+              }
             }
-            //index = existingUnit.end; //assuming that will be the larger one for now - needs to be better
-            
+            unit1 = null;
+            while (unitQueue.length > 0) {
+              if (unit1 === null) {
+                unit1 = unitQueue.pop();
+              }
+              unit2 = unitQueue.pop();
+              tempUnit = {"start": existingUnit.start, "first_word_index": existingUnit.first_word_index, "end": unit2.end};
+              unit1 = SV._combineReadings(unit1.readings, unit2.readings, tempUnit, false);
+            }
+            for (let j=0; j<unit1.readings.length; j+=1) {
+              matchingReadingFound = false;
+              newReadingText = extractWitnessText(unit1.readings[j]);
+              for (let k=0; k<existingUnit.readings.length; k+=1) {
+                if (extractWitnessText(existingUnit.readings[k]) === newReadingText) {
+                  matchingReadingFound = true;
+                  _mergeNewReading(existingUnit.readings[k], unit1.readings[j]);
+                }
+              }
+              if (matchingReadingFound === false) {
+                //the basetext will always have a matching reading as it is in the existing collation so don't need to worry about removing it from any added readings
+                existingUnit.readings.push(unit1.readings[j]);
+              }
+            }
+            index = existingUnit.end + 1; //TODO: assuming that will be the larger one for now - needs to be better maybe
           }
-
         }
       }
     }
-
-    // for (let i=0; i<mainCollation.structure.apparatus.length; i+=1) {
-    //   unit = mainCollation.structure.apparatus[i];
-    //   for (let j=0; j<unit.readings.length; j+=1) {
-    //     //Here need to consider how new readings are added if no lac_verse or om_verse to add to.
-    //     //om_verse could also check for an overlapped om_verse
-    //     //(but be wary of the top line changes which will also be needed - should just add as duplicate and let user decide)
-    //     if (unit.readings[j].hasOwnProperty('type')) {
-    //       if (unit.readings[j].type === 'lac_verse' && newData.lac_readings.length > 0) {
-    //         for (let k=0; k<newData.lac_readings.length; k+=1) {
-    //           if (unit.readings[j].witnesses.indexOf(newData.lac_readings[k]) === -1) {
-    //             unit.readings[j].witnesses.push(newData.lac_readings[k]);
-    //           }
-    //         }
-    //         //untested but same code as above
-    //       } else if (unit.readings[j].type === 'om_verse' && newData.om_readings.length > 0) {
-    //         for (let k=0; k<newData.om_readings.length; k+=1) {
-    //           if (unit.readings[j].witnesses.indexOf(newData.om_readings[k]) === -1) {
-    //             unit.readings[j].witnesses.push(newData.om_readings[k]);
-    //           }
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
     return mainCollation;
+  };
+
+  _mergeNewReading = function (existingReading, addedReading) {
+    for (let i=0; i<addedReading.witnesses.length; i+=1) {
+      if (existingReading.witnesses.indexOf(addedReading.witnesses[i]) === -1) {
+        existingReading.witnesses.push(addedReading.witnesses[i]);
+        for (let j=0; j<addedReading.text.length; j+=1) {
+          //we can assume that there are the same number of tokens in text array in the existing reading otherwise the readings wouldn't have matched
+          existingReading.text[j].reading.push(addedReading.witnesses[i]);
+          existingReading.text[j][addedReading.witnesses[i]] = addedReading.text[j][addedReading.witnesses[i]];
+        }
+      }
+    }
+  };
+
+  _mergeNewLacOmVerseReadings = function (unit, newData) {
+    for (let i=0; i<unit.readings.length; i+=1) {
+      if (unit.readings[i].hasOwnProperty('type')) {
+        if (unit.readings[i].type === 'lac_verse' && newData.lac_readings.length > 0) {
+          for (let j=0; j<newData.lac_readings.length; j+=1) {
+            if (unit.readings[i].witnesses.indexOf(newData.lac_readings[j]) === -1) {
+              unit.readings[i].witnesses.push(newData.lac_readings[j]);
+            }
+          }
+          //untested but same code as above
+        } else if (unit.readings[i].type === 'om_verse' && newData.om_readings.length > 0) {
+          for (let j=0; j<newData.om_readings.length; j+=1) {
+            if (unit.readings[i].witnesses.indexOf(newData.om_readings[j]) === -1) {
+              unit.readings[i].witnesses.push(newData.om_readings[j]);
+            }
+          }
+        }
+      }
+    }
   };
 
   _getUnitByStartIndex = function (startIndex, unitList) {
@@ -3437,6 +3524,8 @@ CL = (function() {
 
   _displaySavedCollation = function (collation) {
       var options;
+      console.log('|||||||||||')
+      console.log(JSON.parse(JSON.stringify(collation)))
       if (collation) {
         CL.context = collation.context;
         CL.data = collation.structure;

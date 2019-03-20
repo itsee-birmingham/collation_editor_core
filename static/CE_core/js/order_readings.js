@@ -137,7 +137,7 @@ OR = (function() {
     CL.addStageLinks();
     SPN.remove_loading_overlay();
     CL.addTriangleFunctions('table');
-    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit});
+    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit, 'add_select': true, 'select_label_text': 'highlight witness'});
     $('#highlighted').on('change', function(event) {
       _highlightWitness(event.target.value);
     });
@@ -242,7 +242,7 @@ OR = (function() {
     CL.addStageLinks();
     SPN.remove_loading_overlay();
     CL.addTriangleFunctions('table');
-    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit});
+    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit, 'add_select': true, 'select_label_text': 'highlight witness'});
     $('#highlighted').on('change', function(event) {
       _highlightWitness(event.target.value, 'approved');
     });

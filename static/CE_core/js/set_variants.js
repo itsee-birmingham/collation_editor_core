@@ -56,7 +56,7 @@ SV = (function () {
   _addToUndoStack,
 	_undo, _removeSplits, _checkTAndNPresence, _checkForStandoffReading, _checkSiglaProblems,
 	_checkIndexesPresent, _checkUniqueWitnesses, _getAllUnitWitnesses, _compareIndexStrings,
-	_compareIndexes, _compareFirstWordIndexes, _setUpSVRemoveWitnessesForm;
+	_compareIndexes, _compareFirstWordIndexes, _setUpSVRemoveWitnessesForm, _highlightAddedWitness;
 
 
 	//*********  public functions *********
@@ -124,6 +124,9 @@ SV = (function () {
 		}
 		footer_html.push('<button class="pure-button right_foot" id="save">Save</button>');
 		footer_html.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
+		if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
+			footer_html.push('<select class="right_foot" id="added_highlight" name="added_highlight"></select>');
+		}
 		footer_html.push('<button class="pure-button right_foot" id="undo_button" style="display:none">undo</button>');
 		$('#footer').addClass('pure-form'); //this does the styling of the select elements in the footer using pure (they cannot be styled individually)
 		document.getElementById('footer').innerHTML = footer_html.join('');
@@ -138,8 +141,10 @@ SV = (function () {
 		//add functions and populate dropdowns etc.
 		CL.addSubreadingEvents('set_variants');
 
-		cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit});
-
+		cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit, 'add_select': true, 'select_label_details': {'label': 'highlight witness', 'value': 'none' }});
+		if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
+			cforms.populateSelect(CL.witnessesAdded, document.getElementById('added_highlight'), {'selected': 'all', 'add_select': true, 'select_label_details': {'label': 'highlight all added witnesses', 'value': 'all'}})
+		}
 		//TODO: this is no longer needed because we show all units all of the time but might be worth keeping as a setting
 		// if (document.getElementById('show_hide_shared_units')) {
 		// 	$('#show_hide_shared_units').on('click', function (event) {
@@ -172,6 +177,9 @@ SV = (function () {
     });
 
 		$('#highlighted').on('change', function (event) {_highlightWitness(event.target.value);});
+		if (document.getElementById('added_highlight')) {
+			$('#added_highlight').on('change', function (event) {_highlightAddedWitness(event.target.value)});
+		}
 		if (document.getElementById('undo_button')) {
 			$('#undo_button').on('click', function (event) {
 				SPN.show_loading_overlay();
@@ -201,7 +209,6 @@ SV = (function () {
       wits = CL.checkWitnessesAgainstProject(CL.dataSettings.witness_list, CL.project.witnesses);
       if (wits[0] === false) {
         if ((wits[1] === 'removed' || wits[1] === 'both') && CL.witnessRemovingMode === true) {
-          console.log('******** remove option needed');
           $.get(staticUrl + 'CE_core/html_fragments/remove_witnesses_form.html', function(html) {
             if (!document.getElementById('remove_witnesses_div')) {
               remove_wits_form = document.createElement('div');
@@ -231,17 +238,15 @@ SV = (function () {
           }, 'text');
         }
         if ((wits[1] === 'added' || wits[1] === 'both') && CL.witnessAddingMode === true) {
-          console.log('******** add option needed');
+          console.log('******** add option needed - or is it?');
+					//TODO: see if the logic currently in collation.js linked to loading from table can be repositioned here.
+					//I suspect not but that means you will need to careful with moving from RG to SV
         }
       }
     }
 
 		prepareForOperation();
-		console.log('pre-lacom fix');
-		console.log(JSON.parse(JSON.stringify(CL.data)));
 		CL.lacOmFix(); //also does extra gaps
-		console.log('ran lacom fix')
-		console.log(JSON.parse(JSON.stringify(CL.data)));
 		unprepareForOperation();
 
 		temp = CL.getUnitLayout(CL.data.apparatus, 1, 'set_variants', options);
@@ -440,6 +445,7 @@ SV = (function () {
 	 * 		gap_unit - boolean - is this a unit which only contains lac/om readings
 	 * 		col_length - int - the expected column width based on other table rows
 	 * 		highlighted_wit - the witness to highlight
+	 * 		highlighted_added_wits - the witnesses to highlight of those that have been added CL.witnessAddingMode only
 	 * 		highlighted_unit - the unit to highlight
 	 * 		created - boolean (is this a specially created gap element)
 	 * 		overlapping_ids - a list of ids for any overlapping readings realted to this top line reading
@@ -454,6 +460,9 @@ SV = (function () {
 		} else {
 			hand = null;
 		}
+		//TODO: in here and later in the function you need to make highlighted_added_wits work
+		//HERE
+
 		if (options.hasOwnProperty('col_length')) {
 			colspan = options.col_length;
 		} else {
@@ -1097,17 +1106,37 @@ SV = (function () {
 		});
 	};
 
-	/** highlight a witness, called from select box in page footer*/
+	/** highlight a witness, called from select box in page footer */
 	_highlightWitness = function (witness) {
 		var scroll_offset;
 		scroll_offset = [document.getElementById('scroller').scrollLeft,
 										 document.getElementById('scroller').scrollTop];
 		CL.highlighted = witness;
-		showSetVariantsData({'highlighted_wit': witness});
-		CL.getHighlightedText(witness);
+		showSetVariantsData({'highlighted_wit': CL.highlighted});
+		CL.getHighlightedText(CL.highlighted);
 		document.getElementById('scroller').scrollLeft = scroll_offset[0];
 		document.getElementById('scroller').scrollTop = scroll_offset[1];
 	};
+
+	/** highlight a witness that has been added or highlight all added witnesses with 'all' (only in CL.witnessAddingMode), called from select box in page footer */
+	_highlightAddedWitness = function (witness) {
+		var scroll_offset, witnesses;
+		scroll_offset = [document.getElementById('scroller').scrollLeft,
+										 document.getElementById('scroller').scrollTop];
+
+		if (witness === 'all') {
+			witnesses = CL.witnessesAdded;
+		} else {
+			witnesses = [witness];
+		}
+		CL.highlightedAdded = witnesses;
+		showSetVariantsData({'highlighted_added_wits': witnesses});
+
+		document.getElementById('scroller').scrollLeft = scroll_offset[0];
+		document.getElementById('scroller').scrollTop = scroll_offset[1];
+	};
+
+
 
 	/** the code for displaying subreadings present in the object model */
 	_showSubreadings = function (reading, id, i, hand) {
@@ -1722,14 +1751,18 @@ SV = (function () {
 		return true;
 	};
 
-	_neighboursShareOverlaps = function (index_point) {
-		var i, before, after;
-		for (i = 0; i < CL.data.apparatus.length; i += 1) {
-			if (CL.data.apparatus[i].end === index_point - 1) {
-				before = CL.data.apparatus[i];
+//TODO: check that this is good enough for what you use it for. It actually requires all overlaps to be shared not just some
+	_neighboursShareOverlaps = function (index_point, data) {
+		var before, after;
+		if (data === undefined) {
+			data = CL.data;
+		}
+		for (let i=0; i<data.apparatus.length; i+=1) {
+			if (data.apparatus[i].end === index_point-1) {
+				before = data.apparatus[i];
 			}
-			if (CL.data.apparatus[i].start === index_point + 1) {
-				after = CL.data.apparatus[i];
+			if (data.apparatus[i].start === index_point+1) {
+				after = data.apparatus[i];
 			}
 		}
 		if (!after || !before) {
@@ -1790,7 +1823,7 @@ SV = (function () {
 					witnesses.splice(witnesses.indexOf(reading.witnesses[i]), 1);
 				}
 				if (CL.data.lac_readings.length > 0) {
-					readings.push({'text' : [], 'type' : 'lac_verse', 'details' : 'lac verse', 'witnesses' : CL.data.lac_readings});
+					readings.push({'text' : [], 'type' : 'lac_verse', 'details' : 'lac verse', 'witnesses' : JSON.parse(JSON.stringify(CL.data.lac_readings))});
 					for (i = 0; i < CL.data.lac_readings.length; i += 1) {
 						witnesses.splice(witnesses.indexOf(CL.data.lac_readings[i]), 1);
 					}
@@ -2040,7 +2073,7 @@ SV = (function () {
 		if (witness_equality && overlap_boundaries && overlap_status_agreement) {
 			if (keep_id === true) {
 				//combine the reference ids in the top apparatus
-				SV.combine_apparatus_ids(unit1._id, unit2._id);
+				_combineApparatusIds(unit1._id, unit2._id);
 			}
 			combined_gap_before_subreadings = [];
 			combined_gap_after_subreadings = [];
@@ -4685,6 +4718,8 @@ SV = (function () {
 
 		//TODO: properly make this public!
 		_combineReadings: _combineReadings,
+		_compareFirstWordIndexes: _compareFirstWordIndexes,
+
 
 	};
 }());

@@ -23,6 +23,7 @@ CL = (function() {
         'distance': 2
       },
       highlighted = 'none',
+      highlightedAdded = [],
       showSubreadings = false,
       managingEditor = false,
       project = {},
@@ -32,7 +33,8 @@ CL = (function() {
       isDirty = false, //this is currently only used for witnessEditingMode but could be expanded maybe on a project setting
       witnessEditingMode = false,
       witnessAddingMode = false,
-      witnessRemovingMode = false;
+      witnessRemovingMode = false,
+      witnessesAdded = [];
 
 
   //private variable declarations
@@ -40,7 +42,7 @@ CL = (function() {
       _defaultDisplaySettings = {},
       _collapsed = false,
       _alpha = 'abcdefghijklmnopqrstuvwxyz',
-      _displayMode = 'editor'; //there used ot be support for 'table' for a straight collation table view but it does not work;;
+      _displayMode = 'editor'; //there used to be support for 'table' for a straight collation table view but it does not work;;
 
   //public function declarations
   let setServiceProvider, expandFillPageClients, getHeaderHtml, addUnitAndReadingIds,
@@ -78,7 +80,7 @@ CL = (function() {
    _findStandoffWitness, _findReadingPosById, _getPreStageChecks, _makeRegDecisionsStandoff,
    _contextInputOnload, _removeWitnessFromUnit, _findSaved, _addToSavedCollation,
    _prepareAdditionalCollation, _displaySavedCollation, _mergeCollationObjects,
-   _getUnitByStartIndex, _mergeNewLacOmVerseReadings, _mergeNewReading;
+   _getUnitsByStartIndex, _mergeNewLacOmVerseReadings, _mergeNewReading;
 
 
   //*********  public functions *********
@@ -643,6 +645,7 @@ CL = (function() {
    * 		possibilities are:
    * 			sort - boolean - do the readings need sorting (default = false)
    * 			highlighted_wit - the witness to highlight
+   *      highlighted_added_wits - the added wit/s that should be highlighted
    * 			highlighted_unit - a unit to mark as having an error
    * 			column_lengths - dictionary detailing widths of columns in top apparatus
    * 			overlap_details - a dictionary keyed by id of overlapping reading giving column width for that unit
@@ -739,6 +742,9 @@ CL = (function() {
           }
           if (options.hasOwnProperty('highlighted_wit')) {
             unit_data_options.highlighted_wit = options.highlighted_wit;
+          }
+          if (options.hasOwnProperty('highlighted_added_wits')) {
+            unit_data_options.highlighted_added_wits = options.highlighted_added_wits;
           }
           if (options.hasOwnProperty('highlighted_version')) {
             unit_data_options.highlighted_version = options.highlighted_version;
@@ -1036,6 +1042,9 @@ CL = (function() {
           if (options.hasOwnProperty('highlighted_wit')) {
             unit_data_options.highlighted_wit = options.highlighted_wit;
           }
+          if (options.hasOwnProperty('highlighted_added_wits')) {
+            unit_data_options.highlighted_added_wits = options.highlighted_added_wits;
+          }
           if (options.hasOwnProperty('highlighted_version')) {
             unit_data_options.highlighted_version = options.highlighted_version;
           }
@@ -1158,13 +1167,10 @@ CL = (function() {
     hand = temp[1];
     text = [];
     display_hand = hand;
+    //TODO: hand and display_hand can be rationalised now we have got rid of _private from sigla
     document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + display_hand + ':</b><img id="loadingbar" src="' + staticUrl + 'CE_core/images/loadingbar.gif"/></span>';
-    if (hand.search('_private') === -1) {
-      is_private = false;
-    } else {
-      is_private = true;
-    }
-    CL.services.getVerseData(CL.context, [transcription_id], is_private, function(transcriptions) {
+    //TODO: remove the false from here when deleted from services file
+    CL.services.getVerseData(CL.context, [transcription_id], false, function(transcriptions) {
       if (transcriptions.length > 0) {
         for (i = 0; i < transcriptions.length; i += 1) {
           verse = transcriptions[i];
@@ -1196,8 +1202,12 @@ CL = (function() {
           }
         }
       } else {
-        //lac verse
-        document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + display_hand + ':</b> no text</span>';
+        if (transcription_id === 'none') {
+          document.getElementById('single_witness_reading').innerHTML = '';
+        } else {
+          //lac verse
+          document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + display_hand + ':</b> no text</span>';
+        }
       }
     });
   };
@@ -1856,11 +1866,13 @@ CL = (function() {
     });
   };
 
-  findUnitPosById = function(app_id, unit_id) {
-    var i, data;
-    if (CL.data.hasOwnProperty(app_id)) {
-      for (i = 0; i < CL.data[app_id].length; i += 1) {
-        if (CL.data[app_id][i]._id === unit_id) {
+  findUnitPosById = function(app_id, unit_id, data) {
+    if (data === undefined) {
+      data = CL.data;
+    }
+    if (data.hasOwnProperty(app_id)) {
+      for (let i = 0; i < CL.data[app_id].length; i += 1) {
+        if (data[app_id][i]._id === unit_id) {
           return i;
         }
       }
@@ -2522,9 +2534,9 @@ CL = (function() {
   };
 
   getHandsAndSigla = function () {
-    var details, key;
+    var details;
     details = [];
-    for (key in CL.data.hand_id_map) {
+    for (let key in CL.data.hand_id_map) {
       if (CL.data.hand_id_map.hasOwnProperty(key)) {
         details.push({'hand': key.replace('_private', ' (private)'), 'document': CL.data.hand_id_map[key]+ '|' + key});
       }
@@ -3196,7 +3208,6 @@ CL = (function() {
     }
     $(':radio').on('click', function() {
       if ($(this).is(':checked')) {
-
         if ( ( $(this).parent().hasClass('regularised') || $(this).parent().hasClass('set') ) && ( $(this).hasClass('added') || $(this).hasClass('both')) ) {
           $('#load_saved_add_button').removeClass('pure-button-disabled');
         } else {
@@ -3268,32 +3279,48 @@ CL = (function() {
     SPN.show_loading_overlay();
     CL.dataSettings.language = document.getElementById('language').value;
     CL.dataSettings.base_text = document.getElementById('base_text').value;
+    //ensure we use the display settings that were used for the existing collation (they are read from here at collation time)
+    CL.displaySettings = existing_collation.display_settings;
     context = existing_collation.context;
     if (context && CL.dataSettings.base_text !== 'none') {
       CL.context = context;
       CL.dataSettings.witness_list = witsToAdd;
       CL.dataSettings.witness_list.push(CL.dataSettings.base_text);
       RG.getCollationData('add_witnesses', 0, function () {
-        //TODO: when running the collation is must use the display settings from the existing collation at least when loading into SV - will need to think carefully about RG
+        // //TODO: remove - this manipulates the data to create an addition in the new unit so we can test making a new unit
+        // for (let i=0; i<CL.collateData.data.length; i+=1) {
+        //   if (CL.collateData.data[i].siglum === 'P66') {
+        //     //add a unit which should end up at index 11 in the basetext
+        //     CL.collateData.data[i].witnesses[0].tokens.splice(5, 0, {"index": 12, "reading": 'P66', "siglum": 'P66', "verse": 'B04K1V2', "original": 'Test', "rule_match": ['test'], "t": 'test'});
+        //     //adjust following indexes
+        //     CL.collateData.data[i].witnesses[0].tokens[6].index = 14;
+        //     CL.collateData.data[i].witnesses[0].tokens[7].index = 16;
+        //     //add 2 units at the end
+        //     CL.collateData.data[i].witnesses[0].tokens.push({"index": 18, "reading": 'P66', "siglum": 'P66', "verse": 'B04K1V2', "original": 'Test', "rule_match": ['test'], "t": 'test'});
+        //     CL.collateData.data[i].witnesses[0].tokens.push({"index": 20, "reading": 'P66', "siglum": 'P66', "verse": 'B04K1V2', "original": 'Test2', "rule_match": ['test2'], "t": 'test2'});
+        //   }
+        // }
+        // //TODO: end of stuff to remove
+        //TODO: when running the collation is must use the display settings from the existing collation at least when loading into SV (this works) - will need to think carefully about RG
           RG.runCollation(CL.collateData, 'add_witnesses', 0, function (data) {
             var mergedCollation;
             CL.data = data; //temporary assignment to allow all the cleaning functions to work
             lacOmFix();
             data = JSON.parse(JSON.stringify(CL.data)); //copy so we can change CL.data without screwing this up
-            console.log('This is your collation data');
-            console.log(JSON.parse(JSON.stringify(data)));
-            console.log('this is your existing collation');
-            console.log(existing_collation);
             if (CL.context === existing_collation.context) { //assume CL.context agrees with the new data since it was used to fetch it
               if (data.overtext_name === existing_collation.structure.overtext_name) { //check we have basetext agreement
-                // console.log('*********************')
-                // console.log(JSON.parse(JSON.stringify(data)))
+                CL.witnessesAdded = [];
+                for (let key in data.hand_id_map) {
+                  if (data.hand_id_map[key] !== CL.dataSettings.base_text) {
+                    CL.witnessesAdded.push(key);
+                  }
+                }
                 mergedCollation = _mergeCollationObjects(JSON.parse(JSON.stringify(existing_collation)), data, witsToAdd);
-                _displaySavedCollation(mergedCollation)
+                _displaySavedCollation(mergedCollation);
 
                 //merge collation objects-
                 //set CL data stuff correctly unless this is done as part of the load which I think it probably is.
-                //remember the witnesses that were added (you should show the list somewhere probably)
+                //remember the witnesses that were added (you should show the list somewhere probably) the provided datais identifiers so need to recreate using hand_id_map in newData
                 //add button to highlight all readings with added witnesses (this will need support in the show... functions which currently only allows for 1)
 
 
@@ -3313,12 +3340,11 @@ CL = (function() {
   };
 
   _mergeCollationObjects = function (mainCollation, newData, addedWits) {
-    var unit, index, newUnit, existingUnit, newReadingText, matchingReadingFound,
-    unitQueue, nextUnit, unit1, unit2, tempUnit, omReading;
-    //console.log('+++++++++++++++');
-    //console.log(JSON.parse(JSON.stringify(newData)));
-    //console.log(newData.apparatus)
-    //add the witnesses to data_settings.witness_list
+    var unit, index, newUnit, existingUnit, newUnits, existingUnits, newReadingText,
+    matchingReadingFound, unitQueue, nextUnits, unit1, unit2, tempUnit, omReading,
+    existingWitnesses, unitId, position, before, after, beforeIds, afterIds,
+    sharedIds;
+
     for (let i=0; i<addedWits.length; i+=1) {
       if (mainCollation.data_settings.witness_list.indexOf(addedWits[i]) === -1) {
         mainCollation.data_settings.witness_list.push(addedWits[i]);
@@ -3350,112 +3376,174 @@ CL = (function() {
     //make reading for any combined or shared units and check against existing readings
     index = 1; //this refers to the position indicated by numbers under the basetext
     while (index<=(newData.overtext[0].tokens.length*2)+1) {
+
       //if new data has one then
-      newUnit = _getUnitByStartIndex(index, newData.apparatus);
-      existingUnit = _getUnitByStartIndex(index, mainCollation.structure.apparatus);
-      if (existingUnit !== null && (newData.lac_readings.length > 0 || newData.om_readings.length > 0)) {
-        _mergeNewLacOmVerseReadings(existingUnit, newData);
+      newUnits = _getUnitsByStartIndex(index, newData.apparatus);
+      existingUnits = _getUnitsByStartIndex(index, mainCollation.structure.apparatus);
+      if (newUnits.length === 0 && existingUnits.length === 0) {
+        index += 1; //because for loop will never run and index is only incremented here and in the for loop
       }
-      if (newUnit === null && existingUnit === null) {
-        index += 1;
-      } else {
-        if (index === 2) {
-          console.log('new unit found: ');
-          console.log(JSON.parse(JSON.stringify(newUnit)));
-          console.log('existing unit found: ');
-          console.log(existingUnit);
+      for (let z=0; z<Math.max(newUnits.length, existingUnits.length); z+=1) {
+        newUnit = z<newUnits.length ? newUnits[z] : null; //_getUnitByStartIndex(index, newData.apparatus);
+        existingUnit = z<existingUnits.length ? existingUnits[z] : null//_getUnitByStartIndex(index, mainCollation.structure.apparatus);
+        if (existingUnit !== null && (newData.lac_readings.length > 0 || newData.om_readings.length > 0)) {
+          _mergeNewLacOmVerseReadings(existingUnit, newData);
         }
-
-
-//adedd Wits give identifier not siglum so doesn't work properly. Basetext also
-//needs to be checked for but can probably assume that it is in the om reading for this scenario
-//so once you added wits list is hands you should be able to fix this.
-        if (newUnit === null) {
-          console.log('om must be added to existing for new witnesses');
-          console.log(addedWits)
-          for (let i=0; i<existingUnit.readings.length; i+=1) {
-            if (existingUnit.readings[i].hasOwnProperty('type') && existingUnit.readings[i].type == 'om') {
-              omReading = existingUnit.readings[i];
-              console.log('OMreading found');
-              console.log(newData.lac_readings)
-            }
-          }
-          for (let i=0; i<addedWits.length; i+=1) {
-
-            if (newData.lac_readings.indexOf(addedWits[i]) === -1 && newData.om_readings.indexOf(addedWits[i]) === -1 ) {
-              console.log('adding witness  ' + addedWits[i])
-              omReading.witnesses.push(addedWits[i]);
-            }
-          }
-          index += 1;
-        } else if (existingUnit === null) {
-          if (index === 2) {
-            console.log('we must add a new unit');
-          }
+        if (newUnit === null && existingUnit === null) {
           index += 1;
         } else {
-          if (newUnit.end == existingUnit.end) {
-            if (index === 2) {
-              console.log('we agree on start and end so just merge')
-            }
-            for (let j=0; j<newUnit.readings.length; j+=1) {
-              matchingReadingFound = false;
-              newReadingText = extractWitnessText(newUnit.readings[j]);
-              if (index === 2) {
-                console.log(newReadingText)
-              }
-              for (let k=0; k<existingUnit.readings.length; k+=1) {
-                if (extractWitnessText(existingUnit.readings[k]) === newReadingText) {
-                  matchingReadingFound = true;
-                  _mergeNewReading(existingUnit.readings[k], newUnit.readings[j]);
-                }
-              }
-              if (matchingReadingFound === false) {
-                if (index === 2) {
-                  console.log('reading must be added')
-                  console.log(JSON.parse(JSON.stringify(newUnit.readings[j])))
-                }
-                //the basetext will always have a matching reading as it is in the existing collation so don't need to worry about removing it from any added readings
-                existingUnit.readings.push(newUnit.readings[j]);
-                if (index === 2) {
-                  console.log(JSON.parse(JSON.stringify(existingUnit.readings)))
-                }
+          if (newUnit === null) {
+            omReading = null;
+            for (let i=0; i<existingUnit.readings.length; i+=1) {
+              if (existingUnit.readings[i].hasOwnProperty('type') && existingUnit.readings[i].type == 'om' && !existingUnit.readings[i].hasOwnProperty('overlap_status')) {
+                omReading = existingUnit.readings[i];
               }
             }
-            index = newUnit.end + 1;
+            if (omReading) {
+              //addedWits is identifiers rather than sigla for readings so use hand_id_map here instead
+              //we can assume that basetext is om in both cases as it is the same text so the check of exisitng witnessses for omReading will filter this out
+              for (let key in newData.hand_id_map) {
+                if (newData.lac_readings.indexOf(key) === -1 && newData.om_readings.indexOf(key) === -1 ) {
+                  if (omReading.witnesses.indexOf(key) === -1) {
+                    omReading.witnesses.push(key);
+                  }
+                }
+              }
+              index += 1;
+            } else {
+              alert('the new witnesses cannot be added due to a problem with a conflict of basetexts');
+              //TODO: more sensible message and reload summary page here or get
+              SPN.remove_loading_overlay();
+              return null;
+            }
+          } else if (existingUnit === null) {
+            //then add a new unit
+            //get all the witnesses
+            existingWitnesses = [];
+            for (let i=0; i<mainCollation.structure.apparatus[0].readings.length; i+=1) {
+              existingWitnesses.push.apply(existingWitnesses, mainCollation.structure.apparatus[0].readings[i].witnesses);
+            }
+            if (mainCollation.structure.lac_readings.length > 0) {
+              newUnit.readings.push({'text' : [], 'type' : 'lac_verse', 'details' : 'lac verse', 'witnesses' : JSON.parse(JSON.stringify(mainCollation.structure.lac_readings))});
+              for (let i=0; i<mainCollation.structure.lac_readings.length; i+=1) {
+                if (existingWitnesses.indexOf(mainCollation.structure.lac_readings[i]) !== -1) {
+                  existingWitnesses.splice(existingWitnesses.indexOf(mainCollation.structure.lac_readings[i]), 1);
+                }
+              }
+            }
+            if (mainCollation.structure.om_readings.length > 0) {
+              newUnit.readings.push({'text' : [], 'type' : 'om_verse', 'details' : 'om verse', 'witnesses' : JSON.parse(JSON.stringify(mainCollation.structure.om_readings))});
+              for (let i=0; i<mainCollation.structure.om_readings.length; i+=1) {
+                if (existingWitnesses.indexOf(mainCollation.structure.om_readings[i]) !== -1) {
+                  existingWitnesses.splice(existingWitnesses.indexOf(mainCollation.structure.om_readings[i]), 1);
+                }
+              }
+            }
+            for (let key in newData.hand_id_map) {
+              if (newData.hand_id_map.hasOwnProperty(key) && existingWitnesses.indexOf(key) !== -1) {
+                existingWitnesses.splice(existingWitnesses.indexOf(key), 1);
+              }
+            }
+            if (existingWitnesses.length > 0) {
+              omReading = null;
+              for (let i=0; i<newUnit.readings.length; i+=1) {
+                if (newUnit.readings[i].hasOwnProperty('type') && newUnit.readings[i].type == 'om'  && !newUnit.readings[i].hasOwnProperty('overlap_status')) {
+                  omReading = newUnit.readings[i];
+                }
+              }
+              if (omReading) {
+                for (let i=0; i<existingWitnesses.length; i+=1) {
+                  if (omReading.witnesses.indexOf(existingWitnesses[i]) === -1) {
+                    omReading.witnesses.push(existingWitnesses[i]);
+                  }
+                }
+              } else {
+                //TODO: address comment below
+                //something has probably gone wrong but we could just add an om reading!
+                //We should probably quit in the same as the reverse situation above because it means something is wrong in the basetext which should always be om and should always be in the unit being changed
+                newUnit.readings.push({'text' : [],
+                  'witnesses' : existingWitnesses});
+              }
+            }
+            mainCollation.structure.apparatus.push(newUnit);
+            mainCollation.structure.apparatus.sort(SV._compareFirstWordIndexes);
+            before = null;
+            after = null;
+            for (let i=0; i<mainCollation.structure.apparatus.length; i+=1) {
+        			if (mainCollation.structure.apparatus[i].end === newUnit.start-1) {
+        				before = mainCollation.structure.apparatus[i];
+        			}
+        			if (mainCollation.structure.apparatus[i].start === newUnit.start+1) {
+        				after = mainCollation.structure.apparatus[i];
+        			}
+        		}
+            if (before && after && before.hasOwnProperty('overlap_units') && after.hasOwnProperty('overlap_units')) {
+              //find out which ones are shared and add them to the new unit (we are not concerned about the ones at the edges as the user can make and merge if needed)
+              beforeIds = Object.keys(before.overlap_units);
+              afterIds = Object.keys(after.overlap_units);
+              sharedIds = beforeIds.filter(x => afterIds.includes(x));
+              if (sharedIds.length > 0) {
+                //then we have shared overlaps and we must add them to the new unit
+                newUnit.overlap_units = {};
+                for (let i=0; i<sharedIds.length; i+=1) {
+                  newUnit.overlap_units[sharedIds[i]] = before.overlap_units[sharedIds[i]];
+                }
+              }
+            }
+            index += 1;
           } else {
-            //collect all the units covered in a stack
-            unitQueue = [newUnit];
-            for (let i=newUnit.end+1; i<=existingUnit.end; i+=1) {
-              nextUnit = _getUnitByStartIndex(i, newData.apparatus);
-              if (nextUnit !== null) {
-                unitQueue.unshift(nextUnit);
-              }
-            }
-            unit1 = null;
-            while (unitQueue.length > 0) {
-              if (unit1 === null) {
-                unit1 = unitQueue.pop();
-              }
-              unit2 = unitQueue.pop();
-              tempUnit = {"start": existingUnit.start, "first_word_index": existingUnit.first_word_index, "end": unit2.end};
-              unit1 = SV._combineReadings(unit1.readings, unit2.readings, tempUnit, false);
-            }
-            for (let j=0; j<unit1.readings.length; j+=1) {
-              matchingReadingFound = false;
-              newReadingText = extractWitnessText(unit1.readings[j]);
-              for (let k=0; k<existingUnit.readings.length; k+=1) {
-                if (extractWitnessText(existingUnit.readings[k]) === newReadingText) {
-                  matchingReadingFound = true;
-                  _mergeNewReading(existingUnit.readings[k], unit1.readings[j]);
+            if (newUnit.end == existingUnit.end) {
+              //console.log('we agree on start and end so just merge')
+              for (let j=0; j<newUnit.readings.length; j+=1) {
+                matchingReadingFound = false;
+                newReadingText = extractWitnessText(newUnit.readings[j]);
+                for (let k=0; k<existingUnit.readings.length; k+=1) {
+                  if (!existingUnit.readings[k].hasOwnProperty('overlap_status') && extractWitnessText(existingUnit.readings[k]) === newReadingText) {
+                    matchingReadingFound = true;
+                    _mergeNewReading(existingUnit.readings[k], newUnit.readings[j]);
+                  }
+                }
+                if (matchingReadingFound === false) {
+                  //the basetext will always have a matching reading as it is in the existing collation so don't need to worry about removing it from any added readings
+                  existingUnit.readings.push(newUnit.readings[j]);
                 }
               }
-              if (matchingReadingFound === false) {
-                //the basetext will always have a matching reading as it is in the existing collation so don't need to worry about removing it from any added readings
-                existingUnit.readings.push(unit1.readings[j]);
+              index = newUnit.end + 1;
+            } else {
+              //no end agreement
+              //collect all the units covered in a stack
+              unitQueue = [newUnit];
+              for (let i=newUnit.end+1; i<=existingUnit.end; i+=1) {
+                nextUnits = _getUnitsByStartIndex(i, newData.apparatus);
+                for (let j=0; j<nextUnits.length; j+=1) {
+                  unitQueue.unshift(nextUnits[j]);
+                }
               }
+              unit1 = null;
+              while (unitQueue.length > 0) {
+                if (unit1 === null) {
+                  unit1 = unitQueue.pop();
+                }
+                unit2 = unitQueue.pop();
+                tempUnit = {"start": existingUnit.start, "first_word_index": existingUnit.first_word_index, "end": unit2.end};
+                unit1 = SV._combineReadings(unit1.readings, unit2.readings, tempUnit, false);
+              }
+              for (let j=0; j<unit1.readings.length; j+=1) {
+                matchingReadingFound = false;
+                newReadingText = extractWitnessText(unit1.readings[j]);
+                for (let k=0; k<existingUnit.readings.length; k+=1) {
+                  if (!existingUnit.readings[k].hasOwnProperty('overlap_status') && extractWitnessText(existingUnit.readings[k]) === newReadingText) {
+                    matchingReadingFound = true;
+                    _mergeNewReading(existingUnit.readings[k], unit1.readings[j]);
+                  }
+                }
+                if (matchingReadingFound === false) {
+                  //the basetext will always have a matching reading as it is in the existing collation so don't need to worry about removing it from any added readings
+                  existingUnit.readings.push(unit1.readings[j]);
+                }
+              }
+              index = existingUnit.end + 1; //TODO: assuming that will be the larger one for now - needs to be better maybe
             }
-            index = existingUnit.end + 1; //TODO: assuming that will be the larger one for now - needs to be better maybe
           }
         }
       }
@@ -3486,6 +3574,7 @@ CL = (function() {
             }
           }
           //untested but same code as above
+          //om verse might want to look for an overlapped unit and add to that with duplicates in the top line for user to deal with
         } else if (unit.readings[i].type === 'om_verse' && newData.om_readings.length > 0) {
           for (let j=0; j<newData.om_readings.length; j+=1) {
             if (unit.readings[i].witnesses.indexOf(newData.om_readings[j]) === -1) {
@@ -3497,13 +3586,14 @@ CL = (function() {
     }
   };
 
-  _getUnitByStartIndex = function (startIndex, unitList) {
+  _getUnitsByStartIndex = function (startIndex, unitList) {
+    var units = [];
     for (let i=0; i<unitList.length; i+=1) {
       if (unitList[i].start == startIndex) {
-        return unitList[i];
+        units.push(unitList[i]);
       }
     }
-    return null;
+    return units;
   };
 
   loadSavedCollation = function(id) {
@@ -3524,8 +3614,6 @@ CL = (function() {
 
   _displaySavedCollation = function (collation) {
       var options;
-      console.log('|||||||||||')
-      console.log(JSON.parse(JSON.stringify(collation)))
       if (collation) {
         CL.context = collation.context;
         CL.data = collation.structure;
@@ -5026,6 +5114,7 @@ CL = (function() {
     dataSettings: dataSettings,
     algorithmSettings: algorithmSettings,
     highlighted: highlighted,
+    highlightedAdded: highlightedAdded,
     showSubreadings: showSubreadings,
     managingEditor: managingEditor,
     project: project,
@@ -5036,6 +5125,7 @@ CL = (function() {
     witnessEditingMode: witnessEditingMode,
     witnessRemovingMode: witnessRemovingMode,
     witnessAddingMode: witnessAddingMode,
+    witnessesAdded: witnessesAdded,
 
     setServiceProvider: setServiceProvider,
     expandFillPageClients: expandFillPageClients,
@@ -5101,6 +5191,7 @@ CL = (function() {
     checkWitnessesAgainstProject: checkWitnessesAgainstProject,
     loadSavedCollation: loadSavedCollation,
     returnToSummaryTable: returnToSummaryTable,
+
 
     //deprecated function mapping for calls from older services
     set_service_provider: setServiceProvider,

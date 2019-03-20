@@ -360,7 +360,7 @@ RG = (function() {
     _addFooterFunctions();
 
     CL.addTriangleFunctions('table');
-    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected':options.highlighted_wit});
+    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected':options.highlighted_wit, 'add_select': true, 'select_label_text': 'highlight witness'});
     //TODO: probably better in for loop
     if (CL.witnessEditingMode === false) {
       i = 0;
@@ -711,6 +711,7 @@ RG = (function() {
     options.algorithm_settings = algorithm_settings;
 
     if (output === 'add_witnesses') {
+      options.split_single_reading_units = true;
       result_callback = function(data) {
         callback(data);
       }

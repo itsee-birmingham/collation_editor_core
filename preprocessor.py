@@ -11,10 +11,11 @@ from collation.core.regulariser import Regulariser
 
 class PreProcessor(Regulariser):
 
-    def __init__(self, display_settings_config=None, local_python_functions=None, rule_conditions_config=None):
+    def __init__(self, display_settings_config=None, local_python_functions=None, rule_conditions_config=None, split_single_reading_units=False):
         self.display_settings_config = display_settings_config
         self.local_python_functions = local_python_functions
         self.rule_conds_config = rule_conditions_config
+        self.split_single_reading_units = split_single_reading_units
         Regulariser.__init__(self, rule_conditions_config, local_python_functions)
 
     def process_witness_list(self, data_input, requested_witnesses, rules, basetext_transcription, project, settings, collation_settings, accept):
@@ -217,7 +218,8 @@ class PreProcessor(Regulariser):
             decisions = decisions,
             display_settings_config=self.display_settings_config,
             local_python_functions=self.local_python_functions,
-            rule_conditions_config=self.rule_conds_config
+            rule_conditions_config=self.rule_conds_config,
+            split_single_reading_units = self.split_single_reading_units
             )
         try:
             output = pp.produce_variant_units()

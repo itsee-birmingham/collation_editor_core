@@ -26,7 +26,8 @@ class PostProcessor(Regulariser):
                  decisions,
                  display_settings_config,
                  local_python_functions,
-                 rule_conditions_config
+                 rule_conditions_config,
+                 split_single_reading_units
                  ):
 
         self.alignment_table = alignment_table
@@ -47,6 +48,7 @@ class PostProcessor(Regulariser):
             self.set_rule_string_instance = MyClass()
         else:
             self.local_python_functions = None
+        self.split_single_reading_units = split_single_reading_units
         Regulariser.__init__(self, rule_conditions_config, local_python_functions)
         module_name = self.display_settings_config['python_file']
         class_name = self.display_settings_config['class_name']
@@ -274,7 +276,18 @@ class PostProcessor(Regulariser):
                 return [readings]
         else:
             #there is only one reading in this unit (therefore all read a - a shared unit) so just return existing readings
-            return [readings]
+            #except when we are combining new witnesses into existing collations we always want the new reading in smallest chunks possible
+            if len(readings.keys()) == 1 and self.split_single_reading_units == True:
+                for key in readings:
+                    if len(key.split(' ')) == len(readings[key]['text']):
+                        token_list = key.split(' ')
+                        witnesses = readings[key]['witnesses']
+                        new_readings = [{token_list[i]: {'witnesses': witnesses, 'text': [readings[key]['text'][i]]}} for i in range(0, len(token_list))]
+                        return new_readings
+                    else:
+                        return [readings]
+            else:
+                return [readings]
 
 
     #may not ever need this actually
@@ -365,6 +378,7 @@ class PostProcessor(Regulariser):
         previous_index = 0
         for i, unit in enumerate(variant_units):
             base_reading = unit[0]['text']
+
             if not len(base_reading) or (\
                     (self.lac_readings != None and self.overtext_name in self.lac_readings) \
                     or (self.om_readings != None and self.overtext_name in self.om_readings)):

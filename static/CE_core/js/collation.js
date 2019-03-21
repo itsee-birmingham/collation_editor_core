@@ -31,6 +31,8 @@ CL = (function() {
       context = '',
       data = {},
       isDirty = false, //this is currently only used for witnessEditingMode but could be expanded maybe on a project setting
+      //It also only works for modifications to witnesses (adding/removing) not any other action while in edit mode.
+      //That should perhaps be changed for adding as more editing is allowed (when removing all you can do is remove so the dirty flag is fine)
       witnessEditingMode = false,
       witnessAddingMode = false,
       witnessRemovingMode = false,
@@ -3316,6 +3318,7 @@ CL = (function() {
                   }
                 }
                 mergedCollation = _mergeCollationObjects(JSON.parse(JSON.stringify(existing_collation)), data, witsToAdd);
+                CL.isDirty = true;
                 _displaySavedCollation(mergedCollation);
 
                 //merge collation objects-

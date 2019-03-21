@@ -441,6 +441,7 @@ OR = (function() {
     }
   };
 
+  //TODO: this also needs to combine shared readings (while preserving a reading - it should be required in most cases but with adding witnesses it might be if an added reading shares that of an existing overlap)
   //Need to work this out from the top line as we can't actually rely on the start and end values in the overlaps
   mergeSharedExtentOverlaps = function() {
     var key, i, m, overlap_lines, overlap_indexes, shared_overlaps, new_key, lead_unit, to_delete;
@@ -509,9 +510,13 @@ OR = (function() {
       delete CL.data[to_delete[i]];
     }
     //this needs to be called at the end once we have deleted any empty overlap lines otherwise it will fill up the empty ones again
-    //it will need to rerun the deletion once it is done so maybe make that a separate function
+    //it reruns the empty line deletion once it is done so maybe make that a separate function?
     _repositionOverlaps();
     _throughNumberApps(2);
+
+    //now check the reading in each of the overlaped units for matching ones and merge if necessary
+
+    //HERE
   };
 
   //
@@ -1559,7 +1564,7 @@ OR = (function() {
       for (key in CL.data) {
         if (key.match(/apparatus\d*/g) !== null) {
           if (unit === null) {
-            unit = findUnitById(key, id);
+            unit = CL.findUnitById(key, id);
             if (unit !== null) {
               return [unit, key];
             }

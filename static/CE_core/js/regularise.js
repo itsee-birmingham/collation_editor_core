@@ -256,6 +256,7 @@ RG = (function() {
     if (!options.hasOwnProperty('highlighted_wit') && CL.highlighted !== 'none') {
       options.highlighted_wit = CL.highlighted;
     }
+
     options.sort = true;
     SimpleContextMenu.setup({
       'preventDefault': true,
@@ -361,6 +362,8 @@ RG = (function() {
 
     CL.addTriangleFunctions('table');
     cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected':options.highlighted_wit, 'add_select': true, 'select_label_text': 'highlight witness'});
+    
+
     //TODO: probably better in for loop
     if (CL.witnessEditingMode === false) {
       i = 0;

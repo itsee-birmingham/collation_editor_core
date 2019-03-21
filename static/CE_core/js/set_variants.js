@@ -73,7 +73,8 @@ SV = (function () {
 	 *              	highlighted_unit - the unit which needs to be highlighted as an error*/
 	showSetVariants = function (options) {
 		var html, i, unit_button, temp, header, event_rows, num, key, overlaps, app_ids,
-		error_panel_html, row, hands, result, undo_button, footer_html, overlap_options, new_overlap_options;
+		error_panel_html, row, hands, result, undo_button, footer_html, overlap_options, new_overlap_options,
+		preselected_added_highlight;
 		console.log(CL.data);
 		if (typeof options === 'undefined') {
 			options = {};
@@ -86,7 +87,7 @@ SV = (function () {
 		} else {
 			container = document.getElementsByTagName('body')[0];
 		}
-		//if (CL.witnessEditingMode === false) {
+		if (CL.witnessRemovingMode !== true) {
 			//attach right click menus
 			SimpleContextMenu.setup({'preventDefault' : true, 'preventForms' : false});
 			SimpleContextMenu.attach('unit', function () {return _makeMenu('unit');});
@@ -98,7 +99,7 @@ SV = (function () {
 			SimpleContextMenu.attach('split_omlac_unit', function () {return _makeMenu('split_omlac_unit');});
 			SimpleContextMenu.attach('split_duplicate_unit', function () {return _makeMenu('split_duplicate_unit');});
 			SimpleContextMenu.attach('subreading', function () {return _makeMenu('subreading');});
-		//}
+		}
 
 		//sort out header and main page
 		document.getElementById('header').innerHTML = CL.getHeaderHtml('Set Variants', CL.context);
@@ -136,6 +137,10 @@ SV = (function () {
 		//get the data itself
 		container.innerHTML = '<div id="drag"><div id="scroller" class="fillPage"></div><div id="single_witness_reading"></div></div>';
 		document.getElementById('single_witness_reading').style.bottom = document.getElementById('footer').offsetHeight + 'px';
+		if (CL.witnessAddingMode === true) {
+			//this sets this a default so that when all is highlighted this will work - any data specified in options will override it
+			CL.highlightedAdded = JSON.parse(JSON.stringify(CL.witnessesAdded));
+		}
 		showSetVariantsData(options);
 
 		//add functions and populate dropdowns etc.
@@ -143,7 +148,12 @@ SV = (function () {
 
 		cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit, 'add_select': true, 'select_label_details': {'label': 'highlight witness', 'value': 'none' }});
 		if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
-			cforms.populateSelect(CL.witnessesAdded, document.getElementById('added_highlight'), {'selected': 'all', 'add_select': true, 'select_label_details': {'label': 'highlight all added witnesses', 'value': 'all'}})
+			if (options.highlighted_added_wits.length === 1) {
+				preselected_added_highlight = options.highlighted_added_wits[0];
+			} else {
+				preselected_added_highlight = 'all';
+			}
+			cforms.populateSelect(CL.sortWitnesses(CL.witnessesAdded), document.getElementById('added_highlight'), {'selected': preselected_added_highlight, 'add_select': true, 'select_label_details': {'label': 'highlight all added witnesses', 'value': 'all'}})
 		}
 		//TODO: this is no longer needed because we show all units all of the time but might be worth keeping as a setting
 		// if (document.getElementById('show_hide_shared_units')) {
@@ -200,6 +210,9 @@ SV = (function () {
 		if (!options.hasOwnProperty('highlighted_wit') && CL.highlighted !== 'none') {
 			options.highlighted_wit = CL.highlighted;
 		}
+		if (CL.witnessAddingMode === true && !options.hasOwnProperty('highlighted_added_wits')) {
+      options.highlighted_added_wits = CL.highlightedAdded;
+    }
 		options.sort = true;
 		//remove the witness removal window if shown
 		if (document.getElementById('remove_witnesses_div')) {
@@ -237,11 +250,6 @@ SV = (function () {
 						CL.setUpRemoveWitnessesForm(wits[2], CL.data, 'set', removeFunction);
           }, 'text');
         }
-        if ((wits[1] === 'added' || wits[1] === 'both') && CL.witnessAddingMode === true) {
-          console.log('******** add option needed - or is it?');
-					//TODO: see if the logic currently in collation.js linked to loading from table can be repositioned here.
-					//I suspect not but that means you will need to careful with moving from RG to SV
-        }
       }
     }
 
@@ -258,6 +266,9 @@ SV = (function () {
 		if (options.hasOwnProperty('highlighted_wit')) {
 			overlap_options.highlighted_wit = options.highlighted_wit;
 		}
+		if (options.hasOwnProperty('highlighted_added_wits')) {
+      overlap_options.highlighted_added_wits = options.highlighted_added_wits;
+    }
 		if (options.hasOwnProperty('highlighted_unit')) {
 			overlap_options.highlighted_unit = options.highlighted_unit;
 		}
@@ -279,10 +290,10 @@ SV = (function () {
 			CL.addHoverEvents(row);
 		}
 		SPN.remove_loading_overlay();
-		//if (CL.witnessEditingMode === false) {
+		if (CL.witnessRemovingMode !== true) {
 			//initialise DnD
 			_redipsInitSV(CL.data.apparatus.length);
-		//}
+		}
 
 		if (SV.undoStack.length > 0) {
 			document.getElementById("undo_button").style.display = 'inline';
@@ -446,23 +457,20 @@ SV = (function () {
 	 * 		col_length - int - the expected column width based on other table rows
 	 * 		highlighted_wit - the witness to highlight
 	 * 		highlighted_added_wits - the witnesses to highlight of those that have been added CL.witnessAddingMode only
-	 * 		highlighted_unit - the unit to highlight
+	 * 		highlighted_unit - the unit to highlight (used for showing which units have errors I think)
 	 * 		created - boolean (is this a specially created gap element)
 	 * 		overlapping_ids - a list of ids for any overlapping readings realted to this top line reading
 	 * 		td_id - the id for the cell (used in overlap rows to allow readings to be moved between rows))*/
 	getUnitData = function (data, id, start, end, options) {
 		var i, j, html, decisions, rows, cells, row_list, temp, events, colspan, row_id, text, split_class,
-		hand, highlighted, SV_rules, key, label_suffix, reading_suffix, alpha_id, reading_label;
+		highlighted_hand, highlighted_unit, highlighted_classes, SV_rules, key, label_suffix, reading_suffix, alpha_id, reading_label;
 		html = [];
 		row_list = [];
 		if (options.hasOwnProperty('highlighted_wit')) {
-			hand = options.highlighted_wit.split('|')[1];
+			highlighted_hand = options.highlighted_wit.split('|')[1];
 		} else {
-			hand = null;
+			highlighted_hand = null;
 		}
-		//TODO: in here and later in the function you need to make highlighted_added_wits work
-		//HERE
-
 		if (options.hasOwnProperty('col_length')) {
 			colspan = options.col_length;
 		} else {
@@ -480,13 +488,15 @@ SV = (function () {
 		} else {
 			html.push('<td class="start_' + start + '" headers="NA_' + start + '" colspan="' + colspan + '">');
 		}
+
+		//is the unit highlighted? used for showing errors
+		if (options.hasOwnProperty('highlighted_unit') && parseInt(id) === options.highlighted_unit[1]) {
+			highlighted_unit = ' highlighted_unit';
+		} else {
+			highlighted_unit = '';
+		}
+
 		for (i = 0; i < data.length; i += 1) {
-			//is it highlighted?
-			if (options.hasOwnProperty('highlighted_unit') && parseInt(id) === options.highlighted_unit[1]) {
-				highlighted = ' highlighted_unit';
-			} else {
-				highlighted = '';
-			}
 			//what is the reading text?
 			text = CL.extractDisplayText(data[i], i, data.length, options.unit_id, options.app_id);
 
@@ -499,6 +509,16 @@ SV = (function () {
 			//what is the row id? (and add it to the list for adding events)
 			row_id = 'variant_unit_' + id + '_row_' + i;
 			row_list.push(row_id);
+
+			//Work out what reading highlighting classes we need
+			highlighted_classes = [];
+			if (data[i].witnesses.indexOf(highlighted_hand) != -1) {
+				//this is the regular highlighting of any selected witness
+				highlighted_classes.push('highlighted');
+			}
+			if (options.hasOwnProperty('highlighted_added_wits') && data[i].witnesses.filter(x => options.highlighted_added_wits.includes(x)).length > 0) {
+				highlighted_classes.push('added_highlighted');
+			}
 			if (options.hasOwnProperty('split') && options.split === true) {
 				if (data[i].hasOwnProperty('overlap_status')) {
 					html.push('<div id="' + 'drag_unit_' + id + '_reading_' + i + '" class="drag split_' + data[i].overlap_status + '_unit">');
@@ -520,13 +540,9 @@ SV = (function () {
 				}
 				html.push('<ul class="variant_unit" id="variant_unit_' + id + '_reading_' + i + '">');
 
-				if (data[i].witnesses.indexOf(hand) != -1) {
-					html.push('<li id="' + row_id + '" class="highlighted">');
-				} else {
-					html.push('<li id="' + row_id + '" >');
-				}
+				html.push('<li id="' + row_id + '" class="' + highlighted_classes.join(' ') + '">');
 				html.push('<div class="spanlike">' + reading_label + ' ' + text + reading_suffix + '  </div>');
-				temp = _showSubreadings(data[i], id, i, hand);
+				temp = _showSubreadings(data[i], id, i, highlighted_hand);
 				html.push.apply(html, temp[0]);
 				row_list.push.apply(row_list, temp[1]);
 				html.push('</li>');
@@ -535,34 +551,23 @@ SV = (function () {
 			} else {
 				if (i === 0) {
 					if (options.hasOwnProperty('overlap') && options.overlap === true) {
-						html.push('<div id="' + 'drag_unit_' + id + '" class="drag overlap_unit' + highlighted + '">');
+						html.push('<div id="' + 'drag_unit_' + id + '" class="drag overlap_unit' + highlighted_unit + '">');
 					} else if (options.hasOwnProperty('gap_unit') && options.gap_unit === true) {
-						html.push('<div id="' + 'drag_unit_' + id + '" class="drag gap_unit' + highlighted + '">');
+						html.push('<div id="' + 'drag_unit_' + id + '" class="drag gap_unit' + highlighted_unit + '">');
 					} else {
-						html.push('<div id="' + 'drag_unit_' + id + '" class="drag unit' + highlighted + '">');
+						html.push('<div id="' + 'drag_unit_' + id + '" class="drag unit' + highlighted_unit + '">');
 					}
 					if (data.length > 1) {
-						//debug version
-						//html.push('<ul class="variant_unit" id="variant_unit_' + id + '"><span>' + id + '</span><span id="toggle_variant_' + id + '" class="triangle">&#9660;</span><br/>');
-						//live version
 						html.push('<ul class="variant_unit" id="variant_unit_' + id + '"><span id="toggle_variant_' + id + '" class="triangle">&#9660;</span><br/>');
 					} else {
 						html.push('<ul class="variant_unit" id="variant_unit_' + id + '"><br/>');
 					}
-					if (data[i].witnesses.indexOf(hand) != -1) {
-						html.push('<li id="' + row_id + '" class="top highlighted">');
-					} else {
-						html.push('<li id="' + row_id + '" class="top">');
-					}
+					html.push('<li id="' + row_id + '" class="top ' + highlighted_classes.join(' ') + '">');
 				} else {
-					if (data[i].witnesses.indexOf(hand) != -1) {
-						html.push('<li id="' + row_id + '" class="highlighted">');
-					} else {
-						html.push('<li id="' + row_id + '" >');
-					}
+					html.push('<li id="' + row_id + '" class="' + highlighted_classes.join(' ') + '">');
 				}
 				html.push('<div class="spanlike">' + reading_label  + ' ' + text + reading_suffix + '  </div>');
-				temp = _showSubreadings(data[i], id, i, hand);
+				temp = _showSubreadings(data[i], id, i, highlighted_hand);
 				html.push.apply(html, temp[0]);
 				row_list.push.apply(row_list, temp[1]);
 				html.push('</li>');
@@ -4447,7 +4452,7 @@ SV = (function () {
 	_removeSplits = function () {
 		var i, key;
 		for (key in CL.data) {
-			if (CL.data.hasOwnProperty(key)) {
+			if (CL.data.hasOwnProperty(key) && key.indexOf('appartus' !== -1)) {
 				for (i = 0; i < CL.data[key].length; i +=1 ) {
 					if (CL.data[key][i].hasOwnProperty('split_readings')) {
 						delete CL.data[key][i].split_readings;

@@ -1016,15 +1016,27 @@ SV = (function () {
 			extra_results = CL.applyPreStageChecks('order_readings');
 			if (extra_results[0] === true) {
 				CL.showSubreadings = false;
-				//we have some legacy data which has not had all of the matching readings in each unit combined
-				//so to ensure they are fixed now we need to call the following 3 functions
-				//would be nicer to just change the data on the database but it would mean rewriting in python
+
 				prepareForOperation();
+				//we have some legacy data which has not had all of the matching readings in each unit combined
+				//so to ensure they are fixed now we need to call the following function (needs prepare and unprepare)
+				//would be nicer to just change the data on the database but it would mean rewriting in python
 				_removeSplits();
 				unprepareForOperation();
-				SR.loseSubreadings(); //for preparation and is needed
 				OR.removeSplits(); //ensure all the units are unsplit (readings wise) - still needed
 				OR.mergeSharedExtentOverlaps(); //do this before adding labels so the labels are correct))
+				//merge any shared readings in now joined overlap units (prepare and unprepare needed)
+				prepareForOperation();
+				for (let key in CL.data) {
+					if (CL.data.hasOwnProperty(key) && key.match(/apparatus\d*/g) !== null) {
+						for (let i=0; i<CL.data[key].length; i+=1 ) {
+							//this is only called if they are split at the time this function is called
+							unsplitUnitWitnesses(i, key);
+						}
+					}
+				}
+				unprepareForOperation();
+				SR.loseSubreadings(); //for preparation and is needed
 				OR.makeWasGapWordsGaps();
 				//merge lacs into a single unit
 				//we used to do this with OM as well but om verse should never be merged with OM so I don't run it anymore as there
@@ -2195,8 +2207,8 @@ SV = (function () {
 					}
 				}
 			}
-			unprepareForOperation();
 			unsplitUnitWitnesses(index, 'apparatus'); //just in case
+			unprepareForOperation();
 			if (app_id !== 'apparatus') {
 				//then check that all witness words in the unit are only 2 apart
 				problems = _checkUnitIntegrity(app_id, index);
@@ -4120,6 +4132,7 @@ SV = (function () {
 		document.getElementById('scroller').scrollTop = scroll_offset[1];
 	};
 
+	//TODO: check this is always between prepare and unprepare as this is needed for unsplitUnitWitnesses
 	_removeReadingFlag = function (reading_details) {
 		var scroll_offset;
 		scroll_offset = [document.getElementById('scroller').scrollLeft,
@@ -4450,17 +4463,18 @@ SV = (function () {
 	};
 
 	_removeSplits = function () {
-		var i, key;
-		for (key in CL.data) {
-			if (CL.data.hasOwnProperty(key) && key.indexOf('appartus' !== -1)) {
-				for (i = 0; i < CL.data[key].length; i +=1 ) {
+		for (let key in CL.data) {
+			if (CL.data.hasOwnProperty(key) && key.indexOf('apparatus') !== -1) {
+				for (let i=0; i<CL.data[key].length; i+=1 ) {
 					if (CL.data[key][i].hasOwnProperty('split_readings')) {
 						delete CL.data[key][i].split_readings;
-						unsplitUnitWitnesses(i, 'apparatus');
+						//this is only called if they are split at the time this function is called
+						unsplitUnitWitnesses(i, key);
 					}
 				}
 			}
 		}
+
 	};
 
 	_checkTAndNPresence = function () {

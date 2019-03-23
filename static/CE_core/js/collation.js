@@ -3267,7 +3267,7 @@ CL = (function() {
           temp = checkWitnessesAgainstProject(collation.data_settings.witness_list, project.witnesses);
           witsToAdd = temp[3];
           if (temp[3].length === 0) {
-            alert('No witnesses were found to add') //should never happen but just in case - TODO: it should then reload the table
+            alert('No witnesses were found to add'); //should never happen but just in case - TODO: it should then reload the table
             return;
           }
           _prepareAdditionalCollation(collation, witsToAdd);
@@ -3317,16 +3317,14 @@ CL = (function() {
                     CL.witnessesAdded.push(key);
                   }
                 }
-                mergedCollation = _mergeCollationObjects(JSON.parse(JSON.stringify(existing_collation)), data, witsToAdd);
-                CL.isDirty = true;
-                _displaySavedCollation(mergedCollation);
-
-                //merge collation objects-
-                //set CL data stuff correctly unless this is done as part of the load which I think it probably is.
-                //remember the witnesses that were added (you should show the list somewhere probably) the provided datais identifiers so need to recreate using hand_id_map in newData
-                //add button to highlight all readings with added witnesses (this will need support in the show... functions which currently only allows for 1)
-
-
+                if (existing_collation.status === 'regularised') {
+                  //HERE TODO: collate the new stuff - merge like with patristics but without combining with existing readings - basically treat all as new readings
+                  //TODO: recollate needs hacking to only recollate the new witnesses and then display against saved in the same way as this.
+                } else if (existing_collation.status === 'set') {
+                  mergedCollation = _mergeCollationObjects(JSON.parse(JSON.stringify(existing_collation)), data, witsToAdd);
+                  CL.isDirty = true;
+                  _displaySavedCollation(mergedCollation);
+                }
               } else {
                 alert('The new witnesses could not be added this time due to a problem with the basetexts, please try again.');
                 //TODO: reload summary page?

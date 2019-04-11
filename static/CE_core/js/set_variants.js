@@ -466,6 +466,9 @@ SV = (function () {
 		highlighted_hand, highlighted_unit, highlighted_classes, SV_rules, key, label_suffix, reading_suffix, alpha_id, reading_label;
 		html = [];
 		row_list = [];
+		if (typeof options === 'undefined') {
+      options = {};
+    }
 		if (options.hasOwnProperty('highlighted_wit')) {
 			highlighted_hand = options.highlighted_wit.split('|')[1];
 		} else {

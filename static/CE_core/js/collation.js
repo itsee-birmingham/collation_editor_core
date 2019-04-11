@@ -36,7 +36,8 @@ CL = (function() {
       witnessEditingMode = false,
       witnessAddingMode = false,
       witnessRemovingMode = false,
-      witnessesAdded = [];
+      witnessesAdded = [],
+      existingCollation = null;
 
 
   //private variable declarations
@@ -61,7 +62,7 @@ CL = (function() {
   makeStandoffReading, doMakeStandoffReading, makeMainReading, getOrderedAppLines,
   loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
   calculatePosition, removeWitness, checkWitnessesAgainstProject, setUpRemoveWitnessesForm,
-  removeWitnesses, loadSavedCollation, returnToSummaryTable;
+  removeWitnesses, loadSavedCollation, returnToSummaryTable, prepareAdditionalCollation;
 
   //private function declarations
   let _initialiseEditor, _initialiseProject, _setProjectConfig, _setDisplaySettings,
@@ -81,7 +82,7 @@ CL = (function() {
    _getMousePosition, _displayWitnessesHover, _getWitnessesForReading,
    _findStandoffWitness, _findReadingPosById, _getPreStageChecks, _makeRegDecisionsStandoff,
    _contextInputOnload, _removeWitnessFromUnit, _findSaved, _addToSavedCollation,
-   _prepareAdditionalCollation, _displaySavedCollation, _mergeCollationObjects,
+   _displaySavedCollation, _mergeCollationObjects,
    _getUnitsByStartIndex, _mergeNewLacOmVerseReadings, _mergeNewReading;
 
 
@@ -976,7 +977,7 @@ CL = (function() {
    * app - a number showing which row of apparatus
    * format - which stage of the editor are we at
    * options - a dictionary of possible options
-   * 		possibilities are:
+   * 		possibilities include:
    * 			sort - boolean - do the readings need sorting (default = false)
    * 			highlighted_wit - the witness to highlight
    * 			highlighted_version - a versional witness to highlight (version editor only)
@@ -1033,6 +1034,8 @@ CL = (function() {
           } else {
             id_string = String(j);
           }
+          //why am I recreating the options here and not reusing - any not required will just be ignored if the getUnitData function doesn't know about them
+          //some might need adding but most seem to be the same
           unit_data_options = {
             'unit_id': unit._id
           };
@@ -1058,6 +1061,9 @@ CL = (function() {
           }
           if (unit.hasOwnProperty('created') && unit.created === true) {
             unit_data_options.created = true;
+          }
+          if (true) { //TODO: placeholder for testing reomve or do this differently
+            unit_data_options.prevent_regularisation = true;
           }
           if (unit.hasOwnProperty('overlap_units')) {
             unit_data_options.overlapping_ids = [];
@@ -3264,30 +3270,44 @@ CL = (function() {
       CL.services.getCurrentEditingProject(function(project) {
         var temp, witsToAdd;
         if (collation) {
+
           temp = checkWitnessesAgainstProject(collation.data_settings.witness_list, project.witnesses);
           witsToAdd = temp[3];
           if (temp[3].length === 0) {
             alert('No witnesses were found to add'); //should never happen but just in case - TODO: it should then reload the table
             return;
           }
-          _prepareAdditionalCollation(collation, witsToAdd);
+          CL.existingCollation = collation;
+          if (collation.status === 'regularised') {
+            alert('When using the add witnesses functions rules can only be made for the witnesses being added.\nChanging the settings will also only have an affect on the witnesses being added.\n\nIf you need to add more rules for existing witnesses then you should recollate the unit from scratch and then redo all of the later stages.')
+          }
+          prepareAdditionalCollation(collation, witsToAdd);
         }
       });
     });
   };
 
-  _prepareAdditionalCollation = function(existing_collation, witsToAdd) {
+  prepareAdditionalCollation = function(existing_collation, witsToAdd) {
     var context;
     SPN.show_loading_overlay();
-    CL.dataSettings.language = document.getElementById('language').value;
-    CL.dataSettings.base_text = document.getElementById('base_text').value;
-    //ensure we use the display settings that were used for the existing collation (they are read from here at collation time)
-    CL.displaySettings = existing_collation.display_settings;
+    if (document.getElementById('language')) {
+      CL.dataSettings.language = document.getElementById('language').value;
+    }
+    if (document.getElementById('base_text')) {
+      CL.dataSettings.base_text = document.getElementById('base_text').value;
+    }
+    if (existing_collation.status !== 'regularised') {
+      //ensure we use the display settings that were used for the existing collation in SV (they are read from here at collation time)
+      //we do not use these for RG as the user can change and we use default ones so we don't hide anything they would want to see
+      CL.displaySettings = existing_collation.display_settings;
+    }
     context = existing_collation.context;
     if (context && CL.dataSettings.base_text !== 'none') {
       CL.context = context;
       CL.dataSettings.witness_list = witsToAdd;
-      CL.dataSettings.witness_list.push(CL.dataSettings.base_text);
+      if (CL.dataSettings.witness_list.indexOf(CL.dataSettings.base_text) === -1) {
+        CL.dataSettings.witness_list.push(CL.dataSettings.base_text);
+      }
       RG.getCollationData('add_witnesses', 0, function () {
         // //TODO: remove - this manipulates the data to create an addition in the new unit so we can test making a new unit
         // for (let i=0; i<CL.collateData.data.length; i+=1) {
@@ -3303,14 +3323,14 @@ CL = (function() {
         //   }
         // }
         // //TODO: end of stuff to remove
-        //TODO: when running the collation is must use the display settings from the existing collation at least when loading into SV (this works) - will need to think carefully about RG
-          RG.runCollation(CL.collateData, 'add_witnesses', 0, function (data) {
+        RG.runCollation(CL.collateData, 'add_witnesses', 0, function (data) {
             var mergedCollation;
             CL.data = data; //temporary assignment to allow all the cleaning functions to work
             lacOmFix();
             data = JSON.parse(JSON.stringify(CL.data)); //copy so we can change CL.data without screwing this up
             if (CL.context === existing_collation.context) { //assume CL.context agrees with the new data since it was used to fetch it
               if (data.overtext_name === existing_collation.structure.overtext_name) { //check we have basetext agreement
+
                 CL.witnessesAdded = [];
                 for (let key in data.hand_id_map) {
                   if (data.hand_id_map[key] !== CL.dataSettings.base_text) {
@@ -3318,11 +3338,20 @@ CL = (function() {
                   }
                 }
                 if (existing_collation.status === 'regularised') {
-                  //HERE TODO: collate the new stuff - merge like with patristics but without combining with existing readings - basically treat all as new readings
-                  //TODO: recollate needs hacking to only recollate the new witnesses and then display against saved in the same way as this.
+                  //merge the existing and new collations
+                  mergedCollation = _mergeCollationObjects(JSON.parse(JSON.stringify(existing_collation)), data, witsToAdd);
+                  //On save they will need smushing together in the case of witnesses or the main one overiding the new one in the case of displaysetting etc.
+                  // like mergedCollation does but they should be separate until then
+
+                  CL.isDirty = true;
+                  //display the pre-merged data
+                  _displaySavedCollation(mergedCollation);
+
                 } else if (existing_collation.status === 'set') {
+                  //merge the existing and new collations
                   mergedCollation = _mergeCollationObjects(JSON.parse(JSON.stringify(existing_collation)), data, witsToAdd);
                   CL.isDirty = true;
+                  //display the pre-merged data
                   _displaySavedCollation(mergedCollation);
                 }
               } else {
@@ -3412,7 +3441,7 @@ CL = (function() {
               }
               index += 1;
             } else {
-              alert('the new witnesses cannot be added due to a problem with a conflict of basetexts');
+              alert('the new witnesses cannot be added due to a problem with a conflict of basetexts (error CL:3433)');
               //TODO: more sensible message and reload summary page here or get
               SPN.remove_loading_overlay();
               return null;
@@ -3621,9 +3650,12 @@ CL = (function() {
         if (!CL.data.apparatus[0].hasOwnProperty('_id')) {
           addUnitAndReadingIds();
         }
-        CL.displaySettings = collation.display_settings;
-        CL.dataSettings = collation.data_settings;
-        CL.algorithmSettings = collation.algorithm_settings;
+        if (collation.status !== 'regularised' || (collation.status === 'regularised' && CL.witnessAddingMode !== true)) {
+          //We use the settings from the saved collation in all cases apart from when adding witnesses at RG stage
+          CL.displaySettings = collation.display_settings;
+          CL.dataSettings = collation.data_settings;
+          CL.algorithmSettings = collation.algorithm_settings;
+        }
         CL.container = document.getElementById('container');
 
         options = {};
@@ -5192,6 +5224,7 @@ CL = (function() {
     checkWitnessesAgainstProject: checkWitnessesAgainstProject,
     loadSavedCollation: loadSavedCollation,
     returnToSummaryTable: returnToSummaryTable,
+    prepareAdditionalCollation: prepareAdditionalCollation,
 
 
     //deprecated function mapping for calls from older services

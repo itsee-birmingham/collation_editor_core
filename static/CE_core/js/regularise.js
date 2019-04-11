@@ -22,7 +22,7 @@ RG = (function() {
   _setUpRuleMenu, _getRuleScopes, _getSuffix, _makeMenu, _redipsInitRegularise,
   _getAncestorRow, _showGlobalExceptions, _removeGlobalExceptions, _scheduleAddGlobalException,
   _scheduleRuleDeletion, _deleteUnappliedRule, _addContextMenuHandlers, _showCollationTable,
-  _scheduleSelectedRulesDeletion, _addFooterFunctions;
+  _scheduleSelectedRulesDeletion, _addFooterFunctions, _highlightAddedWitness;
 
   //*********  public functions *********
 
@@ -61,15 +61,15 @@ RG = (function() {
    * */
   getUnitData = function(data, id, start, end, options) {
     var i, html, j, k, l, decisions, rows, cells, row_list, temp, events, max_length, row_id, type,
-      subrow_id, colspan, hand, class_string, div_class_string, witness, id_dict, key, words, reg_class,
+      subrow_id, colspan, highlighted_hand, classes, div_class_string, witness, id_dict, key, words, reg_class,
       highlighted, cells_dict, rule_cells, keys_to_sort, class_list, variant_unit_id;
     if (typeof options === 'undefined') {
       options = {};
     }
     if (options.hasOwnProperty('highlighted_wit')) {
-      hand = options.highlighted_wit.split('|')[1];
+      highlighted_hand = options.highlighted_wit.split('|')[1];
     } else {
-      hand = null;
+      highlighted_hand = null;
     }
     html = [];
     row_list = [];
@@ -84,15 +84,17 @@ RG = (function() {
       if (i === 0) {
         cells.push('<tr><td class="mark" colspan="MX_LN"><span id="toggle_variant_' + id + '" class="triangle">&#9650;</span></td></tr>');
       }
-      class_string = '';
-      if (data[i].witnesses.indexOf(hand) != -1 && i === 0) {
-        class_string = ' class="top highlighted" ';
-      } else if (data[i].witnesses.indexOf(hand) != -1) {
-        class_string = ' class="highlighted" ';
-      } else if (i === 0) {
-        class_string = ' class="top" ';
+      classes = [];
+      if (i === 0) {
+        classes.push('top');
       }
-      cells.push('<tr id="' + row_id + '"' + class_string + '>');
+      if (data[i].witnesses.indexOf(highlighted_hand) != -1) {
+        classes.push('highlighted');
+      }
+      if (options.hasOwnProperty('highlighted_added_wits') && data[i].witnesses.filter(x => options.highlighted_added_wits.includes(x)).length > 0) {
+				classes.push('added_highlighted');
+			}
+      cells.push('<tr id="' + row_id + '" class="' + classes.join(' ') + '">');
       cells.push('<td class="mark"><div class="spanlike">' + CL.getAlphaId(i) + '. </div></td>');
       if (data[i].text.length === 0) {
         if (i === 0) {
@@ -111,8 +113,14 @@ RG = (function() {
         for (j = 0; j < data[i].text.length; j += 1) {
           variant_unit_id = 'variant_unit_' + id + '_r' + i + '_w' + j;
           div_class_string = '';
-          if (i > 0) {
+
+          class_list = [];
+          //if we are in witnessAdding mode only allow regularisation of readings that have added witnesses (the rules will only be made with the added ones not the full set)
+          if (i > 0 && (CL.witnessAddingMode === false || (CL.witnessAddingMode === true && data[i].witnesses.filter(x => CL.witnessesAdded.includes(x)).length > 0))) {
             class_list = ['drag', 'clone', 'reg_word'];
+          }
+
+          if (i > 0) {
             if (_hasRuleApplied(variant_unit_id)) {
               class_list.push('regularisation_staged');
             }
@@ -174,18 +182,18 @@ RG = (function() {
                 if (keys_to_sort.indexOf(id_dict[key].witnesses[0]) === -1) {
                   keys_to_sort.push(id_dict[key].witnesses[0]);
                 }
-                if (id_dict[key].witnesses.indexOf(hand) !== -1) {
+                if (id_dict[key].witnesses.indexOf(highlighted_hand) !== -1) {
                   highlighted = 'highlighted ';
                 }
                 subrow_id = row_id + '_word_' + j + '_rule_' + key;
                 rule_cells.push('<tr class="' + reg_class + highlighted + '" id="' + subrow_id + '"><td>');
-                if (id_dict[key].witnesses.indexOf(hand) !== -1) {
+                if (id_dict[key].witnesses.indexOf(highlighted_hand) !== -1) {
                   rule_cells.push('<div class="spanlike">');
                 }
                 rule_cells.push(id_dict[key].t.replace(/_/g, '&#803;'));
                 rule_cells.push(' &#9654; ');
                 rule_cells.push(id_dict[key].n.replace(/_/g, '&#803;'));
-                if (id_dict[key].witnesses.indexOf(hand) !== -1) {
+                if (id_dict[key].witnesses.indexOf(highlighted_hand) !== -1) {
                   rule_cells.push('</div>');
                 }
                 rule_cells.push('</td></tr>');
@@ -235,19 +243,23 @@ RG = (function() {
         document.getElementById('scroller').scrollTop
       ];
     }
-    if ($.isEmptyObject(CL.collateData)) {
-      getCollationData('units', scroll_offset, function() {
+    if (CL.witnessAddingMode !== true) {
+      if ($.isEmptyObject(CL.collateData)) {
+        getCollationData('units', scroll_offset, function() {
+          runCollation(CL.collateData, 'units', scroll_offset);
+        });
+      } else {
         runCollation(CL.collateData, 'units', scroll_offset);
-      }); //collation_source, output, scroll_offset, callback
+      }
     } else {
-      runCollation(CL.collateData, 'units', scroll_offset);
+      CL.prepareAdditionalCollation(CL.existingCollation, CL.dataSettings.witness_list);
     }
   };
 
   showVerseCollation = function(data, context, container, options) {
     var html, i, last_row, tr, temp, event_rows, row, triangles, bk, ch, v, nextCh, nextV, prevCh, prevV,
       header, unit_events, key, global_exceptions_html, show_hide_regularisations_button_text,
-      remove_wits_form, wits, footerHtml;
+      remove_wits_form, wits, footerHtml, preselected_added_highlight;
     console.log(JSON.parse(JSON.stringify(data)));
 
     if (typeof options === 'undefined') {
@@ -255,6 +267,9 @@ RG = (function() {
     }
     if (!options.hasOwnProperty('highlighted_wit') && CL.highlighted !== 'none') {
       options.highlighted_wit = CL.highlighted;
+    }
+    if (CL.witnessAddingMode === true && !options.hasOwnProperty('highlighted_added_wits')) {
+      options.highlighted_added_wits = CL.highlightedAdded;
     }
 
     options.sort = true;
@@ -296,9 +311,6 @@ RG = (function() {
             document.getElementsByTagName('body')[0].appendChild(remove_wits_form);
             CL.setUpRemoveWitnessesForm(wits[2], data, 'regularised');
           }, 'text');
-        }
-        if ((wits[1] === 'added' || wits[1] === 'both') && CL.witnessAddingMode === true) {
-          console.log('******** add option needed');
         }
       }
     }
@@ -348,11 +360,14 @@ RG = (function() {
       footerHtml.push('<button class="pure-button right_foot" id="go_to_sv_button">move to set variants</button>');
     }
     footerHtml.push('<button class="pure-button right_foot" id="save_button">save</button>');
-    if (CL.witnessEditingMode === false) {
+    if (CL.witnessEditingMode === false || CL.witnessAddingMode === true) {
       footerHtml.push('<button class="pure-button right_foot" id="recollate_button" type="button">recollate</button>');
       footerHtml.push('<button class="pure-button right_foot" id="settings_button">settings</button>');
     }
     footerHtml.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
+    if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
+			footerHtml.push('<select class="right_foot" id="added_highlight" name="added_highlight"></select>');
+		}
     document.getElementById('footer').innerHTML = footerHtml.join('');
 
     SPN.remove_loading_overlay();
@@ -362,10 +377,17 @@ RG = (function() {
 
     CL.addTriangleFunctions('table');
     cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected':options.highlighted_wit, 'add_select': true, 'select_label_text': 'highlight witness'});
-    
+    if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
+			if (options.highlighted_added_wits.length === 1) {
+				preselected_added_highlight = options.highlighted_added_wits[0];
+			} else {
+				preselected_added_highlight = 'all';
+			}
+			cforms.populateSelect(CL.sortWitnesses(CL.witnessesAdded), document.getElementById('added_highlight'), {'selected': preselected_added_highlight, 'add_select': true, 'select_label_details': {'label': 'highlight all added witnesses', 'value': 'all'}})
+		}
 
     //TODO: probably better in for loop
-    if (CL.witnessEditingMode === false) {
+    if (CL.witnessRemovingMode !== true) {
       i = 0;
       while (i <= temp[4]) {
         if (document.getElementById('drag' + i) !== null) {
@@ -385,6 +407,9 @@ RG = (function() {
     $('#highlighted').on('change', function(event) {
       _highlightWitness(event.target.value);
     });
+    if (document.getElementById('added_highlight')) {
+			$('#added_highlight').on('change', function (event) {_highlightAddedWitness(event.target.value)});
+		}
     _showRegularisations();
 
     CL.makeVerseLinks();
@@ -405,6 +430,24 @@ RG = (function() {
         }
       }
     }
+  };
+
+  /** highlight a witness that has been added or highlight all added witnesses with 'all' (only in CL.witnessAddingMode), called from select box in page footer */
+  _highlightAddedWitness = function (witness) {
+    var scroll_offset, witnesses;
+    scroll_offset = [document.getElementById('scroller').scrollLeft,
+                     document.getElementById('scroller').scrollTop];
+
+    if (witness === 'all') {
+      witnesses = CL.witnessesAdded;
+    } else {
+      witnesses = [witness];
+    }
+    CL.highlightedAdded = witnesses;
+    showVerseCollation(CL.data, CL.context, CL.container, {'highlighted_added_wits': witnesses});
+
+    document.getElementById('scroller').scrollLeft = scroll_offset[0];
+    document.getElementById('scroller').scrollTop = scroll_offset[1];
   };
 
   _addFooterFunctions = function () {

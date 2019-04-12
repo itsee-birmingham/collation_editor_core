@@ -63,7 +63,7 @@ RG = (function() {
     var i, html, j, k, l, decisions, rows, cells, row_list, temp, events, max_length, row_id, type,
       subrow_id, colspan, highlighted_hand, classes, div_class_string, witness, id_dict, key, words, reg_class,
       highlighted, cells_dict, rule_cells, keys_to_sort, class_list, variant_unit_id;
-    if (typeof options === 'undefined') {
+    if (options === undefined) {
       options = {};
     }
     if (options.hasOwnProperty('highlighted_wit')) {
@@ -268,6 +268,10 @@ RG = (function() {
     if (!options.hasOwnProperty('highlighted_wit') && CL.highlighted !== 'none') {
       options.highlighted_wit = CL.highlighted;
     }
+    if (CL.witnessAddingMode === true) {
+			//this sets this a default so that when all is highlighted this will work - any data specified in options will override it
+      CL.highlightedAdded = JSON.parse(JSON.stringify(CL.witnessesAdded));
+		}
     if (CL.witnessAddingMode === true && !options.hasOwnProperty('highlighted_added_wits')) {
       options.highlighted_added_wits = CL.highlightedAdded;
     }
@@ -508,53 +512,6 @@ RG = (function() {
       function(event) {
         CL.saveCollation('regularised');
       });
-      // $('#go_to_sv_with_remove_button').on('click',
-      //   function(event) {
-      //     var collId;
-      //     SPN.show_loading_overlay();
-      //     if (document.getElementById('remove_witnesses_div')) {
-      //       document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
-      //     }
-      //     CL.services.getUserInfo(function(user) {
-      //       if (user) {
-      //         CL.services.getSavedCollations(CL.context, user.id, function (collations) {
-      //           //TODO: consider some kind of save warning if last save not within a few minutes.
-      //           //we have the save time in the collation data returned
-      //           //None of the checks usually made are needed because no genuine editing has been done
-      //           //and we have already checked all units are complete
-      //           //Need to load saved SV for this user
-      //           for (let i=0; i<collations.length; i+=1) {
-      //             if (collations[i].status === 'set' && collations[i].user === user.id) {
-      //               collId = collations[i].id;
-      //             }
-      //           }
-      //           //NB: Any case where the same action (i.e. remove/add) does not need to happen at the
-      //           //next stage will alert the user and reload the table.
-      //           //This is a special mode and to break out of the mode you must go back.
-      //           //This could be changed later but let's keep it locked down for now until we see how stable it is.
-      //           if (collId === undefined) {
-      //             //then there is no saved version at set variants so alert and go back to the table
-      //
-      //
-      //             return;
-      //           }
-      //           //get the collation and check the witnesses against the project
-      //           CL.services.loadSavedCollation(collId, function (collation) {
-      //             var wits;
-      //             CL.services.getCurrentEditingProject(function(project) {
-      //               wits = CL.checkWitnessesAgainstProject(collation.data_settings.witness_list, project.witnesses);
-      //               if (wits[0] === true) {
-      //
-      //               }
-      //             });
-      //           });
-      //           CL.loadSavedCollation(collId);
-      //         });
-      //       } else {
-      //         console.log('User not found - is user still logged in?');
-      //       }
-      //     });
-      //   });
   };
 
 
@@ -1085,7 +1042,11 @@ RG = (function() {
       unit = parseInt(unit_data.substring(0, unit_data.indexOf('_r')).replace('variant_unit_', ''), 10);
       reading = parseInt(unit_data.substring(unit_data.indexOf('_r') + 2, unit_data.indexOf('_w')), 10);
       word = parseInt(unit_data.substring(unit_data.indexOf('_w') + 2), 10);
-      witnesses = CL.data.apparatus[unit].readings[reading].witnesses;
+      if (CL.witnessAddingMode !== true) {
+        witnesses = CL.data.apparatus[unit].readings[reading].witnesses;
+      } else {
+        witnesses = CL.data.apparatus[unit].readings[reading].witnesses.filter(x => CL.witnessesAdded.includes(x));
+      }
       original_text = CL.data.apparatus[unit].readings[reading].text[word];
       original_display_text = CL.data.apparatus[unit].readings[reading].text[word]['interface'];
       if (document.getElementById('reg_form') !== null) {
@@ -1104,11 +1065,8 @@ RG = (function() {
           data['class'] = 'none';
         }
         CL.services.getUserInfo(function(user) {
-          //FIX: here
-          _rules[word_id] = _createRule(data, user, original_text, normalised_text, unit, reading, word, witnesses)
-          //_rules.push.apply(_rules, _createRule(data, user, original_text, normalised_text, unit, reading, word, witnesses));
+          _rules[word_id] = _createRule(data, user, original_text, normalised_text, unit, reading, word, witnesses);
         });
-
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
         rd.enableDrag(false, rd.objOld);
         $(original).addClass('regularisation_staged');
@@ -1118,11 +1076,21 @@ RG = (function() {
         if (new_unit_data !== '') { //only try this if it is not a user added reading
           new_unit = parseInt(new_unit_data.substring(0, new_unit_data.indexOf('_r')).replace('variant_unit_', ''), 10);
           new_reading = parseInt(new_unit_data.substring(new_unit_data.indexOf('_r') + 2, new_unit_data.indexOf('_w')), 10);
-          //TODO: check this isn't causing problems by not eliminating suffixes.
-          new_witnesses = CL.getReadingWitnesses(CL.data.apparatus[unit].readings[reading]);
+          if (CL.witnessAddingMode !== true) {
+            //TODO: check this isn't causing problems by not eliminating suffixes.
+            new_witnesses = CL.getReadingWitnesses(CL.data.apparatus[unit].readings[reading]);
+          } else {
+            //TODO: check this isn't causing problems by not eliminating suffixes.
+            new_witnesses = CL.getReadingWitnesses(CL.data.apparatus[unit].readings[reading]).filter(x => CL.witnessesAdded.includes(x));
+          }
+          console.log(new_witnesses)
+          console.log(CL.project.hasOwnProperty('id'))
+          console.log('+++++')
           if (CL.project.hasOwnProperty('id')) {
             for (i = 0; i < new_witnesses.length; i += 1) {
               suffix = _getSuffix(data['class']);
+              console.log(data['class'])
+              console.log(suffix)
               CL.data.apparatus[new_unit].readings[new_reading].witnesses.push(new_witnesses[i] + suffix);
             }
           }
@@ -1182,6 +1150,10 @@ RG = (function() {
     //document.getElementById('reg_form').style.top = (rd.td.current.offsetTop + rd.obj.redips.container.offsetParent.offsetTop - document.getElementById('scroller').scrollTop) + 'px';
     document.getElementById('reg_form').style.left = left_pos + 'px';
 
+    if (CL.witnessAddingMode === true) {
+      document.getElementById('rule_creation_warning').innerHTML = 'Rules created will only apply to the witnesses being added.';
+    }
+
     rule_scopes = _getRuleScopes();
     cforms.populateSelect(rule_scopes, document.getElementById('scope'), {'value_key': 'value', 'text_keys': 'label', 'add_select': false});
     cforms.populateSelect(classes, document.getElementById('class'), {'value_key': 'value', 'text_keys': 'label', 'add_select': false, 'selected': selected});
@@ -1233,21 +1205,14 @@ RG = (function() {
   };
 
   _getSuffix = function(decision_class) {
-    var i, suffix, rule_classes;
+    var i, suffix;
     suffix = '';
-    if (CL.project.hasOwnProperty('ruleClasses') && CL.project.ruleClasses !== undefined) {
-      rule_classes = CL.project.ruleClasses;
-    } else if (CL.services.hasOwnProperty('ruleClasses')) {
-      rule_classes = CL.services.ruleClasses;
-    } else {
-      rule_classes = DEF.ruleClasses;
-    }
-    for (i = 0; i < rule_classes.length; i += 1) {
-      if (rule_classes[i].value === decision_class) {
-        if (rule_classes[i].hasOwnProperty('suffixed_sigla') &&
-            rule_classes[i].suffixed_sigla === true &&
-            typeof rule_classes[i].identifier !== 'undefined') {
-          suffix += rule_classes[i].identifier;
+    for (i = 0; i < CL.ruleClasses.length; i += 1) {
+      if (CL.ruleClasses[i].value === decision_class) {
+        if (CL.ruleClasses[i].hasOwnProperty('suffixed_sigla') &&
+            CL.ruleClasses[i].suffixed_sigla === true &&
+            typeof CL.ruleClasses[i].identifier !== 'undefined') {
+          suffix += CL.ruleClasses[i].identifier;
         }
       }
     }

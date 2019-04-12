@@ -37,6 +37,9 @@ CL = (function() {
       witnessAddingMode = false,
       witnessRemovingMode = false,
       witnessesAdded = [],
+      savedDisplaySettings = null,
+      savedAlgorithmSettings = null,
+      savedDataSettings = null,
       existingCollation = null;
 
 
@@ -1062,9 +1065,6 @@ CL = (function() {
           if (unit.hasOwnProperty('created') && unit.created === true) {
             unit_data_options.created = true;
           }
-          if (true) { //TODO: placeholder for testing reomve or do this differently
-            unit_data_options.prevent_regularisation = true;
-          }
           if (unit.hasOwnProperty('overlap_units')) {
             unit_data_options.overlapping_ids = [];
             for (key in unit.overlap_units) {
@@ -1559,16 +1559,22 @@ CL = (function() {
     SPN.show_loading_overlay();
     CL.services.getUserInfo(function(user) {
       if (user) {
-        //approved has different rules than others.
         collation = {
           'structure': CL.data,
           'status': status,
           'context': CL.context,
-          'user': user.id,
-          'data_settings': CL.dataSettings,
-          'algorithm_settings': CL.algorithmSettings,
-          'display_settings': CL.displaySettings
+          'user': user.id
         };
+        if (status === 'regularised' && CL.witnessAddingMode === true) {
+          collation.data_settings = CL.savedDataSettings;
+          collation.algorithm_settings = CL.savedAlgorithmSettings;
+          collation.display_settings = CL.savedDisplaySettings;
+        } else {
+          collation.data_settings = CL.dataSettings;
+          collation.algorithm_settings = CL.algorithmSettings;
+          collation.display_settings = CL.displaySettings;
+        }
+        //approved has different rules than others.
         if (status === 'approved') {
           approval_settings = _getApprovalSettings();
           collation.id = CL.context + '_' + status;
@@ -2521,6 +2527,10 @@ CL = (function() {
     if (document.getElementById('collate')) {
       $('#collate').off('click.run_collation');
       $('#collate').on('click.run_collation', function() {
+        //just set these all to false as a precaution
+        CL.witnessEditingMode = false;
+        CL.witnessAddingMode = false;
+        CL.witnessRemovingMode = false;
         if (document.getElementById('settings')) {
           document.getElementById('settings').parentNode.removeChild(document.getElementById('settings'));
         }
@@ -2990,6 +3000,11 @@ CL = (function() {
     var by_user, users, user, i, status, date, minutes, datestring, approved;
     by_user = {};
     users = [];
+    //reset default settings just for safety - shouldn't really be needed
+    CL.witnessEditingMode = false;
+    CL.witnessAddingMode = false;
+    CL.witnessRemovingMode = false;
+
     if (data.length > 0) {
       for (i = 0; i < data.length; i += 1) {
         if (data[i].hasOwnProperty('_id')) {
@@ -3650,8 +3665,14 @@ CL = (function() {
         if (!CL.data.apparatus[0].hasOwnProperty('_id')) {
           addUnitAndReadingIds();
         }
-        if (collation.status !== 'regularised' || (collation.status === 'regularised' && CL.witnessAddingMode !== true)) {
-          //We use the settings from the saved collation in all cases apart from when adding witnesses at RG stage
+        //If we are adding witnesses at the regularisation stage then we need to save the settings
+        //from the main saved collation but not use them for the live data (we need them for saving later)
+        if (collation.status === 'regularised' && CL.witnessAddingMode === true) {
+          CL.savedDisplaySettings = collation.display_settings;
+          CL.savedDataSettings = collation.data_settings;
+          CL.savedAlgorithmSettings = collation.algorithm_settings;
+        } else {
+          //otherwise we can use them
           CL.displaySettings = collation.display_settings;
           CL.dataSettings = collation.data_settings;
           CL.algorithmSettings = collation.algorithm_settings;

@@ -469,6 +469,10 @@ div.highlighted_unit {
   margin-top: 3px;
 }
 
+.reg_form #rule_creation_warning {
+  color: maroon;
+}
+
 #regularisation_menu {
   width: 300px;
 }

@@ -1216,6 +1216,24 @@ RG = (function() {
         }
       }
     }
+    //This is what was in master branch but it was improved and corrected in the muya_dev branch
+    // if (CL.project.hasOwnProperty('ruleClasses') && CL.project.ruleClasses !== undefined) {
+    //   rule_classes = CL.project.ruleClasses;
+    // } else if (CL.services.hasOwnProperty('ruleClasses')) {
+    //   rule_classes = CL.services.ruleClasses;
+    // } else {
+    //   rule_classes = DEF.ruleClasses;
+    // }
+    // for (i = 0; i < rule_classes.length; i += 1) {
+    //   if (rule_classes[i].value === decision_class) {
+    //     if (rule_classes[i].hasOwnProperty('suffixed_sigla') &&
+    //         rule_classes[i].suffixed_sigla === true &&
+    //         rule_classes[i].hasOwnProperty('identifier') &&
+    //         typeof rule_classes[i].identifier !== 'undefined') {
+    //       suffix += rule_classes[i].identifier;
+    //     }
+    //   }
+    // }
     return suffix;
   };
 

@@ -2783,9 +2783,8 @@ CL = (function() {
       CL.project.name = project.name;
     }
     //end deprecation
-    //TODO: this is hard coded for convenience and testing but needs to be in the
-    //services and project settings before releasing
-    CL.project.allowWitnessChanges = true;
+
+
 
     CL.project.witnesses = project.witnesses;
     if (project.hasOwnProperty('book_name')) {
@@ -2809,6 +2808,16 @@ CL = (function() {
     if (project.hasOwnProperty('useVForSupplied')) {
       CL.project.useVForSupplied = project.useVForSupplied;
     }
+    //settings for witness changes
+    if (project.hasOwnProperty('allowWitnessChangesInSavedCollations')) {
+      CL.project.allowWitnessChangesInSavedCollations = project.allowWitnessChangesInSavedCollations;
+    } else if (CL.services.hasOwnProperty('allowWitnessChangesInSavedCollations')) {
+      CL.project.allowWitnessChangesInSavedCollations = CL.services.allowWitnessChangesInSavedCollations;
+    } else {
+      //default is false
+      CL.project.allowWitnessChangesInSavedCollations = false;
+    }
+
     //this bit does the index page settings.
     //If the services want to do their own thing regarding forms (like Django)
     //then CL.services.contextInput or relevant subsections should be null
@@ -3245,10 +3254,10 @@ CL = (function() {
     });
     footerHtml = [];
     footerHtml.push('<input class="pure-button right_foot" id="load_saved_button" type="button" value="Load collation"/>');
-    if (hasCollationsWithWitsToAdd === true) {
+    if (hasCollationsWithWitsToAdd === true && CL.project.allowWitnessChangesInSavedCollations === true) {
       footerHtml.push('<input class="pure-button pure-button-disabled right_foot" id="load_saved_add_button" type="button" value="Load collation and add witnesses"/>');
     }
-    if (hasCollationsWithWitsToRemove === true) {
+    if (hasCollationsWithWitsToRemove === true && CL.project.allowWitnessChangesInSavedCollations === true) {
       footerHtml.push('<input class="pure-button pure-button-disabled right_foot" id="load_saved_remove_button" type="button" value="Load collation and remove witnesses"/>');
     }
     document.getElementById('footer').innerHTML = footerHtml.join('');

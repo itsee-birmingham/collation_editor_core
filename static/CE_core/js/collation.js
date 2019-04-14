@@ -2811,13 +2811,10 @@ CL = (function() {
     }
     //settings for witness changes
     if (project.hasOwnProperty('allowWitnessChangesInSavedCollations')) {
-      console.log('setting from project')
       CL.project.allowWitnessChangesInSavedCollations = project.allowWitnessChangesInSavedCollations;
     } else if (CL.services.hasOwnProperty('allowWitnessChangesInSavedCollations')) {
-      console.log('setting from services')
       CL.project.allowWitnessChangesInSavedCollations = CL.services.allowWitnessChangesInSavedCollations;
     } else {
-      console.log('using default')
       //default is false
       CL.project.allowWitnessChangesInSavedCollations = false;
     }

@@ -2811,10 +2811,13 @@ CL = (function() {
     }
     //settings for witness changes
     if (project.hasOwnProperty('allowWitnessChangesInSavedCollations')) {
+      console.log('setting from project')
       CL.project.allowWitnessChangesInSavedCollations = project.allowWitnessChangesInSavedCollations;
     } else if (CL.services.hasOwnProperty('allowWitnessChangesInSavedCollations')) {
+      console.log('setting from services')
       CL.project.allowWitnessChangesInSavedCollations = CL.services.allowWitnessChangesInSavedCollations;
     } else {
+      console.log('using default')
       //default is false
       CL.project.allowWitnessChangesInSavedCollations = false;
     }
@@ -3142,86 +3145,102 @@ CL = (function() {
           html.push('<tr><td>' + user + '</td>');
         }
         if (by_user[user].hasOwnProperty('regularised')) {
-          if (by_user[user].regularised.witness_comparison[0] === false) {
-            witnessComparisonClass = by_user[user].regularised.witness_comparison[1];
-            if (witnessComparisonClass === 'added') {
-              hasCollationsWithWitsToAdd = true;
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added.';
-            } else if (witnessComparisonClass === 'removed') {
-              hasCollationsWithWitsToRemove = true;
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed.';
-            } else if (witnessComparisonClass === 'both') {
-              hasCollationsWithWitsToRemove = true;
-              hasCollationsWithWitsToAdd = true;
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added.';
+          if (CL.project.allowWitnessChangesInSavedCollations === true) {
+            if (by_user[user].regularised.witness_comparison[0] === false) {
+              witnessComparisonClass = by_user[user].regularised.witness_comparison[1];
+              if (witnessComparisonClass === 'added') {
+                hasCollationsWithWitsToAdd = true;
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added.';
+              } else if (witnessComparisonClass === 'removed') {
+                hasCollationsWithWitsToRemove = true;
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed.';
+              } else if (witnessComparisonClass === 'both') {
+                hasCollationsWithWitsToRemove = true;
+                hasCollationsWithWitsToAdd = true;
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added.';
+              }
+            } else {
+              witnessComparisonClass = 'same';
+              hoveroverText = ''
             }
+            html.push('<td title="' + hoveroverText + '" class="regularised ' + witnessComparisonClass + '">' + by_user[user].regularised.radio_button + '</td>');
           } else {
-            witnessComparisonClass = 'same';
-            hoveroverText = ''
+            html.push('<td>' + by_user[user].regularised.radio_button + '</td>');
           }
-          html.push('<td title="' + hoveroverText + '" class="regularised ' + witnessComparisonClass + '">' + by_user[user].regularised.radio_button + '</td>');
         } else {
           html.push('<td></td>');
         }
         if (by_user[user].hasOwnProperty('set')) {
-          if (by_user[user].set.witness_comparison[0] === false) {
-            witnessComparisonClass = by_user[user].set.witness_comparison[1];
-            if (witnessComparisonClass === 'added') {
-              hasCollationsWithWitsToAdd = true;
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added.';
-            } else if (witnessComparisonClass === 'removed') {
-              hasCollationsWithWitsToRemove = true;
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed.';
-            } else if (witnessComparisonClass === 'both') {
-              hasCollationsWithWitsToRemove = true;
-              hasCollationsWithWitsToAdd = true;
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added.';
+          if (CL.project.allowWitnessChangesInSavedCollations === true) {
+            if (by_user[user].set.witness_comparison[0] === false) {
+              witnessComparisonClass = by_user[user].set.witness_comparison[1];
+              if (witnessComparisonClass === 'added') {
+                hasCollationsWithWitsToAdd = true;
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added.';
+              } else if (witnessComparisonClass === 'removed') {
+                hasCollationsWithWitsToRemove = true;
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed.';
+              } else if (witnessComparisonClass === 'both') {
+                hasCollationsWithWitsToRemove = true;
+                hasCollationsWithWitsToAdd = true;
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added.';
+              }
+            } else {
+              witnessComparisonClass = 'same';
+              hoveroverText = ''
             }
+            html.push('<td title="' + hoveroverText + '" class="set ' + witnessComparisonClass + '">' + by_user[user].set.radio_button + '</td>');
           } else {
-            witnessComparisonClass = 'same';
-            hoveroverText = ''
+            html.push('<td>' + by_user[user].set.radio_button + '</td>');
           }
-          html.push('<td title="' + hoveroverText + '" class="set ' + witnessComparisonClass + '">' + by_user[user].set.radio_button + '</td>');
         } else {
           html.push('<td></td>');
         }
         if (by_user[user].hasOwnProperty('ordered')) {
-          if (by_user[user].ordered.witness_comparison[0] === false) {
-            witnessComparisonClass = by_user[user].ordered.witness_comparison[1];
-            if (witnessComparisonClass === 'added') {
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added. This cannot be fixed at the order readings stage. The witnesses must be added at a previous stage and this stage must be completed again.';
-            } else if (witnessComparisonClass === 'removed') {
-              //hasCollationsWithWitsToRemove = true;
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed. This cannot be fixed at the order readings stage. The witnesses must be removed at a previous stage and this stage must be completed again.';
-            } else if (witnessComparisonClass === 'both') {
-              //hasCollationsWithWitsToRemove = true;
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added. This cannot be fixed at the order readings stage. The witnesses must be removed at a previous stage and this stage must be completed again.';
+          if (CL.project.allowWitnessChangesInSavedCollations === true) {
+            if (by_user[user].ordered.witness_comparison[0] === false) {
+              witnessComparisonClass = by_user[user].ordered.witness_comparison[1];
+              if (witnessComparisonClass === 'added') {
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added. This cannot be fixed at the order readings stage. The witnesses must be added at a previous stage and this stage must be completed again.';
+              } else if (witnessComparisonClass === 'removed') {
+                //hasCollationsWithWitsToRemove = true;
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed. This cannot be fixed at the order readings stage. The witnesses must be removed at a previous stage and this stage must be completed again.';
+              } else if (witnessComparisonClass === 'both') {
+                //hasCollationsWithWitsToRemove = true;
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added. This cannot be fixed at the order readings stage. The witnesses must be removed at a previous stage and this stage must be completed again.';
+              }
+            } else {
+              witnessComparisonClass = 'same';
+              hoveroverText = ''
             }
+            html.push('<td title="' + hoveroverText + '" class="ordered ' + witnessComparisonClass + '">' + by_user[user].ordered.radio_button + '</td>');
           } else {
-            witnessComparisonClass = 'same';
-            hoveroverText = ''
+            html.push('<td>' + by_user[user].ordered.radio_button + '</td>');
           }
-          html.push('<td title="' + hoveroverText + '" class="ordered ' + witnessComparisonClass + '">' + by_user[user].ordered.radio_button + '</td>');
         } else {
           html.push('<td></td>');
         }
         if (firstRow === true && approved !== undefined) {
-          if (approved.witness_comparison[0] === false) {
-            witnessComparisonClass = approved.witness_comparison[1];
-            if (witnessComparisonClass === 'added') {
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added. This cannot be fixed in an approved collation. The witnesses must be added at a previous stage, order readings redone and then the new version must be approved.';
-            } else if (witnessComparisonClass === 'removed') {
-              //hasCollationsWithWitsToRemove = true;
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed. This cannot be fixed in an approved collation. The witnesses must be removed at a previous stage, order readings redone and then the new version must be approved.';
-            } else if (witnessComparisonClass === 'both') {
-              //hasCollationsWithWitsToRemove = true;
-              hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added. This cannot be fixed in an approved collation. The witnesses must be removed and added at a previous stage, order readings redone and then the new version must be approved.';
+          if (CL.project.allowWitnessChangesInSavedCollations === true) {
+            if (approved.witness_comparison[0] === false) {
+              witnessComparisonClass = approved.witness_comparison[1];
+              if (witnessComparisonClass === 'added') {
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added. This cannot be fixed in an approved collation. The witnesses must be added at a previous stage, order readings redone and then the new version must be approved.';
+              } else if (witnessComparisonClass === 'removed') {
+                //hasCollationsWithWitsToRemove = true;
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed. This cannot be fixed in an approved collation. The witnesses must be removed at a previous stage, order readings redone and then the new version must be approved.';
+              } else if (witnessComparisonClass === 'both') {
+                //hasCollationsWithWitsToRemove = true;
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added. This cannot be fixed in an approved collation. The witnesses must be removed and added at a previous stage, order readings redone and then the new version must be approved.';
+              }
+            } else {
+              witnessComparisonClass = 'same';
+              hoveroverText = ''
             }
+            html.push('<td title="' + hoveroverText + '" class="approved ' + witnessComparisonClass + '" rowspan="' + userCount +'">' + approved.radio_button + '</td>');
           } else {
-            witnessComparisonClass = 'same';
-            hoveroverText = ''
+            html.push('<td rowspan="' + userCount +'">' + approved.radio_button + '</td>');
           }
-          html.push('<td title="' + hoveroverText + '" class="approved ' + witnessComparisonClass + '" rowspan="' + userCount +'">' + approved.radio_button + '</td>');
           firstRow = false;
         }
         html.push('</tr>');

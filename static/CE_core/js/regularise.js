@@ -1083,14 +1083,9 @@ RG = (function() {
             //TODO: check this isn't causing problems by not eliminating suffixes.
             new_witnesses = CL.getReadingWitnesses(CL.data.apparatus[unit].readings[reading]).filter(x => CL.witnessesAdded.includes(x));
           }
-          console.log(new_witnesses)
-          console.log(CL.project.hasOwnProperty('id'))
-          console.log('+++++')
           if (CL.project.hasOwnProperty('id')) {
             for (i = 0; i < new_witnesses.length; i += 1) {
               suffix = _getSuffix(data['class']);
-              console.log(data['class'])
-              console.log(suffix)
               CL.data.apparatus[new_unit].readings[new_reading].witnesses.push(new_witnesses[i] + suffix);
             }
           }

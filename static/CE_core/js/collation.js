@@ -2809,6 +2809,16 @@ CL = (function() {
     if (project.hasOwnProperty('useVForSupplied')) {
       CL.project.useVForSupplied = project.useVForSupplied;
     }
+    //settings for collapse all button (rarely used so allowing as option to keep footer clean)
+    if (project.hasOwnProperty('showCollapseAllUnitsButton')) {
+      CL.project.showCollapseAllUnitsButton = project.showCollapseAllUnitsButton;
+    } else if (CL.services.hasOwnProperty('showCollapseAllUnitsButton')) {
+      CL.project.showCollapseAllUnitsButton = CL.services.showCollapseAllUnitsButton;
+    } else {
+      //default is false
+      CL.project.showCollapseAllUnitsButton = false;
+    }
+
     //settings for witness changes
     if (project.hasOwnProperty('allowWitnessChangesInSavedCollations')) {
       CL.project.allowWitnessChangesInSavedCollations = project.allowWitnessChangesInSavedCollations;

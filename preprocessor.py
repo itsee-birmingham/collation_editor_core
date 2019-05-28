@@ -38,7 +38,6 @@ class PreProcessor(Regulariser):
              PendingDeprecationWarning)
         # Add all the witness texts and keep record of witnesses omitting the verse and lacunose witnesses
         for transcription_verse in data:
-
             #TODO: remove legacy support when ready
             if 'transcription_id' in transcription_verse:
                 transcription_verse['transcription'] = transcription_verse['transcription_id']
@@ -88,7 +87,7 @@ class PreProcessor(Regulariser):
                 for reading in reversed(trans_verse):
                     if reading is None:
                         trans_verse.remove(reading)
-            except KeyError:
+            except (KeyError, TypeError):
                 om_witnesses.append(transcription_verse['siglum'])
                 if 'transcription_identifier' in transcription_verse:
                     hand_to_transcript_map[transcription_verse['siglum']] = transcription_verse['transcription_identifier'];

@@ -26,26 +26,45 @@ RG = (function() {
 
   //*********  public functions *********
 
+  // getCollationData = function(output, scroll_offset, callback) {
+  //   CL.container = document.getElementById('container');
+  //   CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, false, function(verse_data) {
+  //     var collation_data;
+  //     collation_data = verse_data;
+  //     //TODO: remove this call since we don't have separate private transcriptions now
+  //     CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, true, function(verse_data, lac_wits_function) {
+  //       collation_data.push.apply(collation_data, verse_data);
+  //       _calculateLacWits(collation_data, function(lac_witness_list) {
+  //         CL.services.getSiglumMap(lac_witness_list, function(lac_witnesses) {
+  //           CL.collateData = {
+  //             'data': collation_data,
+  //             'lac_witnesses': lac_witnesses
+  //           };
+  //           if (typeof callback !== 'undefined') {
+  //             callback();
+  //           } else {
+  //             runCollation(CL.collateData, output, scroll_offset);
+  //           }
+  //         });
+  //       });
+  //     });
+  //   });
+  // };
+
   getCollationData = function(output, scroll_offset, callback) {
     CL.container = document.getElementById('container');
-    CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, false, function(verse_data) {
-      var collation_data;
-      collation_data = verse_data;
-      //TODO: remove this call since we don't have separate private transcriptions now
-      CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, true, function(verse_data, lac_wits_function) {
-        collation_data.push.apply(collation_data, verse_data);
-        _calculateLacWits(collation_data, function(lac_witness_list) {
-          CL.services.getSiglumMap(lac_witness_list, function(lac_witnesses) {
-            CL.collateData = {
-              'data': collation_data,
-              'lac_witnesses': lac_witnesses
-            };
-            if (typeof callback !== 'undefined') {
-              callback();
-            } else {
-              runCollation(CL.collateData, output, scroll_offset);
-            }
-          });
+    CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, function(collation_data) {
+      _calculateLacWits(collation_data, function(lac_witness_list) {
+        CL.services.getSiglumMap(lac_witness_list, function(lac_witnesses) {
+          CL.collateData = {
+            'data': collation_data,
+            'lac_witnesses': lac_witnesses
+          };
+          if (typeof callback !== 'undefined') {
+            callback();
+          } else {
+            runCollation(CL.collateData, output, scroll_offset);
+          }
         });
       });
     });

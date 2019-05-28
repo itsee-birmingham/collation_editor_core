@@ -1177,8 +1177,7 @@ CL = (function() {
     display_hand = hand;
     //TODO: hand and display_hand can be rationalised now we have got rid of _private from sigla
     document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + display_hand + ':</b><img id="loadingbar" src="' + staticUrl + 'CE_core/images/loadingbar.gif"/></span>';
-    //TODO: remove the false from here when deleted from services file
-    CL.services.getVerseData(CL.context, [transcription_id], false, function(transcriptions) {
+    CL.services.getVerseData(CL.context, [transcription_id], function(transcriptions) {
       if (transcriptions.length > 0) {
         for (i = 0; i < transcriptions.length; i += 1) {
           verse = transcriptions[i];

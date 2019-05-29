@@ -368,8 +368,9 @@ RG = (function() {
     }
     $('#footer').addClass('pure-form'); //this does the styling of the select elements in the footer using pure (they cannot be styled individually)
     footerHtml = [];
-    //TODO: collapse button is used so infrequently make it a services or project setting
-    footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+    if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
+      footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+    }
     if (CL.witnessEditingMode === false || CL.witnessAddingMode === true) {
       footerHtml.push('<button class="pure-button left_foot" id="show_hide_regularisations_button">' + show_hide_regularisations_button_text + '</button>');
     }

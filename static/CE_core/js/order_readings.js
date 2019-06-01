@@ -376,7 +376,7 @@ OR = (function() {
   relabelReadings = function(readings, overwrite) {
     var i, j, label;
     for (i = 0; i < readings.length; i += 1) {
-      if (readings[i].hasOwnProperty('type') && readings[i].type === 'lac') {
+      if (readings[i].hasOwnProperty('type') && (readings[i].type === 'lac' || readings[i].type === 'lac_verse')) {
         label = 'zz';
       } else if (readings[i].hasOwnProperty('overlap_status')) {
         for (j = 0; j < CL.overlappedOptions.length; j += 1) {

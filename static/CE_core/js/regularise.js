@@ -16,7 +16,7 @@ RG = (function() {
 
   //private function declarations
   let _calculateLacWits, _hasRuleApplied, _getDisplayClasses, _getToken, _getWordTokenForWitness,
-  _hasDeletionScheduled, _getRegWitsAsString, _integrateLacOmReadings,
+  _hasDeletionScheduled, _getRegWitsAsString, _integrateLacOmReadings, 
   _doRunCollation, _showSettings, _fetchRules, _removeUnrequiredData, _showRegularisations,
   _highlightWitness, _addNewToken, _getWordIndexForWitness, _createRule, _getDisplaySettingValue,
   _setUpRuleMenu, _getRuleScopes, _getSuffix, _makeMenu, _redipsInitRegularise,
@@ -57,9 +57,12 @@ RG = (function() {
       _calculateLacWits(collation_data, function(lac_witness_list) {
         CL.services.getSiglumMap(lac_witness_list, function(lac_witnesses) {
           CL.collateData = {
-            'data': collation_data,
+            'data': collation_data.results,
             'lac_witnesses': lac_witnesses
           };
+          if (collation_data.hasOwnProperty('special_categories')) {
+            CL.collateData.special_categories = collation_data.special_categories;
+          }
           if (typeof callback !== 'undefined') {
             callback();
           } else {
@@ -550,21 +553,26 @@ RG = (function() {
   _calculateLacWits = function(collation_data, result_callback) {
     var i, transcription_id, lac_transcriptions;
     lac_transcriptions = JSON.parse(JSON.stringify(CL.dataSettings.witness_list));
-    if (collation_data[0].hasOwnProperty('transcription_id')) {
+    if (collation_data.results[0].hasOwnProperty('transcription_id')) {
       console.warn('The use of \'transcription_id\' is deprecated. \'transcription\' should be used instead.');
     }
-    for (i = 0; i < collation_data.length; i += 1) {
+    for (i = 0; i < collation_data.results.length; i += 1) {
       //TODO: remove first condition and keep final two when transcription_id key no longer supported
-      if (collation_data[i].hasOwnProperty('transcription_id')) {
-        transcription_id = collation_data[i].transcription_id;
-      } else if (collation_data[i].hasOwnProperty('transcription_identifier')) {
-        transcription_id = collation_data[i].transcription_identifier;
+      if (collation_data.results[i].hasOwnProperty('transcription_id')) {
+        transcription_id = collation_data.results[i].transcription_id;
+      } else if (collation_data.results[i].hasOwnProperty('transcription_identifier')) {
+        transcription_id = collation_data.results[i].transcription_identifier;
       } else {
-        transcription_id = collation_data[i].transcription;
+        transcription_id = collation_data.results[i].transcription;
       }
       if (lac_transcriptions.indexOf(transcription_id) !== -1) {
         lac_transcriptions.splice(lac_transcriptions.indexOf(transcription_id), 1);
       }
+    }
+    console.log('@@@@@')
+    console.log(lac_transcriptions)
+    if (collation_data.hasOwnProperty('special_lacs')) {
+
     }
     result_callback(lac_transcriptions);
   };
@@ -647,42 +655,57 @@ RG = (function() {
     });
   };
 
+
+
   /** add lac_verse and om_verse to the collated data */
   _integrateLacOmReadings = function(data) {
-    var i;
-    if (typeof data.lac_readings !== 'undefined' && data.lac_readings.length > 0) {
-      for (i = 0; i < data.apparatus.length; i += 1) {
+    var special_witnesses, new_lac_witnesses;
+    special_witnesses = [];
+    for (let j = 0; j < data.special_categories.length; j+=1) {
+      for (let i = 0; i < data.apparatus.length; i += 1) {
+        data.apparatus[i].readings.push({
+          'text': [],
+          'type': 'lac_verse',
+          'details': data.special_categories[j].label,
+          'witnesses': data.special_categories[j].witnesses
+        });
+      }
+      special_witnesses.push.apply(special_witnesses, data.special_categories[j].witnesses);
+    }
+    new_lac_witnesses = CL.removeSpecialWitnesses(data.lac_readings, special_witnesses);
+    if (typeof data.lac_readings !== 'undefined' && data.lac_readings.length > 0 && new_lac_witnesses.length > 0) {
+      for (let i = 0; i < data.apparatus.length; i += 1) {
         if (data.lac_readings.indexOf(data.overtext_name) != -1) {
           data.apparatus[i].readings.splice(0, 0, {
             'text': [],
             'type': 'lac_verse',
-            'details': 'lac verse',
-            'witnesses': data.lac_readings
+            'details': CL.project.lac_unit_label,
+            'witnesses': new_lac_witnesses
           });
         } else {
           data.apparatus[i].readings.push({
             'text': [],
             'type': 'lac_verse',
-            'details': 'lac verse',
-            'witnesses': data.lac_readings
+            'details': CL.project.lac_unit_label,
+            'witnesses': new_lac_witnesses
           });
         }
       }
     }
     if (typeof data.om_readings !== 'undefined' && data.om_readings.length > 0) {
-      for (i = 0; i < data.apparatus.length; i += 1) {
+      for (let i = 0; i < data.apparatus.length; i += 1) {
         if (data.om_readings.indexOf(data.overtext_name) != -1) {
           data.apparatus[i].readings.splice(0, 0, {
             'text': [],
             'type': 'om_verse',
-            'details': 'om verse',
+            'details': CL.project.om_unit_label,
             'witnesses': data.om_readings
           });
         } else {
           data.apparatus[i].readings.push({
             'text': [],
             'type': 'om_verse',
-            'details': 'om verse',
+            'details': CL.project.om_unit_label,
             'witnesses': data.om_readings
           });
         }

@@ -65,7 +65,8 @@ CL = (function() {
   makeStandoffReading, doMakeStandoffReading, makeMainReading, getOrderedAppLines,
   loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
   calculatePosition, removeWitness, checkWitnessesAgainstProject, setUpRemoveWitnessesForm,
-  removeWitnesses, loadSavedCollation, returnToSummaryTable, prepareAdditionalCollation;
+  removeWitnesses, loadSavedCollation, returnToSummaryTable, prepareAdditionalCollation,
+  removeSpecialWitnesses;
 
   //private function declarations
   let _initialiseEditor, _initialiseProject, _setProjectConfig, _setDisplaySettings,
@@ -2818,6 +2819,36 @@ CL = (function() {
       CL.project.showCollapseAllUnitsButton = false;
     }
 
+    // combine all lacs
+    if (project.hasOwnProperty('combineAllLacsInOR')) {
+      CL.project.combineAllLacsInOR = project.combineAllLacsInOR;
+    } else if (CL.services.hasOwnProperty('combineAllLacsInOR')) {
+      CL.project.combineAllLacsInOR = CL.services.combineAllLacsInOR;
+    } else {
+      //default is true
+      CL.project.combineAllLacsInOR = true;
+    }
+
+    if (project.hasOwnProperty('lac_unit_label')) {
+      CL.project.lac_unit_label = project.lac_unit_label;
+    } else if (CL.services.hasOwnProperty('lac_unit_label')) {
+      CL.project.lac_unit_label = CL.services.lac_unit_label;
+    } else {
+      //default is lac verse for now to protect existing projects
+      CL.project.lac_unit_label = CL.project.lac_unit_label;
+    }
+
+    if (project.hasOwnProperty('om_unit_label')) {
+      CL.project.om_unit_label = project.om_unit_label;
+    } else if (CL.services.hasOwnProperty('om_unit_label')) {
+      CL.project.om_unit_label = CL.services.om_unit_label;
+    } else {
+      //default is om verse for now to protect existing projects
+      CL.project.om_unit_label = CL.project.om_unit_label;
+    }
+
+
+
     //settings for witness changes
     if (project.hasOwnProperty('allowWitnessChangesInSavedCollations')) {
       CL.project.allowWitnessChangesInSavedCollations = project.allowWitnessChangesInSavedCollations;
@@ -3504,7 +3535,7 @@ CL = (function() {
               existingWitnesses.push.apply(existingWitnesses, mainCollation.structure.apparatus[0].readings[i].witnesses);
             }
             if (mainCollation.structure.lac_readings.length > 0) {
-              newUnit.readings.push({'text' : [], 'type' : 'lac_verse', 'details' : 'lac verse', 'witnesses' : JSON.parse(JSON.stringify(mainCollation.structure.lac_readings))});
+              newUnit.readings.push({'text' : [], 'type' : 'lac_verse', 'details' : CL.project.lac_unit_label, 'witnesses' : JSON.parse(JSON.stringify(mainCollation.structure.lac_readings))});
               for (let i=0; i<mainCollation.structure.lac_readings.length; i+=1) {
                 if (existingWitnesses.indexOf(mainCollation.structure.lac_readings[i]) !== -1) {
                   existingWitnesses.splice(existingWitnesses.indexOf(mainCollation.structure.lac_readings[i]), 1);
@@ -3512,7 +3543,7 @@ CL = (function() {
               }
             }
             if (mainCollation.structure.om_readings.length > 0) {
-              newUnit.readings.push({'text' : [], 'type' : 'om_verse', 'details' : 'om verse', 'witnesses' : JSON.parse(JSON.stringify(mainCollation.structure.om_readings))});
+              newUnit.readings.push({'text' : [], 'type' : 'om_verse', 'details' : CL.project.om_unit_label, 'witnesses' : JSON.parse(JSON.stringify(mainCollation.structure.om_readings))});
               for (let i=0; i<mainCollation.structure.om_readings.length; i+=1) {
                 if (existingWitnesses.indexOf(mainCollation.structure.om_readings[i]) !== -1) {
                   existingWitnesses.splice(existingWitnesses.indexOf(mainCollation.structure.om_readings[i]), 1);
@@ -4376,8 +4407,9 @@ CL = (function() {
     return details;
   };
 
+  // TODO: this needs to separate special_categories from lac/om wits
   _addExtraGapReadings = function(adjacent_unit, all_witnesses, new_unit, inclusive_overlaps) {
-    var lac_wits, om_wits, other_wits, key, ol_unit, i, j, k, new_rdg;
+    var lac_wits, om_wits, other_wits, key, ol_unit, i, j, k, new_rdg, special_witnesses;
     //the rest of this section is really just adding the readings (and witnesses) to this unit
     lac_wits = JSON.parse(JSON.stringify(CL.data.lac_readings));
     om_wits = JSON.parse(JSON.stringify(CL.data.om_readings));
@@ -4401,12 +4433,12 @@ CL = (function() {
               if (lac_wits.indexOf(new_rdg.witnesses[k]) !== -1) {
                 lac_wits.splice(lac_wits.indexOf(new_rdg.witnesses[k]), 1);
                 new_rdg.type = 'lac_verse';
-                new_rdg.details = 'lac verse';
+                new_rdg.details = CL.project.lac_unit_label;
               }
               if (om_wits.indexOf(new_rdg.witnesses[k]) !== -1) {
                 om_wits.splice(om_wits.indexOf(new_rdg.witnesses[k]), 1);
                 new_rdg.type = 'om_verse';
-                new_rdg.details = 'om verse';
+                new_rdg.details = CL.project.om_unit_label;
               }
               if (other_wits.indexOf(new_rdg.witnesses[k]) !== -1) {
                 other_wits.splice(other_wits.indexOf(new_rdg.witnesses[k]), 1);
@@ -4434,13 +4466,26 @@ CL = (function() {
         'text': []
       });
     }
+    special_witnesses = [];
+    for (let j = 0; j < CL.data.special_categories.length; j+=1) {
+      for (let i = 0; i < CL.data.apparatus.length; i += 1) {
+        new_unit.readings.push({
+          'text': [],
+          'type': 'lac_verse',
+          'details': CL.data.special_categories[j].label,
+          'witnesses': CL.data.special_categories[j].witnesses
+        });
+      }
+      special_witnesses.push.apply(special_witnesses, CL.data.special_categories[j].witnesses);
+    }
+    lac_wits = removeSpecialWitnesses(lac_wits, special_witnesses);
     //now add your whole verse lac and om witnesses
     if (lac_wits.length > 0) {
       new_unit.readings.push({
         'witnesses': lac_wits,
         'text': [],
         'type': 'lac_verse',
-        'details': 'lac verse'
+        'details': CL.project.lac_unit_label
       });
     }
     if (om_wits.length > 0) {
@@ -4448,12 +4493,22 @@ CL = (function() {
         'witnesses': om_wits,
         'text': [],
         'type': 'om_verse',
-        'details': 'om verse'
+        'details': CL.project.om_unit_label
       });
     }
     addUnitId(new_unit, 'apparatus');
     addReadingIds(new_unit);
     return new_unit;
+  };
+
+  removeSpecialWitnesses = function (original_witnesses, special_witnesses) {
+    var new_witness_list = [];
+    for (let i=0; i<original_witnesses.length; i+=1) {
+      if (special_witnesses.indexOf(original_witnesses[i]) == -1) {
+        new_witness_list.push(original_witnesses[i]);
+      }
+    }
+    return new_witness_list;
   };
 
   _extraGapIsWithinAnOverlap = function(current) {
@@ -5281,7 +5336,7 @@ CL = (function() {
     loadSavedCollation: loadSavedCollation,
     returnToSummaryTable: returnToSummaryTable,
     prepareAdditionalCollation: prepareAdditionalCollation,
-
+    removeSpecialWitnesses: removeSpecialWitnesses,
 
     //deprecated function mapping for calls from older services
     set_service_provider: setServiceProvider,

@@ -112,7 +112,9 @@ SV = (function () {
 		//sort out footer stuff
 		CL.expandFillPageClients();
 		footer_html = [];
-		footer_html.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+		if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
+      footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+    }
 		footer_html.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">show subreadings</button>');
 		if (CL.witnessEditingMode === false) {
 			footer_html.push('<span id="extra_buttons"></span>');

@@ -120,7 +120,9 @@ OR = (function() {
       show_hide_subreadings_button_text = 'show non-edition subreadings';
     }
     footer_html = [];
-    footer_html.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+    if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
+      footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+    }
     footer_html.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">' + show_hide_subreadings_button_text + '</button>');
     footer_html.push('<span id="extra_buttons"></span>');
     footer_html.push('<span id="stage_links"></span>');
@@ -137,7 +139,7 @@ OR = (function() {
     CL.addStageLinks();
     SPN.remove_loading_overlay();
     CL.addTriangleFunctions('table');
-    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit, 'add_select': true, 'select_label_text': 'highlight witness'});
+    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit, 'add_select': true, 'select_label_details': {'label': 'highlight witness', 'value': 'none' }});
     $('#highlighted').on('change', function(event) {
       _highlightWitness(event.target.value);
     });
@@ -232,7 +234,9 @@ OR = (function() {
     CL.expandFillPageClients();
     //sort out footer stuff
     footer_html = [];
-    footer_html.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+    if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
+      footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+    }
     footer_html.push('<span id="extra_buttons"></span>');
     footer_html.push('<span id="stage_links"></span>');
     footer_html.push('<button class="pure-button right_foot" id="get_apparatus">Get apparatus</button>');
@@ -242,7 +246,7 @@ OR = (function() {
     CL.addStageLinks();
     SPN.remove_loading_overlay();
     CL.addTriangleFunctions('table');
-    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit, 'add_select': true, 'select_label_text': 'highlight witness'});
+    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit, 'add_select': true, 'select_label_details': {'label': 'highlight witness', 'value': 'none' }});
     $('#highlighted').on('change', function(event) {
       _highlightWitness(event.target.value, 'approved');
     });

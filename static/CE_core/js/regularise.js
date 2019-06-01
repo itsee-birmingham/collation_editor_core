@@ -400,7 +400,7 @@ RG = (function() {
     _addFooterFunctions();
 
     CL.addTriangleFunctions('table');
-    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected':options.highlighted_wit, 'add_select': true, 'select_label_text': 'highlight witness'});
+    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected':options.highlighted_wit, 'add_select': true, 'select_label_details': {'label': 'highlight witness', 'value': 'none' }});
     if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
 			if (options.highlighted_added_wits.length === 1) {
 				preselected_added_highlight = options.highlighted_added_wits[0];

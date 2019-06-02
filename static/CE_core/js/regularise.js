@@ -16,7 +16,7 @@ RG = (function() {
 
   //private function declarations
   let _calculateLacWits, _hasRuleApplied, _getDisplayClasses, _getToken, _getWordTokenForWitness,
-  _hasDeletionScheduled, _getRegWitsAsString, _integrateLacOmReadings, 
+  _hasDeletionScheduled, _getRegWitsAsString, _integrateLacOmReadings,
   _doRunCollation, _showSettings, _fetchRules, _removeUnrequiredData, _showRegularisations,
   _highlightWitness, _addNewToken, _getWordIndexForWitness, _createRule, _getDisplaySettingValue,
   _setUpRuleMenu, _getRuleScopes, _getSuffix, _makeMenu, _redipsInitRegularise,
@@ -569,8 +569,6 @@ RG = (function() {
         lac_transcriptions.splice(lac_transcriptions.indexOf(transcription_id), 1);
       }
     }
-    console.log('@@@@@')
-    console.log(lac_transcriptions)
     if (collation_data.hasOwnProperty('special_lacs')) {
 
     }

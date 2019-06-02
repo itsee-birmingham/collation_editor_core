@@ -1178,11 +1178,13 @@ CL = (function() {
     display_hand = hand;
     //TODO: hand and display_hand can be rationalised now we have got rid of _private from sigla
     document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + display_hand + ':</b><img id="loadingbar" src="' + staticUrl + 'CE_core/images/loadingbar.gif"/></span>';
-    CL.services.getVerseData(CL.context, [transcription_id], function(transcriptions) {
+    CL.services.getVerseData(CL.context, [transcription_id], function(response) {
+      var transcriptions;
+      transcriptions = response.results;
       if (transcriptions.length > 0) {
         for (i = 0; i < transcriptions.length; i += 1) {
           verse = transcriptions[i];
-          if (verse.hasOwnProperty('witnesses')) {
+          if (verse.hasOwnProperty('witnesses') && verse.witnesses !== null) {
             for (j = 0; j < verse.witnesses.length; j += 1) {
               if (verse.witnesses[j].id === hand) {
                 for (k = 0; k < verse.witnesses[j].tokens.length; k += 1) {

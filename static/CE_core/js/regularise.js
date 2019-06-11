@@ -212,9 +212,9 @@ RG = (function() {
                 if (id_dict[key].witnesses.indexOf(highlighted_hand) !== -1) {
                   rule_cells.push('<div class="spanlike">');
                 }
-                rule_cells.push(id_dict[key].t.replace(/_/g, '&#803;'));
+                rule_cells.push(CL.project.prepareDisplayString(id_dict[key].t));
                 rule_cells.push(' &#9654; ');
-                rule_cells.push(id_dict[key].n.replace(/_/g, '&#803;'));
+                rule_cells.push(CL.project.prepareDisplayString(id_dict[key].n));
                 if (id_dict[key].witnesses.indexOf(highlighted_hand) !== -1) {
                   rule_cells.push('</div>');
                 }
@@ -597,12 +597,12 @@ RG = (function() {
    * interface > n > t */
   _getToken = function(dict) {
     if (dict.hasOwnProperty('interface')) {
-      return dict['interface'].replace(/_/g, '&#803;');
+      return CL.project.prepareDisplayString(dict['interface']);
     }
     if (dict.hasOwnProperty('n')) {
-      return dict.n.replace(/_/g, '&#803;');
+      return CL.project.prepareDisplayString(dict.n);
     }
-    return dict.t.replace(/_/g, '&#803;');
+    return CL.project.prepareDisplayString(dict.t);
   };
 
   _getWordTokenForWitness = function(unit, reading, word) {
@@ -1031,6 +1031,7 @@ RG = (function() {
         }
         rules.push(rule);
       }
+      console.log(rules)
       return rules;
     }
   };
@@ -1073,7 +1074,7 @@ RG = (function() {
       } else { // we are normalising to an existing value
         normalised_text = normalised_form.childNodes[0].textContent;
       }
-      normalised_text = normalised_text.replace(/̣/g, '_');
+      normalised_text = CL.project.prepareNormalisedString(normalised_text);
       //stop the dragged clone being added to the dom
       if (clone.parentNode !== null) {
         clone.parentNode.removeChild(clone);
@@ -1136,7 +1137,7 @@ RG = (function() {
         reg_menu = document.createElement('div');
         reg_menu.setAttribute('id', 'reg_form');
         reg_menu.setAttribute('class', 'dragdiv reg_form dialogue_form');
-        reg_menu.innerHTML = html.replace('{unit_data}', unit_data).replace('{original_text}', original_display_text.replace(/_/g, '&#803;')).replace('{normalised_text}', normalised_text.replace(/_/g, '&#803;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+        reg_menu.innerHTML = html.replace('{unit_data}', unit_data).replace('{original_text}', CL.project.prepareDisplayString(original_display_text)).replace('{normalised_text}', CL.project.prepareDisplayString(normalised_text).replace(/</g, '&lt;').replace(/>/g, '&gt;'));
         document.getElementsByTagName('body')[0].appendChild(reg_menu);
         reg_rules = CL.getRuleClasses('create_in_RG', true, 'value', ['identifier', 'name', 'RG_default']);
         new_reg_rules = [];

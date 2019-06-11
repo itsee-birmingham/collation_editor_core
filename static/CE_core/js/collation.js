@@ -275,7 +275,7 @@ CL = (function() {
         for (i = 0; i < reading.text.length; i += 1) {
           text.push(reading.text[i]['interface']);
         }
-        return text.join(' ').replace(/_/g, '&#803;');
+        return CL.project.prepareDisplayString(text.join(' '));
       }
       if (reading.hasOwnProperty('details')) {
         if (test === true) {
@@ -459,7 +459,7 @@ CL = (function() {
         console.log(text);
       }
     }
-    return text.join(' ').replace(/_/g, '&#803;');
+    return CL.project.prepareDisplayString(text.join(' '));
   };
 
   getAllReadingWitnesses = function(reading) {
@@ -1202,7 +1202,7 @@ CL = (function() {
                     text.push('&lt;' + verse.witnesses[j].tokens[k].gap_details + '&gt;');
                   }
                 }
-                document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + display_hand + ':</b> ' + text.join(' ').replace(/_/g, '&#803;') + '</span>';
+                document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + display_hand + ':</b> ' + CL.project.prepareDisplayString(text.join(' ')) + '</span>';
                 break;
               }
             }
@@ -2811,6 +2811,29 @@ CL = (function() {
     if (project.hasOwnProperty('useVForSupplied')) {
       CL.project.useVForSupplied = project.useVForSupplied;
     }
+
+    //
+    if (project.hasOwnProperty('prepareDisplayString')) {
+      CL.project.prepareDisplayString;
+    } else if (CL.services.hasOwnProperty('prepareDisplayString')) {
+      CL.project.prepareDisplayString;
+    } else {
+      CL.project.prepareDisplayString = function (string) {
+        return string;
+      }
+    }
+
+    //
+    if (project.hasOwnProperty('prepareNormalisedString')) {
+      CL.project.prepareNormalisedString;
+    } else if (CL.services.hasOwnProperty('prepareNormalisedString')) {
+      CL.project.prepareNormalisedString;
+    } else {
+      CL.project.prepareNormalisedString = function (string) {
+        return string;
+      }
+    }
+
     //settings for collapse all button (rarely used so allowing as option to keep footer clean)
     if (project.hasOwnProperty('showCollapseAllUnitsButton')) {
       CL.project.showCollapseAllUnitsButton = project.showCollapseAllUnitsButton;
@@ -5193,7 +5216,7 @@ CL = (function() {
     }
     //now implement your algorithm and push each result to the standoff reading
     //work out the text at this stage as part of that - text should be before the rules are applied so first one has none applied etc.
-    standoff_reading = getReading_history(classes, details, standoff_reading, rule_details, type, subreading_types, reading, witness, subreading);
+    standoff_reading = get_reading_history(classes, details, standoff_reading, rule_details, type, subreading_types, reading, witness, subreading);
     standoff_reading.value = standoff_reading.values.join('|');
     delete standoff_reading.values;
     if (!CL.data.marked_readings.hasOwnProperty(standoff_reading.value)) {

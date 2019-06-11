@@ -26,26 +26,48 @@ RG = (function() {
 
   //*********  public functions *********
 
+  // getCollationData = function(output, scroll_offset, callback) {
+  //   CL.container = document.getElementById('container');
+  //   CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, false, function(verse_data) {
+  //     var collation_data;
+  //     collation_data = verse_data;
+  //     //TODO: remove this call since we don't have separate private transcriptions now
+  //     CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, true, function(verse_data, lac_wits_function) {
+  //       collation_data.push.apply(collation_data, verse_data);
+  //       _calculateLacWits(collation_data, function(lac_witness_list) {
+  //         CL.services.getSiglumMap(lac_witness_list, function(lac_witnesses) {
+  //           CL.collateData = {
+  //             'data': collation_data,
+  //             'lac_witnesses': lac_witnesses
+  //           };
+  //           if (typeof callback !== 'undefined') {
+  //             callback();
+  //           } else {
+  //             runCollation(CL.collateData, output, scroll_offset);
+  //           }
+  //         });
+  //       });
+  //     });
+  //   });
+  // };
+
   getCollationData = function(output, scroll_offset, callback) {
     CL.container = document.getElementById('container');
-    CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, false, function(verse_data) {
-      var collation_data;
-      collation_data = verse_data;
-      //TODO: remove this call since we don't have separate private transcriptions now
-      CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, true, function(verse_data, lac_wits_function) {
-        collation_data.push.apply(collation_data, verse_data);
-        _calculateLacWits(collation_data, function(lac_witness_list) {
-          CL.services.getSiglumMap(lac_witness_list, function(lac_witnesses) {
-            CL.collateData = {
-              'data': collation_data,
-              'lac_witnesses': lac_witnesses
-            };
-            if (typeof callback !== 'undefined') {
-              callback();
-            } else {
-              runCollation(CL.collateData, output, scroll_offset);
-            }
-          });
+    CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, function(collation_data) {
+      _calculateLacWits(collation_data, function(lac_witness_list) {
+        CL.services.getSiglumMap(lac_witness_list, function(lac_witnesses) {
+          CL.collateData = {
+            'data': collation_data.results,
+            'lac_witnesses': lac_witnesses
+          };
+          if (collation_data.hasOwnProperty('special_categories')) {
+            CL.collateData.special_categories = collation_data.special_categories;
+          }
+          if (typeof callback !== 'undefined') {
+            callback();
+          } else {
+            runCollation(CL.collateData, output, scroll_offset);
+          }
         });
       });
     });
@@ -381,7 +403,7 @@ RG = (function() {
     _addFooterFunctions();
 
     CL.addTriangleFunctions('table');
-    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected':options.highlighted_wit, 'add_select': true, 'select_label_text': 'highlight witness'});
+    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected':options.highlighted_wit, 'add_select': true, 'select_label_details': {'label': 'highlight witness', 'value': 'none' }});
     if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
 			if (options.highlighted_added_wits.length === 1) {
 				preselected_added_highlight = options.highlighted_added_wits[0];
@@ -531,21 +553,24 @@ RG = (function() {
   _calculateLacWits = function(collation_data, result_callback) {
     var i, transcription_id, lac_transcriptions;
     lac_transcriptions = JSON.parse(JSON.stringify(CL.dataSettings.witness_list));
-    if (collation_data[0].hasOwnProperty('transcription_id')) {
+    if (collation_data.results[0].hasOwnProperty('transcription_id')) {
       console.warn('The use of \'transcription_id\' is deprecated. \'transcription\' should be used instead.');
     }
-    for (i = 0; i < collation_data.length; i += 1) {
+    for (i = 0; i < collation_data.results.length; i += 1) {
       //TODO: remove first condition and keep final two when transcription_id key no longer supported
-      if (collation_data[i].hasOwnProperty('transcription_id')) {
-        transcription_id = collation_data[i].transcription_id;
-      } else if (collation_data[i].hasOwnProperty('transcription_identifier')) {
-        transcription_id = collation_data[i].transcription_identifier;
+      if (collation_data.results[i].hasOwnProperty('transcription_id')) {
+        transcription_id = collation_data.results[i].transcription_id;
+      } else if (collation_data.results[i].hasOwnProperty('transcription_identifier')) {
+        transcription_id = collation_data.results[i].transcription_identifier;
       } else {
-        transcription_id = collation_data[i].transcription;
+        transcription_id = collation_data.results[i].transcription;
       }
       if (lac_transcriptions.indexOf(transcription_id) !== -1) {
         lac_transcriptions.splice(lac_transcriptions.indexOf(transcription_id), 1);
       }
+    }
+    if (collation_data.hasOwnProperty('special_lacs')) {
+
     }
     result_callback(lac_transcriptions);
   };
@@ -628,42 +653,57 @@ RG = (function() {
     });
   };
 
+
+
   /** add lac_verse and om_verse to the collated data */
   _integrateLacOmReadings = function(data) {
-    var i;
-    if (typeof data.lac_readings !== 'undefined' && data.lac_readings.length > 0) {
-      for (i = 0; i < data.apparatus.length; i += 1) {
+    var special_witnesses, new_lac_witnesses;
+    special_witnesses = [];
+    for (let j = 0; j < data.special_categories.length; j+=1) {
+      for (let i = 0; i < data.apparatus.length; i += 1) {
+        data.apparatus[i].readings.push({
+          'text': [],
+          'type': 'lac_verse',
+          'details': data.special_categories[j].label,
+          'witnesses': data.special_categories[j].witnesses
+        });
+      }
+      special_witnesses.push.apply(special_witnesses, data.special_categories[j].witnesses);
+    }
+    new_lac_witnesses = CL.removeSpecialWitnesses(data.lac_readings, special_witnesses);
+    if (typeof data.lac_readings !== 'undefined' && data.lac_readings.length > 0 && new_lac_witnesses.length > 0) {
+      for (let i = 0; i < data.apparatus.length; i += 1) {
         if (data.lac_readings.indexOf(data.overtext_name) != -1) {
           data.apparatus[i].readings.splice(0, 0, {
             'text': [],
             'type': 'lac_verse',
-            'details': 'lac verse',
-            'witnesses': data.lac_readings
+            'details': CL.project.lac_unit_label,
+            'witnesses': new_lac_witnesses
           });
         } else {
           data.apparatus[i].readings.push({
             'text': [],
             'type': 'lac_verse',
-            'details': 'lac verse',
-            'witnesses': data.lac_readings
+            'details': CL.project.lac_unit_label,
+            'witnesses': new_lac_witnesses
           });
         }
       }
     }
     if (typeof data.om_readings !== 'undefined' && data.om_readings.length > 0) {
-      for (i = 0; i < data.apparatus.length; i += 1) {
+      for (let i = 0; i < data.apparatus.length; i += 1) {
         if (data.om_readings.indexOf(data.overtext_name) != -1) {
           data.apparatus[i].readings.splice(0, 0, {
             'text': [],
             'type': 'om_verse',
-            'details': 'om verse',
+            'details': CL.project.om_unit_label,
             'witnesses': data.om_readings
           });
         } else {
           data.apparatus[i].readings.push({
             'text': [],
             'type': 'om_verse',
-            'details': 'om verse',
+            'details': CL.project.om_unit_label,
             'witnesses': data.om_readings
           });
         }

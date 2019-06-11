@@ -22,6 +22,7 @@ class PostProcessor(Regulariser):
                  om_readings,
                  lac_readings,
                  hand_id_map,
+                 special_categories,
                  settings,
                  decisions,
                  display_settings_config,
@@ -35,6 +36,7 @@ class PostProcessor(Regulariser):
         self.overtext = overtext
         self.om_readings = om_readings
         self.lac_readings = lac_readings
+        self.special_categories = special_categories
         self.hand_id_map = hand_id_map
         self.settings = settings
         self.decisions = decisions
@@ -135,6 +137,7 @@ class PostProcessor(Regulariser):
                     else:
                         variant_unit.append(unit[key])
                 reading_sets.append(variant_unit)
+
         #next line was an experiment to try chunking myself.
         #reading_sets = self.check_adjacent_shared_units(reading_sets)
         return reading_sets
@@ -443,6 +446,7 @@ class PostProcessor(Regulariser):
                 'apparatus': anchored_readings,
                 'om_readings': self.om_readings,
                 'lac_readings': self.lac_readings,
+                'special_categories': self.special_categories,
                 'hand_id_map': self.hand_id_map}
 
     def apply_settings(self, token):

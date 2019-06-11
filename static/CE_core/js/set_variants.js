@@ -112,7 +112,9 @@ SV = (function () {
 		//sort out footer stuff
 		CL.expandFillPageClients();
 		footer_html = [];
-		footer_html.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+		if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
+      footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+    }
 		footer_html.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">show subreadings</button>');
 		if (CL.witnessEditingMode === false) {
 			footer_html.push('<span id="extra_buttons"></span>');
@@ -1041,12 +1043,13 @@ SV = (function () {
 				unprepareForOperation();
 				SR.loseSubreadings(); //for preparation and is needed
 				OR.makeWasGapWordsGaps();
-				//merge lacs into a single unit
+				//merge lacs into a single unit if in settings (default is also true to protect existing projects)
 				//we used to do this with OM as well but om verse should never be merged with OM so I don't run it anymore as there
 				//should be no more that one OM and om verse in any given unit.
-				//TODO: this one should perhaps be configurable
-				//could just be a flag for this and oms
-				OR.mergeAllLacs();
+				if (CL.project.combineAllLacsInOR === true) {
+					OR.mergeAllLacs();
+				}
+
 				OR.addLabels(true); //this adds the reading labels to the datastructure itself - still required so they can be edited
 				//log that we have moved to OR in the event_list
 				if (CL.data.hasOwnProperty('event_list')) {
@@ -1844,7 +1847,7 @@ SV = (function () {
 					witnesses.splice(witnesses.indexOf(reading.witnesses[i]), 1);
 				}
 				if (CL.data.lac_readings.length > 0) {
-					readings.push({'text' : [], 'type' : 'lac_verse', 'details' : 'lac verse', 'witnesses' : JSON.parse(JSON.stringify(CL.data.lac_readings))});
+					readings.push({'text' : [], 'type' : 'lac_verse', 'details' : CL.project.lac_unit_label, 'witnesses' : JSON.parse(JSON.stringify(CL.data.lac_readings))});
 					for (i = 0; i < CL.data.lac_readings.length; i += 1) {
 						witnesses.splice(witnesses.indexOf(CL.data.lac_readings[i]), 1);
 					}
@@ -1852,7 +1855,7 @@ SV = (function () {
 				if (CL.data.om_readings.length > 0) {
 					readings.push({'text' : [],
 						'type' : 'om_verse',
-						'details' : 'om verse',
+						'details' : CL.project.om_unit_label,
 						'witnesses' : JSON.parse(JSON.stringify(CL.data.om_readings))});
 					for (i = 0; i < CL.data.om_readings.length; i += 1) {
 						witnesses.splice(witnesses.indexOf(CL.data.om_readings[i]), 1);
@@ -3274,13 +3277,13 @@ SV = (function () {
 								}
 							}
 							if (add.length > 0) {
-								newunit.readings.push({'witnesses': add, 'text' : [], 'overlap_status': key, 'type': 'om_verse', 'details': 'om verse'});
+								newunit.readings.push({'witnesses': add, 'text' : [], 'overlap_status': key, 'type': 'om_verse', 'details': CL.project.om_unit_label});
 							}
 						}
 					}
 				}
 				if (om_readings_copy.length > 0) {
-					newunit.readings.push({'witnesses': om_readings_copy, 'text': [], 'type': 'om_verse', 'details': 'om verse'});
+					newunit.readings.push({'witnesses': om_readings_copy, 'text': [], 'type': 'om_verse', 'details': CL.project.om_unit_label});
 				}
 			}
 			if (CL.data.hasOwnProperty('lac_readings') && CL.data.lac_readings.length > 0) {
@@ -3296,13 +3299,13 @@ SV = (function () {
 								}
 							}
 							if (add.length > 0) {
-								newunit.readings.push({'witnesses': add, 'text' : [], 'overlap_status': key, 'type': 'lac_verse', 'details': 'lac verse'});
+								newunit.readings.push({'witnesses': add, 'text' : [], 'overlap_status': key, 'type': 'lac_verse', 'details': CL.project.lac_unit_label});
 							}
 						}
 					}
 				}
 				if (lac_readings_copy.length > 0) {
-					newunit.readings.push({'witnesses': lac_readings_copy, 'text': [], 'type': 'lac_verse', 'details': 'lac verse'});
+					newunit.readings.push({'witnesses': lac_readings_copy, 'text': [], 'type': 'lac_verse', 'details': CL.project.lac_unit_label});
 				}
 			}
 			CL.addUnitId(newunit);

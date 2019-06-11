@@ -11,6 +11,7 @@ from collation.core.regulariser import Regulariser
 
 class PreProcessor(Regulariser):
 
+
     def __init__(self, display_settings_config=None, local_python_functions=None, rule_conditions_config=None, split_single_reading_units=False):
         self.display_settings_config = display_settings_config
         self.local_python_functions = local_python_functions

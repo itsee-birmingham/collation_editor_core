@@ -4501,7 +4501,7 @@ CL = (function() {
     return details;
   };
 
-  // TODO: this needs to separate special_categories from lac/om wits
+  // TODO: this needs to separate special_categories from lac/om wits TODO: is this done now?
   _addExtraGapReadings = function(adjacent_unit, all_witnesses, new_unit, inclusive_overlaps) {
     var lac_wits, om_wits, other_wits, key, ol_unit, i, j, k, new_rdg, special_witnesses;
     //the rest of this section is really just adding the readings (and witnesses) to this unit

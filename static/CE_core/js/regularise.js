@@ -569,9 +569,6 @@ RG = (function() {
         lac_transcriptions.splice(lac_transcriptions.indexOf(transcription_id), 1);
       }
     }
-    if (collation_data.hasOwnProperty('special_lacs')) {
-
-    }
     result_callback(lac_transcriptions);
   };
 

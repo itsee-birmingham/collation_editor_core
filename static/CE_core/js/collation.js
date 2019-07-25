@@ -2931,6 +2931,10 @@ CL = (function() {
       CL.project.lac_unit_label = CL.project.lac_unit_label;
     }
 
+    if (CL.services.hasOwnProperty('undoStackLength')) {
+      SV.undoStackLength = CL.services.undoStackLength;
+    } //default in SV
+
     if (project.hasOwnProperty('om_unit_label')) {
       CL.project.om_unit_label = project.om_unit_label;
     } else if (CL.services.hasOwnProperty('om_unit_label')) {

@@ -13,12 +13,12 @@ SV = (function () {
 	//public variable declarations
 	let undoStack = [],
 			messagePosLeft = null,
+			undoStackLength = 6,
 			showSharedUnits = false;
 
 
 	//private variable declarations
-	let _undoStackLength = 6,
-			_watchList = [],
+	let _watchList = [],
 			_selectedVariantUnits = [],
 			_messageExpanded = true;
 
@@ -4438,13 +4438,14 @@ SV = (function () {
 
 	/** next two functions allow undo operation. */
 
-	/** Length of undo stack is determined by _undoStackLength variable.
+	/** Length of undo stack is determined by SV.undoStackLength variable.
+	 * The default can be overwritten by the services (but not by projects)
 	 * Not all operations lead to a new entry on the stack only those that really
 	 * change the object so split readings and recombine readings for example
 	 * don't get added to the stack. Functions that are considered important enough to
 	 * be undone call _addToUndoStack before making the object changes.*/
 	_addToUndoStack = function (data) {
-		if (SV.undoStack.length === _undoStackLength) {
+		if (SV.undoStack.length === SV.undoStackLength) {
 			SV.undoStack.shift();
 		}
 		SV.undoStack.push(JSON.stringify(data));
@@ -4741,6 +4742,7 @@ SV = (function () {
 		checkBugStatus: checkBugStatus,
 		checkStandoffReadingProblems: checkStandoffReadingProblems,
 		areAllUnitsComplete: areAllUnitsComplete,
+		undoStackLength: undoStackLength,
 
 		//TODO: properly make this public!
 		_combineReadings: _combineReadings,

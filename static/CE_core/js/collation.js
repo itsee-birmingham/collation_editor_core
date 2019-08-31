@@ -993,6 +993,7 @@ CL = (function() {
   getUnitLayout = function(apparatus, app, format, options) {
     var j, i, k, rows, unit, col_len_dict, row_list, extra_rows, new_row, unit_data_options,
       previous_index, id_string, events, unit_data, unit_index, split, spacer_rows, key;
+
     if (typeof options === 'undefined') {
       options = {};
     }
@@ -1016,6 +1017,7 @@ CL = (function() {
     }
     while (j < apparatus.length) {
       unit = apparatus[j];
+
       unit_index = unit.start;
       if (i < unit_index) { //we don't have a variant for this word
         rows.push(_getEmptyCell(format));
@@ -1034,9 +1036,11 @@ CL = (function() {
           (format === 'set_variants') ||
           format === 'version_additions' ||
           format === 'other_version_additions') {
+
           if (options.hasOwnProperty('sort') && options.sort === true) {
             unit.readings = sortReadings(unit.readings);
           }
+
           if (app > 1) {
             id_string = j + '_app_' + app;
           } else {
@@ -1081,6 +1085,8 @@ CL = (function() {
           if (!unitHasText(unit)) {
             unit_data_options.gap_unit = true;
           }
+
+
           if (options.hasOwnProperty('getUnitDataFunction')) {
             unit_data_options.format = format;
             unit_data = options.getUnitDataFunction(unit.readings, id_string, unit.start, unit.end, unit_data_options);
@@ -2494,7 +2500,7 @@ CL = (function() {
       document.getElementById('container').innerHTML = '<div id="saved_collations_div"></div>';
       _findSaved(CL.context);
     }
-  }
+  };
 
 
   //NB: special all gap pop up units will sort themselves out in the display phase
@@ -3095,16 +3101,17 @@ CL = (function() {
     SPN.show_loading_overlay();
     if (context === undefined) {
       context = _getContextFromInputForm();
-      if (context) {
-        CL.services.getSavedCollations(context, undefined, function(collations) {
-          CL.services.getCurrentEditingProject(function(project) {
-            _showSavedVersions(collations, project.witnesses, context);
-          });
-        });
-      } else {
-        SPN.remove_loading_overlay();
-      }
     }
+    if (context) {
+      CL.services.getSavedCollations(context, undefined, function(collations) {
+        CL.services.getCurrentEditingProject(function(project) {
+          _showSavedVersions(collations, project.witnesses, context);
+        });
+      });
+    } else {
+      SPN.remove_loading_overlay();
+    }
+
   };
 
 
@@ -3469,11 +3476,17 @@ CL = (function() {
   prepareAdditionalCollation = function(existing_collation, witsToAdd) {
     var context;
     SPN.show_loading_overlay();
+
     if (document.getElementById('language')) {
       CL.dataSettings.language = document.getElementById('language').value;
     }
     if (document.getElementById('base_text')) {
+      //TODO: mybe check that this agrees with the one in the existing collations data_settings for compatibility.
+      // especially since in the next block we take the base text siglum from there which in theory might not agree with this base text id.
       CL.dataSettings.base_text = document.getElementById('base_text').value;
+    }
+    if (existing_collation.data_settings.hasOwnProperty('base_text_siglum')) {
+      CL.dataSettings.base_text_siglum = existing_collation.data_settings.base_text_siglum;
     }
     if (existing_collation.status !== 'regularised') {
       //ensure we use the display settings that were used for the existing collation in SV (they are read from here at collation time)
@@ -3508,6 +3521,7 @@ CL = (function() {
             lacOmFix();
             data = JSON.parse(JSON.stringify(CL.data)); //copy so we can change CL.data without screwing this up
             if (CL.context === existing_collation.context) { //assume CL.context agrees with the new data since it was used to fetch it
+
               if (data.overtext_name === existing_collation.structure.overtext_name) { //check we have basetext agreement
 
                 CL.witnessesAdded = [];
@@ -3608,7 +3622,10 @@ CL = (function() {
                 omReading = existingUnit.readings[i];
               }
             }
+
+            //THIS FAR - all looks okay so far - looking for what is making Y.3.1.2 get the om in the wrong place in Reg but not SV
             if (omReading) {
+
               //addedWits is identifiers rather than sigla for readings so use hand_id_map here instead
               //we can assume that basetext is om in both cases as it is the same text so the check of exisitng witnessses for omReading will filter this out
               for (let key in newData.hand_id_map) {
@@ -3620,7 +3637,7 @@ CL = (function() {
               }
               index += 1;
             } else {
-              alert('the new witnesses cannot be added due to a problem with a conflict of basetexts (error CL:3433)');
+              alert('the new witnesses cannot be added due to a problem with a conflict of basetexts (error CL:3623)');
               //TODO: more sensible message and reload summary page here or get
               SPN.remove_loading_overlay();
               return null;
@@ -3706,6 +3723,7 @@ CL = (function() {
               for (let j=0; j<newUnit.readings.length; j+=1) {
                 matchingReadingFound = false;
                 newReadingText = extractWitnessText(newUnit.readings[j]);
+
                 for (let k=0; k<existingUnit.readings.length; k+=1) {
                   if (!existingUnit.readings[k].hasOwnProperty('overlap_status') && extractWitnessText(existingUnit.readings[k]) === newReadingText) {
                     matchingReadingFound = true;
@@ -3826,6 +3844,7 @@ CL = (function() {
       if (collation) {
         CL.context = collation.context;
         CL.data = collation.structure;
+
         if (!CL.data.apparatus[0].hasOwnProperty('_id')) {
           addUnitAndReadingIds();
         }

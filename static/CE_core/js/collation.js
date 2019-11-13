@@ -87,9 +87,10 @@ CL = (function() {
    _findStandoffWitness, _findReadingPosById, _getPreStageChecks, _makeRegDecisionsStandoff,
    _contextInputOnload, _removeWitnessFromUnit, _findSaved, _addToSavedCollation,
    _displaySavedCollation, _mergeCollationObjects,
-   _getUnitsByStartIndex, _mergeNewLacOmVerseReadings, _mergeNewReading;
+   _getUnitsByStartIndex, _mergeNewLacOmVerseReadings, _mergeNewReading,
    _getReadingHistory, _getNextTargetRuleInfo, _removeAppliedRules,
-   _getHistoricalReading;
+   _getHistoricalReading, _doMakeRegDecisionsStandoff, _extractAllTValuesForRGAppliedRules,
+   _makeStandoffReading2;
 
 
   //*********  public functions *********
@@ -277,7 +278,7 @@ CL = (function() {
         for (i = 0; i < reading.text.length; i += 1) {
           text.push(reading.text[i]['interface']);
         }
-        return text.join(' ').replace(/_/g, '&#803;');
+        return CL.project.prepareDisplayString(text.join(' '));
       }
       if (reading.hasOwnProperty('details')) {
         if (test === true) {
@@ -461,7 +462,7 @@ CL = (function() {
         console.log(text);
       }
     }
-    return text.join(' ').replace(/_/g, '&#803;');
+    return CL.project.prepareDisplayString(text.join(' '));
   };
 
   getAllReadingWitnesses = function(reading) {
@@ -525,6 +526,7 @@ CL = (function() {
     }
     return null;
   };
+
   //TODO: sort out this mess of what is called what and snake vs camel for regularisation_classes and ruleClasses and rule_classes!!!!
   //TODO: is this the most efficient way to do this?
   //rule_classes could at least be set once in project config even if we have to cycle through them every time here
@@ -991,6 +993,7 @@ CL = (function() {
   getUnitLayout = function(apparatus, app, format, options) {
     var j, i, k, rows, unit, col_len_dict, row_list, extra_rows, new_row, unit_data_options,
       previous_index, id_string, events, unit_data, unit_index, split, spacer_rows, key;
+
     if (typeof options === 'undefined') {
       options = {};
     }
@@ -1014,6 +1017,7 @@ CL = (function() {
     }
     while (j < apparatus.length) {
       unit = apparatus[j];
+
       unit_index = unit.start;
       if (i < unit_index) { //we don't have a variant for this word
         rows.push(_getEmptyCell(format));
@@ -1032,9 +1036,11 @@ CL = (function() {
           (format === 'set_variants') ||
           format === 'version_additions' ||
           format === 'other_version_additions') {
+
           if (options.hasOwnProperty('sort') && options.sort === true) {
             unit.readings = sortReadings(unit.readings);
           }
+
           if (app > 1) {
             id_string = j + '_app_' + app;
           } else {
@@ -1079,6 +1085,8 @@ CL = (function() {
           if (!unitHasText(unit)) {
             unit_data_options.gap_unit = true;
           }
+
+
           if (options.hasOwnProperty('getUnitDataFunction')) {
             unit_data_options.format = format;
             unit_data = options.getUnitDataFunction(unit.readings, id_string, unit.start, unit.end, unit_data_options);
@@ -1204,7 +1212,7 @@ CL = (function() {
                     text.push('&lt;' + verse.witnesses[j].tokens[k].gap_details + '&gt;');
                   }
                 }
-                document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + display_hand + ':</b> ' + text.join(' ').replace(/_/g, '&#803;') + '</span>';
+                document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + display_hand + ':</b> ' + CL.project.prepareDisplayString(text.join(' ')) + '</span>';
                 break;
               }
             }
@@ -1803,10 +1811,9 @@ CL = (function() {
     //Populate the subreading type dropdown
     if (document.getElementById('subreading_select')) {
       subreading_classes = [];
-      //TODO: check this can use CL.project.ruleClasses
-      for (i = 0; i < CL.project.ruleClasses.length; i += 1) {
-        if (CL.project.ruleClasses[i].create_in_SV === true && CL.project.ruleClasses[i].subreading === true) {
-          subreading_classes.push(CL.project.ruleClasses[i]);
+      for (i = 0; i < CL.ruleClasses.length; i += 1) {
+        if (CL.ruleClasses[i].create_in_SV === true && CL.ruleClasses[i].subreading === true) {
+          subreading_classes.push(CL.ruleClasses[i]);
         }
       }
       cforms.populateSelect(subreading_classes, document.getElementById('subreading_select'), {'value_key': 'value', 'text_keys': 'name', 'add_select': false});
@@ -1921,8 +1928,42 @@ CL = (function() {
     return [true];
   };
 
+  _extractAllTValuesForRGAppliedRules = function(reading, unit, apparatus) {
+    var witness, tValue, tokensForSettings, structuredTokens;
+    tokensForSettings = [];
+    if (reading.hasOwnProperty('subreadings')) {
+      for (let key in reading.subreadings) {
+        if (reading.subreadings.hasOwnProperty(key)) {
+          for (let i = reading.subreadings[key].length - 1; i >= 0; i -= 1) {
+            let k = reading.subreadings[key][i].witnesses.length - 1;
+            while (k >= 0) {
+              witness = reading.subreadings[key][i].witnesses[k];
+              if (findStandoffRegularisation(unit, witness, apparatus) === null) {
+                for(let j = 0; j < reading.subreadings[key][i].text.length; j += 1) {
+                  if (reading.subreadings[key][i].text[j][witness].hasOwnProperty('decision_details')) {
+                    tValue = reading.subreadings[key][i].text[j][witness].decision_details[0].t;
+                    if (tokensForSettings.indexOf(tValue) === -1) {
+                      tokensForSettings.push(tValue);
+                    }
+                  }
+                }
+              }
+              k -= 1;
+            }
+          }
+        }
+      }
+    }
+    structuredTokens = [];
+    for (let i=0; i<tokensForSettings.length; i+=1) {
+      structuredTokens.push({'t': tokensForSettings[i]});
+    }
+    return structuredTokens;
+  };
+
   makeStandoffReading = function(type, reading_details, parent_id) {
-    var apparatus, unit, reading, fosilised_reading, parent, key, i, j, k, ids, new_reading, witness;
+    var apparatus, unit, reading, fosilised_reading, parent, key, i, j, k, ids,
+    tValuesForSettings, new_reading, witness, options, displaySettings, resultCallback;
     apparatus = reading_details.app_id;
     unit = findUnitById(apparatus, reading_details.unit_id);
     parent = findReadingById(unit, parent_id);
@@ -1932,27 +1973,58 @@ CL = (function() {
     }); //we need this to see if we have any!
     reading = findReadingById(unit, reading_details.reading_id);
     fosilised_reading = JSON.parse(JSON.stringify(reading));
+
+    //TODO: here we need to apply the settings to all the t strings in the
+    //subreadings and sort them into some kind of lookup table
+    //for use later so that the service call is not embedded in the loop
+    //rest of this function must not continue until data is returned
+    tValuesForSettings = _extractAllTValuesForRGAppliedRules(reading, unit, apparatus);
+    options = {};
+    displaySettings = {};
+    for (let setting in CL.displaySettings) {
+      if (CL.displaySettings.hasOwnProperty(setting)) {
+        if (CL.displaySettings[setting] === true) {
+          displaySettings[setting] = CL.displaySettings[setting];
+        }
+      }
+    }
+    options.display_settings = displaySettings;
+    options.display_settings_config = CL.displaySettingsDetails;
+    resultCallback = function(data) {
+      var baseReadingsWithSettingsApplied;
+      baseReadingsWithSettingsApplied = {};
+      for (let i=0; i<data.tokens.length; i+=1) {
+        baseReadingsWithSettingsApplied[data.tokens[i].t] = data.tokens[i]['interface'];
+      }
+      _makeStandoffReading2(reading, fosilised_reading, parent, baseReadingsWithSettingsApplied, type, unit, apparatus, reading_details);
+    }
+    CL.services.applySettings(tValuesForSettings, options, resultCallback);
+  };
+
+  _makeStandoffReading2 = function (reading, fosilised_reading, parent, baseReadingsWithSettingsApplied, type, unit, apparatus, reading_details) {
+    var k, ids, new_reading, witness;
     //do any existing subreadings
     if (reading.hasOwnProperty('subreadings')) {
       //now here is the tricky bit - if this subreading is a subreading because of work done in the regulariser we need to
       //preserve those decisions in the reading_history of the standoff subreading we are about to create.
       //To do this we need to pretend these are already standoff marked readings and add the data to the standoff marked readings datastructure
-      for (key in reading.subreadings) {
+      for (let key in reading.subreadings) {
         if (reading.subreadings.hasOwnProperty(key)) {
-          for (i = reading.subreadings[key].length - 1; i >= 0; i -= 1) {
+          for (let i = reading.subreadings[key].length - 1; i >= 0; i -= 1) {
             k = reading.subreadings[key][i].witnesses.length - 1;
+            //TODO: what is this doing and why is it so complicated! i is going backwards anyway so why check i here?
             while (reading.hasOwnProperty('subreadings') && reading.subreadings.hasOwnProperty(key) && i < reading.subreadings[key].length && k >= 0) {
               witness = reading.subreadings[key][i].witnesses[k];
               if (findStandoffRegularisation(unit, witness, apparatus) === null) {
-                _makeRegDecisionsStandoff(type, apparatus, unit, reading, parent, reading.subreadings[key][i], witness);
+                _makeRegDecisionsStandoff(type, apparatus, unit, reading, parent, reading.subreadings[key][i], witness, baseReadingsWithSettingsApplied);
                 makeMainReading(unit, reading, key, i, {
                   'witnesses': [witness]
                 });
-              } else {
+              } else { //if we get here we must already have dealt with any regulaisations made in RG for this reading
                 ids = makeMainReading(unit, reading, key, i, {
                   'witnesses': [witness]
                 });
-                for (j = 0; j < ids.length; j += 1) {
+                for (let j = 0; j < ids.length; j += 1) {
                   new_reading = findReadingById(unit, ids[j]);
                   doMakeStandoffReading(type, apparatus, unit, new_reading, parent);
                 }
@@ -1964,7 +2036,6 @@ CL = (function() {
               k -= 1;
             }
           }
-
         }
       }
     }
@@ -2428,7 +2499,7 @@ CL = (function() {
       document.getElementById('container').innerHTML = '<div id="saved_collations_div"></div>';
       _findSaved(CL.context);
     }
-  }
+  };
 
 
   //NB: special all gap pop up units will sort themselves out in the display phase
@@ -2813,6 +2884,29 @@ CL = (function() {
     if (project.hasOwnProperty('useVForSupplied')) {
       CL.project.useVForSupplied = project.useVForSupplied;
     }
+
+    //
+    if (project.hasOwnProperty('prepareDisplayString')) {
+      CL.project.prepareDisplayString;
+    } else if (CL.services.hasOwnProperty('prepareDisplayString')) {
+      CL.project.prepareDisplayString;
+    } else {
+      CL.project.prepareDisplayString = function (string) {
+        return string;
+      }
+    }
+
+    //
+    if (project.hasOwnProperty('prepareNormalisedString')) {
+      CL.project.prepareNormalisedString;
+    } else if (CL.services.hasOwnProperty('prepareNormalisedString')) {
+      CL.project.prepareNormalisedString;
+    } else {
+      CL.project.prepareNormalisedString = function (string) {
+        return string;
+      }
+    }
+
     //settings for collapse all button (rarely used so allowing as option to keep footer clean)
     if (project.hasOwnProperty('showCollapseAllUnitsButton')) {
       CL.project.showCollapseAllUnitsButton = project.showCollapseAllUnitsButton;
@@ -2841,6 +2935,10 @@ CL = (function() {
       //default is lac verse for now to protect existing projects
       CL.project.lac_unit_label = CL.project.lac_unit_label;
     }
+
+    if (CL.services.hasOwnProperty('undoStackLength')) {
+      SV.undoStackLength = CL.services.undoStackLength;
+    } //default in SV
 
     if (project.hasOwnProperty('om_unit_label')) {
       CL.project.om_unit_label = project.om_unit_label;
@@ -2984,12 +3082,12 @@ CL = (function() {
   };
 
   _prepareCollation = function(output) {
-    var language, base_text, context;
+    var context;
     SPN.show_loading_overlay();
     CL.dataSettings.language = document.getElementById('language').value;
     CL.dataSettings.base_text = document.getElementById('base_text').value;
     context = _getContextFromInputForm();
-    if (context && base_text !== 'none') {
+    if (context && CL.dataSettings.base_text !== 'none') {
       CL.context = context;
       CL.dataSettings.witness_list = _getWitnessesFromInputForm();
       RG.getCollationData(output, 0);
@@ -3012,7 +3110,9 @@ CL = (function() {
     } else {
       SPN.remove_loading_overlay();
     }
+
   };
+
 
   _getContextFromInputForm = function() {
     var context;
@@ -3375,11 +3475,17 @@ CL = (function() {
   prepareAdditionalCollation = function(existing_collation, witsToAdd) {
     var context;
     SPN.show_loading_overlay();
+
     if (document.getElementById('language')) {
       CL.dataSettings.language = document.getElementById('language').value;
     }
     if (document.getElementById('base_text')) {
+      //TODO: mybe check that this agrees with the one in the existing collations data_settings for compatibility.
+      // especially since in the next block we take the base text siglum from there which in theory might not agree with this base text id.
       CL.dataSettings.base_text = document.getElementById('base_text').value;
+    }
+    if (existing_collation.data_settings.hasOwnProperty('base_text_siglum')) {
+      CL.dataSettings.base_text_siglum = existing_collation.data_settings.base_text_siglum;
     }
     if (existing_collation.status !== 'regularised') {
       //ensure we use the display settings that were used for the existing collation in SV (they are read from here at collation time)
@@ -3414,6 +3520,7 @@ CL = (function() {
             lacOmFix();
             data = JSON.parse(JSON.stringify(CL.data)); //copy so we can change CL.data without screwing this up
             if (CL.context === existing_collation.context) { //assume CL.context agrees with the new data since it was used to fetch it
+
               if (data.overtext_name === existing_collation.structure.overtext_name) { //check we have basetext agreement
 
                 CL.witnessesAdded = [];
@@ -3514,7 +3621,10 @@ CL = (function() {
                 omReading = existingUnit.readings[i];
               }
             }
+
+            //THIS FAR - all looks okay so far - looking for what is making Y.3.1.2 get the om in the wrong place in Reg but not SV
             if (omReading) {
+
               //addedWits is identifiers rather than sigla for readings so use hand_id_map here instead
               //we can assume that basetext is om in both cases as it is the same text so the check of exisitng witnessses for omReading will filter this out
               for (let key in newData.hand_id_map) {
@@ -3526,7 +3636,7 @@ CL = (function() {
               }
               index += 1;
             } else {
-              alert('the new witnesses cannot be added due to a problem with a conflict of basetexts (error CL:3433)');
+              alert('the new witnesses cannot be added due to a problem with a conflict of basetexts (error CL:3623)');
               //TODO: more sensible message and reload summary page here or get
               SPN.remove_loading_overlay();
               return null;
@@ -3612,6 +3722,7 @@ CL = (function() {
               for (let j=0; j<newUnit.readings.length; j+=1) {
                 matchingReadingFound = false;
                 newReadingText = extractWitnessText(newUnit.readings[j]);
+
                 for (let k=0; k<existingUnit.readings.length; k+=1) {
                   if (!existingUnit.readings[k].hasOwnProperty('overlap_status') && extractWitnessText(existingUnit.readings[k]) === newReadingText) {
                     matchingReadingFound = true;
@@ -3732,6 +3843,7 @@ CL = (function() {
       if (collation) {
         CL.context = collation.context;
         CL.data = collation.structure;
+
         if (!CL.data.apparatus[0].hasOwnProperty('_id')) {
           addUnitAndReadingIds();
         }
@@ -4411,7 +4523,7 @@ CL = (function() {
     return details;
   };
 
-  // TODO: this needs to separate special_categories from lac/om wits
+  // TODO: this needs to separate special_categories from lac/om wits TODO: is this done now?
   _addExtraGapReadings = function(adjacent_unit, all_witnesses, new_unit, inclusive_overlaps) {
     var lac_wits, om_wits, other_wits, key, ol_unit, i, j, k, new_rdg, special_witnesses;
     //the rest of this section is really just adding the readings (and witnesses) to this unit
@@ -5139,47 +5251,108 @@ CL = (function() {
     return [];
   };
 
-  _makeRegDecisionsStandoff = function(type, apparatus, unit, reading, parent, subreading, witness) {
-    var rule_details, key, i, j, k, standoff_reading, values, classes, details, decision_details, subreading_types;
-    //get all the possible rules
-    rule_details = getRuleClasses(undefined, undefined, 'value', ['suffixed_sigla', 'identifier', 'name', 'subreading', 'suffixed_label']);
-    subreading_types = [];
-    for (key in rule_details) {
-      if (rule_details.hasOwnProperty(key) && rule_details[key][3] === true) {
-        subreading_types.push(key);
-      }
-    }
-    //now for each witness construct its regularisation history and make a standoff entry for it
-    standoff_reading = {
-      'start': unit.start,
-      'end': unit.end,
-      'unit_id': unit._id,
-      'first_word_index': unit.first_word_index,
-      'witness': witness,
-      'apparatus': apparatus,
-      'parent_text': extractWitnessText(parent, {
-        'app_id': apparatus,
-        'unit_id': unit._id
-      }),
-      'identifier': [],
-      'suffixed_sigla': [],
-      'suffixed_label': [],
-      'reading_history': [extractWitnessText(reading, {
-        'witness': witness,
-        'reading_type': 'subreading'
-      })],
-      'subreading': [],
-      'name': [],
-      'values': []
-    };
+  _makeRegDecisionsStandoff = function(type, apparatus, unit, reading, parent, subreading, witness, baseReadingsWithSettingsApplied) {
+    var rule_details, key, i, j, k, standoff_reading, values, classes, details,
+      decision_details, subreading_types;
 
+      //get all the possible rules
+      rule_details = getRuleClasses(undefined, undefined, 'value', ['suffixed_sigla', 'identifier', 'name', 'subreading', 'suffixed_label']);
+      subreading_types = [];
+      for (key in rule_details) {
+        if (rule_details.hasOwnProperty(key) && rule_details[key][3] === true) {
+          subreading_types.push(key);
+        }
+      }
+
+      //now for each witness construct its regularisation history and make a standoff entry for it
+      standoff_reading = {
+        'start': unit.start,
+        'end': unit.end,
+        'unit_id': unit._id,
+        'first_word_index': unit.first_word_index,
+        'witness': witness,
+        'apparatus': apparatus,
+        'parent_text': extractWitnessText(parent, {
+          'app_id': apparatus,
+          'unit_id': unit._id
+        }),
+        'identifier': [],
+        'suffixed_sigla': [],
+        'suffixed_label': [],
+        'reading_history': [extractWitnessText(reading, {
+          'witness': witness,
+          'reading_type': 'subreading'
+        })],
+        'subreading': [],
+        'name': [],
+        'values': []
+      };
+
+      //now get all the words and their decisions or an empty list if no decisions
+      classes = [];
+      details = [];
+
+      //loop through the words and get the decisions for each word
+      for (let k = 0; k < subreading.text.length; k += 1) {
+        if (subreading.text[k][witness].hasOwnProperty('decision_class')) {
+          classes.push(JSON.parse(JSON.stringify(subreading.text[k][witness].decision_class)));
+        } else {
+          classes.push([]);
+        }
+        if (subreading.text[k][witness].hasOwnProperty('decision_details')) {
+          decision_details = JSON.parse(JSON.stringify(subreading.text[k][witness].decision_details));
+
+          decision_details[0].base_reading = baseReadingsWithSettingsApplied[decision_details[0].t]['interface'];
+          //decision_details[0].base_reading = _applySettings(decision_details[0].t);
+
+          details.push(decision_details);
+        } else {
+          details.push([{
+            'n': subreading.text[k]['interface']
+          }]);
+        }
+      }
+
+      //now implement your algorithm and push each result to the standoff reading
+      //work out the text at this stage as part of that - text should be before the rules are applied so first one has none applied etc.
+      standoff_reading = _getReadingHistory(classes, details, standoff_reading, rule_details, type, subreading_types, reading, witness, subreading);
+      standoff_reading.value = standoff_reading.values.join('|');
+      delete standoff_reading.values;
+      if (!CL.data.marked_readings.hasOwnProperty(standoff_reading.value)) {
+        CL.data.marked_readings[standoff_reading.value] = [];
+      }
+      if (reading.text.length > 0 && reading.text[reading.text.length - 1].hasOwnProperty('combined_gap_after')) {
+        standoff_reading.combined_gap_after = true;
+      }
+      if (reading.text.length > 0 && reading.text[0].hasOwnProperty('combined_gap_before')) {
+        standoff_reading.combined_gap_before = true;
+        if (reading.text[0].hasOwnProperty('combined_gap_before_details')) {
+          standoff_reading.combined_gap_before_details = reading.text[0].combined_gap_before_details;
+        }
+      }
+
+      CL.data.marked_readings[standoff_reading.value].push(standoff_reading);
+
+
+  };
+
+  _doMakeRegDecisionsStandoff = function(base_reading_data, standoff_reading, rule_details, subreading_types, type, apparatus, unit, reading, parent, subreading, witness) {
+    var key, i, j, k, values, classes, details,
+      decision_details, tokensForSettingsApplication, resultCallback;
+    console.log('called: _doMakeRegDecisionsStandoff')
+    console.log(base_reading_data)
 
 
     //now get all the words and their decisions or an empty list if no decisions
     classes = [];
     details = [];
+
     //loop through the words and get the decisions for each word
     for (k = 0; k < subreading.text.length; k += 1) {
+      console.log(subreading.text[k]);
+      console.log(witness)
+      console.log(subreading.text[k][witness])
+      console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^')
       if (subreading.text[k][witness].hasOwnProperty('decision_class')) {
         classes.push(JSON.parse(JSON.stringify(subreading.text[k][witness].decision_class)));
       } else {
@@ -5187,7 +5360,14 @@ CL = (function() {
       }
       if (subreading.text[k][witness].hasOwnProperty('decision_details')) {
         decision_details = JSON.parse(JSON.stringify(subreading.text[k][witness].decision_details));
-        decision_details[0].base_reading = _applySettings(decision_details[0].t);
+
+
+        //decision_details[0].base_reading = _applySettings(decision_details[0].t);
+        decision_details[0].base_reading = base_reading_data[0]['interface'];
+        base_reading_data.shift();
+
+
+
         details.push(decision_details);
       } else {
         details.push([{
@@ -5195,7 +5375,8 @@ CL = (function() {
         }]);
       }
     }
-
+    console.log(details);
+    console.log('NEW BIT COMPLETE')
 
 
     //now implement your algorithm and push each result to the standoff reading

@@ -76,6 +76,7 @@ SV = (function () {
 		error_panel_html, row, hands, result, undo_button, footer_html, overlap_options, new_overlap_options,
 		preselected_added_highlight;
 		console.log(CL.data);
+		CL.stage = 'set';
 		if (typeof options === 'undefined') {
 			options = {};
 		}

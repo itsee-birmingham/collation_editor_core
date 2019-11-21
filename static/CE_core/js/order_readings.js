@@ -40,7 +40,9 @@ OR = (function() {
       num, temp, event_rows, scroll_offset, overlap_options, new_overlap_options, container,
       undo_button, show_hide_subreadings_button_text;
     //console.log(CL.data);
+    CL.stage = 'ordered';
     addLabels(false);
+
     if (typeof options === 'undefined') {
       options = {};
     }
@@ -192,6 +194,7 @@ OR = (function() {
     if (typeof options === 'undefined') {
       options = {};
     }
+    CL.stage = 'approved';
     //make sure we have a container to put things in
     if (!options.hasOwnProperty('container') || options.container === null) {
       container = document.getElementsByTagName('body')[0];

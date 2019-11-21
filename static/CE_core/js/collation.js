@@ -29,6 +29,7 @@ CL = (function() {
       project = {},
       collateData = {},
       context = '',
+      stage = null,
       data = {},
       isDirty = false, //this is currently only used for witnessEditingMode but could be expanded maybe on a project setting
       //It also only works for modifications to witnesses (adding/removing) not any other action while in edit mode.
@@ -555,24 +556,32 @@ CL = (function() {
     var html, word, words, cols, i, j, colspan;
     html = [];
     words = [];
-    //extract all the words from the data you get back
-    if ($.isArray(data.overtext)) {
-      for (i = 0; i < data.overtext[0].tokens.length; i += 1) {
-        word = [];
-        if (data.overtext[0].tokens[i].hasOwnProperty('pc_before')) {
-          word.push(data.overtext[0].tokens[i].pc_before);
+    //TODO: add in project based option
+    if (CL.services.hasOwnProperty('extractWordsForHeader') ) {
+      words = CL.services.extractWordsForHeader(data);
+    } else {
+      //hardcoded default
+      //extract all the words from the data you get back
+      if ($.isArray(data.overtext)) {
+        for (i = 0; i < data.overtext[0].tokens.length; i += 1) {
+          word = [];
+          if (data.overtext[0].tokens[i].hasOwnProperty('pc_before')) {
+            word.push(data.overtext[0].tokens[i].pc_before);
+          }
+          if (data.overtext[0].tokens[i].hasOwnProperty('original')) {
+            word.push(data.overtext[0].tokens[i].original);
+          } else {
+            word.push(data.overtext[0].tokens[i].t);
+          }
+          if (data.overtext[0].tokens[i].hasOwnProperty('pc_after')) {
+            word.push(data.overtext[0].tokens[i].pc_after);
+          }
+          words.push(word.join(''));
         }
-        if (data.overtext[0].tokens[i].hasOwnProperty('original')) {
-          word.push(data.overtext[0].tokens[i].original);
-        } else {
-          word.push(data.overtext[0].tokens[i].t);
-        }
-        if (data.overtext[0].tokens[i].hasOwnProperty('pc_after')) {
-          word.push(data.overtext[0].tokens[i].pc_after);
-        }
-        words.push(word.join(''));
       }
     }
+
+
     //columns is based on number of words*2 (to include spaces) + 1 (to add space at the end)
     cols = (words.length * 2) + 1;
     if (cols === 1) {
@@ -1443,7 +1452,6 @@ CL = (function() {
           html.push('"/>');
         }
       }
-
     }
     if (document.getElementById('extra_buttons')) {
       document.getElementById('extra_buttons').innerHTML = html.join('');

@@ -283,6 +283,7 @@ RG = (function() {
       header, unit_events, key, global_exceptions_html, show_hide_regularisations_button_text,
       remove_wits_form, wits, footerHtml, preselected_added_highlight;
     console.log(JSON.parse(JSON.stringify(data)));
+    CL.stage = 'regularise';
 
     if (typeof options === 'undefined') {
       options = {};
@@ -378,8 +379,8 @@ RG = (function() {
       footerHtml.push('<button class="pure-button left_foot" id="show_hide_regularisations_button">' + show_hide_regularisations_button_text + '</button>');
     }
     if (CL.witnessEditingMode === false) {
-      footerHtml.push('<span id="stage_links"></span>');
       footerHtml.push('<span id="extra_buttons"></span>');
+      footerHtml.push('<span id="stage_links"></span>');
     }
     if (CL.witnessEditingMode === true) {
       footerHtml.push('<button class="pure-button right_foot" id="return_to_saved_table_button">Return to summary table</button>');
@@ -1533,6 +1534,7 @@ RG = (function() {
   //priv-e
 
   return {
+
 
     showRegularisations: showRegularisations,
     runCollation: runCollation,

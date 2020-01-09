@@ -1511,7 +1511,7 @@ CL = (function() {
     unit_details_regex = /(variant|drag)_unit_(\d+)(_app_)?(\d+)?(_reading_|_row_)?(\d+)?/;
     m = id.match(unit_details_regex);
     if (m === null) {
-      console.log(unit_details_regex)
+      console.log(unit_details_regex);
     }
     details = [parseInt(m[2], 10)];
     if (typeof m[4] !== 'undefined') {
@@ -2005,7 +2005,7 @@ CL = (function() {
         baseReadingsWithSettingsApplied[data.tokens[i].t] = data.tokens[i]['interface'];
       }
       _makeStandoffReading2(reading, fosilised_reading, parent, baseReadingsWithSettingsApplied, type, unit, apparatus, reading_details);
-    }
+    };
     CL.services.applySettings(tValuesForSettings, options, resultCallback);
   };
 
@@ -2411,7 +2411,7 @@ CL = (function() {
         delete reading.SR_text[hand];
       }
       if (reading.hasOwnProperty('SR_text') && $.isEmptyObject(reading.SR_text)) {
-        delete reading['SR_text'];
+        delete reading.SR_text;
       }
     }
     removeNullItems(unit.readings);
@@ -2423,7 +2423,7 @@ CL = (function() {
     document.getElementById('remove_witnesses_div').style.left = document.getElementById('scroller').offsetWidth - document.getElementById('remove_witnesses_div').offsetWidth - 15 + 'px';
     html = [];
     //add a select all option
-    html.push('<input class="boolean" type="checkbox" id="select_all" name="select_all"/><label>Select all</label><br/>')
+    html.push('<input class="boolean" type="checkbox" id="select_all" name="select_all"/><label>Select all</label><br/>');
     for (let i=0; i<wits.length; i+=1) {
       for (let key in data.hand_id_map) {
         if ( data.hand_id_map.hasOwnProperty(key) && data.hand_id_map[key] === wits[i]) {
@@ -2437,7 +2437,7 @@ CL = (function() {
       if ($(this).is(':checked')) {
         $('.witness_select').each(function() {
           $(this).prop('checked', true);
-        })
+        });
       }
     });
     $('.witness_select').on('click', function () {
@@ -2464,7 +2464,7 @@ CL = (function() {
   };
 
   removeWitnesses = function(hands, stage) {
-    console.log('^^^^^^^^^^ remove witnesses')
+    console.log('^^^^^^^^^^ remove witnesses');
     var success, i, dataCopy, witnessListCopy;
     SPN.show_loading_overlay();
 
@@ -2893,26 +2893,26 @@ CL = (function() {
       CL.project.useVForSupplied = project.useVForSupplied;
     }
 
-    //
+    // TODO: check this works as I added the first two assignments since testing
     if (project.hasOwnProperty('prepareDisplayString')) {
-      CL.project.prepareDisplayString;
+      CL.project.prepareDisplayString = project.prepareDisplayString;
     } else if (CL.services.hasOwnProperty('prepareDisplayString')) {
-      CL.project.prepareDisplayString;
+      CL.project.prepareDisplayString = CL.services.prepareDisplayString;
     } else {
       CL.project.prepareDisplayString = function (string) {
         return string;
-      }
+      };
     }
 
-    //
+    // TODO: check this works as I added the first two assignments since testing
     if (project.hasOwnProperty('prepareNormalisedString')) {
-      CL.project.prepareNormalisedString;
+      CL.project.prepareNormalisedString = project.prepareNormalisedString;
     } else if (CL.services.hasOwnProperty('prepareNormalisedString')) {
-      CL.project.prepareNormalisedString;
+      CL.project.prepareNormalisedString = CL.services.prepareNormalisedString;
     } else {
       CL.project.prepareNormalisedString = function (string) {
         return string;
-      }
+      };
     }
 
     //settings for collapse all button (rarely used so allowing as option to keep footer clean)
@@ -3104,7 +3104,6 @@ CL = (function() {
 
   /* Initial page load functions */
   _findSaved = function(context) {
-    var context;
     SPN.show_loading_overlay();
     if (context === undefined) {
       context = _getContextFromInputForm();
@@ -3310,7 +3309,7 @@ CL = (function() {
               }
             } else {
               witnessComparisonClass = 'same';
-              hoveroverText = ''
+              hoveroverText = '';
             }
             html.push('<td title="' + hoveroverText + '" class="regularised ' + witnessComparisonClass + '">' + by_user[user].regularised.radio_button + '</td>');
           } else {
@@ -3336,7 +3335,7 @@ CL = (function() {
               }
             } else {
               witnessComparisonClass = 'same';
-              hoveroverText = ''
+              hoveroverText = '';
             }
             html.push('<td title="' + hoveroverText + '" class="set ' + witnessComparisonClass + '">' + by_user[user].set.radio_button + '</td>');
           } else {
@@ -3360,7 +3359,7 @@ CL = (function() {
               }
             } else {
               witnessComparisonClass = 'same';
-              hoveroverText = ''
+              hoveroverText = '';
             }
             html.push('<td title="' + hoveroverText + '" class="ordered ' + witnessComparisonClass + '">' + by_user[user].ordered.radio_button + '</td>');
           } else {
@@ -3384,7 +3383,7 @@ CL = (function() {
               }
             } else {
               witnessComparisonClass = 'same';
-              hoveroverText = ''
+              hoveroverText = '';
             }
             html.push('<td title="' + hoveroverText + '" class="approved ' + witnessComparisonClass + '" rowspan="' + userCount +'">' + approved.radio_button + '</td>');
           } else {
@@ -3472,7 +3471,7 @@ CL = (function() {
           }
           CL.existingCollation = collation;
           if (collation.status === 'regularised') {
-            alert('When using the add witnesses functions rules can only be made for the witnesses being added.\nChanging the settings will also only have an affect on the witnesses being added.\n\nIf you need to add more rules for existing witnesses then you should recollate the unit from scratch and then redo all of the later stages.')
+            alert('When using the add witnesses functions rules can only be made for the witnesses being added.\nChanging the settings will also only have an affect on the witnesses being added.\n\nIf you need to add more rules for existing witnesses then you should recollate the unit from scratch and then redo all of the later stages.');
           }
           prepareAdditionalCollation(collation, witsToAdd);
         }
@@ -3615,7 +3614,7 @@ CL = (function() {
       }
       for (let z=0; z<Math.max(newUnits.length, existingUnits.length); z+=1) {
         newUnit = z<newUnits.length ? newUnits[z] : null; //_getUnitByStartIndex(index, newData.apparatus);
-        existingUnit = z<existingUnits.length ? existingUnits[z] : null//_getUnitByStartIndex(index, mainCollation.structure.apparatus);
+        existingUnit = z<existingUnits.length ? existingUnits[z] : null;//_getUnitByStartIndex(index, mainCollation.structure.apparatus);
         if (existingUnit !== null && (newData.lac_readings.length > 0 || newData.om_readings.length > 0)) {
           _mergeNewLacOmVerseReadings(existingUnit, newData);
         }
@@ -3832,7 +3831,6 @@ CL = (function() {
 
   loadSavedCollation = function(id) {
     var i, value, bk, data, coll_id, temp, witnessStatus;
-    console.log('loading saved')
     CL.isDirty = false;
     SPN.show_loading_overlay();
     if (id === undefined) {
@@ -5347,8 +5345,8 @@ CL = (function() {
   _doMakeRegDecisionsStandoff = function(base_reading_data, standoff_reading, rule_details, subreading_types, type, apparatus, unit, reading, parent, subreading, witness) {
     var key, i, j, k, values, classes, details,
       decision_details, tokensForSettingsApplication, resultCallback;
-    console.log('called: _doMakeRegDecisionsStandoff')
-    console.log(base_reading_data)
+    console.log('called: _doMakeRegDecisionsStandoff');
+    console.log(base_reading_data);
 
 
     //now get all the words and their decisions or an empty list if no decisions
@@ -5358,9 +5356,9 @@ CL = (function() {
     //loop through the words and get the decisions for each word
     for (k = 0; k < subreading.text.length; k += 1) {
       console.log(subreading.text[k]);
-      console.log(witness)
-      console.log(subreading.text[k][witness])
-      console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+      console.log(witness);
+      console.log(subreading.text[k][witness]);
+      console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^');
       if (subreading.text[k][witness].hasOwnProperty('decision_class')) {
         classes.push(JSON.parse(JSON.stringify(subreading.text[k][witness].decision_class)));
       } else {
@@ -5384,7 +5382,7 @@ CL = (function() {
       }
     }
     console.log(details);
-    console.log('NEW BIT COMPLETE')
+    console.log('NEW BIT COMPLETE');
 
 
     //now implement your algorithm and push each result to the standoff reading

@@ -7,7 +7,7 @@ import xml.etree.ElementTree as etree
 
 class Exporter(object):
 
-    def export_data(self, data, format, ignore_basetext=False):
+    def export_data(self, data, format, ignore_basetext=False, settings={}):
         output = []
         for unit in data:
             if format == 'negative_xml':
@@ -26,10 +26,16 @@ class Exporter(object):
         else:
             if 'overlap_status' in reading.keys() and (reading['overlap_status'] in ['overlapped', 'deleted']):
                 text = ['', reading['overlap_status']]
-            elif 'type' in reading.keys() and (reading['type'] == 'om_verse' or reading['type'] == 'om'):
-                text = ['om', reading['type']]
-            elif 'type' in reading.keys() and (reading['type'] == 'lac_verse' or reading['type'] == 'lac'):
-                text = ['lac', reading['type']]
+            elif 'type' in reading.keys() and reading['type'] in ['om_verse', 'om']:
+                if 'details' in reading.keys():
+                    text = [reading['details'], reading['type']]
+                else:
+                    text = ['om', reading['type']]
+            elif 'type' in reading.keys() and reading['type'] in ['lac_verse', 'lac']:
+                if 'details' in reading.keys():
+                    text = [reading['details'], reading['type']]
+                else:
+                    text = ['lac', reading['type']]
         return text
 
     def get_lemma_text(self, overtext, start, end):
@@ -99,7 +105,6 @@ class Exporter(object):
                         app.append(self.make_reading(reading, i, reading['label'], wits))
                     if 'subreadings' in reading:
                         for key in reading['subreadings']:
-                            print(key)
                             for subreading in reading['subreadings'][key]:
                                 wits = self.get_witnesses(subreading, missing)
                                 if len(wits) > 0:
@@ -118,7 +123,6 @@ class Exporter(object):
                         app.append(self.make_reading(reading, i, reading['label'], wits))
                     if 'subreadings' in reading:
                         for key in reading['subreadings']:
-                            print(key)
                             for subreading in reading['subreadings'][key]:
                                 wits = self.get_witnesses(subreading, missing)
                                 if len(wits) > 0:

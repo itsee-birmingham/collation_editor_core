@@ -23,7 +23,7 @@ class PreProcessor(Regulariser):
                              project, settings, collation_settings, accept):
         self.settings = settings
         data = data_input['data']
-        witnesses = {}  # added to fix broken thing
+        witnesses = {}
         collatable_witnesses = []
         om_witnesses = []
         lac_hands = []
@@ -56,12 +56,12 @@ class PreProcessor(Regulariser):
             if 'transcription_identifier' in transcription_verse:
                 try:
                     lac_witnesses.remove(transcription_verse['transcription_identifier'])
-                except:
+                except ValueError:
                     pass
             else:
                 try:
                     lac_witnesses.remove(transcription_verse['transcription'])
-                except:
+                except ValueError:
                     pass
 
             # now find your base text.
@@ -104,7 +104,8 @@ class PreProcessor(Regulariser):
             except (KeyError, TypeError):
                 om_witnesses.append(transcription_verse['siglum'])
                 if 'transcription_identifier' in transcription_verse:
-                    hand_to_transcript_map[transcription_verse['siglum']] = transcription_verse['transcription_identifier']
+                    hand_to_transcript_map[transcription_verse['siglum']] = \
+                            transcription_verse['transcription_identifier']
                 else:
                     hand_to_transcript_map[transcription_verse['siglum']] = transcription_verse['transcription']
             else:
@@ -163,11 +164,11 @@ class PreProcessor(Regulariser):
                     if details != 'None':
                         try:
                             token['decision_class'].extend([c['class'] for c in details])
-                        except:
+                        except KeyError:
                             token['decision_class'] = [c['class'] for c in details]
                         try:
                             token['decision_details'].extend(details)
-                        except:
+                        except KeyError:
                             token['decision_details'] = details
         return self.get_collation(witnesses, verse, decisions, settings, collation_settings, project, accept)
 
@@ -261,7 +262,7 @@ class PreProcessor(Regulariser):
         if 'witnesses' not in verse.keys():
             try:
                 return [verse['siglum'], verse['missing_reason']]
-            except:
+            except KeyError:
                 return [verse['siglum'], 'om']
         elif len(verse['witnesses']) == 1:
             return [verse['siglum'], verse['witnesses']]
@@ -284,7 +285,7 @@ class PreProcessor(Regulariser):
         try:
             print('algorithm - %s' % (options['algorithm']), file=sys.stderr)
             print('tokenComparator - %s' % (options['tokenComparator']), file=sys.stderr)
-        except:
+        except Exception:
             pass
 
         if self.local_python_functions \
@@ -293,13 +294,16 @@ class PreProcessor(Regulariser):
             class_name = self.local_python_functions['local_collation_function']['class_name']
             MyClass = getattr(importlib.import_module(module_name), class_name)
             collation_class = MyClass()
-            return getattr(collation_class, self.local_python_functions['local_collation_function']['function'])(data, options)
+            return getattr(collation_class,
+                           self.local_python_functions['local_collation_function']['function'])(data, options)
         else:
             # use collateX Java microservices
             if 'algorithm' in options:
-                data['algorithm'] = options['algorithm']  # 'needleman-wunsch'#'dekker'#'dekker-experimental'#
+                # options examples 'needleman-wunsch'#'dekker'#'dekker-experimental'#
+                data['algorithm'] = options['algorithm']
             if 'tokenComparator' in options:
-                data['tokenComparator'] = options['tokenComparator']  # {"type": "levenshtein", "distance": 2}#{'type': 'equality'}
+                # options examples {"type": "levenshtein", "distance": 2}#{'type': 'equality'}
+                data['tokenComparator'] = options['tokenComparator']
 
             if 'collatexHost' in options:
                 target = 'http://%s/collate' % options['collatexHost']

@@ -392,7 +392,7 @@ class PostProcessor(Regulariser, SettingsApplier):
                 try:
                     start_index = int(base_reading[0][self.overtext_name]['index'])
                     end_index = int(base_reading[-1][self.overtext_name]['index'])
-                except:
+                except Exception:
                     print('**** Problem witness: %s' % self.overtext_name, file=sys.stderr)
                     start_index = previous_index + 1
                     end_index = previous_index + 1
@@ -452,11 +452,11 @@ class PostProcessor(Regulariser, SettingsApplier):
                     if details is not None:
                         try:
                             token['decision_class'].extend([c['class'] for c in details])
-                        except:
+                        except KeyError:
                             token['decision_class'] = [c['class'] for c in details]
                         try:
                             token['decision_details'].extend(details)
-                        except:
+                        except KeyError:
                             token['decision_details'] = details
                     token['interface'] = normalised.replace('<', '&lt;').replace('>', '&gt;')
                 else:
@@ -468,7 +468,10 @@ class PostProcessor(Regulariser, SettingsApplier):
 
     def set_rule_string(self, token):
         if self.local_python_functions and 'set_rule_string' in self.local_python_functions:
-            return getattr(self.set_rule_string_instance, self.local_python_functions['set_rule_string']['function'])(token, self.settings, self.display_settings_config)
+            return getattr(self.set_rule_string_instance,
+                           self.local_python_functions['set_rule_string']['function'])(token,
+                                                                                       self.settings,
+                                                                                       self.display_settings_config)
         else:
             if 'n' in token:
                 token['rule_string'] = token['n']
@@ -476,7 +479,8 @@ class PostProcessor(Regulariser, SettingsApplier):
                 token['rule_string'] = token['t']
             return token
 
-#     the plan was to get rid of this but js needs to follow suite as it currently expects this marking (SV does not use it)
+#     the plan was to get rid of this but js needs to follow suite as it currently
+#     expects this marking (SV does not use it)
 #     def identify_regularised_readings(self, variant_readings):
 #         """find all the regularised readings (basically anything that has a rule applied
 #         and identify them at token level)"""
@@ -487,13 +491,16 @@ class PostProcessor(Regulariser, SettingsApplier):
 #                     for j, token in enumerate(reading['text']):
 #                         if 'decision_class' in token[witness].keys():
 #                             token['regularised'] = True
-#                         if len(reading['witnesses']) > 0 and len(reading['text']) > 0: #we only care if there is more than one witness to the reading and it has multiple words
-#                             if j > 0 and j < len(reading['text'])-1: #we don't care about the first or last words of the unit
+#                         # we only care if there is more than one witness to the reading and it has multiple words
+#                         if len(reading['witnesses']) > 0 and len(reading['text']) > 0:
+#                             # we don't care about the first or last words of the unit
+#                             if j > 0 and j < len(reading['text'])-1:
 #                                 if 'gap_after' in token[witness].keys():
 #                                     #make a new reading
 #                                     gapped_text = self.extract_text_with_gaps(reading['text'], witness)
 #                                     if gapped_text in extras:
-#                                         extras[gapped_text] = self.merge_extra_reading(reading['text'], witness, extras[gapped_text])
+#                                         extras[gapped_text] = self.merge_extra_reading(reading['text'],
+#                                                                                        witness, extras[gapped_text])
 #                                     else:
 #                                         extras[gapped_text] = self.create_extra_reading(reading['text'], witness)
 #

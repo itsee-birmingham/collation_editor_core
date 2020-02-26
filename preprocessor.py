@@ -150,7 +150,6 @@ class PreProcessor(Regulariser):
             special_categories.append({'label': reading['gap_reading'],
                                        'witnesses': [reading['id']],
                                        'type': 'lac'})
-
         return special_categories
 
     def regularise(self, decisions, witnesses, verse, settings, collation_settings, project, accept):

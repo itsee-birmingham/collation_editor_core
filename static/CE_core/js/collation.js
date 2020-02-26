@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-
+var testing;
 CL = (function() {
   "use strict";
 
@@ -2925,15 +2925,46 @@ CL = (function() {
       CL.project.showCollapseAllUnitsButton = false;
     }
 
+    //OR lac and OM
     // combine all lacs
     if (project.hasOwnProperty('combineAllLacsInOR')) {
       CL.project.combineAllLacsInOR = project.combineAllLacsInOR;
     } else if (CL.services.hasOwnProperty('combineAllLacsInOR')) {
       CL.project.combineAllLacsInOR = CL.services.combineAllLacsInOR;
     } else {
-      //default is true
+      //default is true to prtect existing projects as this was hard coded in
       CL.project.combineAllLacsInOR = true;
     }
+    //combine all oms
+    if (project.hasOwnProperty('combineAllOmsInOR')) {
+      CL.project.combineAllOmsInOR = project.combineAllOmsInOR;
+    } else if (CL.services.hasOwnProperty('combineAllOmsInOR')) {
+      CL.project.combineAllOmsInOR = CL.services.combineAllOmsInOR;
+    } else {
+      //default is false
+      CL.project.combineAllOmsInOR = false;
+    }
+
+    //approved lac and OM
+    // combine all lacs
+    if (project.hasOwnProperty('combineAllLacsInApproved')) {
+      CL.project.combineAllLacsInApproved = project.combineAllLacsInApproved;
+    } else if (CL.services.hasOwnProperty('combineAllLacsInApproved')) {
+      CL.project.combineAllLacsInApproved = CL.services.combineAllLacsInApproved;
+    } else {
+      //default is false
+      CL.project.combineAllLacsInApproved = false;
+    }
+    //combine all oms
+    if (project.hasOwnProperty('combineAllOmsInApproved')) {
+      CL.project.combineAllOmsInApproved = project.combineAllOmsInApproved;
+    } else if (CL.services.hasOwnProperty('combineAllOmsInApproved')) {
+      CL.project.combineAllOmsInApproved = CL.services.combineAllOmsInApproved;
+    } else {
+      //default is false
+      CL.project.combineAllOmsInApproved = false;
+    }
+
 
     if (project.hasOwnProperty('lac_unit_label')) {
       CL.project.lac_unit_label = project.lac_unit_label;
@@ -5542,128 +5573,352 @@ CL = (function() {
 
 
 //OLD STYLE FROM HERE
+  if (testing) {
+    return {
 
-  return {
-
-    //This needs to go because of eval
-    run_function: function(function_ref, args) {
-      var fn;
-      if (typeof args === 'undefined') {
-        args = [];
-      }
-      if (typeof function_ref === 'string') {
-        // console.warn('This feature will be deprecated soon. All js functions should be specified in a file and referenced in projects and services only');
-        // console.log(function_ref)
-        if (function_ref.indexOf('(') === -1 && function_ref.indexOf('{') === -1) {
-
-          fn = eval(function_ref);
-          return fn.apply(this, args);
-        } else {
-          alert('there may be a security problem on this page');
+      //This needs to go because of eval
+      run_function: function(function_ref, args) {
+        var fn;
+        if (typeof args === 'undefined') {
+          args = [];
         }
-      } else {
-        // console.log('running the else condition in run_function with ')
-        // console.log(function_ref)
-        return function_ref.apply(this, args);
-      }
-    },
-    services: services,
-    container: container,
-    displaySettings: displaySettings,
-    displaySettingsDetails: displaySettingsDetails,
-    ruleConditions: ruleConditions,
-    localPythonFunctions: localPythonFunctions,
-    overlappedOptions: overlappedOptions,
-    dataSettings: dataSettings,
-    algorithmSettings: algorithmSettings,
-    highlighted: highlighted,
-    highlightedAdded: highlightedAdded,
-    showSubreadings: showSubreadings,
-    managingEditor: managingEditor,
-    project: project,
-    collateData: collateData,
-    context: context,
-    data: data,
-    calculatePosition: calculatePosition,
-    witnessEditingMode: witnessEditingMode,
-    witnessRemovingMode: witnessRemovingMode,
-    witnessAddingMode: witnessAddingMode,
-    witnessesAdded: witnessesAdded,
+        if (typeof function_ref === 'string') {
+          // console.warn('This feature will be deprecated soon. All js functions should be specified in a file and referenced in projects and services only');
+          // console.log(function_ref)
+          if (function_ref.indexOf('(') === -1 && function_ref.indexOf('{') === -1) {
 
-    setServiceProvider: setServiceProvider,
-    expandFillPageClients: expandFillPageClients,
-    getHeaderHtml: getHeaderHtml,
-    addUnitAndReadingIds: addUnitAndReadingIds,
-    addReadingIds: addReadingIds,
-    addReadingId: addReadingId,
-    addUnitId: addUnitId,
-    extractWitnessText: extractWitnessText,
-    getAllReadingWitnesses: getAllReadingWitnesses,
-    findUnitById: findUnitById,
-    findStandoffRegularisation: findStandoffRegularisation,
-    getRuleClasses: getRuleClasses,
-    getCollationHeader: getCollationHeader,
-    addTriangleFunctions: addTriangleFunctions,
-    getOverlapLayout: getOverlapLayout,
-    sortReadings: sortReadings,
-    extractDisplayText: extractDisplayText,
-    getReadingLabel: getReadingLabel,
-    getAlphaId: getAlphaId,
-    getReadingSuffix: getReadingSuffix,
-    addSubreadingEvents: addSubreadingEvents,
-    getUnitLayout: getUnitLayout,
-    unitHasText: unitHasText,
-    isBlank: isBlank,
-    getHighlightedText: getHighlightedText,
-    findOverlapUnitById: findOverlapUnitById,
-    getReading: getReading,
-    lacOmFix: lacOmFix,
-    getSubreadingOfWitness: getSubreadingOfWitness,
-    overlapHasEmptyReading: overlapHasEmptyReading,
-    removeNullItems: removeNullItems,
-    addStageLinks: addStageLinks,
-    addExtraFooterButtons: addExtraFooterButtons,
-    makeVerseLinks: makeVerseLinks,
-    getUnitAppReading: getUnitAppReading,
-    setList: setList,
-    getActiveUnitWitnesses: getActiveUnitWitnesses,
-    getExporterSettings: getExporterSettings,
-    saveCollation: saveCollation,
-    sortWitnesses: sortWitnesses,
-    getSpecifiedAncestor: getSpecifiedAncestor,
-    hideTooltip: hideTooltip,
-    addHoverEvents: addHoverEvents,
-    markReading: markReading,
-    showSplitWitnessMenu: showSplitWitnessMenu,
-    markStandoffReading: markStandoffReading,
-    findUnitPosById: findUnitPosById,
-    findReadingById: findReadingById,
-    applyPreStageChecks: applyPreStageChecks,
-    makeStandoffReading: makeStandoffReading,
-    doMakeStandoffReading: doMakeStandoffReading,
-    makeMainReading: makeMainReading,
-    getOrderedAppLines: getOrderedAppLines,
-    loadIndexPage: loadIndexPage,
-    addIndexHandlers: addIndexHandlers,
-    getHandsAndSigla: getHandsAndSigla,
-    createNewReading: createNewReading,
-    getReadingWitnesses: getReadingWitnesses,
-    removeWitness: removeWitness,
-    setUpRemoveWitnessesForm: setUpRemoveWitnessesForm,
-    removeWitnesses: removeWitnesses,
-    checkWitnessesAgainstProject: checkWitnessesAgainstProject,
-    loadSavedCollation: loadSavedCollation,
-    returnToSummaryTable: returnToSummaryTable,
-    prepareAdditionalCollation: prepareAdditionalCollation,
-    removeSpecialWitnesses: removeSpecialWitnesses,
+            fn = eval(function_ref);
+            return fn.apply(this, args);
+          } else {
+            alert('there may be a security problem on this page');
+          }
+        } else {
+          // console.log('running the else condition in run_function with ')
+          // console.log(function_ref)
+          return function_ref.apply(this, args);
+        }
+      },
 
-    //deprecated function mapping for calls from older services
-    set_service_provider: setServiceProvider,
-    load_index_page: loadIndexPage,
-    add_index_handlers: addIndexHandlers,
-    _managing_editor: managingEditor,
+      services: services,
+      container: container,
+      displaySettings: displaySettings,
+      displaySettingsDetails: displaySettingsDetails,
+      ruleClasses: ruleClasses,
+      ruleConditions: ruleConditions,
+      localPythonFunctions: localPythonFunctions,
+      overlappedOptions: overlappedOptions,
+      dataSettings: dataSettings,
+      algorithmSettings: algorithmSettings,
+      highlighted: highlighted,
+      highlightedAdded: highlightedAdded,
+      showSubreadings: showSubreadings,
+      managingEditor: managingEditor,
+      project: project,
+      collateData: collateData,
+      context: context,
+      data: data,
+      stage: stage,
+      isDirty: isDirty,
+      calculatePosition: calculatePosition,
+      witnessEditingMode: witnessEditingMode,
+      witnessRemovingMode: witnessRemovingMode,
+      witnessAddingMode: witnessAddingMode,
+      witnessesAdded: witnessesAdded,
+      savedDisplaySettings: savedDisplaySettings,
+      savedAlgorithmSettings: savedAlgorithmSettings,
+      savedDataSettings: savedDataSettings,
+      existingCollation: existingCollation,
 
-  };
+      setServiceProvider: setServiceProvider,
+      expandFillPageClients: expandFillPageClients,
+      getHeaderHtml: getHeaderHtml,
+      addUnitAndReadingIds: addUnitAndReadingIds,
+      addReadingIds: addReadingIds,
+      addReadingId: addReadingId,
+      addUnitId: addUnitId,
+      extractWitnessText: extractWitnessText,
+      getAllReadingWitnesses: getAllReadingWitnesses,
+      findUnitById: findUnitById,
+      findStandoffRegularisation: findStandoffRegularisation,
+      getRuleClasses: getRuleClasses,
+      getCollationHeader: getCollationHeader,
+      addTriangleFunctions: addTriangleFunctions,
+      getOverlapLayout: getOverlapLayout,
+      sortReadings: sortReadings,
+      extractDisplayText: extractDisplayText,
+      getReadingLabel: getReadingLabel,
+      getAlphaId: getAlphaId,
+      getReadingSuffix: getReadingSuffix,
+      addSubreadingEvents: addSubreadingEvents,
+      getUnitLayout: getUnitLayout,
+      unitHasText: unitHasText,
+      isBlank: isBlank,
+      getHighlightedText: getHighlightedText,
+      findOverlapUnitById: findOverlapUnitById,
+      getReading: getReading,
+      lacOmFix: lacOmFix,
+      getSubreadingOfWitness: getSubreadingOfWitness,
+      overlapHasEmptyReading: overlapHasEmptyReading,
+      removeNullItems: removeNullItems,
+      addStageLinks: addStageLinks,
+      addExtraFooterButtons: addExtraFooterButtons,
+      makeVerseLinks: makeVerseLinks,
+      getUnitAppReading: getUnitAppReading,
+      setList: setList,
+      getActiveUnitWitnesses: getActiveUnitWitnesses,
+      getExporterSettings: getExporterSettings,
+      saveCollation: saveCollation,
+      sortWitnesses: sortWitnesses,
+      getSpecifiedAncestor: getSpecifiedAncestor,
+      hideTooltip: hideTooltip,
+      addHoverEvents: addHoverEvents,
+      markReading: markReading,
+      showSplitWitnessMenu: showSplitWitnessMenu,
+      markStandoffReading: markStandoffReading,
+      findUnitPosById: findUnitPosById,
+      findReadingById: findReadingById,
+      applyPreStageChecks: applyPreStageChecks,
+      makeStandoffReading: makeStandoffReading,
+      doMakeStandoffReading: doMakeStandoffReading,
+      makeMainReading: makeMainReading,
+      getOrderedAppLines: getOrderedAppLines,
+      loadIndexPage: loadIndexPage,
+      addIndexHandlers: addIndexHandlers,
+      getHandsAndSigla: getHandsAndSigla,
+      createNewReading: createNewReading,
+      getReadingWitnesses: getReadingWitnesses,
+      removeWitness: removeWitness,
+      setUpRemoveWitnessesForm: setUpRemoveWitnessesForm,
+      removeWitnesses: removeWitnesses,
+      checkWitnessesAgainstProject: checkWitnessesAgainstProject,
+      loadSavedCollation: loadSavedCollation,
+      returnToSummaryTable: returnToSummaryTable,
+      prepareAdditionalCollation: prepareAdditionalCollation,
+      removeSpecialWitnesses: removeSpecialWitnesses,
+
+      //deprecated function mapping for calls from older services
+      set_service_provider: setServiceProvider,
+      load_index_page: loadIndexPage,
+      add_index_handlers: addIndexHandlers,
+      _managing_editor: managingEditor,
+
+
+      //private for testing only
+       _initialiseEditor: _initialiseEditor,
+       _initialiseProject: _initialiseProject,
+       _setProjectConfig: _setProjectConfig,
+       _setDisplaySettings: _setDisplaySettings,
+       _setLocalPythonFunctions: _setLocalPythonFunctions,
+       _setRuleClasses: _setRuleClasses,
+       _setRuleConditions: _setRuleConditions,
+       _setOverlappedOptions: _setOverlappedOptions,
+       _includeJavascript: _includeJavascript,
+       _prepareCollation: _prepareCollation,
+       _getContextFromInputForm: _getContextFromInputForm,
+       _getWitnessesFromInputForm: _getWitnessesFromInputForm,
+       _showSavedVersions: _showSavedVersions,
+       _getSavedRadio: _getSavedRadio,
+       _makeSavedCollationTable: _makeSavedCollationTable,
+       _getSubreadingWitnessData: _getSubreadingWitnessData,
+       _findStandoffRegularisationText: _findStandoffRegularisationText,
+       _collapseUnit: _collapseUnit,
+       _expandUnit: _expandUnit,
+       _expandAll: _expandAll,
+       _collapseAll: _collapseAll,
+       _getEmptyCell: _getEmptyCell,
+       _mergeDicts: _mergeDicts,
+       _getUnitData: _getUnitData,
+       _hasGapBefore: _hasGapBefore,
+       _hasGapAfter: _hasGapAfter,
+       _getAllEmptyReadingWitnesses: _getAllEmptyReadingWitnesses,
+       _containsEmptyReading: _containsEmptyReading,
+       _isOverlapped: _isOverlapped,
+       _removeLacOmVerseWitnesses: _removeLacOmVerseWitnesses,
+       _cleanExtraGaps: _cleanExtraGaps,
+       _getOverlapUnitReadings: _getOverlapUnitReadings,
+       _checkExtraGapRequiredBefore: _checkExtraGapRequiredBefore,
+       _extraGapRequiredBefore: _extraGapRequiredBefore,
+       _extraGapRequiredAfter: _extraGapRequiredAfter,
+       _combinedGapInNextUnit: _combinedGapInNextUnit,
+       _getNewGapRdgDetails: _getNewGapRdgDetails,
+       _addExtraGapReadings: _addExtraGapReadings,
+       _extraGapIsWithinAnOverlap: _extraGapIsWithinAnOverlap,
+       _getInclusiveOverlapReadings: _getInclusiveOverlapReadings,
+       _getExtraGapLocation: _getExtraGapLocation,
+       _createExtraGaps: _createExtraGaps,
+       _addLacReading: _addLacReading,
+       _addNavEvent: _addNavEvent,
+       _findLatestStageVerse: _findLatestStageVerse,
+       _loadLatestStageVerse: _loadLatestStageVerse,
+       _removeOverlappedReadings: _removeOverlappedReadings,
+       _applySettings: _applySettings,
+       _getApprovalSettings: _getApprovalSettings,
+       _compareReadings: _compareReadings,
+       _disableEventPropagation: _disableEventPropagation,
+       _showCollationSettings: _showCollationSettings,
+       _checkWitnesses: _checkWitnesses,
+       _getScrollPosition: _getScrollPosition,
+       _getMousePosition: _getMousePosition,
+       _displayWitnessesHover: _displayWitnessesHover,
+       _getWitnessesForReading: _getWitnessesForReading,
+       _findStandoffWitness: _findStandoffWitness,
+       _findReadingPosById: _findReadingPosById,
+       _getPreStageChecks: _getPreStageChecks,
+       _makeRegDecisionsStandoff: _makeRegDecisionsStandoff,
+       _contextInputOnload: _contextInputOnload,
+       _removeWitnessFromUnit: _removeWitnessFromUnit,
+       _findSaved: _findSaved,
+       _addToSavedCollation: _addToSavedCollation,
+       _displaySavedCollation: _displaySavedCollation,
+       _mergeCollationObjects: _mergeCollationObjects,
+       _getUnitsByStartIndex: _getUnitsByStartIndex,
+       _mergeNewLacOmVerseReadings: _mergeNewLacOmVerseReadings,
+       _mergeNewReading: _mergeNewReading,
+       _getReadingHistory: _getReadingHistory,
+       _getNextTargetRuleInfo: _getNextTargetRuleInfo,
+       _removeAppliedRules: _removeAppliedRules,
+       _getHistoricalReading: _getHistoricalReading,
+       _doMakeRegDecisionsStandoff: _doMakeRegDecisionsStandoff,
+       _extractAllTValuesForRGAppliedRules: _extractAllTValuesForRGAppliedRules,
+       _makeStandoffReading2: _makeStandoffReading2,
+       //private variables for testing only
+       _contextInput: _contextInput,
+       _defaultDisplaySettings: _defaultDisplaySettings,
+       _collapsed: _collapsed,
+       _alpha: _alpha,
+       _displayMode: _displayMode,
+    };
+  } else {
+
+    return {
+
+      //This needs to go because of eval
+      run_function: function(function_ref, args) {
+        var fn;
+        if (typeof args === 'undefined') {
+          args = [];
+        }
+        if (typeof function_ref === 'string') {
+          // console.warn('This feature will be deprecated soon. All js functions should be specified in a file and referenced in projects and services only');
+          // console.log(function_ref)
+          if (function_ref.indexOf('(') === -1 && function_ref.indexOf('{') === -1) {
+
+            fn = eval(function_ref);
+            return fn.apply(this, args);
+          } else {
+            alert('there may be a security problem on this page');
+          }
+        } else {
+          // console.log('running the else condition in run_function with ')
+          // console.log(function_ref)
+          return function_ref.apply(this, args);
+        }
+      },
+
+      services: services,
+      container: container,
+      displaySettings: displaySettings,
+      displaySettingsDetails: displaySettingsDetails,
+      ruleClasses: ruleClasses,
+      ruleConditions: ruleConditions,
+      localPythonFunctions: localPythonFunctions,
+      overlappedOptions: overlappedOptions,
+      dataSettings: dataSettings,
+      algorithmSettings: algorithmSettings,
+      highlighted: highlighted,
+      highlightedAdded: highlightedAdded,
+      showSubreadings: showSubreadings,
+      managingEditor: managingEditor,
+      project: project,
+      collateData: collateData,
+      context: context,
+      data: data,
+      stage: stage,
+      isDirty: isDirty,
+      calculatePosition: calculatePosition,
+      witnessEditingMode: witnessEditingMode,
+      witnessRemovingMode: witnessRemovingMode,
+      witnessAddingMode: witnessAddingMode,
+      witnessesAdded: witnessesAdded,
+      savedDisplaySettings: savedDisplaySettings,
+      savedAlgorithmSettings: savedAlgorithmSettings,
+      savedDataSettings: savedDataSettings,
+      existingCollation: existingCollation,
+
+      setServiceProvider: setServiceProvider,
+      expandFillPageClients: expandFillPageClients,
+      getHeaderHtml: getHeaderHtml,
+      addUnitAndReadingIds: addUnitAndReadingIds,
+      addReadingIds: addReadingIds,
+      addReadingId: addReadingId,
+      addUnitId: addUnitId,
+      extractWitnessText: extractWitnessText,
+      getAllReadingWitnesses: getAllReadingWitnesses,
+      findUnitById: findUnitById,
+      findStandoffRegularisation: findStandoffRegularisation,
+      getRuleClasses: getRuleClasses,
+      getCollationHeader: getCollationHeader,
+      addTriangleFunctions: addTriangleFunctions,
+      getOverlapLayout: getOverlapLayout,
+      sortReadings: sortReadings,
+      extractDisplayText: extractDisplayText,
+      getReadingLabel: getReadingLabel,
+      getAlphaId: getAlphaId,
+      getReadingSuffix: getReadingSuffix,
+      addSubreadingEvents: addSubreadingEvents,
+      getUnitLayout: getUnitLayout,
+      unitHasText: unitHasText,
+      isBlank: isBlank,
+      getHighlightedText: getHighlightedText,
+      findOverlapUnitById: findOverlapUnitById,
+      getReading: getReading,
+      lacOmFix: lacOmFix,
+      getSubreadingOfWitness: getSubreadingOfWitness,
+      overlapHasEmptyReading: overlapHasEmptyReading,
+      removeNullItems: removeNullItems,
+      addStageLinks: addStageLinks,
+      addExtraFooterButtons: addExtraFooterButtons,
+      makeVerseLinks: makeVerseLinks,
+      getUnitAppReading: getUnitAppReading,
+      setList: setList,
+      getActiveUnitWitnesses: getActiveUnitWitnesses,
+      getExporterSettings: getExporterSettings,
+      saveCollation: saveCollation,
+      sortWitnesses: sortWitnesses,
+      getSpecifiedAncestor: getSpecifiedAncestor,
+      hideTooltip: hideTooltip,
+      addHoverEvents: addHoverEvents,
+      markReading: markReading,
+      showSplitWitnessMenu: showSplitWitnessMenu,
+      markStandoffReading: markStandoffReading,
+      findUnitPosById: findUnitPosById,
+      findReadingById: findReadingById,
+      applyPreStageChecks: applyPreStageChecks,
+      makeStandoffReading: makeStandoffReading,
+      doMakeStandoffReading: doMakeStandoffReading,
+      makeMainReading: makeMainReading,
+      getOrderedAppLines: getOrderedAppLines,
+      loadIndexPage: loadIndexPage,
+      addIndexHandlers: addIndexHandlers,
+      getHandsAndSigla: getHandsAndSigla,
+      createNewReading: createNewReading,
+      getReadingWitnesses: getReadingWitnesses,
+      removeWitness: removeWitness,
+      setUpRemoveWitnessesForm: setUpRemoveWitnessesForm,
+      removeWitnesses: removeWitnesses,
+      checkWitnessesAgainstProject: checkWitnessesAgainstProject,
+      loadSavedCollation: loadSavedCollation,
+      returnToSummaryTable: returnToSummaryTable,
+      prepareAdditionalCollation: prepareAdditionalCollation,
+      removeSpecialWitnesses: removeSpecialWitnesses,
+
+      //deprecated function mapping for calls from older services
+      set_service_provider: setServiceProvider,
+      load_index_page: loadIndexPage,
+      add_index_handlers: addIndexHandlers,
+      _managing_editor: managingEditor,
+    };
+  }
 }());
 
 

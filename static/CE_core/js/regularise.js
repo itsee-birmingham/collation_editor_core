@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-
+var testing;
 RG = (function() {
   "use strict";
 
@@ -1531,21 +1531,76 @@ RG = (function() {
   };
 
 
-  //priv-e
+  if (testing) {
+    return {
 
-  return {
+      showRegularisations: showRegularisations,
+      runCollation: runCollation,
+
+      getCollationData: getCollationData,
+      getUnitData: getUnitData,
+      recollate: recollate,
+      showVerseCollation: showVerseCollation,
+      allRuleStacksEmpty: allRuleStacksEmpty,
+
+      //private variables
+      _rules: _rules,
+      _forDeletion: _forDeletion,
+      _forGlobalExceptions: _forGlobalExceptions,
+
+      //private functions
+      _calculateLacWits: _calculateLacWits,
+      _hasRuleApplied: _hasRuleApplied,
+      _getDisplayClasses: _getDisplayClasses,
+      _getToken: _getToken,
+      _getWordTokenForWitness: _getWordTokenForWitness,
+      _hasDeletionScheduled: _hasDeletionScheduled,
+      _getRegWitsAsString: _getRegWitsAsString,
+      _integrateLacOmReadings: _integrateLacOmReadings,
+      _doRunCollation: _doRunCollation,
+      _showSettings: _showSettings,
+      _fetchRules: _fetchRules,
+      _removeUnrequiredData: _removeUnrequiredData,
+      _showRegularisations: _showRegularisations,
+      _highlightWitness: _highlightWitness,
+      _addNewToken: _addNewToken,
+      _getWordIndexForWitness: _getWordIndexForWitness,
+      _createRule: _createRule,
+      _getDisplaySettingValue: _getDisplaySettingValue,
+      _setUpRuleMenu: _setUpRuleMenu,
+      _getRuleScopes: _getRuleScopes,
+      _getSuffix: _getSuffix,
+      _makeMenu: _makeMenu,
+      _redipsInitRegularise: _redipsInitRegularise,
+      _getAncestorRow: _getAncestorRow,
+      _showGlobalExceptions: _showGlobalExceptions,
+      _removeGlobalExceptions: _removeGlobalExceptions,
+      _scheduleAddGlobalException: _scheduleAddGlobalException,
+      _scheduleRuleDeletion: _scheduleRuleDeletion,
+      _deleteUnappliedRule: _deleteUnappliedRule,
+      _addContextMenuHandlers: _addContextMenuHandlers,
+      _showCollationTable: _showCollationTable,
+      _scheduleSelectedRulesDeletion: _scheduleSelectedRulesDeletion,
+      _addFooterFunctions: _addFooterFunctions,
+      _highlightAddedWitness: _highlightAddedWitness,
+
+    };
+  } else {
+    return {
+
+      showRegularisations: showRegularisations,
+      runCollation: runCollation,
+
+      getCollationData: getCollationData,
+      getUnitData: getUnitData,
+      recollate: recollate,
+      showVerseCollation: showVerseCollation,
+      allRuleStacksEmpty: allRuleStacksEmpty,
+
+    };
+  }
 
 
-    showRegularisations: showRegularisations,
-    runCollation: runCollation,
-
-    getCollationData: getCollationData,
-    getUnitData: getUnitData,
-    recollate: recollate,
-    showVerseCollation: showVerseCollation,
-    allRuleStacksEmpty: allRuleStacksEmpty,
-
-  };
 
 }());
 

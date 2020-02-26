@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-
+var testing;
 OR = (function() {
   "use strict";
 
@@ -573,24 +573,22 @@ OR = (function() {
     }
   };
 
+  //For MUYA this needs to accept a regex for details gap * and lac *
+  //optional: can be set in services or project and when moving to OR or approved
   mergeAllLacs = function() {
-    _mergeAllSuppliedEmptyReadings(['lac', 'lac_verse'], {
-      'created': true,
-      'type': 'lac',
-      'details': 'lac',
-      'text': [],
-      'witnesses': []
-    }, true);
+    var typeList, parentTemplate;
+    typeList = ['lac', 'lac_verse'];
+    parentTemplate = {'created': true, 'type': 'lac', 'details': 'lac',
+                      'text': [], 'witnesses': []};
+    _mergeAllSuppliedEmptyReadings(typeList, parentTemplate, true);
   };
 
-  //not currently used but shows how mergeAllLacs and mergeAllOms work
+  //optional: can be set in services or project and when moving to OR or approved
   mergeAllOms = function() {
-    _mergeAllSuppliedEmptyReadings(['om', 'om_verse'], {
-      'created': true,
-      'type': 'om',
-      'text': [],
-      'witnesses': []
-    }, true);
+    var typeList, parentTemplate;
+    typeList = ['om', 'om_verse'];
+    parentTemplate = {'created': true, 'type': 'om', 'text': [], 'witnesses': []};
+    _mergeAllSuppliedEmptyReadings(typeList, parentTemplate, true);
   };
 
   //pub-e
@@ -626,6 +624,12 @@ OR = (function() {
     if (!standoff_problems[0]) {
       extra_results = CL.applyPreStageChecks('approve');
       if (extra_results[0] === true) {
+        if (CL.project.combineAllLacsInApproved === true) {
+					OR.mergeAllLacs();
+				}
+				if (CL.project.combineAllOmsInApproved === true) {
+					OR.mergeAllOms();
+				}
         CL.showSubreadings = false;
         //now do the stuff we need to do
         //make sure all ids are unique (we know there is a problem with overlapping a readings for example)
@@ -1618,16 +1622,16 @@ OR = (function() {
     //we make a generic parent which goes in the position of the first found reading with all the others as a special kind of subreading
     //and we give the generic parent a unique id like all other readings
     _mergeAllSuppliedEmptyReadings = function(type_list, parent_blueprint, always_create_new_parent) {
-      var key, i, j, k, unit, reading, first_hit_index, matched_readings, new_parent, witness, type, parent_id,
+      var unit, reading, first_hit_index, matched_readings, new_parent, witness, type, parent_id,
         rdg_details;
       SR.loseSubreadings();
       SR.findSubreadings();
       matched_readings = {};
-      for (key in CL.data) {
+      for (let key in CL.data) {
         if (key.match(/apparatus\d*/g) !== null) {
-          for (i = 0; i < CL.data[key].length; i += 1) {
+          for (let i = 0; i < CL.data[key].length; i += 1) {
             unit = CL.data[key][i];
-            for (j = 0; j < CL.data[key][i].readings.length; j += 1) {
+            for (let j = 0; j < CL.data[key][i].readings.length; j += 1) {
               reading = CL.data[key][i].readings[j];
               if (reading.text.length === 0 && !reading.hasOwnProperty('overlap_status')) {
                 if (type_list.indexOf(reading.type) != -1) {
@@ -1652,15 +1656,15 @@ OR = (function() {
       }
       //now data is collected
       SR.loseSubreadings();
-      for (key in CL.data) {
+      for (let key in CL.data) {
         if (key.match(/apparatus\d*/g) !== null) {
-          for (i = 0; i < CL.data[key].length; i += 1) {
+          for (let i = 0; i < CL.data[key].length; i += 1) {
             unit = CL.data[key][i];
             if (matched_readings.hasOwnProperty(unit._id)) {
               if ((always_create_new_parent === true &&
                   matched_readings[unit._id].length > 0) ||
-                matched_readings[unit._id].length > 1) {
-                for (j = 0; j < matched_readings[unit._id].length; j += 1) {
+                    matched_readings[unit._id].length > 1) {
+                for (let j = 0; j < matched_readings[unit._id].length; j += 1) {
                   new_parent = JSON.parse(JSON.stringify(parent_blueprint)); //copy our blueprint
                   parent_id = CL.addReadingId(new_parent, unit.start, unit.end);
                   unit.readings.push(new_parent);
@@ -1689,28 +1693,52 @@ OR = (function() {
     };
 
 
-  //priv-e
+  if (testing) {
+    return {
+      //variables
+      undoStack: undoStack,
 
-  return {
-    //variables
-    undoStack: undoStack,
+      //functions
+      showOrderReadings: showOrderReadings,
+      showApprovedVersion: showApprovedVersion,
+      getUnitData: getUnitData,
+      relabelReadings: relabelReadings,
+      addLabels: addLabels,
+      makeStandoffReading: makeStandoffReading,
+      removeSplits: removeSplits,
+      mergeSharedExtentOverlaps: mergeSharedExtentOverlaps,
+      canUnitMoveTo: canUnitMoveTo,
+      addToUndoStack: addToUndoStack,
+      makeWasGapWordsGaps: makeWasGapWordsGaps,
+      mergeAllLacs: mergeAllLacs,
+      mergeAllOms: mergeAllOms,
 
-    //functions
-    showOrderReadings: showOrderReadings,
-    showApprovedVersion: showApprovedVersion,
-    getUnitData: getUnitData,
-    relabelReadings: relabelReadings,
-    addLabels: addLabels,
-    makeStandoffReading: makeStandoffReading,
-    removeSplits: removeSplits,
-    mergeSharedExtentOverlaps: mergeSharedExtentOverlaps,
-    canUnitMoveTo: canUnitMoveTo,
-    addToUndoStack: addToUndoStack,
-    makeWasGapWordsGaps: makeWasGapWordsGaps,
-    mergeAllLacs: mergeAllLacs,
-    mergeAllOms: mergeAllOms,
+      // private for testing
+      _mergeAllSuppliedEmptyReadings: _mergeAllSuppliedEmptyReadings,
 
-  };
+    };
+  } else {
+    return {
+      //variables
+      undoStack: undoStack,
+
+      //functions
+      showOrderReadings: showOrderReadings,
+      showApprovedVersion: showApprovedVersion,
+      getUnitData: getUnitData,
+      relabelReadings: relabelReadings,
+      addLabels: addLabels,
+      makeStandoffReading: makeStandoffReading,
+      removeSplits: removeSplits,
+      mergeSharedExtentOverlaps: mergeSharedExtentOverlaps,
+      canUnitMoveTo: canUnitMoveTo,
+      addToUndoStack: addToUndoStack,
+      makeWasGapWordsGaps: makeWasGapWordsGaps,
+      mergeAllLacs: mergeAllLacs,
+      mergeAllOms: mergeAllOms,
+
+    };
+  }
 }());
 
 // //TODO: I am fairly sure this is never used. Check not needed in version app

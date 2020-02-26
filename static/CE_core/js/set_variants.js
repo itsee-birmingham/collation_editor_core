@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-
+var testing;
 SV = (function () {
 	"use strict";
 
@@ -1049,6 +1049,9 @@ SV = (function () {
 				//should be no more that one OM and om verse in any given unit.
 				if (CL.project.combineAllLacsInOR === true) {
 					OR.mergeAllLacs();
+				}
+				if (CL.project.combineAllOmsInOR === true) {
+					OR.mergeAllOms();
 				}
 
 				OR.addLabels(true); //this adds the reading labels to the datastructure itself - still required so they can be edited
@@ -4717,40 +4720,174 @@ SV = (function () {
 	};
 
 	//priv-e
+	if (testing) {
+		return {
+			undoStack: undoStack,
+			messagePosLeft: messagePosLeft,
+			showSharedUnits: showSharedUnits,
+
+			showSetVariantsData: showSetVariantsData,
+			showSetVariants: showSetVariants,
+			calculateUnitLengths: calculateUnitLengths,
+			getUnitData: getUnitData,
+			getSpacerUnitData: getSpacerUnitData,
+			getEmptySpacerCell: getEmptySpacerCell,
+			reindexUnit: reindexUnit,
+			checkCombinedGapFlags: checkCombinedGapFlags,
+			doSplitReadingWitnesses: doSplitReadingWitnesses,
+			unsplitUnitWitnesses: unsplitUnitWitnesses,
+			splitReadingWitnesses: splitReadingWitnesses,
+			prepareForOperation: prepareForOperation,
+			unprepareForOperation: unprepareForOperation,
+			makeStandoffReading: makeStandoffReading,
+			checkIds: checkIds,
+			checkBugStatus: checkBugStatus,
+			checkStandoffReadingProblems: checkStandoffReadingProblems,
+			areAllUnitsComplete: areAllUnitsComplete,
+			undoStackLength: undoStackLength,
+
+			//TODO: properly make this public!
+			_combineReadings: _combineReadings,
+			_compareFirstWordIndexes: _compareFirstWordIndexes,
+
+			//private variables
+			_watchList: _watchList,
+			_selectedVariantUnits: _selectedVariantUnits,
+			_messageExpanded: _messageExpanded,
+
+			//private functions
+			_moveToReorder: _moveToReorder,
+			_setupMessage: _setupMessage,
+			_highlightWitness: _highlightWitness,
+			_showSubreadings: _showSubreadings,
+			_redipsInitSV: _redipsInitSV,
+			_reindexMovedReading: _reindexMovedReading,
+			_indexLessThan: _indexLessThan,
+			_indexLessThanOrEqualTo: _indexLessThanOrEqualTo,
+			_incrementSubIndex: _incrementSubIndex,
+			_decrementSubIndex: _decrementSubIndex,
+			_incrementMainIndex: _incrementMainIndex,
+			_decrementMainIndex: _decrementMainIndex,
+			_reindexReadings: _reindexReadings,
+			_checkAndFixIndexOrder: _checkAndFixIndexOrder,
+			_checkAndFixReadingIndexes: _checkAndFixReadingIndexes,
+			_splitReadings: _splitReadings,
+			_unsplitReadings: _unsplitReadings,
+			_removeWitnessFromTokens: _removeWitnessFromTokens,
+			_removeWitnessFromReading: _removeWitnessFromReading,
+			_removeSeparatedWitnessData: _removeSeparatedWitnessData,
+			_getOverlappedWitnessesForUnit: _getOverlappedWitnessesForUnit,
+			_separateOverlapWitnesses: _separateOverlapWitnesses,
+			_doMoveWholeUnit: _doMoveWholeUnit,
+			_targetHasOverlapConflict: _targetHasOverlapConflict,
+			_sourceHasOverlapConflict: _sourceHasOverlapConflict,
+			_allOverlapsMatch: _allOverlapsMatch,
+			_neighboursShareOverlaps: _neighboursShareOverlaps,
+			_doMoveSingleReading: _doMoveSingleReading,
+			_unitAtLocation: _unitAtLocation,
+			_getOverlapDetailsForGap: _getOverlapDetailsForGap,
+			_getOverlappedWitnessesForGap: _getOverlappedWitnessesForGap,
+			_moveUnit: _moveUnit,
+			_checkWitnessEquality: _checkWitnessEquality,
+			_getLowestIndex: _getLowestIndex,
+			_doCombineUnits: _doCombineUnits,
+			_checkOverlapBoundaries: _checkOverlapBoundaries,
+			_checkSpecialOverlapStatusAgreement: _checkSpecialOverlapStatusAgreement,
+			_checkOverlapStatusAgreement: _checkOverlapStatusAgreement,
+			_getObjectKeys: _getObjectKeys,
+			_getGapDetails: _getGapDetails,
+			_isSubsetOf: _isSubsetOf,
+			_specialCombineReadings: _specialCombineReadings,
+			_doSpecialCombineUnits: _doSpecialCombineUnits,
+			_combineUnits: _combineUnits,
+			_combineApparatusIds: _combineApparatusIds,
+			_findApparatusPositionsByOverlapId: _findApparatusPositionsByOverlapId,
+			_moveReading: _moveReading,
+			_areAdjacent: _areAdjacent,
+			_neighboursShareAllOverlaps: _neighboursShareAllOverlaps,
+			_getOverlappedIds: _getOverlappedIds,
+			_getReplacementOmReading: _getReplacementOmReading,
+			_fixIndexNumbers: _fixIndexNumbers,
+			_orderUnitText: _orderUnitText,
+			_combineReadingText: _combineReadingText,
+			_addTypeAndDetails: _addTypeAndDetails,
+			_combineWords: _combineWords,
+			_separateIndividualOverlapWitnesses: _separateIndividualOverlapWitnesses,
+			_doSplitUnit: _doSplitUnit,
+			_splitUnit: _splitUnit,
+			_tidyUnits: _tidyUnits,
+			_checkUnitUniqueness: _checkUnitUniqueness,
+			_getPosInUnitSet: _getPosInUnitSet,
+			_overlapReading: _overlapReading,
+			_makeOverlappingReading: _makeOverlappingReading,
+			_moveOverlapping: _moveOverlapping,
+			_mergeOverlaps: _mergeOverlaps,
+			_checkAllWitnessesIntegrity: _checkAllWitnessesIntegrity,
+			_checkWitnessIntegrity: _checkWitnessIntegrity,
+			_getFirstIndexForWitnesses: _getFirstIndexForWitnesses,
+			_compareWitnessQueue: _compareWitnessQueue,
+			_checkWordOrderIntegrity: _checkWordOrderIntegrity,
+			_checkUnitIntegrity: _checkUnitIntegrity,
+			_removeOffsetSubreadings: _removeOffsetSubreadings,
+			_hasStandoffSubreading: _hasStandoffSubreading,
+			_makeMainReading: _makeMainReading,
+			_addReadingFlag: _addReadingFlag,
+			_removeReadingFlag: _removeReadingFlag,
+			_subreadingIdSort: _subreadingIdSort,
+			_makeMenu: _makeMenu,
+			_addContextMenuHandlers: _addContextMenuHandlers,
+			_addOverlappedEvent: _addOverlappedEvent,
+			_addEvent: _addEvent,
+			_markReading: _markReading,
+		  _addToUndoStack: _addToUndoStack,
+			_undo: _undo,
+			_removeSplits: _removeSplits,
+			_checkTAndNPresence: _checkTAndNPresence,
+			_checkForStandoffReading: _checkForStandoffReading,
+			_checkSiglaProblems: _checkSiglaProblems,
+			_checkIndexesPresent: _checkIndexesPresent,
+			_checkUniqueWitnesses: _checkUniqueWitnesses,
+			_getAllUnitWitnesses: _getAllUnitWitnesses,
+			_compareIndexStrings: _compareIndexStrings,
+			_compareIndexes: _compareIndexes,
+			_setUpSVRemoveWitnessesForm: _setUpSVRemoveWitnessesForm,
+			_highlightAddedWitness: _highlightAddedWitness,
+
+		};
+	} else {
+		return {
+
+			undoStack: undoStack,
+			messagePosLeft: messagePosLeft,
+			showSharedUnits: showSharedUnits,
+
+			showSetVariantsData: showSetVariantsData,
+			showSetVariants: showSetVariants,
+			calculateUnitLengths: calculateUnitLengths,
+			getUnitData: getUnitData,
+			getSpacerUnitData: getSpacerUnitData,
+			getEmptySpacerCell: getEmptySpacerCell,
+			reindexUnit: reindexUnit,
+			checkCombinedGapFlags: checkCombinedGapFlags,
+			doSplitReadingWitnesses: doSplitReadingWitnesses,
+			unsplitUnitWitnesses: unsplitUnitWitnesses,
+			splitReadingWitnesses: splitReadingWitnesses,
+			prepareForOperation: prepareForOperation,
+			unprepareForOperation: unprepareForOperation,
+			makeStandoffReading: makeStandoffReading,
+			checkIds: checkIds,
+			checkBugStatus: checkBugStatus,
+			checkStandoffReadingProblems: checkStandoffReadingProblems,
+			areAllUnitsComplete: areAllUnitsComplete,
+			undoStackLength: undoStackLength,
+
+			//TODO: properly make this public!
+			_combineReadings: _combineReadings,
+			_compareFirstWordIndexes: _compareFirstWordIndexes,
 
 
-	return {
-
-		undoStack: undoStack,
-		messagePosLeft: messagePosLeft,
-		showSharedUnits: showSharedUnits,
-
-		showSetVariantsData: showSetVariantsData,
-		showSetVariants: showSetVariants,
-		calculateUnitLengths: calculateUnitLengths,
-		getUnitData: getUnitData,
-		getSpacerUnitData: getSpacerUnitData,
-		getEmptySpacerCell: getEmptySpacerCell,
-		reindexUnit: reindexUnit,
-		checkCombinedGapFlags: checkCombinedGapFlags,
-		doSplitReadingWitnesses: doSplitReadingWitnesses,
-		unsplitUnitWitnesses: unsplitUnitWitnesses,
-		splitReadingWitnesses: splitReadingWitnesses,
-		prepareForOperation: prepareForOperation,
-		unprepareForOperation: unprepareForOperation,
-		makeStandoffReading: makeStandoffReading,
-		checkIds: checkIds,
-		checkBugStatus: checkBugStatus,
-		checkStandoffReadingProblems: checkStandoffReadingProblems,
-		areAllUnitsComplete: areAllUnitsComplete,
-		undoStackLength: undoStackLength,
-
-		//TODO: properly make this public!
-		_combineReadings: _combineReadings,
-		_compareFirstWordIndexes: _compareFirstWordIndexes,
-
-
-	};
+		};
+	}
 }());
 
 // //TODO: no longer needed should be deleted plus all calls to it

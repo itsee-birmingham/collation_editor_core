@@ -709,7 +709,6 @@ SV = (function () {
 		var i, j, k, text, unit, reading, reading_list, index, witness, current, standoff_record, is_standoff;
 		reading_list = [];
 		unit = CL.data[app_id][unit_num];
-
 		_removeSeparatedWitnessData(app_id, unit._id);
 
 		for (i = 0; i < unit.readings.length; i += 1) {
@@ -725,6 +724,9 @@ SV = (function () {
 				} else {
 					text = text + '_OLSTS_' + reading.overlap_status; //the capital letters are there to help ensure no clash with any real words
 				}
+			}
+			if (reading.hasOwnProperty('type') && reading.type === 'lac_verse') {
+				text = text + '_lac_verse';
 			}
 			//find out if this is a standoff reading
 			//at this point all witnesses to the reading should be standoff if it is a standoff reading made into a main reading so just check first witness (and keep fingers crossed!)

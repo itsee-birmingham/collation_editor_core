@@ -3120,7 +3120,7 @@ SV = (function () {
 	/** split unit stuff*/
 	_doSplitUnit = function (unit, app_id, index) {
 		var i, j, text, apps, witnesses, witnesses_copy, overlap_witnesses, ol_witnesses_copy, words, key, words_dict, scroll_offset, rdg, add,
-		split_adds, newunit, om_readings_copy, lac_readings_copy, new_reading;
+		split_adds, newunit, om_readings_copy, lac_readings_copy, new_reading, special_category_witnesses;
 		scroll_offset = [document.getElementById('scroller').scrollLeft,
 		                 document.getElementById('scroller').scrollTop];
 		_addToUndoStack(CL.data);
@@ -3311,7 +3311,23 @@ SV = (function () {
 					}
 				}
 				if (lac_readings_copy.length > 0) {
-					newunit.readings.push({'witnesses': lac_readings_copy, 'text': [], 'type': 'lac_verse', 'details': CL.project.lac_unit_label});
+					if (CL.data.hasOwnProperty('special_categories')) {
+						for (let i=0; i<CL.data.special_categories.length; i+=1) {
+							special_category_witnesses = [];
+							for (let j=0; j<CL.data.special_categories[i].witnesses.length; j+=1) {
+								if (lac_readings_copy.indexOf(CL.data.special_categories[i].witnesses[j]) >= -1) {
+									special_category_witnesses.push(CL.data.special_categories[i].witnesses[j]);
+									lac_readings_copy.splice(lac_readings_copy.indexOf(CL.data.special_categories[i].witnesses[j]), 1);
+								}
+							}
+							newunit.readings.push({'witnesses': special_category_witnesses, 'text': [], 'type': 'lac_verse', 'details': CL.data.special_categories[i].label});
+						}
+						if (lac_readings_copy.length > 0) {
+							newunit.readings.push({'witnesses': lac_readings_copy, 'text': [], 'type': 'lac_verse', 'details': CL.project.lac_unit_label});
+						}
+					} else {
+						newunit.readings.push({'witnesses': lac_readings_copy, 'text': [], 'type': 'lac_verse', 'details': CL.project.lac_unit_label});
+					}
 				}
 			}
 			CL.addUnitId(newunit);

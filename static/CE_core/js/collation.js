@@ -5021,6 +5021,9 @@ CL = (function() {
     //otherwise check if they are both om lac readings
     if (a.text.length === 0 && b.text.length === 0) {
       //put verse_lac at the very bottom
+      if (a.type === 'lac_verse' && b.type === 'lac_verse') {
+        return 0;
+      }
       if (a.type === 'lac_verse') {
         return 1;
       }

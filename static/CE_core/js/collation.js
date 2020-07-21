@@ -4180,7 +4180,7 @@ CL = (function() {
           //						console.log(witness)
           if (reading.text.length !== 0) {
             //							console.log(reading.text[0])
-            //this should never happen and means the data needs osme serious work but keeping to keep collaborators happy
+            //this should never happen and means the data needs some serious work but keeping to keep collaborators happy
             if (!reading.text[0].hasOwnProperty(witness)) {
               console.log('**** Problem witness: ' + witness);
               return[false];

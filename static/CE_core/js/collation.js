@@ -555,6 +555,7 @@ CL = (function() {
   getCollationHeader = function(data, col_spans, number_spaces) {
     var html, word, words, cols, i, j, colspan;
     html = [];
+    // words is a list of lists now with the first being the word and the second being the class to add
     words = [];
     //TODO: add in project based option
     if (CL.services.hasOwnProperty('extractWordsForHeader') ) {
@@ -576,11 +577,10 @@ CL = (function() {
           if (data.overtext[0].tokens[i].hasOwnProperty('pc_after')) {
             word.push(data.overtext[0].tokens[i].pc_after);
           }
-          words.push(word.join(''));
+          words.push([word.join(''), '']);
         }
       }
     }
-
 
     //columns is based on number of words*2 (to include spaces) + 1 (to add space at the end)
     cols = (words.length * 2) + 1;
@@ -598,16 +598,15 @@ CL = (function() {
         } else {
           colspan = 1;
         }
-        //if i is even add a word if not a blank cell
+        //if i is even add a word; if not add a blank cell
         if (i % 2 === 0) {
-          html.push('<th colspan="' + colspan + '" class="NAword mark" id="NA_' + (i) + '"><div id="NA_' + (i) + '_div">' + words[j] + '</div></th>');
+          html.push('<th colspan="' + colspan + '" class="NAword mark ' + words[j][1] +'" id="NA_' + (i) + '"><div id="NA_' + (i) + '_div">' + words[j][0] + '</div></th>');
           j += 1;
         } else {
           html.push('<th  colspan="' + colspan + '" id="NA_' + (i) + '" class="mark"><div id="NA_' + (i) + '_div"></div></th>');
         }
       }
       html.push('<td class="nav" id="next_verse">&rarr;</td></tr>');
-
 
       html.push('<tr id="number_row" class="number_row"><td></td>');
       j = 1;

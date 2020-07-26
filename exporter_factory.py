@@ -22,4 +22,4 @@ class ExporterFactory (object):
         self.exporter = MyClass()
 
     def export_data(self, data, format='positive_xml', settings={}):
-        return getattr(self.exporter, self.exporter_function)(data, format, self.ignore_basetext, settings)
+        return getattr(self.exporter, self.exporter_function)(data, format, self.ignore_basetext, settings=settings)

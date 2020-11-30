@@ -461,8 +461,8 @@ class PostProcessor(Regulariser, SettingsApplier):
                     token['interface'] = normalised.replace('<', '&lt;').replace('>', '&gt;')
                 else:
                     token = self.set_rule_string(token)
-                    # create the word we will see in the interface
-                    self.apply_settings(token)
+                # create the word we will see in the interface
+                self.apply_settings(token)
                 new_witness.append(token)
             return new_witness
 

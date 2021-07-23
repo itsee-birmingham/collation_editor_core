@@ -127,8 +127,6 @@ td div.spacer {
 	border-radius:4px;
 }
 
-
-
 .label_form {
     position: fixed;
     background-color: whitesmoke;
@@ -464,9 +462,11 @@ div.highlighted_unit {
   vertical-align: middle;
 }
 
-#remove_witnesses_div {
+div#remove_witnesses_div {
   top: 60px;
   font-size: 15px;
+  resize: both;
+  overflow: scroll;
 }
 
 .reg_form {

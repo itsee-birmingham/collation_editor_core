@@ -397,7 +397,7 @@ RG = (function() {
               remove_wits_form = document.getElementById('remove_witnesses_div');
             }
             remove_wits_form.setAttribute('id', 'remove_witnesses_div');
-            remove_wits_form.setAttribute('class', 'dragdiv remove_witnesses_div dialogue_form');
+            remove_wits_form.setAttribute('class', 'remove_witnesses_div dialogue_form');
             remove_wits_form.innerHTML = html;
             document.getElementsByTagName('body')[0].appendChild(remove_wits_form);
             CL.setUpRemoveWitnessesForm(wits[2], data, 'regularised');
@@ -417,7 +417,7 @@ RG = (function() {
       CL.services.showLoginStatus();
     }
     document.getElementById('header').className = 'regularisation_header';
-    global_exceptions_html = '<div class="dialogue_form dragdiv"  id="global_exceptions" style="display:none"><div class="dialogue_form_header" id="global_exceptions_header"><span>Global Exceptions</span><span id="global_exceptions_ex">&#9660;</span></div><div id="global_exceptions_list" style="display:none"></div></div>';
+    global_exceptions_html = '<div class="dialogue_form"  id="global_exceptions" style="display:none"><div class="dialogue_form_header drag-zone" id="global_exceptions_header"><span>Global Exceptions</span><span id="global_exceptions_ex">&#9660;</span></div><div id="global_exceptions_list" style="display:none"></div></div>';
     container.innerHTML = '<div id="scroller" class="fillPage"><table class="collation_overview">' +
       html.join('') + '</table>' + global_exceptions_html + '</div><div id="single_witness_reading"></div>';
     CL.expandFillPageClients();
@@ -1263,7 +1263,6 @@ RG = (function() {
 
   _setUpRuleMenu = function(rd, classes, selected, create_function) {
     var left_pos, window_width, rule_scopes, conditions_html, i, id, setting;
-    //document.getElementById('reg_form').style.width = '300px';
     window_width = window.innerWidth;
     left_pos = rd.td.current.offsetLeft + rd.obj.redips.container.offsetParent.offsetLeft - document.getElementById('scroller').scrollLeft;
     if (left_pos + parseInt(document.getElementById('reg_form').style.width) >= window_width) {
@@ -1304,7 +1303,7 @@ RG = (function() {
     } else {
       document.getElementById('conditions').style.display = 'none';
     }
-    DND.InitDragDrop('reg_form', true, true);
+    drag.initDraggable('reg_form', true, true);
     $('#cancel_button').on('click', function(event) {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
     });
@@ -1394,7 +1393,7 @@ RG = (function() {
     if (document.getElementById('global_exceptions').style.display === 'none') {
       document.getElementById('global_exceptions').style.display = 'block';
       document.getElementById('global_exceptions_list').style.display = 'block';
-      DND.InitDragDrop('global_exceptions', true, true);
+      drag.initDraggable('global_exceptions', true, true);
     }
     html = [];
     html.push('<form id="global_exceptions_form" class="pure-form">');

@@ -219,7 +219,7 @@ SV = (function () {
               remove_wits_form = document.getElementById('remove_witnesses_div');
             }
             remove_wits_form.setAttribute('id', 'remove_witnesses_div');
-            remove_wits_form.setAttribute('class', 'dragdiv remove_witnesses_div dialogue_form');
+            remove_wits_form.setAttribute('class', 'divdrag remove_witnesses_div dialogue_form');
             remove_wits_form.innerHTML = html;
             document.getElementsByTagName('body')[0].appendChild(remove_wits_form);
 						removeFunction = function () {
@@ -266,8 +266,8 @@ SV = (function () {
 			temp[2].push.apply(temp[2], overlaps[1]);
 		}
 		html.push('<ul id="context_menu" class="SimpleContextMenu"></ul>');
-		error_panel_html = '<div id="error_panel" class="dragdiv warning dialogue_form" style="display:none">' +
-											 '<div class="dialogue_form_header"><span id="message_summary">Messages</span>' +
+		error_panel_html = '<div id="error_panel" class="warning dialogue_form" style="display:none">' +
+											 '<div class="dialogue_form_header drag-zone"><span id="message_summary">Messages</span>' +
 											 '<span id="error_coll_ex">&#9660;</span></div><div id="error_message_panel">' +
 											 '<span id="error_message">message</span></div></div>';
 		document.getElementById('scroller').innerHTML = '<table class="collation_overview">' + html.join('') +
@@ -322,7 +322,8 @@ SV = (function () {
       }
     }
     document.getElementById('witness_checkboxes').innerHTML = html.join('');
-    DND.InitDragDrop('remove_witnesses_div', true, true);
+		drag.initDraggable('remove_witnesses_div', true, true);
+    // DND.InitDragDrop('remove_witnesses_div', true, true);
     $('#remove_selected_button').on('click', function () {
       var data, handsToRemove;
       handsToRemove = [];
@@ -1085,7 +1086,7 @@ SV = (function () {
 		$('#error_panel').addClass(type);
 		if (document.getElementById('error_panel').style.display === 'none') {
 			document.getElementById('error_panel').style.display = 'block';
-			DND.InitDragDrop('error_panel', true, true);
+			drag.initDraggable('error_panel', true, true);
 		}
 		if (_messageExpanded === true) {
 			document.getElementById('error_message_panel').style.display = 'block';

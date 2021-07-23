@@ -1727,9 +1727,9 @@ CL = (function() {
     //show the select witnesses menu
     wit_menu = document.createElement('div');
     wit_menu.setAttribute('id', 'wit_form');
-    wit_menu.setAttribute('class', 'wit_form dragdiv dialogue_form');
+    wit_menu.setAttribute('class', 'wit_form dialogue_form');
     witnesses = sortWitnesses(getAllReadingWitnesses(reading));
-    witness_html = ['<div class="dialogue_form_header">' + details.header + '</div><form id="select_wit_form">'];
+    witness_html = ['<div class="dialogue_form_header drag-zone">' + details.header + '</div><form id="select_wit_form">'];
     witness_html.push('<label>Selected reading: </label><span>');
     witness_html.push(CL.extractWitnessText(reading));
     witness_html.push('</span>');
@@ -1781,7 +1781,7 @@ CL = (function() {
       document.getElementById('wit_scroller').style.maxHeight = menu_height + 'px';
     }
     document.getElementById('wit_form').style.left = left + 'px';
-    DND.InitDragDrop('wit_form', true, true);
+    drag.initDraggable('wit_form', true, true);
     $('#close_button').on('click', function(event) {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
     });
@@ -2493,7 +2493,8 @@ CL = (function() {
 
     }
     document.getElementById('witness_checkboxes').innerHTML = html.join('');
-    DND.InitDragDrop('remove_witnesses_div', true, true);
+    drag.initDraggable('remove_witnesses_div', true, true);
+    // DND.InitDragDrop('remove_witnesses_div', true, true);
     $('#select_all').on('click', function () {
       if ($(this).is(':checked')) {
         $('.witness_select').each(function() {

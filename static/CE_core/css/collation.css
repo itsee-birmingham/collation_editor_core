@@ -12,6 +12,10 @@ textarea {
     color: red;
 }
 
+.drag-zone {
+  cursor: move;
+}
+
 form {
     padding: 7px;
 }
@@ -313,7 +317,6 @@ table#raw_json td {
   display: inline-block;
   width: 80px;
   margin-top: 5px;
-
 }
 
 
@@ -485,37 +488,43 @@ div#remove_witnesses_div {
   overflow: scroll;
 }
 
-.reg_form {
+#reg_form.reg_form {
  	top: 30px;
   font-size: 15px;
+  max-height: 75vh;
+  overflow: hidden;
 }
 
-.reg_form .inline-label {
+#reg_form.reg_form .inline-label {
   display: inline-block;
   width: 50px;
 }
 
-.reg_form .inline-select {
+#reg_form.reg_form .inline-select {
   margin-top: 2px;
   margin-bottom: 2px;
 }
 
-.reg_form fieldset {
+#reg_form.reg_form fieldset {
   margin-top: 3px;
 }
 
-.reg_form #rule_creation_warning {
+#reg_form.reg_form #rule_creation_warning {
   color: maroon;
 }
 
 #regularisation_menu {
   width: 300px;
+  overflow-y: scroll;
+}
+
+#regularisation_menu textarea {
+  resize: none;
 }
 
 .dialogue_form_header {
     background: #B0C4DE;
     padding: 5px;
-    margin-bottom: 3px;
     height: 20px;
 }
 

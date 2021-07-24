@@ -1222,9 +1222,10 @@ RG = (function() {
       $.get(staticUrl + 'CE_core/html_fragments/rule_menu.html', function(html) {
         reg_menu = document.createElement('div');
         reg_menu.setAttribute('id', 'reg_form');
-        reg_menu.setAttribute('class', 'dragdiv reg_form dialogue_form');
+        reg_menu.setAttribute('class', 'reg_form dialogue_form');
         reg_menu.innerHTML = html.replace('{unit_data}', unit_data).replace('{original_text}', CL.project.prepareDisplayString(original_display_text)).replace('{normalised_text}', CL.project.prepareDisplayString(normalised_text).replace(/</g, '&lt;').replace(/>/g, '&gt;'));
         document.getElementsByTagName('body')[0].appendChild(reg_menu);
+
         reg_rules = CL.getRuleClasses('create_in_RG', true, 'value', ['identifier', 'name', 'RG_default']);
         new_reg_rules = [];
         selected = 'none';
@@ -1252,8 +1253,7 @@ RG = (function() {
   };
 
   _getDisplaySettingValue = function(id, key) {
-    var i;
-    for (i = 0; i < CL.displaySettingsDetails.configs.length; i += 1) {
+    for (let i = 0; i < CL.displaySettingsDetails.configs.length; i += 1) {
       if (CL.displaySettingsDetails.configs[i].id === id) {
         return CL.displaySettingsDetails.configs[i][key];
       }
@@ -1265,11 +1265,9 @@ RG = (function() {
     var left_pos, window_width, rule_scopes, conditions_html, i, id, setting;
     window_width = window.innerWidth;
     left_pos = rd.td.current.offsetLeft + rd.obj.redips.container.offsetParent.offsetLeft - document.getElementById('scroller').scrollLeft;
-    if (left_pos + parseInt(document.getElementById('reg_form').style.width) >= window_width) {
-      left_pos = (window_width - parseInt(document.getElementById('reg_form').style.width) - 20);
+    if (left_pos + parseInt(document.getElementById('reg_form').offsetWidth) >= window_width) {
+      left_pos = (window_width - parseInt(document.getElementById('reg_form').offsetWidth) - 20);
     }
-    //hardcoded this now as a fail safe against overshooting the bottom of the page, extra tests could be added if you have time.
-    //document.getElementById('reg_form').style.top = (rd.td.current.offsetTop + rd.obj.redips.container.offsetParent.offsetTop - document.getElementById('scroller').scrollTop) + 'px';
     document.getElementById('reg_form').style.left = left_pos + 'px';
 
     if (CL.witnessAddingMode === true) {
@@ -1304,6 +1302,7 @@ RG = (function() {
       document.getElementById('conditions').style.display = 'none';
     }
     drag.initDraggable('reg_form', true, true);
+    document.getElementById('regularisation_menu').style.height = document.getElementById('reg_form').offsetHeight - 43 + 'px';
     $('#cancel_button').on('click', function(event) {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
     });
@@ -1393,7 +1392,6 @@ RG = (function() {
     if (document.getElementById('global_exceptions').style.display === 'none') {
       document.getElementById('global_exceptions').style.display = 'block';
       document.getElementById('global_exceptions_list').style.display = 'block';
-
       drag.initDraggable('global_exceptions', true, true);
     }
     html = [];

@@ -3,10 +3,10 @@ var drag = (function () {
 
     // private variables
     let _behaviours = {};
-    let _startX, _startY, _dragElement, _startZIndex;
+    let _startX, _startY, _startZIndex;
 
     // private functions
-    let _dragMouseDown, _elementDrag, _closeDragElement;
+    let _dragMouseDown, _mouseDrag, _closeDragElement, _dragElement;
     //public functions
     let initDraggable;
 
@@ -16,14 +16,15 @@ var drag = (function () {
         return false;
       }
       element = document.getElementById(elemId);
-      _dragElement = element
       dragZone = element.querySelectorAll('.drag-zone');
       if (dragZone.length === 1) {
         // if there is a drag-zone specified only drag by that
         dragZone[0].onmousedown = _dragMouseDown;
+        dragZone[0].setAttribute('data-drags', elemId);
       } else {
         // else drag from anywhere
         element.onmousedown = _dragMouseDown;
+        element.setAttribute('data-drags', elemId);
       }
       // set permitted behaviour booleans
       _behaviours[elemId] = {};
@@ -37,7 +38,9 @@ var drag = (function () {
 
     _dragMouseDown = function (e) {
       e = e || window.event;
+      console.log(e.target);
       e.preventDefault();
+      _dragElement = document.getElementById(e.target.getAttribute('data-drags'));
       // get the mouse cursor position at startup:
       _startX = _dragElement.clientX;
       _startY = _dragElement.clientY;
@@ -45,10 +48,10 @@ var drag = (function () {
       _dragElement.style.zIndex = 40000;
       document.onmouseup = _closeDragElement;
       // call a function whenever the cursor moves:
-      document.onmousemove = _elementDrag;
+      document.onmousemove = _mouseDrag;
     };
 
-    _elementDrag = function (e) {
+    _mouseDrag = function (e) {
       let newLeft, newRight, newTop, newBase;
       e = e || window.event;
       e.preventDefault();
@@ -74,6 +77,7 @@ var drag = (function () {
     _closeDragElement = function () {
       // stop moving when mouse button is released:
       _dragElement.style.zIndex = _startZIndex;
+      _dragElement = null;
       document.onmouseup = null;
       document.onmousemove = null;
     };

@@ -148,6 +148,14 @@ td div.spacer {
 
 .wit_form {
  	top: 30px;
+  max-width: 75vw;
+  max-height: 75vh;
+  overflow: hidden;
+}
+
+.wit_form input[type=checkbox] {
+  display: inline-block;
+  margin-right: 4px;
 }
 
 .wit_form .inline-label {
@@ -160,11 +168,16 @@ td div.spacer {
   margin-top: 5px;
 }
 
+#select_wit_form {
+  overflow: auto;
+}
+
 #wit_scroller {
 	margin-top: 15px;
 	margin-bottom: 15px;
 	overflow: auto;
 	border: 2px inset grey;
+  padding: 3px;
 }
 
 td.highlight {

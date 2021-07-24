@@ -609,11 +609,11 @@ CL = (function() {
         }
         //if i is even add a word; if not add a blank cell
         if (i % 2 === 0) {
-          html.push('<th colspan="' + colspan + '" class="NAword mark ' + words[j][1] +'" id="NA_' + (i) +
+          html.push('<th colspan="' + colspan + '" class="NAword redips-mark ' + words[j][1] +'" id="NA_' + (i) +
                     '"><div id="NA_' + (i) + '_div">' + words[j][0] + '</div></th>');
           j += 1;
         } else {
-          html.push('<th  colspan="' + colspan + '" id="NA_' + (i) + '" class="mark"><div id="NA_' + (i) +
+          html.push('<th  colspan="' + colspan + '" id="NA_' + (i) + '" class="redips-mark"><div id="NA_' + (i) +
                     '_div"></div></th>');
         }
       }
@@ -628,7 +628,7 @@ CL = (function() {
           colspan = 1;
         }
         if (i % 2 === 0) {
-          html.push('<td id="num_' + j + '" colspan="' + colspan + '" class="number mark">' + j + '</td>');
+          html.push('<td id="num_' + j + '" colspan="' + colspan + '" class="number redips-mark">' + j + '</td>');
           j += 1;
         } else {
           if (number_spaces === true) {
@@ -1717,7 +1717,7 @@ CL = (function() {
 
   //TODO: think about putting html in a html file and calling in
   showSplitWitnessMenu = function(reading, menu_pos, details) {
-    var wit_menu, witnesses, witness_html, window_height, menu_height, sub_types, id, left, top;
+    var wit_menu, witnesses, witness_html, window_height, menu_height, sub_types, id, left, top, wit_form_height;
     left = menu_pos.left;
     top = menu_pos.top;
     //if there is already an old menu hanging around remove it
@@ -1768,20 +1768,22 @@ CL = (function() {
     witness_html.push('<input class="pure-button dialogue-form-button" id="select_button" type="button" value="' + details.button + '"/></form>');
     wit_menu.innerHTML = witness_html.join('');
     document.getElementsByTagName('body')[0].appendChild(wit_menu);
-    window_height = window.innerHeight;
-    menu_height = window_height - 300;
-    if (menu_height < 50) {
-      menu_height = 50;
-    }
     left = parseInt(left) - document.getElementById('scroller').scrollLeft;
     if (left + document.getElementById('wit_form').offsetWidth > window.innerWidth) {
       left = left - document.getElementById('wit_form').offsetWidth;
     }
-    if (witnesses.length > 1 && (!details.hasOwnProperty('witness_select') || details.witness_select !== false)) {
-      document.getElementById('wit_scroller').style.maxHeight = menu_height + 'px';
+    if (left < 0) {
+      left = 4;
     }
     document.getElementById('wit_form').style.left = left + 'px';
     drag.initDraggable('wit_form', true, true);
+    window_height = window.innerHeight;
+    wit_form_height = document.getElementById('wit_form').offsetHeight - 43;
+    document.getElementById('select_wit_form').style.height = wit_form_height + 'px';
+    menu_height = Math.max(wit_form_height - 200, 50);
+    if (witnesses.length > 1 && (!details.hasOwnProperty('witness_select') || details.witness_select !== false)) {
+      document.getElementById('wit_scroller').style.maxHeight = menu_height + 'px';
+    }
     $('#close_button').on('click', function(event) {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
     });

@@ -3,7 +3,7 @@ var drag = (function () {
 
     // private variables
     let _behaviours = {};
-    let _startX, _startY, _dragElement;
+    let _startX, _startY, _dragElement, _startZIndex;
 
     // private functions
     let _dragMouseDown, _elementDrag, _closeDragElement;
@@ -41,35 +41,39 @@ var drag = (function () {
       // get the mouse cursor position at startup:
       _startX = _dragElement.clientX;
       _startY = _dragElement.clientY;
+      _startZIndex = _dragElement.style.zIndex;
+      _dragElement.style.zIndex = 40000;
       document.onmouseup = _closeDragElement;
       // call a function whenever the cursor moves:
       document.onmousemove = _elementDrag;
     };
 
     _elementDrag = function (e) {
-      let endX, endY;
+      let newLeft, newRight, newTop, newBase;
       e = e || window.event;
       e.preventDefault();
       // calculate the new cursor position for the enabled axis
       if (_behaviours[_dragElement.id]['horizontal'] === true) {
-        endX = _startX - e.clientX;
+        newLeft = _dragElement.offsetLeft +  e.clientX - _startX;
+        newRight = newLeft + _dragElement.offsetWidth;
         _startX = e.clientX;
-      } else {
-        endX = _startX;
+        if (newLeft > 0 && newRight < window.innerWidth) {
+          _dragElement.style.left = newLeft + "px";
+        }
       }
       if (_behaviours[_dragElement.id]['vertical'] === true) {
-        endY = _startY - e.clientY;
+        newTop = _dragElement.offsetTop + e.clientY - _startY;
+        newBase = newTop + _dragElement.offsetHeight;
         _startY = e.clientY;
-      } else {
-        endY = _startY;
+        if (newTop > 0 && newBase < window.innerHeight) {
+          _dragElement.style.top = newTop + "px";
+        }
       }
-      // set the element's new position:
-      _dragElement.style.top = (_dragElement.offsetTop - endY) + "px";
-      _dragElement.style.left = (_dragElement.offsetLeft - endX) + "px";
     };
 
     _closeDragElement = function () {
       // stop moving when mouse button is released:
+      _dragElement.style.zIndex = _startZIndex;
       document.onmouseup = null;
       document.onmousemove = null;
     };

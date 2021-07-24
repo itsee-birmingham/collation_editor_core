@@ -1393,6 +1393,7 @@ RG = (function() {
     if (document.getElementById('global_exceptions').style.display === 'none') {
       document.getElementById('global_exceptions').style.display = 'block';
       document.getElementById('global_exceptions_list').style.display = 'block';
+
       drag.initDraggable('global_exceptions', true, true);
     }
     html = [];
@@ -1405,11 +1406,11 @@ RG = (function() {
     html.push('</ul><input class="pure-button dialogue-form-button" type="button" value="Remove exceptions" id="remove_exception_button"/>');
     html.push('</form>');
     document.getElementById('global_exceptions_list').innerHTML = html.join('');
+    document.getElementById('global_exceptions_list').style.height = document.getElementById('global_exceptions').offsetHeight - 35 + 'px';
     document.getElementById('global_exceptions').style.top = (document.getElementById('header').offsetHeight +
         document.getElementById('scroller').offsetHeight + document.getElementById('single_witness_reading').offsetHeight) -
         document.getElementById('global_exceptions').offsetHeight + 15 + 'px';
-    document.getElementById('global_exceptions').style.left = document.getElementById('scroller').offsetWidth -
-        document.getElementById('global_exceptions').offsetWidth - 15 + 'px';
+    document.getElementById('global_exceptions').style.left = 15 + 'px';
 
     $('#remove_exception_button').off('click.rem_ge');
     $('#remove_exception_button').on('click.rem_ge', function(event) {

@@ -413,9 +413,6 @@ tr.added_highlighted > td > div.regularisation_staged {
 }
 
 
-
-
-
 td > div.spanlike {
     width: 95%;
 }
@@ -466,6 +463,12 @@ div#global_exceptions {
   background: #B0C4DE;
   border: 1px solid black;
   z-index: 10;
+  max-height: 50vh;
+  overflow: hidden;
+}
+
+div#error_panel {
+  border: 1px solid black;
   max-height: 50vh;
   overflow: hidden;
 }
@@ -590,6 +593,7 @@ div#error_header {
 div#error_message_panel {
 	background: whitesmoke;
 	padding: 4px;
+  overflow-y: scroll;
 }
 
 span#error_coll_ex, span#global_exceptions_ex {

@@ -104,19 +104,6 @@ CL = (function() {
     $('.fillPage').each(function() {
       if (document.getElementById('footer')) {
         $(this).height(window.innerHeight - $(this).offset().top - 40 - document.getElementById('footer').offsetHeight);
-        //make sure the global exceptions div stays fixed to horizontal scroll bar when page is resized
-        if (document.getElementById('global_exceptions')) {
-          document.getElementById('global_exceptions').style.top = document.getElementById('header').offsetHeight +
-              document.getElementById('scroller').offsetHeight -
-              document.getElementById('global_exceptions').offsetHeight - 3 + 'px';
-        }
-        //do the same for errors in SV
-        if (document.getElementById('error_panel')) {
-          document.getElementById('error_panel').style.top = document.getElementById('scroller').offsetHeight +
-                                                             document.getElementById('header').offsetHeight -
-                                                             document.getElementById('error_panel').offsetHeight -
-                                                             3 + 'px';
-        }
       } else {
         $(this).height(window.innerHeight - $(this).offset().top - 40);
       }

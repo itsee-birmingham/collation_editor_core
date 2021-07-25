@@ -10,7 +10,7 @@ var drag = (function () {
     //public functions
     let initDraggable;
 
-    initDraggable = function (elemId, x, y) {
+    initDraggable = function (elemId, x, y, onDrop) {
       let element, dragZone;
       if (!document.getElementById(elemId)) {
         return false;
@@ -30,17 +30,26 @@ var drag = (function () {
       _behaviours[elemId] = {};
       if (typeof x !== 'undefined') {
         _behaviours[elemId]['horizontal'] = x;
+      } else {
+        _behaviours[elemId]['horizontal'] = false;
       }
       if (typeof y !== 'undefined') {
         _behaviours[elemId]['vertical'] = y;
+      } else {
+        _behaviours[elemId]['vertical'] = false;
+      }
+      if (typeof onDrop !== 'undefined') {
+        _behaviours[elemId]['drop_function'] = onDrop;
       }
     };
 
     _dragMouseDown = function (e) {
       e = e || window.event;
-      console.log(e.target);
       e.preventDefault();
       _dragElement = document.getElementById(e.target.getAttribute('data-drags'));
+      if (!_dragElement) {
+        return false;
+      }
       // get the mouse cursor position at startup:
       _startX = _dragElement.clientX;
       _startY = _dragElement.clientY;
@@ -77,6 +86,9 @@ var drag = (function () {
     _closeDragElement = function () {
       // stop moving when mouse button is released:
       _dragElement.style.zIndex = _startZIndex;
+      if (_behaviours[_dragElement.id].hasOwnProperty('drop_function')) {
+        _behaviours[_dragElement.id].drop_function(_dragElement);
+      }
       _dragElement = null;
       document.onmouseup = null;
       document.onmousemove = null;

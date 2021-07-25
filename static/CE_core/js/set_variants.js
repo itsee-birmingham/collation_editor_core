@@ -190,7 +190,7 @@ SV = (function () {
 	};
 
 	showSetVariantsData = function (options) {
-		var temp, header, html, i, app_ids, num, overlaps, overlap_options,
+		var temp, header, html, app_ids, num, overlaps, overlap_options,
 		new_overlap_options, error_panel_html, event_rows, row, wits, remove_wits_form,
 		removeFunction;
 		//sort out options and get layout
@@ -258,7 +258,7 @@ SV = (function () {
 			overlap_options.highlighted_unit = options.highlighted_unit;
 		}
 		app_ids = CL.getOrderedAppLines();
-		for (i = 0; i < app_ids.length; i += 1) {
+		for (let i = 0; i < app_ids.length; i += 1) {
 			num = app_ids[i].replace('apparatus', '');
 			new_overlap_options = calculateUnitLengths(app_ids[i], overlap_options);
 			overlaps = CL.getOverlapLayout(CL.data[app_ids[i]], num, 'set_variants', header[1], new_overlap_options);
@@ -274,7 +274,7 @@ SV = (function () {
 																										'</table>' + error_panel_html;
 
 		event_rows = temp[2];
-		for (i = 0; i < event_rows.length; i += 1) {
+		for (let i = 0; i < event_rows.length; i += 1) {
 			row = document.getElementById(event_rows[i]);
 			CL.addHoverEvents(row);
 		}
@@ -292,7 +292,7 @@ SV = (function () {
 		}
 		CL.addTriangleFunctions('list');
 		// decide if we need to display any messages and display them if we do
-		for (i = 0; i < _watchList.length; i += 1) {
+		for (let i = 0; i < _watchList.length; i += 1) {
 			if (_checkWitnessIntegrity(_watchList[i])) {
 				_watchList[i] = null;
 			}
@@ -307,7 +307,7 @@ SV = (function () {
 		} else if (_watchList.length > 0) {
 			_setupMessage('warning', 'WARNING: the following witnesses still have words out of order: ' + _watchList.join(', '));
 		}
-		CL.expandFillPageClients(); //this has to be at the end so the message panel is in the right place
+		CL.expandFillPageClients();
 	};
 
 	_setUpSVRemoveWitnessesForm = function(wits, data) {
@@ -1079,6 +1079,7 @@ SV = (function () {
 
 	/** displays warning and error messages on the screen in a draggable and collapsable box */
 	_setupMessage = function (type, message) {
+		var dropFunction;
 		document.getElementById('error_message_panel').innerHTML = message;
 		$('#error_panel').removeClass('warning');
 		$('#error_panel').removeClass('error');
@@ -1086,7 +1087,12 @@ SV = (function () {
 		$('#error_panel').addClass(type);
 		if (document.getElementById('error_panel').style.display === 'none') {
 			document.getElementById('error_panel').style.display = 'block';
-			drag.initDraggable('error_panel', true, true);
+			dropFunction = function (draggable) {
+				SV.messagePosLeft = draggable.style.left;
+				SV.messagePosTop = draggable.style.top;
+			};
+			drag.initDraggable('error_panel', true, true, dropFunction);
+			document.getElementById('error_message_panel').style.height = document.getElementById('error_panel').offsetHeight - 40  + 'px';
 		}
 		if (_messageExpanded === true) {
 			document.getElementById('error_message_panel').style.display = 'block';
@@ -1097,11 +1103,13 @@ SV = (function () {
 		}
 		if (SV.messagePosLeft !== null) {
 			document.getElementById('error_panel').style.left = SV.messagePosLeft;
+			document.getElementById('error_panel').style.top = SV.messagePosTop
+
 		} else {
-			document.getElementById('error_panel').style.top = (document.getElementById('scroller').offsetHeight +
-																													document.getElementById('header').offsetHeight +
+			document.getElementById('error_panel').style.top = (document.getElementById('header').offsetHeight +
+																													document.getElementById('scroller').offsetHeight +
 																													document.getElementById('single_witness_reading').offsetHeight) -
-																													document.getElementById('error_panel').offsetHeight - 3 + 'px';
+																													document.getElementById('error_panel').offsetHeight + 'px';
 			document.getElementById('error_panel').style.left = document.getElementById('scroller').offsetWidth -
 																													document.getElementById('error_panel').offsetWidth - 15 + 'px';
 		}
@@ -1111,12 +1119,14 @@ SV = (function () {
 																													 parseInt(document.getElementById('error_message_panel').offsetHeight) + 'px';
 				document.getElementById('error_message_panel').style.display = 'none';
 				document.getElementById('error_coll_ex').innerHTML = '&#9650;';
+				SV.messagePosTop = document.getElementById('error_panel').style.top;
 				_messageExpanded = false;
 			} else {
 				document.getElementById('error_message_panel').style.display = 'block';
 				document.getElementById('error_panel').style.top = parseInt(document.getElementById('error_panel').style.top) -
 																													 parseInt(document.getElementById('error_message_panel').offsetHeight) + 'px';
 				document.getElementById('error_coll_ex').innerHTML = '&#9660;';
+				SV.messagePosTop = document.getElementById('error_panel').style.top;
 				_messageExpanded = true;
 			}
 		});

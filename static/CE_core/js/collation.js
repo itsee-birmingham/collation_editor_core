@@ -1733,10 +1733,9 @@ CL = (function() {
       for (let i = 0; i < witnesses.length; i += 1) {
         witness_html.push('<input type="hidden" name="' + witnesses[i] + '" value="true"/><br/>');
       }
-      //witness_html.push('<br/><br/>');
     }
     if (details.type === 'overlap') {
-      //witness_html.push('<label>Duplicate reading? <input type="checkbox" id="duplicate" name="duplicate"/></label><br/><br/>');
+      // squelch
     } else if (details.type === 'SVsubreading' || details.type === 'ORsubreading') {
       witness_html.push('<label class="inline-label">Parent reading:</label><select name="parent_reading" id="parent_reading"></select><br/><br/>');
       witness_html.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading_details"/><br/></br/>');
@@ -1767,7 +1766,13 @@ CL = (function() {
     window_height = window.innerHeight;
     wit_form_height = document.getElementById('wit_form').offsetHeight - 43;
     document.getElementById('select_wit_form').style.height = wit_form_height + 'px';
-    menu_height = Math.max(wit_form_height - 200, 50);
+    if (details.hasOwnProperty('form_size') && details.form_size === 'small') {
+      menu_height = Math.max(wit_form_height - 100, 50);
+    } else if (details.type === 'SVsubreading' || details.type === 'ORsubreading') {
+      menu_height = Math.max(wit_form_height - 235, 50);
+    } else {
+      menu_height = Math.max(wit_form_height - 173, 50);
+    }
     if (witnesses.length > 1 && (!details.hasOwnProperty('witness_select') || details.witness_select !== false)) {
       document.getElementById('wit_scroller').style.maxHeight = menu_height + 'px';
     }

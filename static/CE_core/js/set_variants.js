@@ -779,7 +779,10 @@ SV = (function () {
 		                 document.getElementById('scroller').scrollTop];
 		reading = CL.data[rdg_details[1]][rdg_details[0]].readings[rdg_details[2]];
 		if (CL.getAllReadingWitnesses(reading).length > 1) {
-			CL.showSplitWitnessMenu(reading, menu_pos, {'type': 'duplicate', 'header': 'Select witnesses', 'button': 'Split witnesses'});
+			CL.showSplitWitnessMenu(reading, menu_pos, {'type': 'duplicate',
+																									'header': 'Select witnesses',
+																									'button': 'Split witnesses',
+																									'form_size': 'small'});
 			$('#select_button').on('click', function (event) {
 				witness_list = [];
 				data = cforms.serialiseForm('select_wit_form');
@@ -3495,7 +3498,10 @@ SV = (function () {
 			reading = CL.data.apparatus[unit_num].readings[reading_num];
 			if (!_hasStandoffSubreading(reading)) {
 				if (reading.witnesses.length > 1) {
-					CL.showSplitWitnessMenu(reading, menu_pos, {'type': 'overlap', 'header': 'Select witnesses to overlap', 'button': 'Overlap witnesses'});
+					CL.showSplitWitnessMenu(reading, menu_pos, {'type': 'overlap',
+																											'header': 'Select witnesses to overlap',
+																											'button': 'Overlap witnesses',
+																											'form_size': 'small'});
 					$('#select_button').on('click', function (event) {
 						witness_list = [];
 						data = cforms.serialiseForm('select_wit_form');

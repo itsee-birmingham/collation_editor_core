@@ -2428,40 +2428,10 @@ SV = (function () {
 					hit_witnesses.push(text_unit.readings[i].witnesses[j]);
 				}
 			}
-			// if (text_unit.readings[i].text.length > 0 && _isSubsetOf(text_unit.readings[i].witnesses, hit_witnesses)) {
-			// 	//if the reading witnesses are a subset of hit_witnesses
-			// 	console.log('all witnesses')
-			// 	//we are dealing with all witnesses in the reading
-			// 	if (gap_position === 'before') {
-			// 		if (text_unit.readings[i].text.length > 0) {
-			// 			text_unit.readings[i].text[0].combined_gap_before = text_unit.readings[i].witnesses;
-			// 			if (text_unit.readings[i].text[0][hit_witnesses[0]].hasOwnProperty('gap_before_details')) {
-			// 				text_unit.readings[i].text[0].combined_gap_before_details = text_unit.readings[i].text[0][hit_witnesses[0]].gap_before_details;
-			// 			}
-			// 			if (typeof adjacent_unit !== 'undefined') {
-			// 				gap_details = _getGapDetails(adjacent_unit, hit_witnesses);
-			// 				if (gap_details !== null) {
-			// 					text_unit.readings[i].text[0].combined_gap_before_details = gap_details;
-			// 				}
-			// 			}
-			// 		}
-			// 	} else {
-			// 		//gap is after
-			// 		for (let j = 0; j < hit_witnesses.length; j += 1) {
-			// 			//we need to remember these and add it later (when we are not looping through the readings)
-			// 			readings_to_add.push([text_unit_pos, i, [hit_witnesses[j]], app_id]);
-			// 		}
-			// 	}
-			// } else if (text_unit.readings[i].text.length > 0 && hit_witnesses.length > 0) {
-
-				//we are only dealing with only some witnesses in the reading
-
-					for (let j = 0; j < hit_witnesses.length; j += 1) {
-						//we need to remember these and add it later (when we are not looping through the readings)
-						readings_to_add.push([text_unit_pos, i, [hit_witnesses[j]], app_id]);
-					}
-
-			// }
+			for (let j = 0; j < hit_witnesses.length; j += 1) {
+				//we need to remember these and add it later (when we are not looping through the readings)
+				readings_to_add.push([text_unit_pos, i, [hit_witnesses[j]], app_id]);
+			}
 		}
 		for (let i = readings_to_add.length - 1; i >= 0; i -= 1) { // go backwards so you don't screw up positions by adding readings
 			new_reading_id = doSplitReadingWitnesses(readings_to_add[i][0], readings_to_add[i][1], readings_to_add[i][2], readings_to_add[i][3], false);

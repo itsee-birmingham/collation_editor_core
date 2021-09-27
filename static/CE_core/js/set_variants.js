@@ -116,9 +116,15 @@ SV = (function() {
       SimpleContextMenu.attach('split_duplicate_unit', function() {
         return _makeMenu('split_duplicate_unit');
       });
+      SimpleContextMenu.attach('split_deleted_unit', function() {
+        return _makeMenu('split_overlapped_change_unit');
+      });
+      SimpleContextMenu.attach('split_overlapped_unit', function() {
+        return _makeMenu('split_overlapped_change_unit');
+      });
     }
 
-    //sort out header and main page
+    // sort out header and main page
     document.getElementById('header').innerHTML = CL.getHeaderHtml('Set Variants', CL.context);
     document.getElementById('header').className = 'set_variants_header';
     if (CL.services.hasOwnProperty('showLoginStatus')) {
@@ -126,7 +132,7 @@ SV = (function() {
     }
     _addContextMenuHandlers();
 
-    //sort out footer stuff
+    // sort out footer stuff
     CL.expandFillPageClients();
     footerHtml = [];
     if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
@@ -148,12 +154,12 @@ SV = (function() {
       footerHtml.push('<select class="right_foot" id="added_highlight" name="added_highlight"></select>');
     }
     footerHtml.push('<button class="pure-button right_foot" id="undo_button" style="display:none">undo</button>');
-    $('#footer').addClass('pure-form'); //this does the styling of the select elements in the footer using pure (they cannot be styled individually)
+    $('#footer').addClass('pure-form');  // this does the styling of the select elements in the footer using pure (they cannot be styled individually)
     document.getElementById('footer').innerHTML = footerHtml.join('');
     CL.addExtraFooterButtons('set');
     CL.addStageLinks();
 
-    //get the data itself
+    // get the data itself
     container.innerHTML = '<div id="redips-drag"><div id="scroller" class="fillPage"></div><div id="single_witness_reading"></div></div>';
     document.getElementById('single_witness_reading').style.bottom = document.getElementById('footer').offsetHeight + 'px';
     if (CL.witnessAddingMode === true) {
@@ -501,10 +507,11 @@ SV = (function() {
    * 		highlighted_unit - the unit to highlight (used for showing which units have errors I think)
    * 		created - boolean (is this a specially created gap element)
    * 		overlapping_ids - a list of ids for any overlapping readings realted to this top line reading
-   * 		td_id - the id for the cell (used in overlap rows to allow readings to be moved between rows))*/
+   * 		td_id - the id for the cell (used in overlap rows to allow readings to be moved between rows))
+   *    overlap_units - the overlap_units object as recorded on the unit (for working out overlap witnesses)*/
   getUnitData = function(data, id, start, end, options) {
     var html, decisions, rows, cells, rowList, temp, events, colspan, rowId, text, splitClass, highlightedHand,
-      	highlightedUnit, highlightedClasses, svRules, readingSuffix, readingLabel;
+      	highlightedUnit, highlightedClasses, svRules, readingSuffix, readingLabel, allOverlappedWitnesses;
     html = [];
     rowList = [];
     if (typeof options === 'undefined') {
@@ -540,6 +547,12 @@ SV = (function() {
       highlightedUnit = '';
     }
 
+    allOverlappedWitnesses = [];
+    if (options.hasOwnProperty('split') && options.split === true && options.hasOwnProperty('overlap_units')) {
+      for (let key in options.overlap_units) {
+        allOverlappedWitnesses = allOverlappedWitnesses.concat(options.overlap_units[key]);
+      }
+    }
     for (let i = 0; i < data.length; i += 1) {
       //what is the reading text?
       text = CL.extractDisplayText(data[i], i, data.length, options.unit_id, options.app_id);
@@ -579,7 +592,12 @@ SV = (function() {
             if (i === 0) {
               splitClass = 'split_unit_a';
             } else {
-              splitClass = 'redips-drag split_unit';
+              if (data[i].witnesses.filter(x => allOverlappedWitnesses.includes(x)).length === data[i].witnesses.length) {
+                splitClass = 'redips-drag split_duplicate_unit';
+              } else {
+                splitClass = 'redips-drag split_unit';
+              }
+
             }
           }
           html.push('<div id="' + 'drag_unit_' + id + '_reading_' + i + '" class="' + splitClass + '">');
@@ -4506,6 +4524,12 @@ SV = (function() {
     } else if (menuName === 'split_duplicate_unit') {
       // used for reading in top line labelled 'duplicate' when the unit is in split readings state
       menu = ['<li id="treat_as_main"><span>Make main reading</span></li>'];
+      for (let i = 0; i < CL.overlappedOptions.length; i += 1) {
+        menu.push('<li id="' + CL.overlappedOptions[i].id + '"><span>' + CL.overlappedOptions[i].label + '</span></li>');
+      }
+      document.getElementById('context_menu').innerHTML = menu.join('');
+    } else if (menuName === 'split_overlapped_change_unit') {
+      menu = [];
       for (let i = 0; i < CL.overlappedOptions.length; i += 1) {
         menu.push('<li id="' + CL.overlappedOptions[i].id + '"><span>' + CL.overlappedOptions[i].label + '</span></li>');
       }

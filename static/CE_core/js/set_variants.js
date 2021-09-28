@@ -850,8 +850,7 @@ SV = (function() {
   splitReadingWitnesses = function(rdgDetails, stage, menuPos) {
     var reading, scrollOffset, witnessList, data, unit;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      							document.getElementById('scroller').scrollTop
-    								];
+      							document.getElementById('scroller').scrollTop];
     reading = CL.data[rdgDetails[1]][rdgDetails[0]].readings[rdgDetails[2]];
     if (CL.getAllReadingWitnesses(reading).length > 1) {
       CL.showSplitWitnessMenu(reading, menuPos, {
@@ -941,8 +940,7 @@ SV = (function() {
   makeStandoffReading = function(type, readingDetails, parentReading, outerCallback) {
     var scrollOffset, callback;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
+                    document.getElementById('scroller').scrollTop];
     _addToUndoStack(CL.data);
     callback = function() {
       checkBugStatus('make offset reading', 'of type ' + type + ' in apparatus unit ' + readingDetails.unit_pos +
@@ -1232,8 +1230,7 @@ SV = (function() {
   _highlightWitness = function(witness) {
     var scrollOffset;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      							document.getElementById('scroller').scrollTop
-    								];
+      							document.getElementById('scroller').scrollTop];
     CL.highlighted = witness;
     showSetVariantsData({
       'highlighted_wit': CL.highlighted
@@ -1248,9 +1245,7 @@ SV = (function() {
   _highlightAddedWitness = function(witness) {
     var scrollOffset, witnesses;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      							document.getElementById('scroller').scrollTop
-    								];
-
+      							document.getElementById('scroller').scrollTop];
     if (witness === 'all') {
       witnesses = CL.witnessesAdded;
     } else {
@@ -1595,8 +1590,7 @@ SV = (function() {
   _splitReadings = function(details) {
     var scrollOffset;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
+                    document.getElementById('scroller').scrollTop];
     CL.data[details[1]][details[0]].split_readings = true;
     showSetVariantsData();
     document.getElementById('scroller').scrollLeft = scrollOffset[0];
@@ -1607,8 +1601,7 @@ SV = (function() {
   _unsplitReadings = function(details) {
     var scrollOffset;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
+                    document.getElementById('scroller').scrollTop];
     prepareForOperation(); //we do this because we have to sort out split witnesses as well
     delete CL.data[details[1]][details[0]].split_readings;
     unsplitUnitWitnesses(details[0], details[1]);
@@ -1786,8 +1779,7 @@ SV = (function() {
     var scrollOffset, problems, warningMess;
     //then move the whole unit
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
+                    document.getElementById('scroller').scrollTop];
     // check that the unit is not currently associated with an overlapped unit
     // AND that the location its moving to is either not part of an overlapped unit or is but with om or
     //lac readings for overlapped witnesses OR it has overlapping units and the new gap has the same ones
@@ -1952,9 +1944,7 @@ SV = (function() {
 
     //move the single reading
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
-
+                    document.getElementById('scroller').scrollTop];
     //get some details we need to check for overlap
     unit2 = CL.data.apparatus[unitNum];
     rdgDetails = CL.getUnitAppReading(rd.obj.id);
@@ -2166,8 +2156,7 @@ SV = (function() {
 
     //then move the element
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
+                    document.getElementById('scroller').scrollTop];
     unitDetails = CL.getUnitAppReading(rd.obj.firstChild.id);
     unitNum = unitDetails[0];
     unit = CL.data[unitDetails[1]][unitNum];
@@ -2662,8 +2651,7 @@ SV = (function() {
   _doSpecialCombineUnits = function(units, appId) {
     var scrollOffset, unit1, unit2, unit1Pos, unit2Pos, witnessEquality, errorMess, warningUnit;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
+                    document.getElementById('scroller').scrollTop];
     _addToUndoStack(CL.data);
     //make sure unit 1 is leftmost and unit 2 is rightmost
     unit1Pos = Math.min(units[0][0], units[1][0]);
@@ -2725,8 +2713,7 @@ SV = (function() {
   _combineUnits = function(units, rd) {
     var unit1, unit2, scrollOffset, added, appId, errorMess;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
+                    document.getElementById('scroller').scrollTop];
     prepareForOperation();
     //at this point both units are from same apparatus
     appId = units[0][1];
@@ -2820,8 +2807,7 @@ SV = (function() {
     var appId, unit1, unit2, unit2ReadingPos, problems, warningMess, reading, added, newunit, scrollOffset,
       	witnesses, doMoveOut, doMoveIn, replacementReadings, readingId;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
+                    document.getElementById('scroller').scrollTop];
     // at this point both units are from same apparatus
     appId = units[0][1];
     // first in merge list is always the target, second is always the one you moved
@@ -3677,8 +3663,7 @@ SV = (function() {
   _splitUnit = function(index) {
     var appId, apparatusNum, scrollOffset, operationNeeded;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
+                    document.getElementById('scroller').scrollTop];
     // find the correct apparatus
     if (index.match(/_app_/g)) {
       apparatusNum = parseInt(index.match(/\d+/g)[1], 10);
@@ -3796,8 +3781,7 @@ SV = (function() {
   _overlapReading = function(unitNum, readingNum, menuPos) {
     var reading, errorMess, duplicate, scrollOffset, witnessList, data, newReadingId;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      							document.getElementById('scroller').scrollTop
-    							 ];
+      							document.getElementById('scroller').scrollTop];
     duplicate = true;
     if (_checkUnitUniqueness(unitNum, 'apparatus')) {
       reading = CL.data.apparatus[unitNum].readings[readingNum];
@@ -3859,8 +3843,7 @@ SV = (function() {
   _makeOverlappingReading = function(unitNum, readingId, duplicate) {
     var originalUnit, aReading, reading, newunit, found, key, scrollOffset, olId, newWord, temp, appIds;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      							document.getElementById('scroller').scrollTop
-    							 ];
+      							document.getElementById('scroller').scrollTop];
     _addToUndoStack(CL.data);
     originalUnit = CL.data.apparatus[unitNum];
     aReading = CL.data.apparatus[unitNum].readings[0];
@@ -4004,8 +3987,7 @@ SV = (function() {
   _moveOverlapping = function(unitDetails, targetRow) {
     var unit, scrollOffset;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
+                    document.getElementById('scroller').scrollTop];
     _addToUndoStack(CL.data);
     unit = CL.data[unitDetails[1]][unitDetails[0]];
     unit.row = parseInt(targetRow);
@@ -4413,8 +4395,7 @@ SV = (function() {
       // issue on line 4397 which has no subreading sometimes - save is what causes this issue not the code here
       // this section is a top level action called from the context menu so must be prepared to a certain extent
       scrollOffset = [document.getElementById('scroller').scrollLeft,
-        document.getElementById('scroller').scrollTop
-      ];
+                      document.getElementById('scroller').scrollTop];
       _addToUndoStack(CL.data);
 
       if (idString.indexOf('_app_') === -1) {
@@ -4450,8 +4431,7 @@ SV = (function() {
   _addReadingFlag = function(readingDetails, flag) {
     var scrollOffset, reading;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
+                    document.getElementById('scroller').scrollTop];
     _addToUndoStack(CL.data);
     //now add the flag and set to true
 		reading = CL.data[readingDetails[1]][readingDetails[0]].readings[readingDetails[2]];
@@ -4474,8 +4454,7 @@ SV = (function() {
   _removeReadingFlag = function(readingDetails) {
     var scrollOffset;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
+                    document.getElementById('scroller').scrollTop];
     _addToUndoStack(CL.data);
     delete CL.data[readingDetails[1]][readingDetails[0]].readings[readingDetails[2]].overlap_status;
     unsplitUnitWitnesses(readingDetails[0], readingDetails[1]);
@@ -4884,8 +4863,7 @@ SV = (function() {
   _markReading = function(value, reading) {
     var scrollOffset;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
+                    document.getElementById('scroller').scrollTop];
     CL.markReading(value, reading);
     showSetVariantsData();
     document.getElementById('scroller').scrollLeft = scrollOffset[0];
@@ -4911,8 +4889,7 @@ SV = (function() {
     var eventList, scrollOffset;
     if (SV.undoStack.length > 0) {
       scrollOffset = [document.getElementById('scroller').scrollLeft,
-        document.getElementById('scroller').scrollTop
-      ];
+                      document.getElementById('scroller').scrollTop];
       eventList = CL.data.event_list;
       CL.data = JSON.parse(SV.undoStack.pop());
       CL.data.event_list = eventList;
@@ -5181,8 +5158,7 @@ SV = (function() {
 	_mergeOverlaps = function(units, rd) {
 		var i, j, k, unit1, unit2, text_string, target, counter, errorMess, scrollOffset;
 		scrollOffset = [document.getElementById('scroller').scrollLeft,
-			document.getElementById('scroller').scrollTop
-		];
+			              document.getElementById('scroller').scrollTop];
 		unit1 = CL.data[units[0][1]][units[0][0]];
 		unit2 = CL.data[units[1][1]][units[1][0]];
 		_addToUndoStack(CL.data);

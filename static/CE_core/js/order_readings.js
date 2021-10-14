@@ -1415,13 +1415,20 @@ OR = (function() {
         spinner.removeLoadingOverlay();
       });
     } else {
-      var url;
+      var url, settings;
+      settings = JSON.parse(CL.getExporterSettings());
+      if (!settings.hasOwnProperty('options')) {
+        settings.options = {};
+      }
+      settings.options.rule_classes = CL.ruleClasses;
       spinner.showLoadingOverlay();
       url = CL.services.apparatusServiceUrl;
       $.fileDownload(url, {
         httpMethod: 'POST',
         data: {
-          settings: CL.getExporterSettings(),
+          // TODO DEBUG: remove this line when done testing
+          csrfmiddlewaretoken: api.getCSRFToken(),
+          settings: JSON.stringify(settings),
           data: JSON.stringify([{'context': CL.context, 'structure': CL.data}])
         },
         successCallback: function() {

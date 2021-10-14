@@ -15,7 +15,8 @@ class Exporter(object):
                  overlap_status_to_ignore=['overlapped', 'deleted'],
                  consolidate_om_verse=True,
                  consolidate_lac_verse=True,
-                 include_lemma_when_no_variants=False):
+                 include_lemma_when_no_variants=False,
+                 rule_classes={}):
 
         self.format = format
         self.include_punctuation = include_punctuation
@@ -28,6 +29,7 @@ class Exporter(object):
         self.consolidate_om_verse = consolidate_om_verse
         self.consolidate_lac_verse = consolidate_lac_verse
         self.include_lemma_when_no_variants = include_lemma_when_no_variants
+        self.rule_classes = rule_classes
 
     def export_data(self, data):
         output = []
@@ -82,8 +84,8 @@ class Exporter(object):
         text = self.get_text(reading, type)
         if type:
             rdg.set('type', type)
-            if subtype:
-                rdg.set('cause', subtype)
+        if subtype:
+            rdg.set('cause', subtype)
         elif len(text) > 1:
             rdg.set('type', text[1])
         rdg.text = text[0]
@@ -108,7 +110,6 @@ class Exporter(object):
             lem = etree.Element('lem')
             lem.set('wit', overtext['id'])
             text = self.get_lemma_text(overtext, int(start), int(end))
-            print(text)
             lem.text = text[0]
             if len(text) > 1:
                 lem.set('type', text[1])
@@ -126,7 +127,10 @@ class Exporter(object):
                             wits = []
                         if len(wits) > 0:
                             readings = True
-                        app.append(self.make_reading(reading, i, reading['label'], wits))
+                        subtype = None
+                        if 'reading_classes' in reading:
+                            subtype = ' '.join(reading['reading_classes'])
+                        app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
                     if 'subreadings' in reading:
                         for key in reading['subreadings']:
                             for subreading in reading['subreadings'][key]:
@@ -144,7 +148,10 @@ class Exporter(object):
                                  or reading['overlap_status'] not in self.overlap_status_to_ignore)):
                         if len(wits) > 0:
                             readings = True
-                        app.append(self.make_reading(reading, i, reading['label'], wits))
+                        subtype = None
+                        if 'reading_classes' in reading:
+                            subtype = ' '.join(reading['reading_classes'])
+                        app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
                     if 'subreadings' in reading:
                         for key in reading['subreadings']:
                             for subreading in reading['subreadings'][key]:

@@ -1556,14 +1556,15 @@ CL = (function() {
   };
 
   getExporterSettings = function() {
-    if (CL.project.hasOwnProperty('exporterSettings')) {
-      return JSON.stringify(CL.project.exporterSettings);
-    }
-    if (CL.services.hasOwnProperty('exporterSettings')) {
-      return JSON.stringify(CL.services.exporterSettings);
-    }
+    //TODO DEBUG uncomment
+    // if (CL.project.hasOwnProperty('exporterSettings')) {
+    //   return JSON.stringify(CL.project.exporterSettings);
+    // }
+    // if (CL.services.hasOwnProperty('exporterSettings')) {
+    //   return JSON.stringify(CL.services.exporterSettings);
+    // }
     // exporter factory has its own defaults so no need to have any here
-    return;
+    return '{}';
   };
 
   saveCollation = function(status, successCallback) {

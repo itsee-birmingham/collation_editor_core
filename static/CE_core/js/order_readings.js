@@ -485,7 +485,6 @@ OR = (function() {
     }
   };
 
-  // DEBUG this does not allow overlap units to have standoff subreadings
   // Need to work this out from the top line references to the overlap units as we can't actually rely on the start
   // and end values in the overlaps
   mergeSharedExtentOverlaps = function() {
@@ -1426,8 +1425,6 @@ OR = (function() {
       $.fileDownload(url, {
         httpMethod: 'POST',
         data: {
-          // TODO DEBUG: remove this line when done testing
-          csrfmiddlewaretoken: api.getCSRFToken(),
           settings: JSON.stringify(settings),
           data: JSON.stringify([{'context': CL.context, 'structure': CL.data}])
         },

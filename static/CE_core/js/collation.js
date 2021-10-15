@@ -1556,13 +1556,12 @@ CL = (function() {
   };
 
   getExporterSettings = function() {
-    //TODO DEBUG uncomment
-    // if (CL.project.hasOwnProperty('exporterSettings')) {
-    //   return JSON.stringify(CL.project.exporterSettings);
-    // }
-    // if (CL.services.hasOwnProperty('exporterSettings')) {
-    //   return JSON.stringify(CL.services.exporterSettings);
-    // }
+    if (CL.project.hasOwnProperty('exporterSettings')) {
+      return JSON.stringify(CL.project.exporterSettings);
+    }
+    if (CL.services.hasOwnProperty('exporterSettings')) {
+      return JSON.stringify(CL.services.exporterSettings);
+    }
     // exporter factory has its own defaults so no need to have any here
     return '{}';
   };

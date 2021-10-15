@@ -78,10 +78,32 @@ class Exporter(object):
                 witnesses.remove(miss)
         return witnesses
 
+    def get_label(self, label, subtype):
+        if subtype is None:
+            return label
+        for entry in self.rule_classes:
+            if entry['value'] == subtype:
+                if entry['suffixed_label'] is True:
+                    return '{}{}'.format(label, entry['identifier'])
+                break
+        return label
+
+    def check_for_suffixed_reading_marker(self, text, subtype):
+        if subtype is None:
+            return text
+        for entry in self.rule_classes:
+            if entry['value'] == subtype:
+                if entry['suffixed_reading'] is True:
+                    text[0] = '{} ({})'.format(text[0], entry['identifier'])
+                    return text
+                break
+        return text
+
     def make_reading(self, reading, i, label, witnesses, type=None, subtype=None):
         rdg = etree.Element('rdg')
-        rdg.set('n', label)
+        rdg.set('n', self.get_label(label, subtype))
         text = self.get_text(reading, type)
+        text = self.check_for_suffixed_reading_marker(text, subtype)
         if type:
             rdg.set('type', type)
         if subtype:

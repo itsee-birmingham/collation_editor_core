@@ -1723,12 +1723,13 @@ CL = (function() {
       witnessHtml.push('<label class="inline-label">Parent reading:</label><select name="parent_reading" id="parent_reading"></select><br/><br/>');
       witnessHtml.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading_details"/><br/></br/>');
       subTypes = getRuleClasses('subreading', true, 'value', 'identifier');
-      if (Object.keys(subTypes).length > 1) {
-        witnessHtml.push('<label>Subreading type: <select class="stringnotnull" name="subreading_type" id="subreading_select"></select></label><br/><br/>');
-      } else {
-        id = error_types[Object.keys(subTypes)];
-        witnessHtml.push('<input type="hidden" id="subreading_type" name="subreading_type" value="' + id + '"/>');
-      }
+      // console.log(subTypes)
+      // if (Object.keys(subTypes).length > 1) {
+      witnessHtml.push('<label>Subreading type: <select class="stringnotnull" name="subreading_type" id="subreading_select"></select></label><br/><br/>');
+      // } else {
+      //   id = error_types[Object.keys(subTypes)];
+      //   witnessHtml.push('<input type="hidden" id="subreading_type" name="subreading_type" value="' + id + '"/>');
+      // }
     } else if (details.type !== 'duplicate') {
       witnessHtml.push('<label class="inline-label">Parent reading:</label><select name="parent_reading" id="parent_reading"></select><br/>');
       witnessHtml.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading_details"/><br/></br/>');

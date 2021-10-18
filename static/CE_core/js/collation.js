@@ -1821,8 +1821,14 @@ CL = (function() {
     if (document.getElementById('subreading_select')) {
       subreadingClasses = [];
       for (let i = 0; i < CL.ruleClasses.length; i += 1) {
-        if (CL.ruleClasses[i].create_in_SV === true && CL.ruleClasses[i].keep_as_main_reading === false) {//CL.ruleClasses[i].subreading === true) {
-          subreadingClasses.push(CL.ruleClasses[i]);
+        if (format === 'set_variants') {
+          if (CL.ruleClasses[i].create_in_SV === true && CL.ruleClasses[i].keep_as_main_reading === false) {
+            subreadingClasses.push(CL.ruleClasses[i]);
+          }
+        } else if (format === 'order_readings') {
+          if (CL.ruleClasses[i].create_in_OR === true && CL.ruleClasses[i].keep_as_main_reading === false) {
+            subreadingClasses.push(CL.ruleClasses[i]);
+          }
         }
       }
       cforms.populateSelect(subreadingClasses, document.getElementById('subreading_select'),

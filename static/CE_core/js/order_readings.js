@@ -252,11 +252,8 @@ OR = (function() {
     if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
       footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
     }
-    // This button breaks the export in a very specific circumstance where a main reading has been created to
-    // allow a regularisation. It should not be available until a fix for show/hide subreadings once sigla suffixes
-    // has been extracted has been released
-    // footerHtml.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">' +
-    //                 showHideSubreadingsButtonText + '</button>');
+    footerHtml.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">' +
+                    showHideSubreadingsButtonText + '</button>');
     footerHtml.push('<span id="extra_buttons"></span>');
     footerHtml.push('<span id="stage_links"></span>');
     if (CL.project.showGetApparatusButton === true) {
@@ -1788,10 +1785,12 @@ OR = (function() {
                 // this pass through. Somehow this still works!
                 if (reading) {
                   if (matchedReadings[unit._id][j].hasOwnProperty('subreadings')) {
-                    CL.makeStandoffReading('none', {'app_id': key,
-                                                    'unit_id': unit._id,
-                                                    'unit_pos': i,
-                                                    'reading_id': matchedReadings[unit._id][j].reading_id}, parentId);
+                    CL.makeStandoffReading('none',
+                                           {'app_id': key,
+                                            'unit_id': unit._id,
+                                            'unit_pos': i,
+                                            'reading_id': matchedReadings[unit._id][j].reading_id},
+                                            parentId, undefined, true);
                   } else {
                     CL.doMakeStandoffReading('none', key, unit, reading, newParent);
                   }

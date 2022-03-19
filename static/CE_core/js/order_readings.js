@@ -1458,7 +1458,7 @@ OR = (function() {
         spinner.removeLoadingOverlay();
       });
     } else {
-      var url, settings, data;
+      var url, settings, callback;
       settings = JSON.parse(CL.getExporterSettings());
       if (!settings.hasOwnProperty('options')) {
         settings.options = {};
@@ -1466,23 +1466,40 @@ OR = (function() {
       settings.options.rule_classes = CL.ruleClasses;
       spinner.showLoadingOverlay();
       url = CL.services.apparatusServiceUrl;
-      data = {settings: JSON.stringify(settings),
-              data: JSON.stringify([{'context': CL.context, 'structure': CL.data}])
-              };
-      $.post(url, data).then(function (response) {
-          var blob, filename, downloadUrl, hiddenLink;
-          blob = new Blob([response], {'type': 'text/txt'});
-          filename = CL.context + '_apparatus.txt';
-          downloadUrl = window.URL.createObjectURL(blob);
-          hiddenLink = document.createElement('a');
-          hiddenLink.style.display = 'none';
-          hiddenLink.href = downloadUrl;
-          hiddenLink.download = filename;
-          document.body.appendChild(hiddenLink);
-          hiddenLink.click();
-          window.URL.revokeObjectURL(downloadUrl);
-          spinner.removeLoadingOverlay();
-      });
+      callback = function(collations) {
+          var collationId, innerCallback;
+          for (let i=0; i<collations.length; i+=1) {
+              if (collations[i].status === 'approved') {
+                  collationId = collations[i].id;
+              }
+          }
+          innerCallback = function (collation) {
+              var data;
+              data = {settings: JSON.stringify(settings),
+                      data: JSON.stringify([{'context': CL.context, 'structure': collation.structure}])
+                      };
+              $.post(url, data).then(function (response) {
+                  var blob, filename, downloadUrl, hiddenLink;
+                  blob = new Blob([response], {'type': 'text/txt'});
+                  filename = CL.context + '_apparatus.txt';
+                  downloadUrl = window.URL.createObjectURL(blob);
+                  hiddenLink = document.createElement('a');
+                  hiddenLink.style.display = 'none';
+                  hiddenLink.href = downloadUrl;
+                  hiddenLink.download = filename;
+                  document.body.appendChild(hiddenLink);
+                  hiddenLink.click();
+                  window.URL.revokeObjectURL(downloadUrl);
+                  spinner.removeLoadingOverlay();
+              }).fail(function (response) {
+                  alert('This unit cannot be exported 2. First try reapproving the unit. If the problem persists please ' +
+                        'recollate the unit from the collation home page.');
+                  spinner.removeLoadingOverlay();
+              });
+          };
+          loadSavedCollation(collationId, innerCallback);
+      };
+      getSavedCollations(CL.context, undefined, callback);
     }
   };
 

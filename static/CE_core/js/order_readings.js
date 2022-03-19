@@ -252,8 +252,11 @@ OR = (function() {
     if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
       footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
     }
-    footerHtml.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">' +
-                    showHideSubreadingsButtonText + '</button>');
+    // This button breaks the export in a very specific circumstance where a main reading has been created to
+    // allow a regularisation. It should not be available until a fix for show/hide subreadings once sigla suffixes
+    // has been extracted has been released
+    // footerHtml.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">' +
+    //                 showHideSubreadingsButtonText + '</button>');
     footerHtml.push('<span id="extra_buttons"></span>');
     footerHtml.push('<span id="stage_links"></span>');
     if (CL.project.showGetApparatusButton === true) {
@@ -707,7 +710,7 @@ OR = (function() {
         // TODO: fosilise the reading suffixes and main reading label suffixes here
         // then make output dependent on these not being present
         _getMainReadingSpecialClasses();
-
+        // The following comment is no longer true as we do have that button in the approved screen!
         // at this point the saved approved version always and only ever has the correct subreadings shown we
         // don't have the option to show/hide subreadings in the interface so we can be sure they are always correct
         CL.saveCollation('approved', function() {
@@ -896,7 +899,7 @@ OR = (function() {
     labelForm.setAttribute('id', 'label_form');
     labelForm.setAttribute('class', 'label_form');
     html = [];
-    html.push('<div class="dialogue_form_header drag-zone">Edit Label</div>')
+    html.push('<div class="dialogue_form_header drag-zone">Edit Label</div>');
     html.push('<form id="label_change_form">');
     html.push('<label for="new_label">new label:<br/><input type="text" id="new_label"/></label><br/><br/>');
     html.push('<input class="pure-button dialogue-form-button" id="close_label_button" type="button" value="Cancel"/>');

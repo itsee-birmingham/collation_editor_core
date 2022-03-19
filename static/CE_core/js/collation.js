@@ -1569,14 +1569,14 @@ CL = (function() {
   saveCollation = function(status, successCallback) {
     var collation, confirmed, confirmMessage, successMessage, approvalSettings;
     spinner.showLoadingOverlay();
+    collation = {
+        'structure': JSON.parse(JSON.stringify(CL.data)),
+        'status': status,
+        'context': CL.context,
+    };
     CL.services.getUserInfo(function(user) {
       if (user) {
-        collation = {
-          'structure': CL.data,
-          'status': status,
-          'context': CL.context,
-          'user': user.id
-        };
+        collation.user = user.id;
         if (status === 'regularised' && CL.witnessAddingMode === true) {
           collation.data_settings = CL.savedDataSettings;
           collation.algorithm_settings = CL.savedAlgorithmSettings;
@@ -1612,6 +1612,8 @@ CL = (function() {
         CL.services.saveCollation(CL.context, collation, confirmMessage, approvalSettings[0],
                                   approvalSettings[1], function(savedSuccessful) {
           document.getElementById('message_panel').innerHTML = savedSuccessful ? successMessage : '';
+          // I don't know why this is needed - somewhere in the code show/hide subreadings must be called after suffixes have been added
+          CL.data = collation.structure;
           if (savedSuccessful) { //only run success callback if successful!
             CL.isDirty = false;
             if (typeof successCallback !== 'undefined') {

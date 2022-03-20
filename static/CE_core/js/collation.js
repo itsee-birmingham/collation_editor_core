@@ -1612,8 +1612,6 @@ CL = (function() {
         CL.services.saveCollation(CL.context, collation, confirmMessage, approvalSettings[0],
                                   approvalSettings[1], function(savedSuccessful) {
           document.getElementById('message_panel').innerHTML = savedSuccessful ? successMessage : '';
-          // I don't know why this is needed - somewhere in the code show/hide subreadings must be called after suffixes have been added
-          CL.data = collation.structure;
           if (savedSuccessful) { //only run success callback if successful!
             CL.isDirty = false;
             if (typeof successCallback !== 'undefined') {

@@ -1,2 +1,5 @@
 __pycache__/
 *.pyc
+
+# Sphinx docs
+docs/_build/

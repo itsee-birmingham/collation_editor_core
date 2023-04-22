@@ -21,13 +21,20 @@ Collation Editor Documentation
    Standalone Collation Editor <standalone-getting-started.rst>
    Collation Editor Core <core-getting-started.rst>
 
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Configuration:
+
+   services-file.rst
+   python-services.rst
 
 .. toctree::
    :maxdepth: 2
    :hidden:
    :caption: Preparing Your Own Data:
 
-   installation.rst
+   data-format.rst
 
 
 .. toctree::

@@ -2,7 +2,7 @@
 Getting Started: Collation Editor Core
 **************************************
 
-.. role:: python(code)
+.. role:: py(code)
    :language: python
 
 .. role:: js(code)

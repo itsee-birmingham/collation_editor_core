@@ -20,7 +20,7 @@ Installation and start up
     From here run the start up script `startup.sh`. This script should start both collateX and the server that runs 
     the collation editor.
 
-    If collate has started sucessfully you should be able to see it at:
+    If collate has started successfully you should be able to see it at:
     :code:`localhost:7369`
 
     If the script has been successful you should be able to see the collation editor when you visit:
@@ -33,7 +33,7 @@ Installation and start up
     From here run the start up script `startup.bat`. This script should start both collateX and the server that runs 
     the collation editor.
 
-    If collate has started sucessfully you should be able to see it at:
+    If collate has started successfully you should be able to see it at:
     :code:`localhost:7369`
 
     If the collation editor has started successfully you should be able to see the collation editor when you visit:

@@ -1,0 +1,14 @@
+Changelog
+collateX
+subreading
+subreadings
+css
+JQuery
+lacunose
+microservices
+boolean
+overtext
+siglum
+sigla
+nomena
+preprocessor

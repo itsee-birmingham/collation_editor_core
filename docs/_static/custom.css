@@ -1,0 +1,7 @@
+span.strikethrough {
+    text-decoration: line-through; 
+}
+
+span.superscript {
+    vertical-align: super;
+}

@@ -8,6 +8,7 @@ Services File
 .. role:: js(code)
    :language: JavaScript
 
+
 To connect the collation editor to your own database or platform a services file must be provided. Some variables and
 functions are required, others are optional and additional configuration can also be added. The first two types are
 described in this section and the configuration additions are explained in the configuration section.
@@ -58,7 +59,6 @@ Required Service File Variables
         };
 
     
-
 
 Required Service File Functions
 ===============================

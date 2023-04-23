@@ -63,9 +63,9 @@ Terminology
 For the purposes of this documentation the Documents/Works/Texts model will be used.
 (See D.C. Parker, *Textual Scholarship and the making of the New Testament* Oxford: OUP (2011), pp. 10-14,29)
 
-- **Document** - The physical artefact on which the text of a work is preserved
-- **Work** - The work which is distilled from the texts that exist of it
-- **Text** - The version or versions of a work preserved in document
+* **Document** - The physical artefact on which the text of a work is preserved
+* **Work** - The work which is distilled from the texts that exist of it
+* **Text** - The version or versions of a work preserved in document
 
 Acknowledgements
 ================
@@ -86,11 +86,9 @@ of sources and licenses are available in the headers of the relevant JavaScript 
 Citation
 ========
 
-To cite the collation editor core code please use the doi:   
-[![DOI](https://zenodo.org/badge/142011800.svg)](https://zenodo.org/badge/latestdoi/142011800)
+To cite the collation editor core code please use the doi: `142011800 <https://zenodo.org/badge/latestdoi/142011800>`_
 
-To cite the standalone collation editor please use the doi:
-[![DOI](https://zenodo.org/badge/142014378.svg)](https://zenodo.org/badge/latestdoi/142014378)
+To cite the standalone collation editor please use the doi: `142014378 <https://zenodo.org/badge/latestdoi/142014378>`_
 
 
 Indices and tables

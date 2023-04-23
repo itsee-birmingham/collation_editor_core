@@ -25,8 +25,12 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
-# html_theme_options = {'collapse_navigation': False,
-#                       'navigation_depth': -1}
+html_theme_options = {'collapse_navigation': True,
+                      'navigation_depth': -1}
+
+html_css_files = [
+    'custom.css',
+]
 
 spelling_lang = 'en_GB'
 

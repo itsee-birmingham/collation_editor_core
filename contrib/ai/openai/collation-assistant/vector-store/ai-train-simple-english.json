@@ -1,0 +1,1068 @@
+{
+    "input": {
+        "witnesses": [
+            {
+                "tokens": [
+                    {
+                        "original": "This",
+                        "t": "This",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "2",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "This"
+                        ]
+                    },
+                    {
+                        "original": "is",
+                        "t": "is",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "4",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "is"
+                        ]
+                    },
+                    {
+                        "original": "an",
+                        "t": "an",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "6",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "an"
+                        ]
+                    },
+                    {
+                        "original": "long",
+                        "t": "long",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "8",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "long"
+                        ]
+                    },
+                    {
+                        "original": "example",
+                        "t": "example",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "10",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "example"
+                        ]
+                    },
+                    {
+                        "original": "for",
+                        "t": "for",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "12",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "for"
+                        ]
+                    },
+                    {
+                        "original": "how",
+                        "t": "how",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "14",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "how"
+                        ]
+                    },
+                    {
+                        "original": "to",
+                        "t": "to",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "16",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "to"
+                        ]
+                    },
+                    {
+                        "original": "collate",
+                        "t": "collate",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "18",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "collate"
+                        ]
+                    },
+                    {
+                        "original": "correctly",
+                        "t": "correctly",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "20",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "correctly"
+                        ]
+                    }
+                ],
+                "id": "HBCE Psalms (critical text)"
+            },
+            {
+                "tokens": [
+                    {
+                        "original": "This",
+                        "t": "This",
+                        "siglum": "AITrain1",
+                        "index": "2",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "This"
+                        ]
+                    },
+                    {
+                        "original": "is",
+                        "t": "is",
+                        "siglum": "AITrain1",
+                        "index": "4",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "is"
+                        ]
+                    },
+                    {
+                        "original": "a",
+                        "t": "a",
+                        "siglum": "AITrain1",
+                        "index": "6",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "a"
+                        ]
+                    },
+                    {
+                        "original": "long",
+                        "t": "long",
+                        "siglum": "AITrain1",
+                        "index": "8",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "long"
+                        ]
+                    },
+                    {
+                        "original": "example",
+                        "t": "example",
+                        "siglum": "AITrain1",
+                        "index": "10",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "example"
+                        ]
+                    },
+                    {
+                        "original": "of",
+                        "t": "of",
+                        "siglum": "AITrain1",
+                        "index": "12",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "of"
+                        ]
+                    },
+                    {
+                        "original": "how",
+                        "t": "how",
+                        "siglum": "AITrain1",
+                        "index": "14",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "how"
+                        ]
+                    },
+                    {
+                        "original": "to",
+                        "t": "to",
+                        "siglum": "AITrain1",
+                        "index": "16",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "to"
+                        ]
+                    },
+                    {
+                        "original": "collate",
+                        "t": "collate",
+                        "siglum": "AITrain1",
+                        "index": "18",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "collate"
+                        ]
+                    },
+                    {
+                        "original": "correctly",
+                        "t": "correctly",
+                        "siglum": "AITrain1",
+                        "index": "20",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "correctly"
+                        ]
+                    }
+                ],
+                "id": "AITrain1"
+            },
+            {
+                "tokens": [
+                    {
+                        "original": "This",
+                        "t": "This",
+                        "siglum": "AITrain2",
+                        "index": "2",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "This"
+                        ]
+                    },
+                    {
+                        "original": "is",
+                        "t": "is",
+                        "siglum": "AITrain2",
+                        "index": "4",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "is"
+                        ]
+                    },
+                    {
+                        "original": "a",
+                        "t": "a",
+                        "siglum": "AITrain2",
+                        "index": "6",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "a"
+                        ]
+                    },
+                    {
+                        "original": "long",
+                        "t": "long",
+                        "siglum": "AITrain2",
+                        "index": "8",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "long"
+                        ]
+                    },
+                    {
+                        "original": "example",
+                        "t": "example",
+                        "siglum": "AITrain2",
+                        "index": "10",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "example"
+                        ]
+                    },
+                    {
+                        "original": "how",
+                        "t": "how",
+                        "siglum": "AITrain2",
+                        "index": "12",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "how"
+                        ]
+                    },
+                    {
+                        "original": "to",
+                        "t": "to",
+                        "siglum": "AITrain2",
+                        "index": "14",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "to"
+                        ]
+                    },
+                    {
+                        "original": "collage",
+                        "t": "collage",
+                        "siglum": "AITrain2",
+                        "index": "16",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "collage"
+                        ]
+                    },
+                    {
+                        "original": "correctly",
+                        "t": "correctly",
+                        "siglum": "AITrain2",
+                        "index": "18",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "correctly"
+                        ]
+                    }
+                ],
+                "id": "AITrain2"
+            },
+            {
+                "tokens": [
+                    {
+                        "original": "This",
+                        "t": "This",
+                        "siglum": "AITrain3",
+                        "index": "2",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "This"
+                        ]
+                    },
+                    {
+                        "original": "is",
+                        "t": "is",
+                        "siglum": "AITrain3",
+                        "index": "4",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "is"
+                        ]
+                    },
+                    {
+                        "original": "a",
+                        "t": "a",
+                        "siglum": "AITrain3",
+                        "index": "6",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "a"
+                        ]
+                    },
+                    {
+                        "original": "very",
+                        "t": "very",
+                        "siglum": "AITrain3",
+                        "index": "8",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "very"
+                        ]
+                    },
+                    {
+                        "original": "very",
+                        "t": "very",
+                        "siglum": "AITrain3",
+                        "index": "10",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "very"
+                        ]
+                    },
+                    {
+                        "original": "long",
+                        "t": "long",
+                        "siglum": "AITrain3",
+                        "index": "12",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "long"
+                        ]
+                    },
+                    {
+                        "original": "example",
+                        "t": "example",
+                        "siglum": "AITrain3",
+                        "index": "14",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "example"
+                        ]
+                    },
+                    {
+                        "original": "of",
+                        "t": "of",
+                        "siglum": "AITrain3",
+                        "index": "16",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "of"
+                        ]
+                    },
+                    {
+                        "original": "how",
+                        "t": "how",
+                        "siglum": "AITrain3",
+                        "index": "18",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "how"
+                        ]
+                    },
+                    {
+                        "original": "to",
+                        "t": "to",
+                        "siglum": "AITrain3",
+                        "index": "20",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "to"
+                        ]
+                    },
+                    {
+                        "original": "collate",
+                        "t": "collate",
+                        "siglum": "AITrain3",
+                        "index": "22",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "collate"
+                        ]
+                    },
+                    {
+                        "original": "many",
+                        "t": "many",
+                        "siglum": "AITrain3",
+                        "index": "24",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "many"
+                        ]
+                    },
+                    {
+                        "original": "words",
+                        "t": "words",
+                        "siglum": "AITrain3",
+                        "index": "26",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "words"
+                        ]
+                    },
+                    {
+                        "original": "correctly",
+                        "t": "correctly",
+                        "siglum": "AITrain3",
+                        "index": "28",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "correctly"
+                        ]
+                    }
+                ],
+                "id": "AITrain3"
+            }
+        ]
+    },
+    "basetext_siglum": "HBCE Psalms (critical text)",
+    "ai_comments": "",
+    "output": {
+        "witnesses": [
+            "AITrain1",
+            "AITrain2",
+            "AITrain3",
+            "HBCE Psalms (critical text)"
+        ],
+        "table": [
+            [
+                [
+                    {
+                        "original": "This",
+                        "t": "This",
+                        "siglum": "AITrain1",
+                        "index": "2",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "This"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "This",
+                        "t": "This",
+                        "siglum": "AITrain2",
+                        "index": "2",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "This"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "This",
+                        "t": "This",
+                        "siglum": "AITrain3",
+                        "index": "2",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "This"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "This",
+                        "t": "This",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "2",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "This"
+                        ]
+                    }
+                ]
+            ],
+            [
+                [
+                    {
+                        "original": "is",
+                        "t": "is",
+                        "siglum": "AITrain1",
+                        "index": "4",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "is"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "is",
+                        "t": "is",
+                        "siglum": "AITrain2",
+                        "index": "4",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "is"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "is",
+                        "t": "is",
+                        "siglum": "AITrain3",
+                        "index": "4",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "is"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "is",
+                        "t": "is",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "4",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "is"
+                        ]
+                    }
+                ]
+            ],
+            [
+                [
+                    {
+                        "original": "a",
+                        "t": "a",
+                        "siglum": "AITrain1",
+                        "index": "6",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "a"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "a",
+                        "t": "a",
+                        "siglum": "AITrain2",
+                        "index": "6",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "a"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "a",
+                        "t": "a",
+                        "siglum": "AITrain3",
+                        "index": "6",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "a"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "an",
+                        "t": "an",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "6",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "an"
+                        ]
+                    }
+                ]
+            ],
+            [
+                [],
+                [],
+                [
+                    {
+                        "original": "very",
+                        "t": "very",
+                        "siglum": "AITrain3",
+                        "index": "8",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "very"
+                        ]
+                    },
+                    {
+                        "original": "very",
+                        "t": "very",
+                        "siglum": "AITrain3",
+                        "index": "10",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "very"
+                        ]
+                    }
+                ],
+                []
+            ],
+            [
+                [
+                    {
+                        "original": "long",
+                        "t": "long",
+                        "siglum": "AITrain1",
+                        "index": "8",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "long"
+                        ]
+                    },
+                    {
+                        "original": "example",
+                        "t": "example",
+                        "siglum": "AITrain1",
+                        "index": "10",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "example"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "long",
+                        "t": "long",
+                        "siglum": "AITrain2",
+                        "index": "8",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "long"
+                        ]
+                    },
+                    {
+                        "original": "example",
+                        "t": "example",
+                        "siglum": "AITrain2",
+                        "index": "10",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "example"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "long",
+                        "t": "long",
+                        "siglum": "AITrain3",
+                        "index": "12",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "long"
+                        ]
+                    },
+                    {
+                        "original": "example",
+                        "t": "example",
+                        "siglum": "AITrain3",
+                        "index": "14",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "example"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "long",
+                        "t": "long",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "8",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "long"
+                        ]
+                    },
+                    {
+                        "original": "example",
+                        "t": "example",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "10",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "example"
+                        ]
+                    }
+                ]
+            ],
+            [
+                [
+                    {
+                        "original": "of",
+                        "t": "of",
+                        "siglum": "AITrain1",
+                        "index": "12",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "of"
+                        ]
+                    }
+                ],
+                [],
+                [
+                    {
+                        "original": "of",
+                        "t": "of",
+                        "siglum": "AITrain3",
+                        "index": "16",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "of"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "for",
+                        "t": "for",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "12",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "for"
+                        ]
+                    }
+                ]
+            ],
+            [
+                [
+                    {
+                        "original": "how",
+                        "t": "how",
+                        "siglum": "AITrain1",
+                        "index": "14",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "how"
+                        ]
+                    },
+                    {
+                        "original": "to",
+                        "t": "to",
+                        "siglum": "AITrain1",
+                        "index": "16",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "to"
+                        ]
+                    },
+                    {
+                        "original": "collate",
+                        "t": "collate",
+                        "siglum": "AITrain1",
+                        "index": "18",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "collate"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "how",
+                        "t": "how",
+                        "siglum": "AITrain2",
+                        "index": "12",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "how"
+                        ]
+                    },
+                    {
+                        "original": "to",
+                        "t": "to",
+                        "siglum": "AITrain2",
+                        "index": "14",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "to"
+                        ]
+                    },
+                    {
+                        "original": "collage",
+                        "t": "collage",
+                        "siglum": "AITrain2",
+                        "index": "16",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "collage"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "how",
+                        "t": "how",
+                        "siglum": "AITrain3",
+                        "index": "18",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "how"
+                        ]
+                    },
+                    {
+                        "original": "to",
+                        "t": "to",
+                        "siglum": "AITrain3",
+                        "index": "20",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "to"
+                        ]
+                    },
+                    {
+                        "original": "collate",
+                        "t": "collate",
+                        "siglum": "AITrain3",
+                        "index": "22",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "collate"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "how",
+                        "t": "how",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "14",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "how"
+                        ]
+                    },
+                    {
+                        "original": "to",
+                        "t": "to",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "16",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "to"
+                        ]
+                    },
+                    {
+                        "original": "collate",
+                        "t": "collate",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "18",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "collate"
+                        ]
+                    }
+                ]
+            ],
+            [
+                [],
+                [],
+                [
+                    {
+                        "original": "many",
+                        "t": "many",
+                        "siglum": "AITrain3",
+                        "index": "24",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "many"
+                        ]
+                    },
+                    {
+                        "original": "words",
+                        "t": "words",
+                        "siglum": "AITrain3",
+                        "index": "26",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "words"
+                        ]
+                    }
+                ],
+                []
+            ],
+            [
+                [
+                    {
+                        "original": "correctly",
+                        "t": "correctly",
+                        "siglum": "AITrain1",
+                        "index": "20",
+                        "reading": "AITrain1",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "correctly"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "correctly",
+                        "t": "correctly",
+                        "siglum": "AITrain2",
+                        "index": "18",
+                        "reading": "AITrain2",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "correctly"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "correctly",
+                        "t": "correctly",
+                        "siglum": "AITrain3",
+                        "index": "28",
+                        "reading": "AITrain3",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "correctly"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "original": "correctly",
+                        "t": "correctly",
+                        "siglum": "HBCE Psalms (critical text)",
+                        "index": "20",
+                        "reading": "HBCE Psalms (critical text)",
+                        "verse": "Bel.1.1",
+                        "rule_match": [
+                            "correctly"
+                        ]
+                    }
+                ]
+            ]
+        ],
+        "ai_comments": ""
+    }
+}

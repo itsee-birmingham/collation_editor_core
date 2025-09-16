@@ -49,6 +49,6 @@ jobs:
           node-version: '22'
       - name: Install dependencies and lint
         run: |
-          npm i eslint 
-          npm i @stylistic/eslint-plugin
+          npm i stylelint-config-standard
+          npm i @stylistic/stylelint-plugin
           node_modules/stylelint/bin/stylelint.mjs static/CE_core/css/*.css

@@ -1,5 +1,6 @@
 import re
 import xml.etree.ElementTree as etree
+
 from .restructure_export_data_mixin import RestructureExportDataMixin
 
 
@@ -13,27 +14,29 @@ class Exporter(RestructureExportDataMixin, object):
     restructures the data from collation data into a simpler stripped down format to use for exporting and also
     backfills some data which may be missing in collations produced in the early versions of the collation editor.
 
-    Args:
-        format (str, optional): The output format requires. options are [negative_xml|positive_xml].
-            Defaults to positive_xml.
-        include_punctuation (bool, optional): Indicates whether or not to include punctuation in the lemma.
-            Defaults to False.
-        ignore_basetext (bool, optional): Indicates whether or not to report the base text as a witness.
+    Attributes:
+        format (str, optional): The output format required. options are [negative_xml|positive_xml]. Defaults to
+            positive_xml.
+        include_punctuation (bool, optional): Indicates whether or not to include punctuation in the lemma. Defaults
+            to False.
+        ignore_basetext (bool, optional): Indicates whether or not to report the base text as a witness. Defaults
+            to False.
         overlap_status_to_ignore (list, optional): A list of strings representing the overlap status categories
-            that should be ignored in the export. Defaults to ['overlapped','deleted'].
+            that should be ignored in the export. Defaults to ['overlapped', 'deleted'].
         consolidate_om_verse (bool, optional): Indicates whether or not witnesses omitted in the entire collation
             unit are listed once at the start of the apparatus or indicated in each variant unit. Defaults to True.
         consolidate_lac_verse (bool, optional): Indicates whether or not witnesses which are lac for the entire
-            collation unit are listed once at the start of the apparatus or indicated in each variant unit.
-            Defaults to True.
+            collation unit are listed once at the start of the apparatus or indicated in each variant unit. Defaults
+            to True.
         include_lemma_when_no_variants (bool, optional): Indicates whether or not to include the lemma in the export
             if it has no variant readings. Defaults to False.
         exclude_lemma_entry (bool, optional): Indicates if the lemma entry in the apparatus should be excluded. If the
             setting is True the apparatus will not have a <lem> tag for each entry. Defaults to False.
-        rule_classes (dict, optional): This is the dictionary representing the rule classes used in the current
-            editing project. Defaults to {}. Only needed for older data.
-        witness_decorators (list, optional): This is a list of JSON objects which define any decorators and the list of
-            witnesses to be decorated, this will always be set at project level. Defaults to [].
+        rule_classes (dict, optional): The dictionary representing the rule classes used in the current editing project.
+            Only needed for older data. Defaults to {}.
+        witness_decorators (list, optional): A list of JSON objects which define any decorators and the list of
+            witnesses to be decorated, this will always be set at the project level. Defaults to [].
+
     """
 
     def __init__(self,
@@ -48,7 +51,6 @@ class Exporter(RestructureExportDataMixin, object):
                  rule_classes={},
                  witness_decorators=[],
                  ):
-
         self.format = format
         self.include_punctuation = include_punctuation
         if 'negative' in self.format:
@@ -313,13 +315,16 @@ class Exporter(RestructureExportDataMixin, object):
         return ''.join(new_label)
 
     def get_required_end(self, unit, context):
-        """This is a function which is not important when working on a single unit where the end value is taken
-        directly from the unit. It is a separate function so inheriting classes, which may be joining readings
-        over multiple units, can overwrite it to provide the end value required.
+        """Get the location where this unit ends.
+
+        This is a function which is not important when working on a single unit as the end value is taken directly
+        from the single unit. It is a separate function so inheriting classes, which may be joining readings
+        over multiple units, can overwrite it to provide the end value required for those joined cases where it will not
+        be in the same unit.
 
         Args:
             unit (dict): The current apparatus unit being processed.
-            context (str): The context of this collation unit (used in inheriting classes to recognise joined readings)
+            context (str): The context of this collation unit (used in inheriting classes to recognise joined readings).
 
         Returns:
             str: The string to use for the end value in the apparatus <app> tag.
@@ -327,7 +332,15 @@ class Exporter(RestructureExportDataMixin, object):
         return unit['end']
 
     def get_subreading_label(self, parent_label, subreading):
-        """Work out the subreading label and return it as a string."""
+        """Work out the subreading label and return it as a string.
+
+        Args:
+            parent_label (str): The label of the parent reading for this subreading.
+            subreading (dict): The dictionary representing the subreading.
+
+        Returns:
+            str: The label for the subreading.
+        """
         label = [parent_label]
         if 'suffix' in subreading:
             label.append(self.fix_subreading_suffix(subreading['suffix']))
@@ -336,14 +349,14 @@ class Exporter(RestructureExportDataMixin, object):
         return ''.join(label)
 
     def get_app_units(self, apparatus, overtext, context, missing):
-        """Function to take the JSON apparatus and turn it into a list of ElementTree.Elements with each entry
-        representing one variant unit in TEI XML.
+        """Turn the JSON apparatus into a list of ElementTree.Elements.
+
+        Each entry in the list represents one variant unit in TEI XML.
 
         Args:
             apparatus (dict): The JSON segment representing the apparatus for this unit.
             overtext (dict): The JSON segment representing the overtext for this unit. The data should be wrapped in a
-                             dictionary as the value to the key 'current'
-                             eg. {'current': [{'id': 'basetext', 'tokens': []}]}
+                dictionary as the value to the key 'current' eg. {'current': [{'id': 'basetext', 'tokens': []}]}
             context (str): The reference for this apparatus unit context.
             missing (list): The list of witnesses to exclude from this apparatus.
 
@@ -415,9 +428,29 @@ class Exporter(RestructureExportDataMixin, object):
         return app_list
 
     def get_overtext_data(self, entry):
+        """Get the overtext data in a specfic format.
+
+        The format required for the overtext is in expectation of exporters which inherit this exporter and which
+        implement joins across collation unit boundaries. In these cases the overtext need to be concatenated from all
+        of the joined units.
+
+        Args:
+            entry (dict): The entry for this collation unit.
+
+        Returns:
+            dict: The overtext in a specific form required by the exporter.
+        """
         return {'current': entry['structure']['overtext']}
 
     def sort_units(self, unit):
+        """Sort function to sort units by start value in reverse order of end value (used as sort key).
+
+        Args:
+            unit (dict): The dictionary representing a collation unit
+
+        Returns:
+            tuple: The indexes data to sort by.
+        """
         return (unit['start'], -unit['end'])
 
     def get_unit_xml(self, entry):

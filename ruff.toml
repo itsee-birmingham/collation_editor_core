@@ -1,0 +1,33 @@
+line-length = 120
+exclude = [
+    
+]
+
+
+[format]
+quote-style = "preserve"
+
+
+[lint]
+select = [
+    # Pyflakes
+    "F",
+    # pycodestyle errors
+    "E",
+    # pycodestyle warnings
+    "W",
+    # isort
+    "I",
+    # pydocstyle
+    "D",
+]
+
+ignore = [
+    "D100",  # Missing docstring in public module
+    "D104",  # Missing docstring in public package
+    "D107",  # Missing docstring in __init__
+]
+
+
+[lint.pydocstyle]
+convention = "google"

@@ -1,9 +1,15 @@
-# -*- coding: utf-8 -*-
-import sys
 import importlib
+import sys
 
 
 class Regulariser(object):
+    """Apply regularisation rules.
+
+    Attributes:
+        rule_conditions_config (_type_): _description_
+        local_python_functions (_type_): _description_
+
+    """
 
     def __init__(self, rule_conditions_config, local_python_functions):
         self.rule_conditions_config = rule_conditions_config
@@ -17,6 +23,15 @@ class Regulariser(object):
             self.local_python_functions = None
 
     def match_tokens(self, token, decision):
+        """_summary_
+
+        Args:
+            token (_type_): _description_
+            decision (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         if '_id' in decision:
             print('deprecated - use \'id\' for rules not \'_id\'', file=sys.stderr)
             decision['id'] = decision['_id']
@@ -47,7 +62,15 @@ class Regulariser(object):
         return (False, None, None, None, None, None, None)
 
     def regularise_token(self, token, decisions):
-        """Check the token against the rules."""
+        """Check the token against the rules.
+
+        Args:
+            token (dict): The token to be regualised.
+            decisions (list): _description_
+
+        Returns:
+           tuple: _description_
+        """
         decision_matches = []
         for decision in decisions:
             if '_id' in decision:
@@ -66,8 +89,9 @@ class Regulariser(object):
         # TODO: perhaps always better to do created time otherwise adding exception
         # to a global rule will change the order for all verses
         if len(decision_matches) > 1:
-            decision_matches.sort(key=lambda x: x['_meta']['_last_modified_time']
-                                  if '_meta' in x else x['created_time'])
+            decision_matches.sort(
+                key=lambda x: x['_meta']['_last_modified_time'] if '_meta' in x else x['created_time']
+            )
 
         classes = []
         last_match = None

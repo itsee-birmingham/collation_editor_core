@@ -1,19 +1,24 @@
-# -*- coding: utf-8 -*-
-import sys
 import importlib
 import json
-import warnings
-from .exceptions import DataInputException
-from collation.core.postprocessor import PostProcessor
+import sys
 import urllib.request
+import warnings
+
+from collation.core.postprocessor import PostProcessor
 from collation.core.regulariser import Regulariser
+
+from .exceptions import DataInputException
 
 
 class PreProcessor(Regulariser):
+    """Pre-process the data to be collated, send it to collateX and start the post processing on the result.
+
+    Attributes:
+        configs (dict): The dictionary of configuration information passed from the collation editor JavaScript.
+    """
 
     def __init__(self, configs):
-
-        # if not present these are set to the previous default values to maintain consistency
+        # if not provided these are set to the default values of previous code releases to maintain consistency
         if 'display_settings_config' in configs:
             self.display_settings_config = configs['display_settings_config']
         else:
@@ -221,9 +226,7 @@ class PreProcessor(Regulariser):
         return self.get_collation(witnesses, verse, decisions, accept)
 
     def get_collation(self, witnesses, verse, decisions, accept):
-        """
-        Get the collation for the context.
-        """
+        """Get the collation for the context."""
         algorithm = 'dekker'
         tokenComparator = {}
         if self.algorithm_settings['algorithm']:
@@ -335,7 +338,7 @@ class PreProcessor(Regulariser):
                 return [verse['witnesses'][0]['id'], [verse['witnesses'][0]]]
 
     def do_collate(self, data, options):  # accept, algorithm, tokenComparator, host='localhost'):
-        """Do the collation"""
+        """Do the collation."""
         print('COLLATING', file=sys.stderr)
         try:
             print('algorithm - {}'.format(options['algorithm']), file=sys.stderr)

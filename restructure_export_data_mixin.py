@@ -2,6 +2,7 @@ from .exceptions import MissingSuffixesException
 
 
 class RestructureExportDataMixin(object):
+    """Mixin for restructuring export data."""
 
     def clean_collation_unit(self, collation_unit):
         """Clean the data and back fill anything missing from older data structures.

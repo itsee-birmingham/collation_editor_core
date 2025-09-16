@@ -1,15 +1,16 @@
+from copy import deepcopy
 from unittest import TestCase
 from unittest.mock import patch
+
 from collation.core.exceptions import MissingSuffixesException
 from collation.core.restructure_export_data_mixin import RestructureExportDataMixin
-from copy import deepcopy
 
 
 class RestructureExportDataMixinUnitTests(TestCase):
+    """Tests for the Restructure Mixin."""
 
     def test__strip_keys_1(self):
-        """Test that the correct keys are removed.
-        """
+        """Test that the correct keys are removed."""
         data = {'index': '2', 't': 'word', 'interface': 'word'}
         to_remove = ['index', 't']
         expected = {'interface': 'word'}
@@ -18,8 +19,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
         self.assertEqual(result, expected)
 
     def test__strip_keys_2(self):
-        """Test that no error is raised if an item in to_remove list is not in the data.
-        """
+        """Test that no error is raised if an item in to_remove list is not in the data."""
         data = {'index': '2', 't': 'word', 'interface': 'word'}
         to_remove = ['index', 't', 'missing']
         expected = {'interface': 'word'}
@@ -28,8 +28,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
         self.assertEqual(result, expected)
 
     def test__simplify_text_list(self):
-        """Test that the correct keys are removed from every item in the text list.
-        """
+        """Test that the correct keys are removed from every item in the text list."""
         data = {'witnesses': ['01', '03*'],
                 'text': [{'index': '2', 'reading': ['01', '03*'], 'verse': 'Gal.1.2',
                           'interface': 'word1', '01': {}, '03*': {}},
@@ -41,8 +40,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
         self.assertEqual(result, expected)
 
     def test__supply_missing_reading_data_1(self):
-        """Test that the missing text_string data is added when it is missing.
-        """
+        """Test that the missing text_string data is added when it is missing."""
         data = {'text': [{'interface': 'my'}, {'interface': 'string'}],
                 'reading_classes': ['reconstructed', 'lectionary_influence'],
                 'label_suffix': 'r',
@@ -62,8 +60,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
         self.assertEqual(data, expected)
 
     def test__supply_missing_reading_data_2(self):
-        """Test that the missing label_suffix is added when it is needed.
-        """
+        """Test that the missing label_suffix is added when it is needed."""
         data = {'text_string': 'my string',
                 'text': [{'interface': 'my'}, {'interface': 'string'}],
                 'reading_classes': ['reconstructed', 'lectionary_influence'],
@@ -83,8 +80,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
         self.assertEqual(data, expected)
 
     def test__supply_missing_reading_data_3(self):
-        """Test that the missing reading_suffix is added when it is needed.
-        """
+        """Test that the missing reading_suffix is added when it is needed."""
         data = {'text_string': 'my string',
                 'text': [{'interface': 'my'}, {'interface': 'string'}],
                 'reading_classes': ['reconstructed', 'lectionary_influence'],
@@ -104,8 +100,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
         self.assertEqual(data, expected)
 
     def test__supply_missing_reading_data_5(self):
-        """Test that the data is unchanged if the details are already present.
-        """
+        """Test that the data is unchanged if the details are already present."""
         data = {'text_string': 'my string',
                 'text': [{'interface': 'my'}, {'interface': 'string'}],
                 'reading_classes': ['reconstructed', 'lectionary_influence'],
@@ -127,8 +122,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
     @patch('collation.core.restructure_export_data_mixin.RestructureExportDataMixin._simplify_text_list')
     @patch('collation.core.restructure_export_data_mixin.RestructureExportDataMixin._supply_missing_reading_data')
     def test__clean_reading_1(self, mocked_supply_missing_reading_data, mocked_simplify_text_list):
-        """Test that the correct keys are removed from a reading and the correct functions called.
-        """
+        """Test that the correct keys are removed from a reading and the correct functions called."""
         data = {'witnesses': ['01'],
                 'suffixes': [''],
                 'SR_text': [],
@@ -154,8 +148,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
     def test__clean_reading_2(self,
                               mocked_supply_missing_reading_data,
                               mocked_simplify_text_list):
-        """Test that the correct things happen if there is a subreading.
-        """
+        """Test that the correct things happen if there is a subreading."""
         self.maxDiff = None
         subreading_1 = {'witnesses': ['02'], 'suffixes': [''], 'SR_text': [], 'text_string': 'first subreading',
                         'text': [{'interface': 'first'}, {'interface': 'subreading'}]}
@@ -187,8 +180,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
         self.assertEqual(data, expected)
 
     def test__clean_reading_3(self):
-        """Test that an exception is raised if there is no suffix list.
-        """
+        """Test that an exception is raised if there is no suffix list."""
         data = {'witnesses': ['01'],
                 'SR_text': [],
                 'standoff_subreadings': [],
@@ -202,8 +194,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
 
     @patch('collation.core.restructure_export_data_mixin.RestructureExportDataMixin._clean_reading')
     def test_clean_variant_unit_1(self, mocked_clean_reading):
-        """Test that the right keys are removed and clean reading is called for each reading.
-        """
+        """Test that the right keys are removed and clean reading is called for each reading."""
         mocked_clean_reading.side_effect = [{}, {}]
         data = {'_id': '123', 'start': 2, 'end': 2, 'first_word_index': '2.1',
                 'overlap_units': {}, 'readings': [{}, {}]}
@@ -216,8 +207,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
 
     @patch('collation.core.restructure_export_data_mixin.RestructureExportDataMixin._clean_reading')
     def test_clean_variant_unit_2(self, mocked_clean_reading):
-        """Test that the no error is raised if any of the keys to delete are not present in the data.
-        """
+        """Test that the no error is raised if any of the keys to delete are not present in the data."""
         mocked_clean_reading.side_effect = [{}, {}]
         data = {'_id': '123', 'start': 2, 'end': 2, 'first_word_index': '2.1', 'readings': [{}, {}]}
         expected = deepcopy(data)
@@ -229,8 +219,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
 
     @patch('collation.core.restructure_export_data_mixin.RestructureExportDataMixin._clean_reading')
     def test_clean_variant_unit_3(self, mocked_clean_reading):
-        """Test that the this function raises an error if _clean_reading does.
-        """
+        """Test that the this function raises an error if _clean_reading does."""
         mocked_clean_reading.side_effect = [{}, MissingSuffixesException('suffixes missing')]
         data = {'_id': '123', 'start': 2, 'end': 2, 'first_word_index': '2.1',
                 'overlap_units': {}, 'readings': [{}, {}]}
@@ -242,8 +231,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
     @patch('collation.core.restructure_export_data_mixin.RestructureExportDataMixin._clean_variant_unit')
     @patch('collation.core.restructure_export_data_mixin.RestructureExportDataMixin._strip_keys')
     def test_clean_collation_unit_1(self, mocked_strip_keys, mocked_clean_variant_unit):
-        """Test that the right keys are removed and _clean_variant_unit is called correctly.
-        """
+        """Test that the right keys are removed and _clean_variant_unit is called correctly."""
         data = {'context': 'Gal.1.1',
                 'structure': {'special_categories': [], 'marked_readings': {}, 'apparatus': [{}, {}],
                               'overtext': [{'tokens': [{}, {}, {}]}]}}
@@ -262,8 +250,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
     @patch('collation.core.restructure_export_data_mixin.RestructureExportDataMixin._clean_variant_unit')
     @patch('collation.core.restructure_export_data_mixin.RestructureExportDataMixin._strip_keys')
     def test_clean_collation_unit_2(self, mocked_strip_keys, mocked_clean_variant_unit):
-        """Test that the right keys are removed if the keys being removed are already missing.
-        """
+        """Test that the right keys are removed if the keys being removed are already missing."""
         data = {'context': 'Gal.1.1',
                 'structure': {'marked_readings': {}, 'apparatus': [{}, {}],
                               'overtext': [{'tokens': [{}, {}, {}]}]}}
@@ -281,8 +268,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
     @patch('collation.core.restructure_export_data_mixin.RestructureExportDataMixin._clean_variant_unit')
     @patch('collation.core.restructure_export_data_mixin.RestructureExportDataMixin._strip_keys')
     def test_clean_collation_unit_3(self, mocked_strip_keys, mocked_clean_variant_unit):
-        """Test that this function raises an exception if the called function does.
-        """
+        """Test that this function raises an exception if the called function does."""
         data = {'context': 'Gal.1.1',
                 'structure': {'special_categories': [], 'marked_readings': {}, 'apparatus': [{}, {}],
                               'overtext': [{'tokens': [{}, {}, {}]}]}}

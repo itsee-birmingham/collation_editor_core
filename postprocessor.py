@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-"""Algorithm for post-collate processing.
-
-"""
+"""Algorithm for post-collate processing."""
 import copy
 import sys
-from .exceptions import DataInputException
+
 from collation.core.regulariser import Regulariser
 from collation.core.settings_applier import SettingsApplier
+
+from .exceptions import DataInputException
 
 
 class PostProcessor(Regulariser, SettingsApplier):
@@ -90,7 +90,7 @@ class PostProcessor(Regulariser, SettingsApplier):
         return ' '.join(text)
 
     def create_readings_sets(self):
-        """turn alignment table into our variant readings structure"""
+        """Turn alignment table into our variant readings structure."""
         readings = {}
         reading_sets = []
 
@@ -140,7 +140,7 @@ class PostProcessor(Regulariser, SettingsApplier):
             return None
 
     def extract_witnesses(self, data):
-        """Extract witnesses from a token or list of tokens and return"""
+        """Extract witnesses from a token or list of tokens and return."""
         witnesses = []
         try:
             for witness in data['reading']:
@@ -157,8 +157,10 @@ class PostProcessor(Regulariser, SettingsApplier):
         return list1 + list(set(list2) - set(list1))
 
     def split_unit_into_single_words(self, readings_list, matrix, highest):
-        """Split unit into single words (columns of matrix) and use
-        vertically_combine_readings to combine any resulting shared units """
+        """Split unit into single words and use vertically_combine_readings to combine any resulting shared units.
+
+        The single words are the columns of the matrix. (NB: not an actual matrix object just a list of lists.)
+        """
         # TODO: make work with matrices of different lengths
         # get a full set of witnesses
         witnesses = []
@@ -256,7 +258,7 @@ class PostProcessor(Regulariser, SettingsApplier):
             return [readings]
 
     def check_unit_splits(self, readings):
-        """Works out whether any units need further splitting and sends them off to restructure_unit"""
+        """Work out whether any units need further splitting and if so send them off to restructure_unit."""
         # if we have at least two actual readings (not including empty readings)
         if ((len(readings.keys()) > 1 and ('_' not in readings.keys())) or
                 (len(readings.keys()) > 2 and ('_' in readings.keys()))):
@@ -299,7 +301,7 @@ class PostProcessor(Regulariser, SettingsApplier):
         return new_readings
 
     def restructure_tokens(self, witness):
-        """restructure the tokens so to move MS specific details into a secondary level"""
+        """Restructure the tokens so to move MS specific details into a secondary level."""
         new_witness = []
         if witness is None:
             return witness
@@ -315,7 +317,7 @@ class PostProcessor(Regulariser, SettingsApplier):
         return new_witness
 
     def combine_readings(self, existing_reading, new_reading):
-        """combine a new readings with an existing reading token by token"""
+        """Combine a new readings with an existing reading token by token."""
         combined_reading = []
         if existing_reading is None:
             return None
@@ -324,7 +326,7 @@ class PostProcessor(Regulariser, SettingsApplier):
         return combined_reading
 
     def combine_tokens(self, token, new_token):
-        """combine token dictionaries"""
+        """Combine token dictionaries."""
         reading = new_token['reading']
         token['reading'].append(new_token['reading'])
         token[reading] = {}

@@ -20,7 +20,7 @@ form {
     padding: 7px;
 }
 
-tr.selected_rule {
+tr.selected-rule {
     color: salmon;
 }
 
@@ -29,21 +29,21 @@ td.nav {
 }
 
 div#drag {
-    padding: 0px 0px 0px 0px;
+    padding: 0;
 }
 
-div#message_panel {
+div#message-panel {
     float: left;
     margin-top: 7px;
     margin-left: 20px;
-    padding: 3px 3px 3px 3px;
+    padding: 3px;
 }
 
-div#message_panel.warning {
+div#message-panel.warning {
     border: 1px solid red;
 }
 
-span.saved_version {
+span.saved-version {
     color: green;
     text-decoration: underline;
 }
@@ -63,7 +63,7 @@ img#loadingbar {
     vertical-align: bottom;
 }
 
-span.highlighted_reading {
+span.highlighted-reading {
     padding-left: 10px;
 }
 
@@ -77,13 +77,14 @@ tr.hidden {
 
 td {
     vertical-align: top;
+    white-space: nowrap;
 }
 
 td.space {
     min-width: 30px;
 }
 
-table.variant_unit {
+table.variant-unit {
     background: silver;
     width: 100%;
     border: 2px solid silver;
@@ -94,7 +95,6 @@ span.triangle {
     padding-left: 5px;
     cursor: pointer;
 }
-
 
 div.row {
     border: 1px solid silver;
@@ -108,72 +108,61 @@ td div.spacer {
     border: none;
 }
 
-.subreading_form {
-    position: fixed;
-    top: 40px;
-    left: 60px;
-    width: 300px;
-    padding: 5px;
-    background-color: white;
-    border: 2px solid blue;
-    border-radius: 4px;
-}
-
-.label_form {
+.label-form {
     position: fixed;
     background-color: whitesmoke;
     border: 1px solid black;
 }
 
-#label_change_form {
+#label-change-form {
     padding: 5px;
 }
 
-#label_change_form .top_label {
+#label-change-form .top-label {
     vertical-align: top;
     display: inline-block;
     margin-top: 10px;
 }
 
-#label_change_form #parent_select {
+#label-change-form #parent-select {
     margin-top: 10px;
 }
 
-#label_change_form .disabled {
-    color: LightGray;
+#label-change-form .disabled {
+    color: lightgray;
 }
 
-.label_form #new_label {
+.label-form #new-label {
     width: 100px;
 }
 
-.wit_form {
+.wit-form {
     top: 30px;
     max-width: 75vw;
     max-height: 75vh;
     overflow: hidden;
 }
 
-.wit_form input[type=checkbox] {
+.wit-form input[type="checkbox"] {
     display: inline-block;
     margin-right: 4px;
 }
 
-.wit_form .inline-label {
+.wit-form .inline-label {
     display: inline-block;
     width: 120px;
     margin-top: 5px;
 }
 
-.wit_form input {
+.wit-form input {
     margin-top: 5px;
 }
 
-#select_wit_form {
+#select-wit-form {
     overflow: auto;
 }
 
-#wit_scroller {
+#wit-scroller {
     margin-top: 15px;
     margin-bottom: 15px;
     overflow: auto;
@@ -185,7 +174,7 @@ td.highlight {
     color: blue;
 }
 
-tr.number_row {
+tr.number-row {
     border-bottom: 1px solid gray;
 }
 
@@ -193,26 +182,19 @@ div#test {
     width: 100px;
 }
 
-input#expand_collapse_button,
-input#show_hide_subreadings_button,
-input#show_hide_otherreadings_button,
-input#show_hide_regularisations_button {
+input#expand-collapse-button,
+input#show-hide-subreadings-button,
+input#show-hide-regularisations-button {
     float: left;
 }
 
-span#extra_buttons {
+span#extra-buttons {
     display: inline-block;
     float: left;
 }
 
-input#expand_collapse_button {
+input#expand-collapse-button {
     margin-left: 10px;
-}
-
-div.wit_column,
-div.saved_column {
-    float: left;
-    padding: 10px;
 }
 
 label.lac {
@@ -223,14 +205,13 @@ label.lac {
 tr.top,
 li.top {
     border-bottom: 1px solid gray;
-
 }
 
-div.reg_word {
+div.reg-word {
     display: inline-block;
 }
 
-div.drag_div {
+div.drag-div {
     background: silver;
 }
 
@@ -240,13 +221,12 @@ div.drag_div {
 
 td.number,
 td.space,
-td.NAword {
+td.overtext-word {
     text-align: center;
 }
 
 li.subreading,
-tr.subreading,
-tr.perma_subreading {
+tr.subreading {
     padding-left: 20px;
     color: grey;
 }
@@ -255,7 +235,7 @@ tr.regularised {
     color: grey;
 }
 
-tr.regularised_global {
+tr.regularised-global {
     color: gray;
 }
 
@@ -263,11 +243,11 @@ tr.deleted {
     color: red;
 }
 
-div.selected_reg_word {
+div.selected-reg-word {
     color: green;
 }
 
-div.regularisation_staged {
+div.regularisation-staged {
     color: gray;
 }
 
@@ -275,39 +255,29 @@ table.unselectable {
     border-top: 1px solid gray;
 }
 
-tr.non_deletable_rule {
-    color: #666699;
-}
-
-
-/** reordering table */
-
-table#reorder_table td,
-table#reorder_table th {
-    border: 1px solid black;
-    background: silver;
-    padding: 5px;
+tr.non-deletable-rule {
+    color: #669;
 }
 
 /* setting variants */
 
 ul {
     list-style-type: none;
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
 }
 
 div.unit,
-div.split_unit,
-div.split_unit_a,
-div.overlap_split_unit,
-div.overlap_split_unit_a,
-div.overlap_unit,
-div.split_deleted_unit,
-div.split_overlapped_unit,
-div.gap_unit,
-div.split_duplicate_unit,
-div.split_omlac_unit {
+div.split-unit,
+div.split-unit-a,
+div.overlap-split-unit,
+div.overlap-split-unit-a,
+div.overlap-unit,
+div.split-deleted-unit,
+div.split-overlapped-unit,
+div.gap-unit,
+div.split-duplicate-unit,
+div.split-omlac-unit {
     background: silver;
     border: 1px solid silver;
     padding: 5px;
@@ -318,31 +288,19 @@ li.hidden {
     display: none;
 }
 
-td {
-    white-space: nowrap;
-}
-
-td#split_readings {
+td#split-readings {
     background: #E9967A;
     margin-top: 20px;
     padding: 20px;
 }
 
-
-/* raw JSON stuff */
-
-table#raw_json td {
-    padding: 3px;
-    border: 1px solid black;
-}
-
-#redips_clone {
+#redips_clone {  /* stylelint-disable-line */ /* 3rd party id */
     background: silver;
     display: none;
 }
 
 /* settings */
-.settings_dialogue {
+.settings-dialogue {
     bottom: 50px;
     right: 5px;
     width: 300px;
@@ -350,100 +308,68 @@ table#raw_json td {
     z-index: 10;
 }
 
-.settings_dialogue .inline-label {
+.settings-dialogue .inline-label {
     display: inline-block;
     width: 80px;
     margin-top: 5px;
 }
 
-
 /* context menu */
-ul.SimpleContextMenu {
+ul.simple-context-menu {
     display: none;
     position: absolute;
-    margin: 0px;
-    padding: 0px;
-    font-family: arial;
+    margin: 0;
+    padding: 0;
+    font-family: arial, sans-serif;
     font-size: 12pt;
     list-style-type: none;
-    border-top: 1px solid #000000;
-    border-left: 1px solid #000000;
-    border-right: 1px solid #000000;
+    border-top: 1px solid #000;
+    border-left: 1px solid #000;
+    border-right: 1px solid #000;
     z-index: 3000;
 }
 
-ul.SimpleContextMenu li {
-    border-bottom: 1px solid #000000;
+ul.simple-context-menu li {
+    border-bottom: 1px solid #000;
 }
 
-/*note: if you change width here it needs to be changed in js code for contextmenu in the function _show */
-ul.SimpleContextMenu li span {
+/* note: if you change width here it needs to be changed in js code for contextmenu in the function _show */
+ul.simple-context-menu li span {
     display: block;
     width: 110px;
-    padding: 2px 10px 3px 10px;
+    padding: 2px 10px 3px;
     text-decoration: none;
-    color: #000000;
-    background: #eeeeee;
+    color: #000;
+    background: #eee;
 }
 
-ul.SimpleContextMenu li span:hover {
+ul.simple-context-menu li span:hover {
     text-decoration: none;
-    color: #000000;
-    background: #FFBB55;
+    color: #000;
+    background: #FB5;
 }
 
-/* load saved collation page */
-table#saved_collations {
-    width: 95%;
-    margin-top: 20px;
-    margin-left: 20px;
+li.highlighted > div {
+    background: #FB5;
 }
 
-table#saved_collations td,
-table#saved_collations th {
-    padding: 10px 10px 10px 10px;
-    border: solid 1px silver;
-}
-
-table#saved_collations td.added,
-table#saved_collations td.removed,
-table#saved_collations td.both {
-    color: red;
-}
-
-li.highlighted>div {
-    background: #FFBB55;
-}
-
-tr.highlighted>td>div {
-    background: #FFBB55;
-}
-
-tr.highlighted>td>div {
-    border: 1px solid #FFBB55;
-}
-
-li.added_highlighted>div {
+li.added-highlighted > div,
+tr.added-highlighted > td > div {
     color: sienna;
     font-weight: bold;
 }
 
-tr.added_highlighted>td>div {
-    color: sienna;
-    font-weight: bold;
+tr.highlighted > td > div {
+    background: #FB5;
+    border: 1px solid #FB5;
 }
 
-tr.added_highlighted>td>div.regularisation_staged {
+tr.added-highlighted > td > div.regularisation-staged {
     color: peru;
     font-weight: bold;
 }
 
-
-td>div.spanlike {
-    width: 95%;
-}
-
-td>div.clone {
+td > div.spanlike {
     width: 95%;
 }
 
@@ -451,41 +377,41 @@ div.clone {
     padding-left: 2px;
 }
 
-td.main_reading,
-td.overlap_main_reading {
+td > div.clone {
+    width: 95%;
+}
+
+td.main-reading,
+td.overlap-main-reading {
     width: 100%;
 }
 
-#single_witness_reading {
+#single-witness-reading {
     background: white;
     left: 10px;
-    font-family: arial;
+    font-family: arial, sans-serif;
     overflow-y: auto;
     height: 30px;
 }
 
-table.collation_overview {
+table.collation-overview {
     margin-bottom: 15px;
-    /*border-collapse: separate;
-  border-spacing: 2px;*/
     border: 0;
-
 }
 
-table.collation_overview td {
+table.collation-overview td {
     padding: 1px;
 }
 
-table.variant_unit td {
+table.variant-unit td {
     padding: 0;
 }
 
-
-div.error_unit {
+div.error-unit {
     border: 2px solid red;
 }
 
-div#global_exceptions {
+div#global-exceptions {
     left: 20px;
     background: #B0C4DE;
     border: 1px solid black;
@@ -494,18 +420,12 @@ div#global_exceptions {
     overflow: hidden;
 }
 
-div#error_panel {
-    border: 1px solid black;
-    max-height: 50vh;
-    overflow: hidden;
-}
-
-div#global_exceptions_list {
+div#global-exceptions-list {
     /* The height of this div is set in javascript */
     overflow: hidden;
 }
 
-form#global_exceptions_form {
+form#global-exceptions-form {
     background: whitesmoke;
     padding: 6px;
     margin: 0;
@@ -513,81 +433,80 @@ form#global_exceptions_form {
     overflow: scroll;
 }
 
-form#global_exceptions_form input[type='checkbox'] {
+form#global-exceptions-form input[type='checkbox'] {
     vertical-align: middle;
     margin-right: 5px;
 }
-
 
 .checkbox-label {
     display: inline-block;
     vertical-align: middle;
 }
 
-div#remove_witnesses_div {
+div#remove-witnesses-div {
     top: 60px;
     font-size: 15px;
     max-height: 60vh;
     overflow: hidden;
 }
 
-form#remove_witnesses_form {
+form#remove-witnesses-form {
     padding: 0;
 }
 
-form#remove_witnesses_form label {
+form#remove-witnesses-form label {
     margin-left: 3px;
 }
 
-div#remove_witnesses_content {
+div#remove-witnesses-content {
     padding-left: 7px;
     padding-top: 7px;
     overflow: scroll;
 }
 
-#reg_form.reg_form {
+#reg-form.reg-form {
     top: 30px;
     font-size: 15px;
     max-height: 75vh;
     overflow: hidden;
 }
 
-#reg_form.reg_form .inline-label {
+#reg-form.reg-form .inline-label {
     display: inline-block;
     width: 50px;
 }
 
-#reg_form.reg_form .inline-select {
+#reg-form.reg-form .inline-select {
     margin-top: 2px;
     margin-bottom: 2px;
 }
 
-#reg_form.reg_form fieldset {
+#reg-form.reg-form fieldset {
     margin-top: 3px;
 }
 
-#reg_form.reg_form #rule_creation_warning {
+#reg-form.reg-form #rule-creation-warning {
     color: maroon;
 }
 
-#regularisation_menu {
+#regularisation-menu {
     width: 300px;
     overflow-y: scroll;
 }
 
-#regularisation_menu textarea {
+#regularisation-menu textarea {
     resize: none;
 }
 
-.dialogue_form_header {
+.dialogue-form-header {
     background: #B0C4DE;
     padding: 5px;
     height: 20px;
 }
 
-.dialogue_form {
+.dialogue-form {
     position: fixed;
-    font-family: arial;
+    font-family: arial, sans-serif;
     background: whitesmoke;
     border: 1px solid black;
 }
@@ -599,48 +518,75 @@ div#remove_witnesses_content {
     margin-top: 10px;
 }
 
-
-
-div#error_panel {
+div#error-panel {
     position: fixed;
-    font-family: arial;
+    font-family: arial, sans-serif;
     width: 200px;
     padding: 2px;
+    border: 1px solid black;
+    max-height: 50vh;
+    overflow: hidden;
 }
 
-div#error_panel.warning,
-div#error_panel.warning div.dialogue_form_header {
+div#error-panel.warning,
+div#error-panel.warning div.dialogue-form-header {
     background: crimson;
-    border: 0px;
+    border: 0;
 }
 
-div#error_panel.error,
-div#error_panel.error div.dialogue_form_header {
+div#error-panel.error,
+div#error-panel.error div.dialogue-form-header {
     background: gold;
-    border: 0px;
+    border: 0;
 }
 
-div#error_panel.clear,
-div#error_panel.clear div.dialogue_form_header {
+div#error-panel.clear,
+div#error-panel.clear div.dialogue-form-header {
     background: green;
-    border: 0px;
+    border: 0;
 }
 
-span#message_summary {
+span#message-summary {
     padding: 2px;
 }
 
-div#error_header {
+div#error-header {
     background: blue;
 }
 
-div#error_message_panel {
+div#error-message-panel {
     background: whitesmoke;
     padding: 4px;
     overflow-y: scroll;
 }
 
-span#error_coll_ex,
-span#global_exceptions_ex {
+span#error-coll-ex,
+span#global-exceptions-ex {
     float: right;
+}
+
+/* load saved collation page */
+table#saved-collations {
+    width: 95%;
+    margin-top: 20px;
+    margin-left: 20px;
+}
+
+table#saved-collations td,
+table#saved-collations th {
+    padding: 10px;
+    border: solid 1px silver;
+}
+
+table#saved-collations td.added,
+table#saved-collations td.removed,
+table#saved-collations td.both {
+    color: red;
+}
+
+/* raw JSON stuff */
+
+table#raw-json td {
+    padding: 3px;
+    border: 1px solid black;
 }

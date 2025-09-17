@@ -77,7 +77,7 @@ var CL = (function() {
     }
     $.get(url, function(html) {
       CL.container.innerHTML = html;
-      document.getElementById('project_name').innerHTML = CL.project.name;
+      document.getElementById('project-name').innerHTML = CL.project.name;
       if (_contextInput && Object.prototype.hasOwnProperty.call(_contextInput, 'onload_function') && _contextInput.onload_function !== null) {
         CL.runFunction(_contextInput.onload_function, [CL.project]);
       } else {
@@ -86,13 +86,13 @@ var CL = (function() {
       }
       const footer = [];
       if (Object.prototype.hasOwnProperty.call(CL.services, 'switchProject')) {
-        footer.push('<input class="pure-button left_foot" type="button" id="switch_project_button" value="Switch project" />');
+        footer.push('<input class="pure-button left-foot" type="button" id="switch_project_button" value="Switch project" />');
       }
       if (Object.prototype.hasOwnProperty.call(CL.services, 'viewProjectSummary')) {
-        footer.push('<input class="pure-button right_foot" type="button" id="project_summary" value="View Project Page"/>');
+        footer.push('<input class="pure-button right-foot" type="button" id="project_summary" value="View Project Page"/>');
       }
 
-      footer.push('<input class="pure-button right_foot" id="collation_settings" type="button" value="Change Collation Settings"/>');
+      footer.push('<input class="pure-button right-foot" id="collation_settings" type="button" value="Change Collation Settings"/>');
 
       document.getElementById('footer').innerHTML = footer.join('');
       addIndexHandlers();
@@ -155,13 +155,13 @@ var CL = (function() {
           stage += ' - Witness Removing Mode';
         }
       }
-      html = '<h1 id="stage_id">' + stage + '</h1>' +
-        '<h1 id="verse_ref">' + context +
-        '</h1><h1 id="project_name">';
+      html = '<span id="stage-id" class="title">' + stage + '</span>' +
+        '<span id="unit-ref" class="title">' + context +
+        '</span><span id="project-name" class="title">';
       if (Object.prototype.hasOwnProperty.call(CL.project, 'name')) {
         html += CL.project.name;
       }
-      html += '</h1><div id="message_panel"></div><div id="login_status"></div>';
+      html += '</span><div id="message-panel"></div><div id="login-status"></div>';
       return html;
     },
 
@@ -619,7 +619,7 @@ var CL = (function() {
           }
           // if i is even add a word; if not add a blank cell
           if (i % 2 === 0) {
-            html.push('<th colspan="' + colspan + '" class="NAword redips-mark ' + words[j][1] + '" id="NA_' + (i) +
+            html.push('<th colspan="' + colspan + '" class="overtext-word redips-mark ' + words[j][1] + '" id="NA_' + (i) +
                       '"><div id="NA_' + (i) + '_div">' + words[j][0] + '</div></th>');
             j += 1;
           } else {
@@ -628,7 +628,7 @@ var CL = (function() {
           }
         }
         html.push(nextLinkHtml + '</tr>');
-        html.push('<tr id="number_row" class="number_row"><td></td>');
+        html.push('<tr id="number-row" class="number-row"><td></td>');
         j = 1;
         for (let i = 1; i <= cols; i += 1) {
           if (Object.prototype.hasOwnProperty.call(colSpans, i)) {
@@ -658,17 +658,17 @@ var CL = (function() {
         CL._collapseUnit(event.target.id, format);
         event.stopPropagation();
       });
-      if (document.getElementById('expand_collapse_button')) {
+      if (document.getElementById('expand-collapse-button')) {
         if (_collapsed === true) {
           CL._collapseAll(format);
-          document.getElementById('expand_collapse_button').value = 'expand all';
-          $('#expand_collapse_button').on('click.expand_all', function() {
+          document.getElementById('expand-collapse-button').value = 'expand all';
+          $('#expand-collapse-button').on('click.expand_all', function() {
             CL._expandAll(format);
           });
         } else {
           CL._expandAll(format);
-          document.getElementById('expand_collapse_button').value = 'collapse all';
-          $('#expand_collapse_button').on('click.collapse_all', function() {
+          document.getElementById('expand-collapse-button').value = 'collapse all';
+          $('#expand-collapse-button').on('click.collapse_all', function() {
             CL._collapseAll(format);
           });
         }
@@ -978,8 +978,8 @@ var CL = (function() {
       let scrollOffset;
       if (CL.showSubreadings === true) {
         // hide the subreadings (except the edition ones if we are have supplied baseSubreadingRules)
-        if (document.getElementById('show_hide_subreadings_button')) {
-          $('#show_hide_subreadings_button').on('click.hide_subreadings', function() {
+        if (document.getElementById('show-hide-subreadings-button')) {
+          $('#show-hide-subreadings-button').on('click.hide_subreadings', function() {
             scrollOffset = [document.getElementById('scroller').scrollLeft,
                             document.getElementById('scroller').scrollTop
             ];
@@ -1002,9 +1002,9 @@ var CL = (function() {
           });
         }
       } else {
-        if (document.getElementById('show_hide_subreadings_button')) {
+        if (document.getElementById('show-hide-subreadings-button')) {
           // show all the subreadings
-          $('#show_hide_subreadings_button').on('click.show_subreadings', function() {
+          $('#show-hide-subreadings-button').on('click.show_subreadings', function() {
             scrollOffset = [document.getElementById('scroller').scrollLeft,
                             document.getElementById('scroller').scrollTop];
             $(this).text($(this).text().replace('show', 'hide'));
@@ -1232,7 +1232,7 @@ var CL = (function() {
       const transcriptionId = temp[0];
       const hand = temp[1];
       const text = [];
-      document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + hand +
+      document.getElementById('single-witness-reading').innerHTML = '<span class="highlighted-reading"><b>' + hand +
                               ':</b><img id="loadingbar" src="' + staticUrl + 'CE_core/images/loadingbar.gif"/></span>';
       CL.services.getUnitData(CL.context, [transcriptionId], function(response) {
         let unit;
@@ -1258,23 +1258,23 @@ var CL = (function() {
                       text.push('&lt;' + unit.witnesses[j].tokens[k].gap_details + '&gt;');
                     }
                   }
-                  document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' +
+                  document.getElementById('single-witness-reading').innerHTML = '<span class="highlighted-reading"><b>' +
                                 hand + ':</b> ' + CL.project.prepareDisplayString(text.join(' ')) + '</span>';
                   break;
                 }
               }
             } else {
               // om unit
-              document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' +
+              document.getElementById('single-witness-reading').innerHTML = '<span class="highlighted-reading"><b>' +
                                                                             hand + ':</b> no text</span>';
             }
           }
         } else {
           if (transcriptionId === 'none') {
-            document.getElementById('single_witness_reading').innerHTML = '';
+            document.getElementById('single-witness-reading').innerHTML = '';
           } else {
             // lac unit
-            document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' +
+            document.getElementById('single-witness-reading').innerHTML = '<span class="highlighted-reading"><b>' +
                                                                           hand + ':</b> no text</span>';
           }
         }
@@ -1439,24 +1439,24 @@ var CL = (function() {
     },
   
     addStageLinks: function() {
-      if (document.getElementById('stage_links') && Object.prototype.hasOwnProperty.call(CL.services, 'getSavedStageIds')) {
-        document.getElementById('stage_links').innerHTML = '<span id="R">Reg</span><span id="S">Set</span>' +
+      if (document.getElementById('stage-links') && Object.prototype.hasOwnProperty.call(CL.services, 'getSavedStageIds')) {
+        document.getElementById('stage-links').innerHTML = '<span id="R">Reg</span><span id="S">Set</span>' +
                                                            '<span id="O">Ord</span><span id="A">App</span>';
         CL.services.getSavedStageIds(CL.context, function(reg, set, ord, app) {
           if (reg) {
-            $('#R').addClass('saved_version');
+            $('#R').addClass('saved-version');
             CL._addNavEvent('R', reg);
           }
           if (set) {
-            $('#S').addClass('saved_version');
+            $('#S').addClass('saved-version');
             CL._addNavEvent('S', set);
           }
           if (ord) {
-            $('#O').addClass('saved_version');
+            $('#O').addClass('saved-version');
             CL._addNavEvent('O', ord);
           }
           if (app) {
-            $('#A').addClass('saved_version');
+            $('#A').addClass('saved-version');
             CL._addNavEvent('A', app);
           }
         });
@@ -1469,7 +1469,7 @@ var CL = (function() {
                 Object.prototype.hasOwnProperty.call(CL.project.extraFooterButtons, stage)) {
         for (let i = 0; i < CL.project.extraFooterButtons[stage].length; i += 1) {
           if (Object.prototype.hasOwnProperty.call(CL.project.extraFooterButtons[stage][i], 'id')) {
-            html.push('<input class="pure-button left_foot" type="button" id="' +
+            html.push('<input class="pure-button left-foot" type="button" id="' +
                       CL.project.extraFooterButtons[stage][i].id + '" value="');
             if (Object.prototype.hasOwnProperty.call(CL.project.extraFooterButtons[stage][i], 'label')) {
               html.push(CL.project.extraFooterButtons[stage][i].label);
@@ -1483,7 +1483,7 @@ var CL = (function() {
                       Object.prototype.hasOwnProperty.call(CL.services.extraFooterButtons, stage)) {
         for (let i = 0; i < CL.services.extraFooterButtons[stage].length; i += 1) {
           if (Object.prototype.hasOwnProperty.call(CL.services.extraFooterButtons[stage][i], 'id')) {
-            html.push('<input class="pure-button left_foot" type="button" id="' +
+            html.push('<input class="pure-button left-foot" type="button" id="' +
                       CL.services.extraFooterButtons[stage][i].id + '" value="');
             if (Object.prototype.hasOwnProperty.call(CL.services.extraFooterButtons[stage][i], 'label')) {
               html.push(CL.services.extraFooterButtons[stage][i].label);
@@ -1494,8 +1494,8 @@ var CL = (function() {
           }
         }
       }
-      if (document.getElementById('extra_buttons')) {
-        document.getElementById('extra_buttons').innerHTML = html.join('');
+      if (document.getElementById('extra-buttons')) {
+        document.getElementById('extra-buttons').innerHTML = html.join('');
         if (Object.prototype.hasOwnProperty.call(CL.services, 'addExtraFooterFunctions')) {
           CL.services.addExtraFooterFunctions();
         }
@@ -1662,7 +1662,7 @@ var CL = (function() {
           }
           CL.services.saveCollation(CL.context, collation, confirmMessage, approvalSettings[0],
                                     approvalSettings[1], function(savedSuccessful) {
-            document.getElementById('message_panel').innerHTML = savedSuccessful ? successMessage : '';
+            document.getElementById('message-panel').innerHTML = savedSuccessful ? successMessage : '';
             // I don't know why this is needed - somewhere in the code show/hide subreadings must be called after suffixes have been added
             CL.data = collation.structure;
             if (savedSuccessful) { //only run success callback if successful!
@@ -1743,20 +1743,20 @@ var CL = (function() {
       let menuHeight, left;
       left = menuPos.left;
       // if there is already an old menu hanging around remove it
-      if (document.getElementById('wit_form')) {
-        document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
+      if (document.getElementById('wit-form')) {
+        document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit-form'));
       }
       // show the select witnesses menu
       const witMenu = document.createElement('div');
-      witMenu.setAttribute('id', 'wit_form');
-      witMenu.setAttribute('class', 'wit_form dialogue_form');
+      witMenu.setAttribute('id', 'wit-form');
+      witMenu.setAttribute('class', 'wit-form dialogue-form');
       const witnesses = CL.sortWitnesses(CL.getAllReadingWitnesses(reading));
-      const witnessHtml = ['<div class="dialogue_form_header drag-zone">' + details.header + '</div><form id="select_wit_form">'];
+      const witnessHtml = ['<div class="dialogue-form-header drag-zone">' + details.header + '</div><form id="select-wit-form">'];
       witnessHtml.push('<label>Selected reading: </label><span>');
       witnessHtml.push(CL.extractWitnessText(reading));
       witnessHtml.push('</span>');
       if (witnesses.length > 1 && (!Object.prototype.hasOwnProperty.call(details, 'witness_select') || details.witness_select !== false)) {
-        witnessHtml.push('<div id="wit_scroller">');
+        witnessHtml.push('<div id="wit-scroller">');
         if (!Object.prototype.hasOwnProperty.call(details, 'just_split') || details.just_split !== true ) {
           witnessHtml.push('<input type="checkbox" id="wit_select_all">Select All</input><br/>');
         }
@@ -1789,16 +1789,16 @@ var CL = (function() {
       witMenu.innerHTML = witnessHtml.join('');
       document.getElementsByTagName('body')[0].appendChild(witMenu);
       left = parseInt(left) - document.getElementById('scroller').scrollLeft;
-      if (left + document.getElementById('wit_form').offsetWidth > window.innerWidth) {
-        left = left - document.getElementById('wit_form').offsetWidth;
+      if (left + document.getElementById('wit-form').offsetWidth > window.innerWidth) {
+        left = left - document.getElementById('wit-form').offsetWidth;
       }
       if (left < 0) {
         left = 4;
       }
-      document.getElementById('wit_form').style.left = left + 'px';
-      drag.initDraggable('wit_form', true, true);
-      const witFormHeight = document.getElementById('wit_form').offsetHeight - 43;
-      document.getElementById('select_wit_form').style.height = witFormHeight + 'px';
+      document.getElementById('wit-form').style.left = left + 'px';
+      drag.initDraggable('wit-form', true, true);
+      const witFormHeight = document.getElementById('wit-form').offsetHeight - 43;
+      document.getElementById('select-wit-form').style.height = witFormHeight + 'px';
       if (Object.prototype.hasOwnProperty.call(details, 'form_size') && details.form_size === 'small') {
         menuHeight = Math.max(witFormHeight - 100, 50);
       } else if (details.type === 'SVsubreading' || details.type === 'ORsubreading') {
@@ -1807,10 +1807,10 @@ var CL = (function() {
         menuHeight = Math.max(witFormHeight - 173, 50);
       }
       if (witnesses.length > 1 && (!Object.prototype.hasOwnProperty.call(details, 'witness_select') || details.witness_select !== false)) {
-        document.getElementById('wit_scroller').style.maxHeight = menuHeight + 'px';
+        document.getElementById('wit-scroller').style.maxHeight = menuHeight + 'px';
       }
       $('#close_button').on('click', function() {
-        document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
+        document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit-form'));
       });
       if (document.getElementById('wit_select_all')) {
         $('#wit_select_all').on('click', function(event) {
@@ -1898,7 +1898,7 @@ var CL = (function() {
       $('#select_button').on('click', function() {
         let extraDetails;
         const unit = CL.data[readingDetails.app_id][readingDetails.unit_pos];
-        const data = cforms.serialiseForm('select_wit_form');
+        const data = cforms.serialiseForm('select-wit-form');
         if (data.parent_reading !== null) {
           const witnessList = [];
           for (const key in data) {
@@ -1946,7 +1946,7 @@ var CL = (function() {
                                               'reading_id': readingDetails.reading_id});
           }
           const callback = function() {
-            document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
+            document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit-form'));
           };
           if (format === 'set_variants') {
             SV.makeStandoffReading(type, readingDetails, data.parent_reading, callback);
@@ -2381,8 +2381,8 @@ var CL = (function() {
 
     setUpRemoveWitnessesForm: function(wits, data, stage, removeFunction) {
       let sigla;
-      document.getElementById('remove_witnesses_div').style.left = document.getElementById('scroller').offsetWidth -
-      document.getElementById('remove_witnesses_div').offsetWidth - 15 + 'px';
+      document.getElementById('remove-witnesses-div').style.left = document.getElementById('scroller').offsetWidth -
+      document.getElementById('remove-witnesses-div').offsetWidth - 15 + 'px';
       const transcriptionIds = {};
       for (let i = 0; i < wits.length; i += 1) {
         for (const key in data.hand_id_map) {
@@ -2410,9 +2410,9 @@ var CL = (function() {
         }
 
       }
-      document.getElementById('witness_checkboxes').innerHTML = html.join('');
-      drag.initDraggable('remove_witnesses_div', true, true);
-      document.getElementById('remove_witnesses_content').style.height = document.getElementById('remove_witnesses_div').offsetHeight - 35 + 'px';
+      document.getElementById('witness-checkboxes').innerHTML = html.join('');
+      drag.initDraggable('remove-witnesses-div', true, true);
+      document.getElementById('remove-witnesses-content').style.height = document.getElementById('remove-witnesses-div').offsetHeight - 35 + 'px';
       $('#select_all').on('click', function() {
         if ($(this).is(':checked')) {
           $('.witness_select').each(function() {
@@ -2433,9 +2433,9 @@ var CL = (function() {
         }
       });
       if (removeFunction !== undefined) {
-        $('#remove_selected_button').on('click', removeFunction);
+        $('#remove-selected-button').on('click', removeFunction);
       } else {
-        $('#remove_selected_button').on('click', function() {
+        $('#remove-selected-button').on('click', function() {
           const handsToRemove = CL.getRemoveWitnessDataFromForm();
           CL.removeWitnesses(handsToRemove, stage);
           CL.isDirty = true;
@@ -2446,7 +2446,7 @@ var CL = (function() {
     getRemoveWitnessDataFromForm: function() {
       let hands;
       const handsToRemove = [];
-      const data = cforms.serialiseForm('remove_witnesses_form');
+      const data = cforms.serialiseForm('remove-witnesses-form');
       for (const key in data) {
         if (Object.prototype.hasOwnProperty.call(data, key) && data[key] !== null && data[key] !== true) {
           hands = data[key].split('|');
@@ -2471,13 +2471,13 @@ var CL = (function() {
       if (ok) {
         //return to Table
         //remove the witness removal window if shown
-        if (document.getElementById('remove_witnesses_div')) {
-          document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
+        if (document.getElementById('remove-witnesses-div')) {
+          document.getElementById('remove-witnesses-div').parentNode.removeChild(document.getElementById('remove-witnesses-div'));
         }
         if (callback !== undefined) {
           callback();
         }
-        document.getElementById('container').innerHTML = '<div id="saved_collations_div"></div>';
+        document.getElementById('container').innerHTML = '<div id="saved-collations-div"></div>';
         CL._findSaved(CL.context);
       }
     },
@@ -3670,7 +3670,7 @@ var CL = (function() {
         document.getElementById('collation_form').style.display = 'none';
       }
       html.push('<form id="saved_collation_form">');
-      html.push('<table id="saved_collations">');
+      html.push('<table id="saved-collations">');
       html.push('<th>User</th><th>Regularised</th><th>Variants Set</th><th>Ordered</th><th>Approved</th>');
       const userCount = Object.keys(byUser).length;
       firstRow = true;
@@ -3825,7 +3825,7 @@ var CL = (function() {
       if (document.getElementById('witnesses')) {
         document.getElementById('witnesses').innerHTML = '';
       }
-      document.getElementById('saved_collations_div').innerHTML = html.join('');
+      document.getElementById('saved-collations-div').innerHTML = html.join('');
       document.getElementById('header').innerHTML = CL.getHeaderHtml('Collation', context);
   
       if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
@@ -3852,13 +3852,13 @@ var CL = (function() {
         }
       });
       const footerHtml = [];
-      footerHtml.push('<input class="pure-button right_foot" id="load_saved_button" type="button" value="Load collation"/>');
+      footerHtml.push('<input class="pure-button right-foot" id="load_saved_button" type="button" value="Load collation"/>');
       if (hasCollationsWithWitsToAdd === true && CL.project.allowWitnessChangesInSavedCollations === true) {
-        footerHtml.push('<input class="pure-button pure-button-disabled right_foot" id="load_saved_add_button" ' +
+        footerHtml.push('<input class="pure-button pure-button-disabled right-foot" id="load_saved_add_button" ' +
                         'type="button" value="Load collation and add witnesses"/>');
       }
       if (hasCollationsWithWitsToRemove === true && CL.project.allowWitnessChangesInSavedCollations === true) {
-        footerHtml.push('<input class="pure-button pure-button-disabled right_foot" id="load_saved_remove_button" ' +
+        footerHtml.push('<input class="pure-button pure-button-disabled right-foot" id="load_saved_remove_button" ' +
                         'type="button" value="Load collation and remove witnesses"/>');
       }
       document.getElementById('footer').innerHTML = footerHtml.join('');
@@ -4348,8 +4348,8 @@ var CL = (function() {
       for (let i = 0; i < triangles.length; i += 1) {
         CL._expandUnit(triangles[i].id, format);
       }
-      $('#expand_collapse_button').off('click.expand_all');
-      $('#expand_collapse_button').on('click.expand_collapse_button', function() {
+      $('#expand-collapse-button').off('click.expand_all');
+      $('#expand-collapse-button').on('click.expand-collapse-button', function() {
         $(this).text('expand all');
         CL._collapseAll(format);
       });
@@ -4361,8 +4361,8 @@ var CL = (function() {
       for (let i = 0; i < triangles.length; i += 1) {
         CL._collapseUnit(triangles[i].id, format);
       }
-      $('#expand_collapse_button').off('click.collapse_all');
-      $('#expand_collapse_button').on('click.expand_all', function() {
+      $('#expand-collapse-button').off('click.collapse_all');
+      $('#expand-collapse-button').on('click.expand_all', function() {
         $(this).text('collapse all');
         CL._expandAll(format);
       });
@@ -4447,7 +4447,7 @@ var CL = (function() {
         }
       }
       html.push('<td class="mark start_' + start + ' " colspan="' + (end - start + 1) + '">');
-      html.push('<table class="variant_unit" id="variant_unit_' + id + '">');
+      html.push('<table class="variant-unit" id="variant_unit_' + id + '">');
       for (let i = 0; i < data.length; i += 1) {
         rowId = 'variant_unit_' + id + '_row_' + i;
         rowList.push(rowId);
@@ -4476,7 +4476,7 @@ var CL = (function() {
         html.push('<td></td>');
         html.push('<td id="' + rowId + '_label">' + readingLabel);
         html.push('</td>');
-        html.push('<td class="main_reading">');
+        html.push('<td class="main-reading">');
         html.push(text);
         if (readingSuffix !== '') {
           html.push(' ' + readingSuffix);
@@ -5257,8 +5257,8 @@ var CL = (function() {
       }
       const settingsDiv = document.createElement('div');
       settingsDiv.setAttribute('id', 'settings');
-      settingsDiv.setAttribute('class', 'dialogue_form settings_dialogue');
-      settingsDiv.innerHTML = '<div class="dialogue_form_header"><span id="settings_title">Algorithm Settings</span></div><form id="settings_form">' +
+      settingsDiv.setAttribute('class', 'dialogue-form settings-dialogue');
+      settingsDiv.innerHTML = '<div class="dialogue-form-header"><span id="settings_title">Algorithm Settings</span></div><form id="settings_form">' +
         '<label class="inline-label" for="algorithm">Algorithm:</label><select id="algorithm" name="algorithm">' +
         '<option value="auto">Auto</option><option value="dekker">Dekker</option><option value="needleman-wunsch">Needleman-Wunsch</option>' +
         '</select><br/>' +

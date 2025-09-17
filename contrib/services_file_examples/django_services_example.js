@@ -253,7 +253,7 @@ django_services = (function() {
 
   showLoginStatus = function(callback) {
     var elem, loginStatusMessage;
-    elem = document.getElementById('login_status');
+    elem = document.getElementById('login-status');
     if (elem !== null) {
       CL.services.getUserInfo(function(response) {
         if (response) {

@@ -21,7 +21,7 @@ The default is false.
 | ------ | ------------------- | ------------ |
 | callback | <code>function</code> |[optional] A function to be called when this function completes. |
 
-This function can be used to display the currently logged in user. It is called when pages are displayed. It should get the current user and display the required details in the preferred way for the platform. There is a <div> element on each page that calls this function which has the id 'login_status' which should be used to display the user details. When this is done the function should run the callback if one was provided.
+This function can be used to display the currently logged in user. It is called when pages are displayed. It should get the current user and display the required details in the preferred way for the platform. There is a <div> element on each page that calls this function which has the id 'login-status' which should be used to display the user details. When this is done the function should run the callback if one was provided.
 
 ## `getSavedStageIds()`
 

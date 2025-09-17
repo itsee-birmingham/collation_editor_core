@@ -1,23 +1,23 @@
 /* exported RG */
 /* global CL, SV, SR, spinner, cforms, SimpleContextMenu, staticUrl, drag, REDIPS */
-var RG = (function() {
+var RG = (function () {
 
 
   //private variable declarations
   let _rules = {},
-      _forDeletion = [],
-      _forGlobalExceptions = [];
+    _forDeletion = [],
+    _forGlobalExceptions = [];
 
   return {
 
     _allDeletableRules: {},
     showRegularisations: false,
 
-    getCollationData: function(output, scrollOffset, callback) {
+    getCollationData: function (output, scrollOffset, callback) {
       CL.container = document.getElementById('container');
-      CL.services.getUnitData(CL.context, CL.dataSettings.witness_list, function(collationData) {
-        RG._calculateLacWits(collationData, function(lacWitnessList) {
-          CL.services.getSiglumMap(lacWitnessList, function(lacWitnesses) {
+      CL.services.getUnitData(CL.context, CL.dataSettings.witness_list, function (collationData) {
+        RG._calculateLacWits(collationData, function (lacWitnessList) {
+          CL.services.getSiglumMap(lacWitnessList, function (lacWitnesses) {
             CL.collateData = {
               'data': collationData.results,
               'lac_witnesses': lacWitnesses
@@ -34,7 +34,7 @@ var RG = (function() {
         });
       });
     },
-    
+
     /** get the data for the unit of this type
      * 	data - the readings for that unit
      * 	id - the identifier for the unit
@@ -43,9 +43,9 @@ var RG = (function() {
      * 	options - possibilities are:
      *
      * */
-    getUnitData: function(data, id, start, end, options) {
+    getUnitData: function (data, id, start, end, options) {
       let cells, events, maxLength, rowId, rowIdBase, highlightedHand, classes, divClassString, witness, words,
-          cellsDict, ruleCells, keysToSort, classList, variantUnitId, deletableRules, nonDeletableRules;
+        cellsDict, ruleCells, keysToSort, classList, variantUnitId, deletableRules, nonDeletableRules;
       if (options === undefined) {
         options = {};
       }
@@ -64,11 +64,11 @@ var RG = (function() {
         rowId = 'variant_unit_' + id + '_row_' + i;
         rowList.push(rowId);
         if (i === 0) {
-            cells.push('<tr><td class="redips-mark" colspan="MX_LN">');
-            if (CL.project.showSelectAllVariantsOption === true) {
-              cells.push('<img class="select_all" src="' + staticUrl + 'CE_core/images/checkall.png" height="16px">');
-            }
-            cells.push('<span id="toggle_variant_' + id + '" class="triangle">&#9650;</span></td></tr>');
+          cells.push('<tr><td class="redips-mark" colspan="MX_LN">');
+          if (CL.project.showSelectAllVariantsOption === true) {
+            cells.push('<img class="select_all" src="' + staticUrl + 'CE_core/images/checkall.png" height="16px">');
+          }
+          cells.push('<span id="toggle_variant_' + id + '" class="triangle">&#9650;</span></td></tr>');
         }
         classes = [];
         if (i === 0) {
@@ -78,8 +78,8 @@ var RG = (function() {
           classes.push('highlighted');
         }
         if (Object.prototype.hasOwnProperty.call(options, 'highlighted_added_wits') &&
-            data[i].witnesses.filter(x => options.highlighted_added_wits.includes(x)).length > 0) {
-          classes.push('added_highlighted');
+          data[i].witnesses.filter(x => options.highlighted_added_wits.includes(x)).length > 0) {
+          classes.push('added-highlighted');
         }
         cells.push('<tr id="' + rowId + '" class="' + classes.join(' ') + '">');
         cells.push('<td class="redips-mark"><div class="spanlike">' + CL.getAlphaId(i) + '. </div></td>');
@@ -91,7 +91,7 @@ var RG = (function() {
               cells.push('<td class="redips-mark gap" colspan="MX_LN"><div class="spanlike">om.</div></td>');
             } else {
               cells.push('<td class="redips-mark gap" colspan="MX_LN"><div class="spanlike">&lt;' + data[i].details +
-                        '&gt;</div></td>');
+                '&gt;</div></td>');
             }
           }
         } else {
@@ -106,14 +106,14 @@ var RG = (function() {
             // if we are in witnessAdding mode only allow regularisation of readings that have added witnesses
             // (the rules will only be made with the added ones not the full set)
             if (i > 0 && (CL.witnessAddingMode === false ||
-                    (CL.witnessAddingMode === true &&
-                        data[i].witnesses.filter(x => CL.witnessesAdded.includes(x)).length > 0))) {
-              classList = ['redips-drag', 'redips-clone', 'reg_word'];
+              (CL.witnessAddingMode === true &&
+                data[i].witnesses.filter(x => CL.witnessesAdded.includes(x)).length > 0))) {
+              classList = ['redips-drag', 'redips-clone', 'reg-word'];
             }
 
             if (i > 0) {
               if (RG._hasRuleApplied(variantUnitId)) {
-                classList.push('regularisation_staged');
+                classList.push('regularisation-staged');
               }
               classList.push(RG._getDisplayClasses(data[i].text[j]));
               divClassString = ' class="' + classList.join(' ') + '" ';
@@ -121,12 +121,12 @@ var RG = (function() {
             cells.push('<td>');
             words = data[i].text;
             if (Object.prototype.hasOwnProperty.call(words[j][words[j].reading[0]], 'gap_before') &&
-                    Object.prototype.hasOwnProperty.call(words[j], 'combined_gap_before')) {
+              Object.prototype.hasOwnProperty.call(words[j], 'combined_gap_before')) {
               cells.push('<div class="gap spanlike"> &lt;' + words[j][words[j].reading[0]].gap_details + '&gt; </div>');
             }
             cells.push('<div ' + divClassString + 'id="' + variantUnitId + '">' + RG._getToken(words[j]) + '</div>');
             if (Object.prototype.hasOwnProperty.call(words[j][words[j].reading[0]], 'gap_after') &&
-                    (j < words.length - 1 || Object.prototype.hasOwnProperty.call(words[j], 'combined_gap_after'))) {
+              (j < words.length - 1 || Object.prototype.hasOwnProperty.call(words[j], 'combined_gap_after'))) {
               cells.push('<div class="gap spanlike"> &lt;' + words[j][words[j].reading[0]].gap_details + '&gt; </div>');
             }
             if (RG.showRegularisations) {
@@ -137,7 +137,7 @@ var RG = (function() {
                 witness = data[i].witnesses[k];
                 if (CL.witnessAddingMode === false || CL.witnessesAdded.indexOf(witness) !== -1) {
                   if (Object.prototype.hasOwnProperty.call(data[i].text[j], witness) &&
-                          Object.prototype.hasOwnProperty.call(data[i].text[j][witness], 'decision_details')) {
+                    Object.prototype.hasOwnProperty.call(data[i].text[j][witness], 'decision_details')) {
                     for (let l = 0; l < data[i].text[j][witness].decision_details.length; l += 1) {
                       if (Object.prototype.hasOwnProperty.call(deletableRules, data[i].text[j][witness].decision_details[l].id)) {
                         deletableRules[data[i].text[j][witness].decision_details[l].id].witnesses.push(witness);
@@ -157,7 +157,7 @@ var RG = (function() {
                 }
                 if (CL.witnessAddingMode === true) {
                   if (Object.prototype.hasOwnProperty.call(data[i].text[j], witness) &&
-                        Object.prototype.hasOwnProperty.call(data[i].text[j][witness], 'decision_details')) {
+                    Object.prototype.hasOwnProperty.call(data[i].text[j][witness], 'decision_details')) {
                     for (let l = 0; l < data[i].text[j][witness].decision_details.length; l += 1) {
                       if (!Object.prototype.hasOwnProperty.call(deletableRules, data[i].text[j][witness].decision_details[l].id)) {
                         if (Object.prototype.hasOwnProperty.call(nonDeletableRules, data[i].text[j][witness].decision_details[l].id)) {
@@ -219,8 +219,8 @@ var RG = (function() {
         cells.push('</tr>');
         rows.push(cells.join(''));
       }
-      html.push('<td class="start_' + start + '" colspan="' + (end - start + 1) + '"><div class="drag_div" id="redips-drag' + id + '">');
-      html.push('<table class="variant_unit" id="variant_unit_' + id + '">');
+      html.push('<td class="start_' + start + '" colspan="' + (end - start + 1) + '"><div class="drag-div" id="redips-drag' + id + '">');
+      html.push('<table class="variant-unit" id="variant_unit_' + id + '">');
       html.push(rows.join('').replace(/MX_LN/g, String(maxLength + 1)));
       html.push('<tr><td class="redips-mark" colspan="' + (maxLength + 1) + '"><span id="add_reading_' + id + '">+</span></td></tr>');
       html.push('</table>');
@@ -228,7 +228,7 @@ var RG = (function() {
       return [html, rowList, events];
     },
 
-    recollate: function(resetScroll) {
+    recollate: function (resetScroll) {
       let scrollOffset;
       spinner.showLoadingOverlay();
       if (resetScroll === undefined) {
@@ -237,11 +237,11 @@ var RG = (function() {
       scrollOffset = 0;
       if (!resetScroll) {
         scrollOffset = [document.getElementById('scroller').scrollLeft,
-                        document.getElementById('scroller').scrollTop];
+        document.getElementById('scroller').scrollTop];
       }
       if (CL.witnessAddingMode !== true) {
         if ($.isEmptyObject(CL.collateData)) {
-          RG.getCollationData('units', scrollOffset, function() {
+          RG.getCollationData('units', scrollOffset, function () {
             RG.runCollation(CL.collateData, 'units', scrollOffset);
           });
         } else {
@@ -252,11 +252,11 @@ var RG = (function() {
       }
     },
 
-    showVerseCollation: function(data, context, container, options) {
+    showVerseCollation: function (data, context, container, options) {
       let i, row, showHideRegularisationsButtonText, removeWitsForm, wits, preselectedAddedHighlight;
       console.log(JSON.parse(JSON.stringify(data)));
       CL.stage = 'regularise';
-  
+
       if (typeof options === 'undefined') {
         options = {};
       }
@@ -275,37 +275,37 @@ var RG = (function() {
         options.highlighted_added_wits = CL.highlightedAdded;
       }
       options.sort = true;
-      SimpleContextMenu.setup({'preventDefault': true, 'preventForms': false});
+      SimpleContextMenu.setup({ 'preventDefault': true, 'preventForms': false });
       if (CL.witnessEditingMode === false || CL.witnessAddingMode === true) {
-        SimpleContextMenu.attach('selected_rule', function() {
+        SimpleContextMenu.attach('selected-rule', function () {
           return RG._makeMenu('group_delete');
         });
-        SimpleContextMenu.attach('regularised', function() {
+        SimpleContextMenu.attach('regularised', function () {
           return RG._makeMenu('regularised');
         });
-        SimpleContextMenu.attach('regularised_global', function() {
-          return RG._makeMenu('regularised_global');
+        SimpleContextMenu.attach('regularised-global', function () {
+          return RG._makeMenu('regularised-global');
         });
-        SimpleContextMenu.attach('regularisation_staged', function() {
-          return RG._makeMenu('regularisation_staged');
+        SimpleContextMenu.attach('regularisation-staged', function () {
+          return RG._makeMenu('regularisation-staged');
         });
       }
       // remove the witness removal window if shown
-      if (document.getElementById('remove_witnesses_div')) {
-        document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
+      if (document.getElementById('remove-witnesses-div')) {
+        document.getElementById('remove-witnesses-div').parentNode.removeChild(document.getElementById('remove-witnesses-div'));
       }
       if (CL.witnessEditingMode === true) {
         wits = CL.checkWitnessesAgainstProject(CL.dataSettings.witness_list, CL.project.witnesses);
         if (wits[0] === false) {
           if ((wits[1] === 'removed' || wits[1] === 'both') && CL.witnessRemovingMode === true) {
-            $.get(staticUrl + 'CE_core/html_fragments/remove_witnesses_form.html', function(html) {
-              if (!document.getElementById('remove_witnesses_div')) {
+            $.get(staticUrl + 'CE_core/html_fragments/remove_witnesses_form.html', function (html) {
+              if (!document.getElementById('remove-witnesses-div')) {
                 removeWitsForm = document.createElement('div');
               } else {
-                removeWitsForm = document.getElementById('remove_witnesses_div');
+                removeWitsForm = document.getElementById('remove-witnesses-div');
               }
-              removeWitsForm.setAttribute('id', 'remove_witnesses_div');
-              removeWitsForm.setAttribute('class', 'remove_witnesses_div dialogue_form');
+              removeWitsForm.setAttribute('id', 'remove-witnesses-div');
+              removeWitsForm.setAttribute('class', 'remove-witnesses-div dialogue-form');
               removeWitsForm.innerHTML = html;
               document.getElementsByTagName('body')[0].appendChild(removeWitsForm);
               CL.setUpRemoveWitnessesForm(wits[2], data, 'regularised');
@@ -318,24 +318,24 @@ var RG = (function() {
       const header = CL.getCollationHeader(CL.data, temp[1], false);
       const html = header[0];
       html.push.apply(html, temp[0]);
-      html.push('<ul id="context_menu" class="SimpleContextMenu"></ul>');
+      html.push('<ul id="context_menu" class="simple-context-menu"></ul>');
       document.getElementById('header').innerHTML = CL.getHeaderHtml('Regulariser', CL.context);
       //TODO: this might need to be improved everywhere it has been done if it turns out we need this in the services
       if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
         CL.services.showLoginStatus();
       }
-      document.getElementById('header').className = 'regularisation_header';
-      const globalExceptionsHtml = '<div class="dialogue_form"  id="global_exceptions" style="display:none">' +
-                                   '<div class="dialogue_form_header drag-zone" id="global_exceptions_header">' +
-                                   '<span>Global Exceptions</span><span id="global_exceptions_ex">&#9660;</span></div>' +
-                                   '<div id="global_exceptions_list" style="display:none"></div></div>';
-      container.innerHTML = '<div id="scroller" class="fillPage"><table class="collation_overview">' +
-        html.join('') + '</table>' + globalExceptionsHtml + '</div><div id="single_witness_reading"></div>';
+      document.getElementById('header').className = 'regularisation-header';
+      const globalExceptionsHtml = '<div class="dialogue-form"  id="global-exceptions" style="display:none">' +
+        '<div class="dialogue-form-header drag-zone" id="global-exceptions-header">' +
+        '<span>Global Exceptions</span><span id="global-exceptions-ex">&#9660;</span></div>' +
+        '<div id="global-exceptions-list" style="display:none"></div></div>';
+      container.innerHTML = '<div id="scroller" class="fillPage"><table class="collation-overview">' +
+        html.join('') + '</table>' + globalExceptionsHtml + '</div><div id="single-witness-reading"></div>';
       CL.expandFillPageClients();
-  
+
       if (RG.showRegularisations === true) {
         showHideRegularisationsButtonText = 'hide regularisations';
-        CL.services.getRuleExceptions(CL.context, function(rules) {
+        CL.services.getRuleExceptions(CL.context, function (rules) {
           if (rules.length > 0) {
             RG._showGlobalExceptions(rules);
           } else {
@@ -349,60 +349,68 @@ var RG = (function() {
       $('#footer').addClass('pure-form');
       const footerHtml = [];
       if (Object.prototype.hasOwnProperty.call(CL.project, 'showCollapseAllUnitsButton') &&
-              CL.project.showCollapseAllUnitsButton === true) {
-        footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+        CL.project.showCollapseAllUnitsButton === true) {
+        footerHtml.push('<button class="pure-button left-foot" id="expand-collapse-button">collapse all</button>');
       }
       if (CL.witnessEditingMode === false || CL.witnessAddingMode === true) {
-        footerHtml.push('<button class="pure-button left_foot" id="show_hide_regularisations_button">' +
-                        showHideRegularisationsButtonText + '</button>');
+        footerHtml.push('<button class="pure-button left-foot" id="show-hide-regularisations-button">' +
+          showHideRegularisationsButtonText + '</button>');
       }
       if (CL.witnessEditingMode === false) {
-        footerHtml.push('<span id="extra_buttons"></span>');
-        footerHtml.push('<span id="stage_links"></span>');
+        footerHtml.push('<span id="extra-buttons"></span>');
+        footerHtml.push('<span id="stage-links"></span>');
       }
       if (CL.witnessEditingMode === true) {
-        footerHtml.push('<button class="pure-button right_foot" id="return_to_saved_table_button">' +
-                        'Return to summary table</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="return_to_saved_table_button">' +
+          'Return to summary table</button>');
       } else {
-        footerHtml.push('<button class="pure-button right_foot" id="go_to_sv_button">move to set variants</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="go_to_sv_button">move to set variants</button>');
       }
-      footerHtml.push('<button class="pure-button right_foot" id="save_button">save</button>');
+      footerHtml.push('<button class="pure-button right-foot" id="save_button">save</button>');
       if (CL.witnessEditingMode === false || CL.witnessAddingMode === true) {
-        footerHtml.push('<button class="pure-button right_foot" id="recollate_button" type="button">recollate</button>');
-        footerHtml.push('<button class="pure-button right_foot" id="settings_button">settings</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="recollate_button" type="button">recollate</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="settings_button">settings</button>');
       }
-      footerHtml.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
+      footerHtml.push('<select class="right-foot" id="highlighted" name="highlighted"></select>');
       if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
-        footerHtml.push('<select class="right_foot" id="added_highlight" name="added_highlight"></select>');
+        footerHtml.push('<select class="right-foot" id="added_highlight" name="added_highlight"></select>');
       }
       document.getElementById('footer').innerHTML = footerHtml.join('');
-  
+
       spinner.removeLoadingOverlay();
       CL.addExtraFooterButtons('regularised');
       CL.addStageLinks();
       RG._addFooterFunctions();
-  
+
       CL.addTriangleFunctions('table');
-      cforms.populateSelect(CL.getHandsAndSigla(),
-                            document.getElementById('highlighted'),
-                            {'value_key': 'document',
-                             'text_keys': 'hand',
-                             'selected':options.highlighted_wit,
-                             'add_select': true,
-                             'select_label_details': {'label': 'highlight witness', 'value': 'none' }});
+      cforms.populateSelect(
+        CL.getHandsAndSigla(),
+        document.getElementById('highlighted'),
+        {
+          'value_key': 'document',
+          'text_keys': 'hand',
+          'selected': options.highlighted_wit,
+          'add_select': true,
+          'select_label_details': { 'label': 'highlight witness', 'value': 'none' }
+        }
+      );
       if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
         if (options.highlighted_added_wits.length === 1) {
           preselectedAddedHighlight = options.highlighted_added_wits[0];
         } else {
           preselectedAddedHighlight = 'all';
         }
-        cforms.populateSelect(CL.sortWitnesses(CL.witnessesAdded),
-                              document.getElementById('added_highlight'),
-                              {'selected': preselectedAddedHighlight,
-                               'add_select': true,
-                               'select_label_details': {'label': 'highlight all added witnesses', 'value': 'all'}});
+        cforms.populateSelect(
+          CL.sortWitnesses(CL.witnessesAdded),
+          document.getElementById('added_highlight'),
+          {
+            'selected': preselectedAddedHighlight,
+            'add_select': true,
+            'select_label_details': { 'label': 'highlight all added witnesses', 'value': 'all' }
+          }
+        );
       }
-  
+
       //TODO: probably better in for loop
       if (CL.witnessRemovingMode !== true) {
         i = 0;
@@ -417,17 +425,17 @@ var RG = (function() {
         }
       }
       RG._addMultipleRuleDeletionEvents();
-  
-      $('#highlighted').on('change', function(event) {
+
+      $('#highlighted').on('change', function (event) {
         RG._highlightWitness(event.target.value);
       });
       if (document.getElementById('added_highlight')) {
-        $('#added_highlight').on('change', function (event) {RG._highlightAddedWitness(event.target.value);});
+        $('#added_highlight').on('change', function (event) { RG._highlightAddedWitness(event.target.value); });
       }
       RG._showRegularisations();
-  
+
       CL.makeVerseLinks();
-  
+
       const eventRows = temp[2];
       for (let i = 0; i < eventRows.length; i += 1) {
         row = document.getElementById(eventRows[i]);
@@ -453,14 +461,14 @@ var RG = (function() {
       }
     },
 
-    allRuleStacksEmpty: function() {
+    allRuleStacksEmpty: function () {
       if (!$.isEmptyObject(_rules) || _forDeletion.length > 0 || _forGlobalExceptions.length > 0) {
         return false;
       }
       return true;
     },
 
-    runCollation: function(collationData, output, scrollOffset, callback) {
+    runCollation: function (collationData, output, scrollOffset, callback) {
       // put all the rules in a single list
       const ruleList = [];
       for (const key in _rules) {
@@ -468,17 +476,17 @@ var RG = (function() {
           ruleList.push.apply(ruleList, _rules[key]);
         }
       }
-      CL.services.updateRuleset(_forDeletion, _forGlobalExceptions, ruleList, CL.context, function() {
+      CL.services.updateRuleset(_forDeletion, _forGlobalExceptions, ruleList, CL.context, function () {
         _forDeletion = [];
         _forGlobalExceptions = [];
         _rules = {};
-        RG._fetchRules(function(rules) {
+        RG._fetchRules(function (rules) {
           RG._doRunCollation(collationData, rules, output, scrollOffset, callback);
         });
       });
     },
 
-    _doSelectAll: function(element) {
+    _doSelectAll: function (element) {
       let currentState = 'unselected';
       const variantUnit = $(element).parents('table')[0];
       const unselectedImage = staticUrl + 'CE_core/images/checkall.png';
@@ -488,15 +496,15 @@ var RG = (function() {
       }
       // first reset all the other images to unselected and unselect any selected words
       $('.select_all').attr('src', unselectedImage);
-      $(".selected_reg_word").removeClass("selected_reg_word");
+      $(".selected-reg-word").removeClass("selected-reg-word");
       // now change the selected one and select the words or don't if we are unselecting it
       if (currentState === 'unselected') {
         $(element).attr('src', selectedImage);
-        $('#' + variantUnit.id + ' .reg_word').addClass("selected_reg_word");
+        $('#' + variantUnit.id + ' .reg-word').addClass("selected-reg-word");
       }
     },
 
-    _getRulesForDisplay: function(rules, events, deletable, highlightedHand, rowIdBase) {
+    _getRulesForDisplay: function (rules, events, deletable, highlightedHand, rowIdBase) {
       let regClass, highlighted, ruleCells, subrowId;
       const keysToSort = [];
       const cellsDict = {};
@@ -505,7 +513,7 @@ var RG = (function() {
           ruleCells = [];
           if (deletable === true) {
             if (rules[key].scope === 'always') {
-              regClass = 'regularised_global ';
+              regClass = 'regularised-global ';
             } else {
               regClass = 'deletable_rule regularised ';
             }
@@ -513,7 +521,7 @@ var RG = (function() {
               regClass += 'deleted ';
             }
           } else {
-            regClass = 'non_deletable_rule ';
+            regClass = 'non-deletable-rule ';
           }
           regClass += 'regclass_' + rules[key].class + ' ';
           highlighted = '';
@@ -544,8 +552,8 @@ var RG = (function() {
             cellsDict[rules[key].witnesses[0]] = [ruleCells.join(' ')];
           }
           events[subrowId] = rules[key].scope + ': ' +
-                             RG._getRegWitsAsString(rules[key].witnesses) + ' (' +
-                             rules[key].class + ')';
+            RG._getRegWitsAsString(rules[key].witnesses) + ' (' +
+            rules[key].class + ')';
         }
       }
       return [keysToSort, cellsDict, events];
@@ -557,20 +565,20 @@ var RG = (function() {
         if (e.shiftKey || e.altKey) {
           // check if there are already words in other variant units selected and remove them.
           const thisVariantUnitId = $(e.target).parents('div').attr('id');
-          const prevSelected = $('.selected_rule');
+          const prevSelected = $('.selected-rule');
           $.each(prevSelected, function (i, selected) {
             if ($(selected).parents('div').attr('id') != thisVariantUnitId) {
-              $(selected).removeClass('selected_rule');
+              $(selected).removeClass('selected-rule');
               $(selected).addClass('regularised');
             }
           })
           const tr = $(e.target).closest('tr');
-          if ($(tr).hasClass('selected_rule')) {
+          if ($(tr).hasClass('selected-rule')) {
             // we are deselecting this so remove the colour and add regularised
-            $(tr).removeClass('selected_rule');
+            $(tr).removeClass('selected-rule');
             $(tr).addClass('regularised');
           } else {
-            $(tr).addClass('selected_rule');
+            $(tr).addClass('selected-rule');
             $(tr).removeClass('regularised');
           }
         }
@@ -578,15 +586,15 @@ var RG = (function() {
     },
 
     _addMultipleWordSelectionEvents: function (row) {
-      $(row).click(function(e) {
+      $(row).click(function (e) {
         if (e.shiftKey || e.altKey) {
           let elem;
           // check if there are already words in other variant units selected and remove them.
           const thisVariantUnitId = $(e.target).parents('div').attr('id');
-          const prevSelected = $('.selected_reg_word');
+          const prevSelected = $('.selected-reg-word');
           $.each(prevSelected, function (i, selected) {
             if ($(selected).parents('div').attr('id') != thisVariantUnitId) {
-              $(selected).removeClass('selected_reg_word');
+              $(selected).removeClass('selected-reg-word');
             }
           })
           if ($(e.target).hasClass('spanlike')) {
@@ -594,10 +602,10 @@ var RG = (function() {
           } else {
             elem = $(e.target)[0];
           }
-          if ($(elem).hasClass('selected_reg_word')) {
-            $(elem).removeClass('selected_reg_word');
+          if ($(elem).hasClass('selected-reg-word')) {
+            $(elem).removeClass('selected-reg-word');
           } else {
-            $(elem).addClass('selected_reg_word');
+            $(elem).addClass('selected-reg-word');
           }
         }
       });
@@ -608,7 +616,7 @@ var RG = (function() {
     _highlightAddedWitness: function (witness) {
       let witnesses;
       const scrollOffset = [document.getElementById('scroller').scrollLeft,
-                            document.getElementById('scroller').scrollTop];
+      document.getElementById('scroller').scrollTop];
 
       if (witness === 'all') {
         witnesses = CL.witnessesAdded;
@@ -616,32 +624,32 @@ var RG = (function() {
         witnesses = [witness];
       }
       CL.highlightedAdded = witnesses;
-      RG.showVerseCollation(CL.data, CL.context, CL.container, {'highlighted_added_wits': witnesses});
+      RG.showVerseCollation(CL.data, CL.context, CL.container, { 'highlighted_added_wits': witnesses });
 
       document.getElementById('scroller').scrollLeft = scrollOffset[0];
       document.getElementById('scroller').scrollTop = scrollOffset[1];
     },
 
     _addFooterFunctions: function () {
-      $('#return_to_saved_table_button').on('click', function() {
-          const callback = function () {
-            _rules = {};
-            _forDeletion = [];
-            _forGlobalExceptions = [];
-            CL.isDirty = false;
-          };
-          CL.returnToSummaryTable(callback);
+      $('#return_to_saved_table_button').on('click', function () {
+        const callback = function () {
+          _rules = {};
+          _forDeletion = [];
+          _forGlobalExceptions = [];
+          CL.isDirty = false;
+        };
+        CL.returnToSummaryTable(callback);
       });
       $('#go_to_sv_button').on('click',
-        function() {
+        function () {
           let extraResults;
           spinner.showLoadingOverlay();
           //remove any forms still present
-          if (document.getElementById('reg_form')) {
-            document.getElementById('reg_form').parentNode.removeChild(document.getElementById('reg_form'));
+          if (document.getElementById('reg-form')) {
+            document.getElementById('reg-form').parentNode.removeChild(document.getElementById('reg-form'));
           }
-          if (document.getElementById('global_exceptions')) {
-            document.getElementById('global_exceptions').parentNode.removeChild(document.getElementById('global_exceptions'));
+          if (document.getElementById('global-exceptions')) {
+            document.getElementById('global-exceptions').parentNode.removeChild(document.getElementById('global-exceptions'));
           }
           //check that there are no rules in stacks waiting to be added/deleted/have exceptions made etc.
           if (RG.allRuleStacksEmpty()) {
@@ -651,7 +659,7 @@ var RG = (function() {
                 RG._removeUnrequiredData(); //remove the key-value pairs we don't need anymore
                 CL.data.marked_readings = {}; //added for SV
                 CL.addUnitAndReadingIds(); //added for SV
-                SV.showSetVariants({'container': CL.container});
+                SV.showSetVariants({ 'container': CL.container });
                 document.getElementById('scroller').scrollLeft = 0;
                 document.getElementById('scroller').scrollTop = 0;
               } else {
@@ -671,20 +679,20 @@ var RG = (function() {
           }
         });
       $('#settings_button').on('click',
-        function() {
+        function () {
           RG._showSettings();
         });
       $('#recollate_button').on('click',
-        function() {
+        function () {
           RG.recollate();
         });
       $('#save_button').on('click',
-        function() {
+        function () {
           CL.saveCollation('regularised');
         });
     },
 
-    _calculateLacWits: function(collationData, resultCallback) {
+    _calculateLacWits: function (collationData, resultCallback) {
       let transcriptionId;
       const lacTranscriptions = JSON.parse(JSON.stringify(CL.dataSettings.witness_list));
       if (Object.prototype.hasOwnProperty.call(collationData.results[0], 'transcription_id')) {
@@ -706,14 +714,14 @@ var RG = (function() {
       resultCallback(lacTranscriptions);
     },
 
-    _hasRuleApplied: function(id) {
+    _hasRuleApplied: function (id) {
       if (Object.prototype.hasOwnProperty.call(_rules, id)) {
         return true;
       }
       return false;
     },
 
-    _getDisplayClasses: function(word) {
+    _getDisplayClasses: function (word) {
       for (let i = 0; i < word.reading.length; i += 1) {
         if (Object.prototype.hasOwnProperty.call(word, word.reading[i])) {
           if (Object.prototype.hasOwnProperty.call(word[word.reading[i]], 'display_class')) {
@@ -726,7 +734,7 @@ var RG = (function() {
 
     /** returns the token with the following priorities
      * interface > n > t */
-    _getToken: function(dict) {
+    _getToken: function (dict) {
       if (Object.prototype.hasOwnProperty.call(dict, 'interface')) {
         return CL.project.prepareDisplayString(dict['interface']);
       }
@@ -736,12 +744,12 @@ var RG = (function() {
       return CL.project.prepareDisplayString(dict.t);
     },
 
-    _getWordTokenForWitness: function(unit, reading, word) {
+    _getWordTokenForWitness: function (unit, reading, word) {
       const token = CL.data.apparatus[unit].readings[reading].text[word];
       return token['interface'];
     },
 
-    _hasDeletionScheduled: function(ruleId) {
+    _hasDeletionScheduled: function (ruleId) {
       for (let i = 0; i < _forDeletion.length; i += 1) {
         if (_forDeletion[i].id === ruleId) {
           return true;
@@ -755,7 +763,7 @@ var RG = (function() {
       return false;
     },
 
-    _getRegWitsAsString: function(witList) {
+    _getRegWitsAsString: function (witList) {
       const newWits = [];
       for (let i = 0; i < witList.length; i += 1) {
         newWits.push(witList[i]);
@@ -764,10 +772,10 @@ var RG = (function() {
     },
 
     /** add lac_verse and om_verse to the collated data */
-    _integrateLacOmReadings: function(data) {
+    _integrateLacOmReadings: function (data) {
       const specialWitnesses = [];
       if (Object.prototype.hasOwnProperty.call(data, 'special_categories')) {
-        for (let j = 0; j < data.special_categories.length; j+=1) {
+        for (let j = 0; j < data.special_categories.length; j += 1) {
           for (let i = 0; i < data.apparatus.length; i += 1) {
             data.apparatus[i].readings.push({
               'text': [],
@@ -821,9 +829,9 @@ var RG = (function() {
       return data;
     },
 
-    _doRunCollation: function(collationData, rules, output, scrollOffset, callback) {
+    _doRunCollation: function (collationData, rules, output, scrollOffset, callback) {
       let resultCallback;
-      const options = {'configs': {}, 'data': {}};
+      const options = { 'configs': {}, 'data': {} };
       // set the data values
       options.data.rules = rules;
       options.data.unit_data = collationData;
@@ -834,7 +842,7 @@ var RG = (function() {
       dataSettings.language = CL.dataSettings.language;
       dataSettings.witness_list = CL.dataSettings.witness_list;
       options.data.data_settings = dataSettings;
-  
+
       const displaySettings = {};
       for (const setting in CL.displaySettings) {
         if (Object.prototype.hasOwnProperty.call(CL.displaySettings, setting)) {
@@ -844,7 +852,7 @@ var RG = (function() {
         }
       }
       options.data.display_settings = displaySettings;
-  
+
       // Set all the config options
       options.configs.display_settings_config = CL.displaySettingsDetails;
       options.configs.rule_conditions_config = CL.ruleConditions;
@@ -861,18 +869,18 @@ var RG = (function() {
         }
       }
       options.configs.algorithm_settings = algorithmSettings;
-  
+
       if (Object.prototype.hasOwnProperty.call(CL.services, 'collatexHost')) {
         options.configs.collatexHost = CL.services.collatexHost;
       }
-  
+
       if (output === 'add_witnesses') {
         options.configs.split_single_reading_units = true;
-        resultCallback = function(data) {
+        resultCallback = function (data) {
           callback(data);
         };
       } else {
-        resultCallback = function(data) {
+        resultCallback = function (data) {
           if (data === null) {
             alert(CL.context + ' does not collate.');
             spinner.removeLoadingOverlay();
@@ -892,17 +900,17 @@ var RG = (function() {
       CL.services.doCollation(CL.context, options, resultCallback);
     },
 
-    _showSettings: function() {
+    _showSettings: function () {
       if (document.getElementById('settings') !== null) {
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('settings'));
       }
       const settingsDiv = document.createElement('div');
       settingsDiv.setAttribute('id', 'settings');
-      settingsDiv.setAttribute('class', 'settings_dialogue dialogue_form');
-      settingsDiv.innerHTML = '<div class="dialogue_form_header"><span id="settings_title">Settings</span></div>' +
-                              '<form id="settings_form"></form>';
+      settingsDiv.setAttribute('class', 'settings-dialogue dialogue-form');
+      settingsDiv.innerHTML = '<div class="dialogue-form-header"><span id="settings_title">Settings</span></div>' +
+        '<form id="settings_form"></form>';
       const settingsHtml = [];
-      CL.displaySettingsDetails.configs.sort(function(a, b) {
+      CL.displaySettingsDetails.configs.sort(function (a, b) {
         return a.menu_pos - b.menu_pos;
       });
       for (let i = 0; i < CL.displaySettingsDetails.configs.length; i += 1) {
@@ -913,7 +921,7 @@ var RG = (function() {
         } else {
           settingsHtml.push('<label for="' + CL.displaySettingsDetails.configs[i].id + '">');
           settingsHtml.push('<input class="boolean" name="' + CL.displaySettingsDetails.configs[i].id + '" id="' +
-                            CL.displaySettingsDetails.configs[i].id + '" type="checkbox"/>');
+            CL.displaySettingsDetails.configs[i].id + '" type="checkbox"/>');
           settingsHtml.push(CL.displaySettingsDetails.configs[i].label + '</label>');
           settingsHtml.push('<br/>');
         }
@@ -927,7 +935,7 @@ var RG = (function() {
           document.getElementById(CL.displaySettingsDetails.configs[i].id).checked = CL.displaySettings[CL.displaySettingsDetails.configs[i].id];
         }
       }
-      $('#save_settings').on('click', function() {
+      $('#save_settings').on('click', function () {
         const data = cforms.serialiseForm('settings_form');
         for (const setting in CL.displaySettings) {
           if (Object.prototype.hasOwnProperty.call(CL.displaySettings, setting)) {
@@ -942,21 +950,21 @@ var RG = (function() {
         CL.isDirty = true; // may not have changed but let's be safe
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('settings'));
       });
-      $('#close_settings').on('click', function() {
+      $('#close_settings').on('click', function () {
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('settings'));
       });
     },
 
-    _fetchRules: function(callback) {
+    _fetchRules: function (callback) {
       //get the rules according to the appropriate service
-      CL.services.getRules(CL.context, function(rules) {
+      CL.services.getRules(CL.context, function (rules) {
         callback(rules);
       });
     },
 
     // This is not really needed anymore as we are no longer adding rule_string into the data It is still here because
     // we may have data at the regularisation stage which does still have this key and it may as well be deleted.
-    _removeUnrequiredData: function() {
+    _removeUnrequiredData: function () {
       for (let i = 0; i < CL.data.apparatus.length; i += 1) {
         for (let j = 0; j < CL.data.apparatus[i].readings.length; j += 1) {
           for (let k = 0; k < CL.data.apparatus[i].readings[j].text.length; k += 1) {
@@ -968,14 +976,14 @@ var RG = (function() {
       }
     },
 
-    _showRegularisations: function() {
+    _showRegularisations: function () {
       if (RG.showRegularisations === true) {
-        if (document.getElementById('show_hide_regularisations_button')) {
-          document.getElementById('show_hide_regularisations_button').value = document.getElementById('show_hide_regularisations_button').value.replace('show', 'hide');
-          $('#show_hide_regularisations_button').on('click.hide_regularisations', function() {
+        if (document.getElementById('show-hide-regularisations-button')) {
+          document.getElementById('show-hide-regularisations-button').value = document.getElementById('show-hide-regularisations-button').value.replace('show', 'hide');
+          $('#show-hide-regularisations-button').on('click.hide_regularisations', function () {
             spinner.showLoadingOverlay();
             const scrollOffset = [document.getElementById('scroller').scrollLeft,
-                                  document.getElementById('scroller').scrollTop];
+            document.getElementById('scroller').scrollTop];
             RG.showRegularisations = false;
             RG.showVerseCollation(CL.data, CL.context, CL.container);
             document.getElementById('scroller').scrollLeft = scrollOffset[0];
@@ -983,12 +991,12 @@ var RG = (function() {
           });
         }
       } else {
-        if (document.getElementById('show_hide_regularisations_button')) {
-          document.getElementById('show_hide_regularisations_button').value = document.getElementById('show_hide_regularisations_button').value.replace('hide', 'show');
-          $('#show_hide_regularisations_button').on('click.show_regularisations', function() {
+        if (document.getElementById('show-hide-regularisations-button')) {
+          document.getElementById('show-hide-regularisations-button').value = document.getElementById('show-hide-regularisations-button').value.replace('hide', 'show');
+          $('#show-hide-regularisations-button').on('click.show_regularisations', function () {
             spinner.showLoadingOverlay();
             const scrollOffset = [document.getElementById('scroller').scrollLeft,
-                                  document.getElementById('scroller').scrollTop];
+            document.getElementById('scroller').scrollTop];
             RG.showRegularisations = true;
             RG.showVerseCollation(CL.data, CL.context, CL.container);
             document.getElementById('scroller').scrollLeft = scrollOffset[0];
@@ -998,9 +1006,9 @@ var RG = (function() {
       }
     },
 
-    _highlightWitness: function(witness) {
+    _highlightWitness: function (witness) {
       const scrollOffset = [document.getElementById('scroller').scrollLeft,
-                            document.getElementById('scroller').scrollTop];
+      document.getElementById('scroller').scrollTop];
       CL.highlighted = witness;
       RG.showVerseCollation(CL.data, CL.context, CL.container, {
         'highlighted_wit': witness
@@ -1012,9 +1020,9 @@ var RG = (function() {
       }
     },
 
-    _addNewToken: function(element) {
+    _addNewToken: function (element) {
       let lastRow, tr;
-      $(element).on('click', function(event) {
+      $(element).on('click', function (event) {
         lastRow = event.target.parentNode.parentNode;
         tr = document.createElement('tr');
         tr.innerHTML = '<td colspan="' + event.target.parentNode.getAttribute('colspan') + '"><input type="text" size="10"/></td>';
@@ -1022,13 +1030,13 @@ var RG = (function() {
       });
     },
 
-    _getWordIndexForWitness: function(unit, reading, word, witness) {
+    _getWordIndexForWitness: function (unit, reading, word, witness) {
       const token = CL.data.apparatus[unit].readings[reading].text[word];
       return token[witness].index;
     },
 
     // TODO: check on originalText use
-    _createRule: function(data, user, originalText, normalisedText, unit, reading, word, witnesses) {
+    _createRule: function (data, user, originalText, normalisedText, unit, reading, word, witnesses) {
       let rule, rules, witness, context, reconstructedReadings;
       //sort text out so that anything we turned to &lt; or &gt; get stored as < and >
       //TODO: I'm not sure we even use originalText anymore - check and streamline?
@@ -1036,11 +1044,13 @@ var RG = (function() {
       normalisedText = normalisedText.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
       //now make the rules
       if (data.scope === 'always' || data.scope === 'verse') {
-        rule = {'type': 'regularisation',
-                'scope': data.scope,
-                'class': data['class'] || 'none',
-                't': RG._getWordTokenForWitness(unit, reading, word).replace(/&lt;/g, '<').replace(/&gt;/g, '>'),
-                'n': normalisedText};
+        rule = {
+          'type': 'regularisation',
+          'scope': data.scope,
+          'class': data['class'] || 'none',
+          't': RG._getWordTokenForWitness(unit, reading, word).replace(/&lt;/g, '<').replace(/&gt;/g, '>'),
+          'n': normalisedText
+        };
         if (Object.prototype.hasOwnProperty.call(data, 'comments')) {
           rule.comments = data.comments;
         }
@@ -1067,10 +1077,12 @@ var RG = (function() {
         rules = [];
         for (let i = 0; i < witnesses.length; i += 1) {
           witness = witnesses[i];
-          rule = {'type': 'regularisation',
-                  'scope': data.scope,
-                  'class': data['class'] || 'none',
-                  'n': normalisedText};
+          rule = {
+            'type': 'regularisation',
+            'scope': data.scope,
+            'class': data['class'] || 'none',
+            'n': normalisedText
+          };
           if (Object.prototype.hasOwnProperty.call(data, 'comments')) {
             rule.comments = data.comments;
           }
@@ -1088,7 +1100,7 @@ var RG = (function() {
             reconstructedReadings = [];
             for (let j = 0; j < CL.project.ruleClasses; j += 1) {
               if (Object.prototype.hasOwnProperty.call(CL.project.ruleClasses[j], 'reconstructedreading') &&
-                        CL.project.ruleClasses[j].reconstructedreading === true) {
+                CL.project.ruleClasses[j].reconstructedreading === true) {
                 reconstructedReadings.push(CL.project.ruleClasses[j].value);
               }
             }
@@ -1124,12 +1136,12 @@ var RG = (function() {
       }
     },
 
-    _redipsInitRegularise: function(id) {
+    _redipsInitRegularise: function (id) {
       let clone, original, wordId, normalisedForm, normalisedText, unitData, unit, reading, word, witnesses,
-          originalText, originalDisplayText, createFunction, variantUnit, collectedWitnesses;
+        originalText, originalDisplayText, createFunction, variantUnit, collectedWitnesses;
       const rd = REDIPS.drag;
       rd.init(id);
-      rd.event.dropped = function() {
+      rd.event.dropped = function () {
         collectedWitnesses = [];
         clone = document.getElementById(rd.obj.id);
         original = document.getElementById(rd.objOld.id);
@@ -1146,8 +1158,8 @@ var RG = (function() {
                 clone.parentNode.removeChild(clone);
               }
               alert('You are not allowed to regularise to multiple tokens, the normalised form must not include ' +
-                    'spaces.\n\nIf you need to regularise to multiple words this can be done in the Set Variants ' +
-                    'interface');
+                'spaces.\n\nIf you need to regularise to multiple words this can be done in the Set Variants ' +
+                'interface');
               return;
             } else {
               // you are asking to regularise a single token to a single token that is allowed and we will continue
@@ -1169,11 +1181,11 @@ var RG = (function() {
           clone.parentNode.removeChild(clone);
         }
         // get any selected words from this unit, if there are any then we use these alone, if none then just use the word at original
-        const selectedWords = $('#' + variantUnit.id + ' *.selected_reg_word');
-        for (let i = 0; i < selectedWords.length; i += 1 ) {
-          selectedWords[i].objOld={id:$(selectedWords[i]).attr("id")};
-          selectedWords[i].unit_data=$(selectedWords[i]).attr("id");
-          selectedWords[i].original=$(selectedWords[i]).attr("id");
+        const selectedWords = $('#' + variantUnit.id + ' *.selected-reg-word');
+        for (let i = 0; i < selectedWords.length; i += 1) {
+          selectedWords[i].objOld = { id: $(selectedWords[i]).attr("id") };
+          selectedWords[i].unit_data = $(selectedWords[i]).attr("id");
+          selectedWords[i].original = $(selectedWords[i]).attr("id");
           selectedWords[i].unit = parseInt(selectedWords[i].unit_data.substring(0, selectedWords[i].unit_data.indexOf('_r')).replace('variant_unit_', ''), 10);
           selectedWords[i].reading = parseInt(selectedWords[i].unit_data.substring(selectedWords[i].unit_data.indexOf('_r') + 2, selectedWords[i].unit_data.indexOf('_w')), 10);
           selectedWords[i].word = parseInt(selectedWords[i].unit_data.substring(selectedWords[i].unit_data.indexOf('_w') + 2), 10);
@@ -1188,7 +1200,7 @@ var RG = (function() {
 
         unitData = rd.objOld.id;
         unit = parseInt(unitData.substring(0, unitData.indexOf('_r')).replace('variant_unit_', ''), 10);
-        
+
         if (selectedWords.length > 0) {
           let originalWords = []
           for (let i = 0; i < selectedWords.length; i += 1) {
@@ -1209,11 +1221,11 @@ var RG = (function() {
           collectedWitnesses.push.apply(collectedWitnesses, witnesses)
         }
 
-        if (document.getElementById('reg_form') !== null) {
-          document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
+        if (document.getElementById('reg-form') !== null) {
+          document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg-form'));
         }
         // function to create the rules - triggered from the form
-        createFunction = function() {
+        createFunction = function () {
           let newUnit, newReading, newWitnesses, suffix;
           // create the rule
           // make sure all the data (even any disabled ones are submitted)
@@ -1221,11 +1233,11 @@ var RG = (function() {
           if (document.getElementById('scope').value === 'none') {
             return false;
           }
-          const data = cforms.serialiseForm('regularisation_menu');
+          const data = cforms.serialiseForm('regularisation-menu');
           if (!Object.prototype.hasOwnProperty.call(data, 'class')) {
             data['class'] = 'none';
           }
-          CL.services.getUserInfo(function(user) {
+          CL.services.getUserInfo(function (user) {
             if (selectedWords.length > 0) {
               for (let i = 0; i < selectedWords.length; i += 1) {
                 _rules[selectedWords[i].objOld.id] = RG._createRule(
@@ -1243,16 +1255,16 @@ var RG = (function() {
               _rules[wordId] = RG._createRule(data, user, originalText, normalisedText, unit, reading, word, witnesses);
             }
           });
-          document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
+          document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg-form'));
           rd.enableDrag(false, rd.objOld);
-          $(original).addClass('regularisation_staged');
+          $(original).addClass('regularisation-staged');
           $(original.parentNode).addClass('redips-mark');
-	        if ($(original).hasClass('selected_reg_word')) {
-            $(original).removeClass('selected_reg_word');
+          if ($(original).hasClass('selected-reg-word')) {
+            $(original).removeClass('selected-reg-word');
           }
           for (let i = 0; i < selectedWords.length; i += 1) {
-            $(selectedWords[i]).removeClass('selected_reg_word');
-            $(selectedWords[i]).addClass('regularisation_staged');
+            $(selectedWords[i]).removeClass('selected-reg-word');
+            $(selectedWords[i]).addClass('regularisation-staged');
             $(selectedWords[i].parentNode).addClass('mark');
           };
 
@@ -1274,19 +1286,19 @@ var RG = (function() {
             }
           }
         };  // end of createFunction
-        $.get(staticUrl + 'CE_core/html_fragments/rule_menu.html', function(html) {
+        $.get(staticUrl + 'CE_core/html_fragments/rule_menu.html', function (html) {
           let selected;
           const regMenu = document.createElement('div');
-          regMenu.setAttribute('id', 'reg_form');
-          regMenu.setAttribute('class', 'reg_form dialogue_form');
+          regMenu.setAttribute('id', 'reg-form');
+          regMenu.setAttribute('class', 'reg-form dialogue-form');
           html = html.replace('{unit_data}', unitData);
           html = html.replace('{original_text}', CL.project.prepareDisplayString(originalDisplayText));
           html = html.replace('{normalised_text}',
-                              CL.project.prepareDisplayString(normalisedText).replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+            CL.project.prepareDisplayString(normalisedText).replace(/</g, '&lt;').replace(/>/g, '&gt;'));
           regMenu.innerHTML = html;
           document.getElementsByTagName('body')[0].appendChild(regMenu);
           if (CL.project.allowCommentsOnRegRules === true) {
-            document.getElementById('reg_rules_comments_div').style.display = 'block';
+            document.getElementById('reg-rules-comments-div').style.display = 'block';
           }
           const regRules = CL.getRuleClasses('create_in_RG', true, 'value', ['identifier', 'name', 'RG_default']);
           const newRegRules = [];
@@ -1294,9 +1306,9 @@ var RG = (function() {
           for (const key in regRules) {
             if (Object.prototype.hasOwnProperty.call(regRules, key)) {
               if (typeof regRules[key][0] !== 'undefined') {
-                newRegRules.push({'value': key, 'label': regRules[key][1] + ' (' + regRules[key][0] + ')'});
+                newRegRules.push({ 'value': key, 'label': regRules[key][1] + ' (' + regRules[key][0] + ')' });
               } else {
-                newRegRules.push({'value': key, 'label': regRules[key][1]});
+                newRegRules.push({ 'value': key, 'label': regRules[key][1] });
               }
               if (regRules[key][2] === true) {
                 selected = key;
@@ -1308,7 +1320,7 @@ var RG = (function() {
       };
     },
 
-    _getDisplaySettingValue: function(id, key) {
+    _getDisplaySettingValue: function (id, key) {
       for (let i = 0; i < CL.displaySettingsDetails.configs.length; i += 1) {
         if (CL.displaySettingsDetails.configs[i].id === id) {
           return CL.displaySettingsDetails.configs[i][key];
@@ -1317,28 +1329,28 @@ var RG = (function() {
       return null;
     },
 
-    _setUpRuleMenu: function(rd, classes, selected, createFunction) {
+    _setUpRuleMenu: function (rd, classes, selected, createFunction) {
       let leftPos, conditionsHtml, id, setting;
       const windowWidth = window.innerWidth;
       leftPos = rd.td.current.offsetLeft + rd.obj.redips.container.offsetParent.offsetLeft -
-                          document.getElementById('scroller').scrollLeft;
-      if (leftPos + parseInt(document.getElementById('reg_form').offsetWidth) >= windowWidth) {
-        leftPos = (windowWidth - parseInt(document.getElementById('reg_form').offsetWidth) - 20);
+        document.getElementById('scroller').scrollLeft;
+      if (leftPos + parseInt(document.getElementById('reg-form').offsetWidth) >= windowWidth) {
+        leftPos = (windowWidth - parseInt(document.getElementById('reg-form').offsetWidth) - 20);
       }
-      document.getElementById('reg_form').style.left = leftPos + 'px';
-  
+      document.getElementById('reg-form').style.left = leftPos + 'px';
+
       if (CL.witnessAddingMode === true) {
-        document.getElementById('rule_creation_warning').innerHTML = 'Rules created will only apply to the witnesses being added.';
+        document.getElementById('rule-creation-warning').innerHTML = 'Rules created will only apply to the witnesses being added.';
       }
-  
+
       const ruleScopes = RG._getRuleScopes();
       cforms.populateSelect(ruleScopes,
-                            document.getElementById('scope'),
-                            {'value_key': 'value', 'text_keys': 'label', 'add_select': false});
+        document.getElementById('scope'),
+        { 'value_key': 'value', 'text_keys': 'label', 'add_select': false });
       cforms.populateSelect(classes,
-                            document.getElementById('class'),
-                            {'value_key': 'value', 'text_keys': 'label', 'add_select': false, 'selected': selected});
-  
+        document.getElementById('class'),
+        { 'value_key': 'value', 'text_keys': 'label', 'add_select': false, 'selected': selected });
+
       if (Object.prototype.hasOwnProperty.call(CL, 'ruleConditions') && CL.ruleConditions !== undefined) {
         conditionsHtml = [];
         for (let i = 0; i < CL.ruleConditions.configs.length; i += 1) {
@@ -1351,7 +1363,7 @@ var RG = (function() {
         document.getElementById('conditions').innerHTML = conditionsHtml.join('');
         for (let i = 0; i < CL.ruleConditions.configs.length; i += 1) {
           if (Object.prototype.hasOwnProperty.call(CL.ruleConditions.configs[i], 'linked_to_settings') &&
-                  CL.ruleConditions.configs[i].linked_to_settings === true) {
+            CL.ruleConditions.configs[i].linked_to_settings === true) {
             setting = CL.ruleConditions.configs[i].setting_id;
             id = 'conditions_' + CL.ruleConditions.configs[i].id;
             if (CL.displaySettings[setting] === RG._getDisplaySettingValue(setting, 'apply_when')) {
@@ -1363,34 +1375,34 @@ var RG = (function() {
       } else {
         document.getElementById('conditions').style.display = 'none';
       }
-      drag.initDraggable('reg_form', true, true);
-      document.getElementById('regularisation_menu').style.height = document.getElementById('reg_form').offsetHeight - 43 + 'px';
-      $('#cancel_button').on('click', function() {
-        document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
+      drag.initDraggable('reg-form', true, true);
+      document.getElementById('regularisation-menu').style.height = document.getElementById('reg-form').offsetHeight - 43 + 'px';
+      $('#cancel-button').on('click', function () {
+        document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg-form'));
       });
-      $('#save_rule_button').on('click', createFunction);
+      $('#save-rule-button').on('click', createFunction);
     },
 
-    _getRuleScopes: function() {
+    _getRuleScopes: function () {
       const allowedScopes = ['once', 'verse', 'manuscript', 'always'];
       const ruleScopes = CL.services.supportedRuleScopes;
       const scopesAndLabels = [];
       for (const key in ruleScopes) {
         if (Object.prototype.hasOwnProperty.call(ruleScopes, key) && allowedScopes.indexOf(key) !== -1) {
-          scopesAndLabels.push({'value': key, 'label': ruleScopes[key]});
+          scopesAndLabels.push({ 'value': key, 'label': ruleScopes[key] });
         }
       }
       return scopesAndLabels;
     },
 
-    _getSuffix: function(decisionClass) {
+    _getSuffix: function (decisionClass) {
       let suffix;
       suffix = '';
       for (let i = 0; i < CL.ruleClasses.length; i += 1) {
         if (CL.ruleClasses[i].value === decisionClass) {
           if (Object.prototype.hasOwnProperty.call(CL.ruleClasses[i], 'suffixed_sigla') &&
-              CL.ruleClasses[i].suffixed_sigla === true &&
-              typeof CL.ruleClasses[i].identifier !== 'undefined') {
+            CL.ruleClasses[i].suffixed_sigla === true &&
+            typeof CL.ruleClasses[i].identifier !== 'undefined') {
             suffix += CL.ruleClasses[i].identifier;
           }
         }
@@ -1398,26 +1410,26 @@ var RG = (function() {
       return suffix;
     },
 
-    _makeMenu: function(menuName) {
+    _makeMenu: function (menuName) {
       if (menuName === 'regularised') {
         document.getElementById('context_menu').innerHTML = '<li id="delete_rule"><span>Delete rule</span></li>' +
-                                                            '<li id="delete_variant_unit_rules"><span>Delete rule for all witnesses</span></li>';
+          '<li id="delete_variant_unit_rules"><span>Delete rule for all witnesses</span></li>';
       }
-      if (menuName === 'regularised_global') {
+      if (menuName === 'regularised-global') {
         document.getElementById('context_menu').innerHTML = '<li id="add_exception"><span>Add exception</span></li>' +
-                                                            '<li id="delete_rule"><span>Delete rule</span></li>';
+          '<li id="delete_rule"><span>Delete rule</span></li>';
       }
-      if (menuName === 'regularisation_staged') {
+      if (menuName === 'regularisation-staged') {
         document.getElementById('context_menu').innerHTML = '<li id="delete_unapplied_rule"><span>Delete rule</span></li>';
       }
       if (menuName === 'group_delete') {
-        document.getElementById('context_menu').innerHTML = '<li id="delete_selected_rules"><span>Delete selected rules</span></li>';
+        document.getElementById('context_menu').innerHTML = '<li id="delete-selected-rules"><span>Delete selected rules</span></li>';
       }
       RG._addContextMenuHandlers();
       return 'context_menu';
     },
 
-    _getAncestorRow: function(element) {
+    _getAncestorRow: function (element) {
       if (element.tagName === 'TR') {
         return element;
       } else {
@@ -1428,14 +1440,14 @@ var RG = (function() {
       }
     },
 
-    _showGlobalExceptions: function(rules) {
-      if (document.getElementById('global_exceptions').style.display === 'none') {
-        document.getElementById('global_exceptions').style.display = 'block';
-        document.getElementById('global_exceptions_list').style.display = 'block';
-        drag.initDraggable('global_exceptions', true, true);
+    _showGlobalExceptions: function (rules) {
+      if (document.getElementById('global-exceptions').style.display === 'none') {
+        document.getElementById('global-exceptions').style.display = 'block';
+        document.getElementById('global-exceptions-list').style.display = 'block';
+        drag.initDraggable('global-exceptions', true, true);
       }
       const html = [];
-      html.push('<form id="global_exceptions_form" class="pure-form">');
+      html.push('<form id="global-exceptions-form" class="pure-form">');
       html.push('<span>To remove an exception check the box<br/> and click the \'Remove exceptions\' button.</span><br/><ul>');
       for (let i = 0; i < rules.length; i += 1) {
         html.push('<li><input type="checkbox" name="' + rules[i].id + '" id="checkbox_' + rules[i].id + '"/>');
@@ -1443,33 +1455,33 @@ var RG = (function() {
       }
       html.push('</ul><input class="pure-button dialogue-form-button" type="button" value="Remove exceptions" id="remove_exception_button"/>');
       html.push('</form>');
-      document.getElementById('global_exceptions_list').innerHTML = html.join('');
-      document.getElementById('global_exceptions_list').style.height = document.getElementById('global_exceptions').offsetHeight - 35 + 'px';
-      document.getElementById('global_exceptions').style.top = (document.getElementById('header').offsetHeight +
-          document.getElementById('scroller').offsetHeight + document.getElementById('single_witness_reading').offsetHeight) -
-          document.getElementById('global_exceptions').offsetHeight + 15 + 'px';
-      document.getElementById('global_exceptions').style.left = 15 + 'px';
-  
+      document.getElementById('global-exceptions-list').innerHTML = html.join('');
+      document.getElementById('global-exceptions-list').style.height = document.getElementById('global-exceptions').offsetHeight - 35 + 'px';
+      document.getElementById('global-exceptions').style.top = (document.getElementById('header').offsetHeight +
+        document.getElementById('scroller').offsetHeight + document.getElementById('single-witness-reading').offsetHeight) -
+        document.getElementById('global-exceptions').offsetHeight + 15 + 'px';
+      document.getElementById('global-exceptions').style.left = 15 + 'px';
+
       $('#remove_exception_button').off('click.rem_ge');
-      $('#remove_exception_button').on('click.rem_ge', function() {
+      $('#remove_exception_button').on('click.rem_ge', function () {
         RG._removeGlobalExceptions();
       });
-      $('#global_exceptions_ex').on('click', function() {
-        if (document.getElementById('global_exceptions_list').style.display === 'block') {
-          $('#global_exceptions_header').width($('#global_exceptions_list').width());
-          document.getElementById('global_exceptions').style.top = parseInt(document.getElementById('global_exceptions').style.top) + parseInt(document.getElementById('global_exceptions_list').offsetHeight) + 'px';
-          document.getElementById('global_exceptions_list').style.display = 'none';
-          document.getElementById('global_exceptions_ex').innerHTML = '&#9650;';
+      $('#global-exceptions-ex').on('click', function () {
+        if (document.getElementById('global-exceptions-list').style.display === 'block') {
+          $('#global-exceptions-header').width($('#global-exceptions-list').width());
+          document.getElementById('global-exceptions').style.top = parseInt(document.getElementById('global-exceptions').style.top) + parseInt(document.getElementById('global-exceptions-list').offsetHeight) + 'px';
+          document.getElementById('global-exceptions-list').style.display = 'none';
+          document.getElementById('global-exceptions-ex').innerHTML = '&#9650;';
         } else {
-          document.getElementById('global_exceptions_list').style.display = 'block';
-          document.getElementById('global_exceptions').style.top = parseInt(document.getElementById('global_exceptions').style.top) - parseInt(document.getElementById('global_exceptions_list').offsetHeight) + 'px';
-          document.getElementById('global_exceptions_ex').innerHTML = '&#9660;';
+          document.getElementById('global-exceptions-list').style.display = 'block';
+          document.getElementById('global-exceptions').style.top = parseInt(document.getElementById('global-exceptions').style.top) - parseInt(document.getElementById('global-exceptions-list').offsetHeight) + 'px';
+          document.getElementById('global-exceptions-ex').innerHTML = '&#9660;';
         }
       });
     },
 
-    _removeGlobalExceptions: function() {
-      const data = cforms.serialiseForm('global_exceptions_form');
+    _removeGlobalExceptions: function () {
+      const data = cforms.serialiseForm('global-exceptions-form');
       const ruleIds = [];
       for (const key in data) {
         if (data[key] !== null) {
@@ -1478,7 +1490,7 @@ var RG = (function() {
       }
       // get the rules
       if (ruleIds.length > 0) {
-        CL.services.getRulesByIds(ruleIds, function(rules) {
+        CL.services.getRulesByIds(ruleIds, function (rules) {
           // remove this context from exceptions
           for (let i = 0; i < rules.length; i += 1) {
             if (Object.prototype.hasOwnProperty.call(rules[i], 'exceptions') && rules[i].exceptions !== null) {
@@ -1491,39 +1503,39 @@ var RG = (function() {
             }
           }
           // resave the rules
-          CL.services.updateRules(rules, CL.context, function() {
+          CL.services.updateRules(rules, CL.context, function () {
             RG.recollate(false);
           });
         });
       }
     },
 
-    _scheduleAddGlobalException: function() {
+    _scheduleAddGlobalException: function () {
       const element = SimpleContextMenu._target_element;
       const row = RG._getAncestorRow(element);
       const ruleId = row.id.substring(row.id.indexOf('_rule_') + 6);
-      _forGlobalExceptions.push({'id': ruleId});
+      _forGlobalExceptions.push({ 'id': ruleId });
       $(row).addClass('deleted');
     },
 
-    _deleteUnappliedRule: function() {
+    _deleteUnappliedRule: function () {
       const element = SimpleContextMenu._target_element;
       delete _rules[element.id];
       $(element.parentNode).removeClass('redips-mark');
-      $(element).removeClass('regularisation_staged');
+      $(element).removeClass('regularisation-staged');
       const rd = REDIPS.drag;
       rd.enableDrag(true, element);
     },
 
     _scheduleSelectedRulesDeletion: function () {
-      $('tr.selected_rule').each(function () {
+      $('tr.selected-rule').each(function () {
         RG._scheduleRuleDeletion(this);
         // remove the class so it is not selected again if we delete more
-        $(this).removeClass('selected_rule');
+        $(this).removeClass('selected-rule');
       });
     },
 
-    _scheduleRuleDeletion: function(element) {
+    _scheduleRuleDeletion: function (element) {
       if (element === undefined) {
         element = SimpleContextMenu._target_element;
       }
@@ -1534,11 +1546,11 @@ var RG = (function() {
       const ruleType = rule.scope;
       if (ruleType === 'always') {
         const ok = confirm('You are asking to delete a global rule.\nDeleting this rule will mean it is deleted everywhere ' +
-                     'in your project for all editors.\nIf you just want the rule to be ignored in this verse you can ' +
-                     'add an exception.\nAre you sure you want to delete this rule?');
+          'in your project for all editors.\nIf you just want the rule to be ignored in this verse you can ' +
+          'add an exception.\nAre you sure you want to delete this rule?');
         if (ok) {
           $(row).addClass('deleted');
-          _forDeletion.push({id: ruleId, scope: ruleType});
+          _forDeletion.push({ id: ruleId, scope: ruleType });
           if (CL.witnessEditingMode === true) {
             CL.isDirty = true;
           }
@@ -1547,14 +1559,14 @@ var RG = (function() {
         }
       } else {
         $(row).addClass('deleted');
-        _forDeletion.push({id: ruleId, scope: ruleType});
+        _forDeletion.push({ id: ruleId, scope: ruleType });
         if (CL.witnessEditingMode === true) {
           CL.isDirty = true;
         }
       }
     },
 
-    _scheduleAllRuleDeletion: function() {
+    _scheduleAllRuleDeletion: function () {
       /* schedule the deletion of all rules in the unit which match the n, t and scope of the clicked rule */
       const element = SimpleContextMenu._target_element;
       const row = RG._getAncestorRow(element);
@@ -1569,10 +1581,10 @@ var RG = (function() {
         // find all the rules we need to delete
         for (let key in RG._allDeletableRules[unitNum]) {
           if (RG._allDeletableRules[unitNum][key].n === rule.n &&
-              RG._allDeletableRules[unitNum][key].t === rule.t &&
-              RG._allDeletableRules[unitNum][key].scope === rule.scope) {
+            RG._allDeletableRules[unitNum][key].t === rule.t &&
+            RG._allDeletableRules[unitNum][key].scope === rule.scope) {
             $('#' + key).closest('tr').addClass('deleted');
-            _forDeletion.push({id: key, scope: rule.scope});
+            _forDeletion.push({ id: key, scope: rule.scope });
           }
         }
       } else {
@@ -1580,57 +1592,57 @@ var RG = (function() {
       }
     },
 
-    _addContextMenuHandlers: function() {
+    _addContextMenuHandlers: function () {
       if (document.getElementById('delete_rule')) {
         $('#delete_rule').off('click.dr_c');
         $('#delete_rule').off('mouseover.dr_mo');
-        $('#delete_rule').on('click.dr_c', function() {
+        $('#delete_rule').on('click.dr_c', function () {
           RG._scheduleRuleDeletion();
         });
-        $('#delete_rule').on('mouseover.dr_mo', function() {
+        $('#delete_rule').on('mouseover.dr_mo', function () {
           CL.hideTooltip();
         });
       }
       if (document.getElementById('delete_variant_unit_rules')) {
         $('#delete_variant_unit_rules').off('click.dar_c');
         $('#delete_variant_unit_rules').off('mouseover.dar_mo');
-        $('#delete_variant_unit_rules').on('click.dar_c', function() {RG._scheduleAllRuleDeletion();});
-        $('#delete_variant_unit_rules').on('mouseover.dar_mo', function() {CL.hideTooltip();});
+        $('#delete_variant_unit_rules').on('click.dar_c', function () { RG._scheduleAllRuleDeletion(); });
+        $('#delete_variant_unit_rules').on('mouseover.dar_mo', function () { CL.hideTooltip(); });
       }
       if (document.getElementById('add_exception')) {
         $('#add_exception').off('click.ae_c');
         $('#add_exception').off('mouseover.ae_mo');
-        $('#add_exception').on('click.ae_c', function() {
+        $('#add_exception').on('click.ae_c', function () {
           RG._scheduleAddGlobalException();
         });
-        $('#add_exception').on('mouseover.ae_mo', function() {
+        $('#add_exception').on('mouseover.ae_mo', function () {
           CL.hideTooltip();
         });
       }
       if (document.getElementById('delete_unapplied_rule')) {
         $('#delete_unapplied_rule').off('click.dur_c');
         $('#delete_unapplied_rule').off('mouseover.dur_mo');
-        $('#delete_unapplied_rule').on('click.dur_c', function() {
+        $('#delete_unapplied_rule').on('click.dur_c', function () {
           RG._deleteUnappliedRule();
         });
-        $('#delete_unapplied_rule').on('mouseover.dur_mo', function() {
+        $('#delete_unapplied_rule').on('mouseover.dur_mo', function () {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('delete_selected_rules')) {
-        $('#delete_selected_rules').off('click.dsr_c');
-        $('#delete_selected_rules').off('mouseover.dsr_mo');
-        $('#delete_selected_rules').on('click.dsr_c', function() {
+      if (document.getElementById('delete-selected-rules')) {
+        $('#delete-selected-rules').off('click.dsr_c');
+        $('#delete-selected-rules').off('mouseover.dsr_mo');
+        $('#delete-selected-rules').on('click.dsr_c', function () {
           RG._scheduleSelectedRulesDeletion();
         });
-        $('#delete_selected_rules').on('mouseover.dsr_mo', function() {
+        $('#delete-selected-rules').on('mouseover.dsr_mo', function () {
           CL.hideTooltip();
         });
       }
     },
 
     /* not currently used but can be useful in debugging */
-    _showCollationTable: function(data, context, container) {
+    _showCollationTable: function (data, context, container) {
       let row, column, witnesses;
       const html = [];
       html.push('<tr>');
@@ -1667,7 +1679,7 @@ var RG = (function() {
         }
         html.push('</tr>');
       }
-      container.innerHTML = '<div id="scroller"><table id="raw_json"><tbody>' + html.join('') + '</tbody></table></div>';
+      container.innerHTML = '<div id="scroller"><table id="raw-json"><tbody>' + html.join('') + '</tbody></table></div>';
     }
 
   };

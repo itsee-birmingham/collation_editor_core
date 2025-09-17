@@ -59,41 +59,41 @@ var SV = (function() {
         SimpleContextMenu.attach('unit', function() {
           return SV._makeMenu('unit');
         });
-        SimpleContextMenu.attach('overlap_unit', function() {
-          return SV._makeMenu('overlap_unit');
+        SimpleContextMenu.attach('overlap-unit', function() {
+          return SV._makeMenu('overlap-unit');
         });
-        SimpleContextMenu.attach('split_unit_a', function() {
-          return SV._makeMenu('split_unit_a');
+        SimpleContextMenu.attach('split-unit-a', function() {
+          return SV._makeMenu('split-unit-a');
         });
-        SimpleContextMenu.attach('split_unit', function() {
-          return SV._makeMenu('split_unit');
+        SimpleContextMenu.attach('split-unit', function() {
+          return SV._makeMenu('split-unit');
         });
-        SimpleContextMenu.attach('overlap_split_unit_a', function() {
-          return SV._makeMenu('overlap_split_unit_a');
+        SimpleContextMenu.attach('overlap-split-unit-a', function() {
+          return SV._makeMenu('overlap-split-unit-a');
         });
-        SimpleContextMenu.attach('overlap_split_unit', function() {
-          return SV._makeMenu('overlap_split_unit');
+        SimpleContextMenu.attach('overlap-split-unit', function() {
+          return SV._makeMenu('overlap-split-unit');
         });
         SimpleContextMenu.attach('subreading', function() {
           return SV._makeMenu('subreading');
         });
-        SimpleContextMenu.attach('split_omlac_unit', function() {
-          return SV._makeMenu('split_omlac_unit');
+        SimpleContextMenu.attach('split-omlac-unit', function() {
+          return SV._makeMenu('split-omlac-unit');
         });
-        SimpleContextMenu.attach('split_duplicate_unit', function() {
-          return SV._makeMenu('split_duplicate_unit');
+        SimpleContextMenu.attach('split-duplicate-unit', function() {
+          return SV._makeMenu('split-duplicate-unit');
         });
-        SimpleContextMenu.attach('split_deleted_unit', function() {
-          return SV._makeMenu('split_overlapped_change_unit');
+        SimpleContextMenu.attach('split-deleted-unit', function() {
+          return SV._makeMenu('split-overlapped-change-unit');
         });
-        SimpleContextMenu.attach('split_overlapped_unit', function() {
-          return SV._makeMenu('split_overlapped_change_unit');
+        SimpleContextMenu.attach('split-overlapped-unit', function() {
+          return SV._makeMenu('split-overlapped-change-unit');
         });
       }
 
       // sort out header and main page
       document.getElementById('header').innerHTML = CL.getHeaderHtml('Set Variants', CL.context);
-      document.getElementById('header').className = 'set_variants_header';
+      document.getElementById('header').className = 'set-variants-header';
       if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
         CL.services.showLoginStatus();
       }
@@ -104,24 +104,24 @@ var SV = (function() {
       footerHtml = [];
       if (Object.prototype.hasOwnProperty.call(CL.project, 'showCollapseAllUnitsButton') &&
               CL.project.showCollapseAllUnitsButton === true) {
-        footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+        footerHtml.push('<button class="pure-button left-foot" id="expand-collapse-button">collapse all</button>');
       }
-      footerHtml.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">show subreadings</button>');
+      footerHtml.push('<button class="pure-button left-foot" id="show-hide-subreadings-button">show subreadings</button>');
       if (CL.witnessEditingMode === false) {
-        footerHtml.push('<span id="extra_buttons"></span>');
-        footerHtml.push('<span id="stage_links"></span>');
+        footerHtml.push('<span id="extra-buttons"></span>');
+        footerHtml.push('<span id="stage-links"></span>');
       }
       if (CL.witnessEditingMode === true) {
-        footerHtml.push('<button class="pure-button right_foot" id="return_to_saved_table_button">Return to summary table</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="return_to_saved_table_button">Return to summary table</button>');
       } else {
-        footerHtml.push('<button class="pure-button right_foot" id="move_to_reorder_button">Move to Reorder Variants</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="move_to_reorder_button">Move to Reorder Variants</button>');
       }
-      footerHtml.push('<button class="pure-button right_foot" id="save">Save</button>');
-      footerHtml.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
+      footerHtml.push('<button class="pure-button right-foot" id="save">Save</button>');
+      footerHtml.push('<select class="right-foot" id="highlighted" name="highlighted"></select>');
       if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
-        footerHtml.push('<select class="right_foot" id="added_highlight" name="added_highlight"></select>');
+        footerHtml.push('<select class="right-foot" id="added_highlight" name="added_highlight"></select>');
       }
-      footerHtml.push('<button class="pure-button right_foot" id="undo_button" style="display:none">undo</button>');
+      footerHtml.push('<button class="pure-button right-foot" id="undo_button" style="display:none">undo</button>');
       // this does the styling of the select elements in the footer using pure (they cannot be styled individually)
       $('#footer').addClass('pure-form');
       document.getElementById('footer').innerHTML = footerHtml.join('');
@@ -130,8 +130,8 @@ var SV = (function() {
 
       // get the data itself
       CL.container.innerHTML = '<div id="redips-drag"><div id="scroller" class="fillPage"></div>' +
-                               '<div id="single_witness_reading"></div></div>';
-      document.getElementById('single_witness_reading').style.bottom = document.getElementById('footer').offsetHeight +
+                               '<div id="single-witness-reading"></div></div>';
+      document.getElementById('single-witness-reading').style.bottom = document.getElementById('footer').offsetHeight +
                                                                       'px';
       if (CL.witnessAddingMode === true) {
         // this sets this a default so that when all is highlighted this will work - any data specified in
@@ -222,21 +222,21 @@ var SV = (function() {
       }
       options.sort = true;
       // remove the witness removal window if shown
-      if (document.getElementById('remove_witnesses_div')) {
-        document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
+      if (document.getElementById('remove-witnesses-div')) {
+        document.getElementById('remove-witnesses-div').parentNode.removeChild(document.getElementById('remove-witnesses-div'));
       }
       if (CL.witnessEditingMode === true) {
         wits = CL.checkWitnessesAgainstProject(CL.dataSettings.witness_list, CL.project.witnesses);
         if (wits[0] === false) {
           if ((wits[1] === 'removed' || wits[1] === 'both') && CL.witnessRemovingMode === true) {
             $.get(staticUrl + 'CE_core/html_fragments/remove_witnesses_form.html', function(html) {
-              if (!document.getElementById('remove_witnesses_div')) {
+              if (!document.getElementById('remove-witnesses-div')) {
                 removeWitsForm = document.createElement('div');
               } else {
-                removeWitsForm = document.getElementById('remove_witnesses_div');
+                removeWitsForm = document.getElementById('remove-witnesses-div');
               }
-              removeWitsForm.setAttribute('id', 'remove_witnesses_div');
-              removeWitsForm.setAttribute('class', 'remove_witnesses_div dialogue_form');
+              removeWitsForm.setAttribute('id', 'remove-witnesses-div');
+              removeWitsForm.setAttribute('class', 'remove-witnesses-div dialogue-form');
               removeWitsForm.innerHTML = html;
               document.getElementsByTagName('body')[0].appendChild(removeWitsForm);
               removeFunction = function() {
@@ -282,12 +282,12 @@ var SV = (function() {
         html.push.apply(html, overlaps[0]);
         temp[2].push.apply(temp[2], overlaps[1]);
       }
-      html.push('<ul id="context_menu" class="SimpleContextMenu"></ul>');
-      errorPanelHtml = '<div id="error_panel" class="warning dialogue_form" style="display:none">' +
-        '<div class="dialogue_form_header drag-zone"><span id="message_summary">Messages</span>' +
-        '<span id="error_coll_ex">&#9660;</span></div><div id="error_message_panel">' +
-        '<span id="error_message">message</span></div></div>';
-      document.getElementById('scroller').innerHTML = '<table class="collation_overview">' + html.join('') +
+      html.push('<ul id="context_menu" class="simple-context-menu"></ul>');
+      errorPanelHtml = '<div id="error-panel" class="warning dialogue-form" style="display:none">' +
+        '<div class="dialogue-form-header drag-zone"><span id="message-summary">Messages</span>' +
+        '<span id="error-coll-ex">&#9660;</span></div><div id="error-message-panel">' +
+        '<span id="error-message">message</span></div></div>';
+      document.getElementById('scroller').innerHTML = '<table class="collation-overview">' + html.join('') +
         '</table>' + errorPanelHtml;
       eventRows = temp[2];
       for (let i = 0; i < eventRows.length; i += 1) {
@@ -483,7 +483,7 @@ var SV = (function() {
 
       // is the unit highlighted? used for showing errors
       if (Object.prototype.hasOwnProperty.call(options, 'error_unit') && parseInt(id) === options.error_unit[1]) {
-        errorUnit = ' error_unit';
+        errorUnit = ' error-unit';
       } else {
         errorUnit = '';
       }
@@ -517,7 +517,7 @@ var SV = (function() {
         }
         if (Object.prototype.hasOwnProperty.call(options, 'highlighted_added_wits') &&
               data[i].witnesses.filter(x => options.highlighted_added_wits.includes(x)).length > 0) {
-          highlightedClasses.push('added_highlighted');
+          highlightedClasses.push('added-highlighted');
         }
         if (Object.prototype.hasOwnProperty.call(options, 'split') && options.split === true) {
           if (Object.prototype.hasOwnProperty.call(data[i], 'overlap_status')) {
@@ -526,25 +526,25 @@ var SV = (function() {
           } else {
             if (Object.prototype.hasOwnProperty.call(options, 'overlap') && options.overlap === true) {
               if (i === 0) {
-                splitClass = 'overlap_split_unit_a';
+                splitClass = 'overlap-split-unit-a';
               } else {
-                splitClass = 'overlap_split_unit';
+                splitClass = 'overlap-split-unit';
               }
             } else {
               if (i === 0) {
-                splitClass = 'split_unit_a';
+                splitClass = 'split-unit-a';
               } else {
                 if (CL.witnessAddingMode === true &&
                       data[i].witnesses.filter(x => allOverlappedWitnesses.includes(x)).length === data[i].witnesses.length) {
-                  splitClass = 'redips-drag split_duplicate_unit';
+                  splitClass = 'redips-drag split-duplicate-unit';
                 } else {
-                  splitClass = 'redips-drag split_unit';
+                  splitClass = 'redips-drag split-unit';
                 }
               }
             }
             html.push('<div id="' + 'drag_unit_' + id + '_reading_' + i + '" class="' + splitClass + '">');
           }
-          html.push('<ul class="variant_unit" id="variant_unit_' + id + '_reading_' + i + '">');
+          html.push('<ul class="variant-unit" id="variant_unit_' + id + '_reading_' + i + '">');
 
           html.push('<li id="' + rowId + '" class="' + highlightedClasses.join(' ') + '">');
           html.push('<div class="spanlike">' + readingLabel + ' ' + text + readingSuffix + '  </div>');
@@ -557,16 +557,16 @@ var SV = (function() {
         } else {
           if (i === 0) {
             if (Object.prototype.hasOwnProperty.call(options, 'overlap') && options.overlap === true) {
-              html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag overlap_unit' + errorUnit + '">');
+              html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag overlap-unit' + errorUnit + '">');
             } else if (Object.prototype.hasOwnProperty.call(options, 'gap_unit') && options.gap_unit === true) {
-              html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag gap_unit' + errorUnit + '">');
+              html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag gap-unit' + errorUnit + '">');
             } else {
               html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag unit' + errorUnit + '">');
             }
             if (data.length > 1) {
-              html.push('<ul class="variant_unit" id="variant_unit_' + id + '"><span id="toggle_variant_' + id + '" class="triangle">&#9660;</span><br/>');
+              html.push('<ul class="variant-unit" id="variant_unit_' + id + '"><span id="toggle_variant_' + id + '" class="triangle">&#9660;</span><br/>');
             } else {
-              html.push('<ul class="variant_unit" id="variant_unit_' + id + '"><br/>');
+              html.push('<ul class="variant-unit" id="variant_unit_' + id + '"><br/>');
             }
             html.push('<li id="' + rowId + '" class="top ' + highlightedClasses.join(' ') + '">');
           } else {
@@ -813,7 +813,7 @@ var SV = (function() {
         });
         $('#select_button').on('click', function() {
           witnessList = [];
-          data = cforms.serialiseForm('select_wit_form');
+          data = cforms.serialiseForm('select-wit-form');
           if (!$.isEmptyObject(data)) {
             witnessList = [];
             for (const key in data) {
@@ -840,7 +840,7 @@ var SV = (function() {
             'witnesses': witnessList
           });
           SV.doSplitReadingWitnesses(rdgDetails[0], rdgDetails[2], witnessList, rdgDetails[1], true);
-          document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
+          document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit-form'));
           if (stage === 'set_variants') {
             SV.checkBugStatus('move', 'split witnesses ' + witnessList.join(', ') + ' out of reading ' + rdgDetails[2] +
                               ' in unit ' + rdgDetails[0] + ' in apparatus.');
@@ -1213,8 +1213,8 @@ var SV = (function() {
     },
 
     _setUpSVRemoveWitnessesForm: function(wits, data) {
-      document.getElementById('remove_witnesses_div').style.left = document.getElementById('scroller').offsetWidth -
-                                                document.getElementById('remove_witnesses_div').offsetWidth - 15 + 'px';
+      document.getElementById('remove-witnesses-div').style.left = document.getElementById('scroller').offsetWidth -
+                                                document.getElementById('remove-witnesses-div').offsetWidth - 15 + 'px';
       const html = [];
       for (let i = 0; i < wits.length; i += 1) {
         for (const key in data.hand_id_map) {
@@ -1224,12 +1224,12 @@ var SV = (function() {
           }
         }
       }
-      document.getElementById('witness_checkboxes').innerHTML = html.join('');
-      drag.initDraggable('remove_witnesses_div', true, true);
-      $('#remove_selected_button').on('click', function() {
+      document.getElementById('witness-checkboxes').innerHTML = html.join('');
+      drag.initDraggable('remove-witnesses-div', true, true);
+      $('#remove-selected-button').on('click', function() {
         var data, handsToRemove;
         handsToRemove = [];
-        data = cforms.serialiseForm('remove_witnesses_form');
+        data = cforms.serialiseForm('remove-witnesses-form');
         for (const key in data) {
           if (Object.prototype.hasOwnProperty.call(data, key) && data[key] === true) {
             handsToRemove.push(key);
@@ -1287,8 +1287,8 @@ var SV = (function() {
             'rule_classes': CL.getRuleClasses('subreading', true, 'value', ['identifier', 'subreading'])
           }); // only show the subreadings when there class is labelled as subreading in the project)))
           // remove the remove witnesses menu if it is still hanging about
-          if (document.getElementById('remove_witnesses_div')) {
-            document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
+          if (document.getElementById('remove-witnesses-div')) {
+            document.getElementById('remove-witnesses-div').parentNode.removeChild(document.getElementById('remove-witnesses-div'));
           }
           OR.showOrderReadings({
             'container': CL.container
@@ -1327,53 +1327,53 @@ var SV = (function() {
     /** displays warning and error messages on the screen in a draggable and collapsable box */
     _setupMessage: function(type, message) {
       let dropFunction;
-      document.getElementById('error_message_panel').innerHTML = message;
-      $('#error_panel').removeClass('warning');
-      $('#error_panel').removeClass('error');
-      $('#error_panel').removeClass('clear');
-      $('#error_panel').addClass(type);
-      if (document.getElementById('error_panel').style.display === 'none') {
-        document.getElementById('error_panel').style.display = 'block';
+      document.getElementById('error-message-panel').innerHTML = message;
+      $('#error-panel').removeClass('warning');
+      $('#error-panel').removeClass('error');
+      $('#error-panel').removeClass('clear');
+      $('#error-panel').addClass(type);
+      if (document.getElementById('error-panel').style.display === 'none') {
+        document.getElementById('error-panel').style.display = 'block';
         dropFunction = function(draggable) {
           SV.messagePosLeft = draggable.style.left;
           SV.messagePosTop = draggable.style.top;
         };
-        drag.initDraggable('error_panel', true, true, dropFunction);
-        document.getElementById('error_message_panel').style.height = document.getElementById('error_panel').offsetHeight - 40 + 'px';
+        drag.initDraggable('error-panel', true, true, dropFunction);
+        document.getElementById('error-message-panel').style.height = document.getElementById('error-panel').offsetHeight - 40 + 'px';
       }
       if (_messageExpanded === true) {
-        document.getElementById('error_message_panel').style.display = 'block';
-        document.getElementById('error_coll_ex').innerHTML = '&#9660;';
+        document.getElementById('error-message-panel').style.display = 'block';
+        document.getElementById('error-coll-ex').innerHTML = '&#9660;';
       } else {
-        document.getElementById('error_message_panel').style.display = 'none';
-        document.getElementById('error_coll_ex').innerHTML = '&#9650;';
+        document.getElementById('error-message-panel').style.display = 'none';
+        document.getElementById('error-coll-ex').innerHTML = '&#9650;';
       }
       if (SV.messagePosLeft !== null) {
-        document.getElementById('error_panel').style.left = SV.messagePosLeft;
-        document.getElementById('error_panel').style.top = SV.messagePosTop;
+        document.getElementById('error-panel').style.left = SV.messagePosLeft;
+        document.getElementById('error-panel').style.top = SV.messagePosTop;
 
       } else {
-        document.getElementById('error_panel').style.top = (document.getElementById('header').offsetHeight +
+        document.getElementById('error-panel').style.top = (document.getElementById('header').offsetHeight +
             document.getElementById('scroller').offsetHeight +
-            document.getElementById('single_witness_reading').offsetHeight) -
-          document.getElementById('error_panel').offsetHeight + 'px';
-        document.getElementById('error_panel').style.left = document.getElementById('scroller').offsetWidth -
-          document.getElementById('error_panel').offsetWidth - 15 + 'px';
+            document.getElementById('single-witness-reading').offsetHeight) -
+          document.getElementById('error-panel').offsetHeight + 'px';
+        document.getElementById('error-panel').style.left = document.getElementById('scroller').offsetWidth -
+          document.getElementById('error-panel').offsetWidth - 15 + 'px';
       }
-      $('#error_coll_ex').on('click', function() {
-        if (document.getElementById('error_message_panel').style.display === 'block') {
-          document.getElementById('error_panel').style.top = parseInt(document.getElementById('error_panel').style.top) +
-            parseInt(document.getElementById('error_message_panel').offsetHeight) + 'px';
-          document.getElementById('error_message_panel').style.display = 'none';
-          document.getElementById('error_coll_ex').innerHTML = '&#9650;';
-          SV.messagePosTop = document.getElementById('error_panel').style.top;
+      $('#error-coll-ex').on('click', function() {
+        if (document.getElementById('error-message-panel').style.display === 'block') {
+          document.getElementById('error-panel').style.top = parseInt(document.getElementById('error-panel').style.top) +
+            parseInt(document.getElementById('error-message-panel').offsetHeight) + 'px';
+          document.getElementById('error-message-panel').style.display = 'none';
+          document.getElementById('error-coll-ex').innerHTML = '&#9650;';
+          SV.messagePosTop = document.getElementById('error-panel').style.top;
           _messageExpanded = false;
         } else {
-          document.getElementById('error_message_panel').style.display = 'block';
-          document.getElementById('error_panel').style.top = parseInt(document.getElementById('error_panel').style.top) -
-            parseInt(document.getElementById('error_message_panel').offsetHeight) + 'px';
-          document.getElementById('error_coll_ex').innerHTML = '&#9660;';
-          SV.messagePosTop = document.getElementById('error_panel').style.top;
+          document.getElementById('error-message-panel').style.display = 'block';
+          document.getElementById('error-panel').style.top = parseInt(document.getElementById('error-panel').style.top) -
+            parseInt(document.getElementById('error-message-panel').offsetHeight) + 'px';
+          document.getElementById('error-coll-ex').innerHTML = '&#9660;';
+          SV.messagePosTop = document.getElementById('error-panel').style.top;
           _messageExpanded = true;
         }
       });
@@ -1432,7 +1432,7 @@ var SV = (function() {
               }
               if (highlightedAdded !== undefined &&
                     reading.subreadings[type][j].witnesses.filter(x => highlightedAdded.includes(x)).length > 0) {
-                highlightedClasses.push('added_highlighted');
+                highlightedClasses.push('added-highlighted');
               }
               if (reading.subreadings[type][j].type === 'lac') {
                 textString = '&lt;' + reading.subreadings[type][j].text_string + '&gt;';
@@ -1466,7 +1466,7 @@ var SV = (function() {
       rd.event.dropped = function() {
         scrollOffset = [document.getElementById('scroller').scrollLeft,
                         document.getElementById('scroller').scrollTop];
-        if (rd.td.target.parentElement.id === 'number_row') {  // if you drag onto a number
+        if (rd.td.target.parentElement.id === 'number-row') {  // if you drag onto a number
           SV._moveUnit(rd);
         } else {
           _selectedVariantUnits = [];
@@ -3786,7 +3786,7 @@ var SV = (function() {
             });
             $('#select_button').on('click', function() {
               witnessList = [];
-              data = cforms.serialiseForm('select_wit_form');
+              data = cforms.serialiseForm('select-wit-form');
               if (!$.isEmptyObject(data)) {
                 witnessList = [];
                 for (const key in data) {
@@ -3801,7 +3801,7 @@ var SV = (function() {
               }
               newReadingId = SV.doSplitReadingWitnesses(unitNum, readingNum, witnessList, 'apparatus');
               SV._makeOverlappingReading(unitNum, newReadingId, duplicate);
-              document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
+              document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit-form'));
             });
           } else {
             SV._makeOverlappingReading(unitNum, reading._id, duplicate);
@@ -4504,26 +4504,26 @@ var SV = (function() {
     /** The next three functions are concerned with the context menu and associated event handling */
 
     /** creates context menu for right clicked on element
-     * unit, overlap_unit, subreading and split_duplicate_unit are straight hard coded menus
+     * unit, overlap-unit, subreading and split-duplicate-unit are straight hard coded menus
      * the others are determined from project configuration
      *  */
     _makeMenu: function(menuName) {
       let menu, subreadings, svRules;
       // menus for full units
       if (menuName === 'unit') {
-        document.getElementById('context_menu').innerHTML = '<li id="split_words"><span>Split words</span></li><li id="split_readings"><span>Split readings</span></li>';
-      } else if (menuName === 'overlap_unit') {
-        document.getElementById('context_menu').innerHTML = '<li id="split_readings"><span>Split readings</span></li>';
+        document.getElementById('context_menu').innerHTML = '<li id="split_words"><span>Split words</span></li><li id="split-readings"><span>Split readings</span></li>';
+      } else if (menuName === 'overlap-unit') {
+        document.getElementById('context_menu').innerHTML = '<li id="split-readings"><span>Split readings</span></li>';
       } else if (menuName === 'subreading') {
         document.getElementById('context_menu').innerHTML = '<li id="make_main_reading"><span>Make main reading</span></li>';
-      } else if (menuName === 'split_duplicate_unit') {
+      } else if (menuName === 'split-duplicate-unit') {
         // used for reading in top line labelled 'duplicate' when the unit is in split readings state
         menu = ['<li id="treat_as_main"><span>Make main reading</span></li>'];
         for (let i = 0; i < CL.overlappedOptions.length; i += 1) {
           menu.push('<li id="' + CL.overlappedOptions[i].id + '"><span>' + CL.overlappedOptions[i].label + '</span></li>');
         }
         document.getElementById('context_menu').innerHTML = menu.join('');
-      } else if (menuName === 'split_overlapped_change_unit') {
+      } else if (menuName === 'split-overlapped-change-unit') {
         menu = [];
         for (let i = 0; i < CL.overlappedOptions.length; i += 1) {
           menu.push('<li id="' + CL.overlappedOptions[i].id + '"><span>' + CL.overlappedOptions[i].label + '</span></li>');
@@ -4532,14 +4532,14 @@ var SV = (function() {
       } else {
         menu = [];
         menu.push('<li id="recombine_readings"><span>Recombine</span></li>');
-        if (menuName === 'split_unit' || menuName === 'split_unit_a') {
+        if (menuName === 'split-unit' || menuName === 'split-unit-a') {
           menu.push('<li id="overlap"><span>Overlap</span></li>');
         }
-        if (menuName === 'split_unit' || menuName === 'split_unit_a' || menuName === 'overlap_split_unit') {
+        if (menuName === 'split-unit' || menuName === 'split-unit-a' || menuName === 'overlap-split-unit') {
           menu.push('<li id="split_witnesses"><span>Split Witnesses</span></li>');
         }
 
-        if (menuName === 'split_unit' || menuName === 'split_omlac_unit' || menuName === 'overlap_split_unit') {
+        if (menuName === 'split-unit' || menuName === 'split-omlac-unit' || menuName === 'overlap-split-unit') {
           svRules = CL.getRuleClasses('create_in_SV', true, 'name', ['subreading', 'value', 'identifier', 'keep_as_main_reading']);
           subreadings = [];
           for (const key in svRules) {
@@ -4587,10 +4587,10 @@ var SV = (function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('split_readings')) {
-        $('#split_readings').off('click.sr_c');
-        $('#split_readings').off('mouseover.sr_mo');
-        $('#split_readings').on('click.sr_c', function() {
+      if (document.getElementById('split-readings')) {
+        $('#split-readings').off('click.sr_c');
+        $('#split-readings').off('mouseover.sr_mo');
+        $('#split-readings').on('click.sr_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -4601,7 +4601,7 @@ var SV = (function() {
           const rdgDetails = CL.getUnitAppReading(div.id);
           SV._splitReadings(rdgDetails);
         });
-        $('#split_readings').on('mouseover.sr_mo', function() {
+        $('#split-readings').on('mouseover.sr_mo', function() {
           CL.hideTooltip();
         });
       }

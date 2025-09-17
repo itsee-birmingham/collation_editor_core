@@ -1,11 +1,7 @@
 div#overlay {
     position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    background: rgba(0, 0, 0, 0.3);
-
+    inset: 0;
+    background: rgb(0 0 0 / 30%);
 }
 
 div#spinner {
@@ -19,15 +15,15 @@ div#spinner {
     display: block;
     width: 48px;
     height: 48px;
-    background-image: url(../images/loading.png);
+    background-image: url("../images/loading.png");
 }
 
 @keyframes flower-12l-48x48 {
     from {
-        background-position: 0px 0px;
+        background-position: 0 0;
     }
 
     to {
-        background-position: 0px -576px;
+        background-position: 0 -576px;
     }
 }

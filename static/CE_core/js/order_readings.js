@@ -43,68 +43,68 @@ var OR = (function() {
         'preventDefault': true,
         'preventForms': false
       });
-      SimpleContextMenu.attach('main_reading', function() {
-        return OR._makeMenu('main_reading');
+      SimpleContextMenu.attach('main-reading', function() {
+        return OR._makeMenu('main-reading');
       });
-      SimpleContextMenu.attach('main_reading_joinable_backwards', function() {
-        return OR._makeMenu('main_reading', true, false);
+      SimpleContextMenu.attach('main-reading-joinable-backwards', function() {
+        return OR._makeMenu('main-reading', true, false);
       });
-      SimpleContextMenu.attach('main_reading_joinable_forwards', function() {
-        return OR._makeMenu('main_reading', false, true);
+      SimpleContextMenu.attach('main-reading-joinable-forwards', function() {
+        return OR._makeMenu('main-reading', false, true);
       });
-      SimpleContextMenu.attach('main_reading_joinable_backwards_joinable_forwards', function() {
-        return OR._makeMenu('main_reading', true, true);
+      SimpleContextMenu.attach('main-reading-joinable-backwards-joinable-forwards', function() {
+        return OR._makeMenu('main-reading', true, true);
       });
-      SimpleContextMenu.attach('main_reading_om', function() {
-        return OR._makeMenu('main_reading_om');
+      SimpleContextMenu.attach('main-reading-om', function() {
+        return OR._makeMenu('main-reading-om');
       });
-      SimpleContextMenu.attach('main_reading_om_joinable_backwards', function() {
-        return OR._makeMenu('main_reading_om', true, false);
+      SimpleContextMenu.attach('main-reading-om-joinable-backwards', function() {
+        return OR._makeMenu('main-reading-om', true, false);
       });
-      SimpleContextMenu.attach('main_reading_om_joinable_forwards', function() {
-        return OR._makeMenu('main_reading_om', false, true);
+      SimpleContextMenu.attach('main-reading-om-joinable-forwards', function() {
+        return OR._makeMenu('main-reading-om', false, true);
       });
-      SimpleContextMenu.attach('main_reading_om_joinable_backwards_joinable_forwards', function() {
-        return OR._makeMenu('main_reading_om', true, true);
+      SimpleContextMenu.attach('main-reading-om-joinable-backwards-joinable-forwards', function() {
+        return OR._makeMenu('main-reading-om', true, true);
       });
       SimpleContextMenu.attach('deletable', function() {
         return OR._makeMenu('deletable_unit');
       });
-      SimpleContextMenu.attach('overlap_main_reading', function() {
-        return OR._makeMenu('overlap_main_reading');
+      SimpleContextMenu.attach('overlap-main-reading', function() {
+        return OR._makeMenu('overlap-main-reading');
       });
-      SimpleContextMenu.attach('overlap_main_reading_joinable_backwards', function() {
-        return OR._makeMenu('overlap_main_reading', true, false);
+      SimpleContextMenu.attach('overlap-main-reading-joinable-backwards', function() {
+        return OR._makeMenu('overlap-main-reading', true, false);
       });
-      SimpleContextMenu.attach('overlap_main_reading_joinable_forwards', function() {
-        return OR._makeMenu('overlap_main_reading', false, true);
+      SimpleContextMenu.attach('overlap-main-reading-joinable-forwards', function() {
+        return OR._makeMenu('overlap-main-reading', false, true);
       });
-      SimpleContextMenu.attach('overlap_main_reading_joinable_backwards_joinable_forwards', function() {
-        return OR._makeMenu('overlap_main_reading', true, true);
+      SimpleContextMenu.attach('overlap-main-reading-joinable-backwards-joinable-forwards', function() {
+        return OR._makeMenu('overlap-main-reading', true, true);
       });
-      SimpleContextMenu.attach('overlap_main_reading_om', function() {
-        return OR._makeMenu('overlap_main_reading_om');
+      SimpleContextMenu.attach('overlap-main-reading-om', function() {
+        return OR._makeMenu('overlap-main-reading-om');
       });
-      SimpleContextMenu.attach('overlap_main_reading_om_joinable_backwards', function() {
-        return OR._makeMenu('overlap_main_reading_om', true, false);
+      SimpleContextMenu.attach('overlap-main-reading-om-joinable-backwards', function() {
+        return OR._makeMenu('overlap-main-reading-om', true, false);
       });
-      SimpleContextMenu.attach('overlap_main_reading_om_joinable_forwards', function() {
-        return OR._makeMenu('overlap_main_reading_om', false, true);
+      SimpleContextMenu.attach('overlap-main-reading-om-joinable-forwards', function() {
+        return OR._makeMenu('overlap-main-reading-om', false, true);
       });
-      SimpleContextMenu.attach('overlap_main_reading_om_joinable_backwards_joinable_forwards', function() {
-        return OR._makeMenu('overlap_main_reading_om', true, true);
+      SimpleContextMenu.attach('overlap-main-reading-om-joinable-backwards-joinable-forwards', function() {
+        return OR._makeMenu('overlap-main-reading-om', true, true);
       });
       SimpleContextMenu.attach('subreading', function() {
         return OR._makeMenu('subreading');
       });
-      SimpleContextMenu.attach('overlap_unit', function() {
-        return OR._makeMenu('overlap_unit');
+      SimpleContextMenu.attach('overlap-unit', function() {
+        return OR._makeMenu('overlap-unit');
       });
-      SimpleContextMenu.attach('topline_unit', function() {
-        return OR._makeMenu('topline_unit');
+      SimpleContextMenu.attach('topline-unit', function() {
+        return OR._makeMenu('topline-unit');
       });
-      SimpleContextMenu.attach('reading_label', function() {
-        return OR._makeMenu('reading_label');
+      SimpleContextMenu.attach('reading-label', function() {
+        return OR._makeMenu('reading-label');
       });
       const temp = CL.getUnitLayout(CL.data.apparatus, 1, 'reorder', options);
       const header = CL.getCollationHeader(CL.data, temp[1], false);
@@ -134,17 +134,17 @@ var OR = (function() {
         html.push.apply(html, overlaps[0]);
         temp[2].push.apply(temp[2], overlaps[1]);
       }
-      html.push('<ul id="context_menu" class="SimpleContextMenu"></ul>');
+      html.push('<ul id="context_menu" class="simple-context-menu"></ul>');
       document.getElementById('header').innerHTML = CL.getHeaderHtml('Order Readings', CL.context);
       if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
         CL.services.showLoginStatus();
       }
-      document.getElementById('header').className = 'reorder_header';
-      container.innerHTML = '<div id="scroller" class="fillPage"><table class="collation_overview">' +
-        html.join('') + '</table></div><div id="single_witness_reading"></div>';
+      document.getElementById('header').className = 'reorder-header';
+      container.innerHTML = '<div id="scroller" class="fillPage"><table class="collation-overview">' +
+        html.join('') + '</table></div><div id="single-witness-reading"></div>';
       CL.expandFillPageClients();
       if (OR.undoStack.length > 0) {
-        undoButton = '<button class="pure-button right_foot" id="undo_button">undo</button>';
+        undoButton = '<button class="pure-button right-foot" id="undo_button">undo</button>';
       } else {
         undoButton = '';
       }
@@ -156,19 +156,19 @@ var OR = (function() {
       }
       const footerHtml = [];
       if (Object.prototype.hasOwnProperty.call(CL.project, 'showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
-        footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+        footerHtml.push('<button class="pure-button left-foot" id="expand-collapse-button">collapse all</button>');
       }
       footerHtml.push(
-        '<button class="pure-button left_foot" id="show_hide_subreadings_button">' + showHideSubreadingsButtonText + '</button>'
+        '<button class="pure-button left-foot" id="show-hide-subreadings-button">' + showHideSubreadingsButtonText + '</button>'
       );
-      footerHtml.push('<span id="extra_buttons"></span>');
-      footerHtml.push('<span id="stage_links"></span>');
+      footerHtml.push('<span id="extra-buttons"></span>');
+      footerHtml.push('<span id="stage-links"></span>');
 
       if (CL.managingEditor === true) {
-        footerHtml.push('<button class="pure-button right_foot" id="approve">Approve</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="approve">Approve</button>');
       }
-      footerHtml.push('<button class="pure-button right_foot" id="save">Save</button>');
-      footerHtml.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
+      footerHtml.push('<button class="pure-button right-foot" id="save">Save</button>');
+      footerHtml.push('<select class="right-foot" id="highlighted" name="highlighted"></select>');
       footerHtml.push(undoButton);
       // this does the styling of the select elements in the footer using pure (they cannot be styled individually)
       $('#footer').addClass('pure-form');
@@ -277,9 +277,9 @@ var OR = (function() {
       if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
         CL.services.showLoginStatus();
       }
-      document.getElementById('header').className = 'approved_header';
-      container.innerHTML = '<div id="scroller" class="fillPage"><table class="collation_overview">' +
-                            html.join('') + '</table></div><div id="single_witness_reading"></div>';
+      document.getElementById('header').className = 'approved-header';
+      container.innerHTML = '<div id="scroller" class="fillPage"><table class="collation-overview">' +
+                            html.join('') + '</table></div><div id="single-witness-reading"></div>';
       CL.expandFillPageClients();
       // sort out footer stuff
       if (CL.showSubreadings === true) {
@@ -289,17 +289,17 @@ var OR = (function() {
       }
       footerHtml = [];
       if (Object.prototype.hasOwnProperty.call(CL.project, 'showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
-        footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+        footerHtml.push('<button class="pure-button left-foot" id="expand-collapse-button">collapse all</button>');
       }
       footerHtml.push(
-        '<button class="pure-button left_foot" id="show_hide_subreadings_button">' + showHideSubreadingsButtonText + '</button>'
+        '<button class="pure-button left-foot" id="show-hide-subreadings-button">' + showHideSubreadingsButtonText + '</button>'
       );
-      footerHtml.push('<span id="extra_buttons"></span>');
-      footerHtml.push('<span id="stage_links"></span>');
+      footerHtml.push('<span id="extra-buttons"></span>');
+      footerHtml.push('<span id="stage-links"></span>');
       if (CL.project.showGetApparatusButton === true) {
-        footerHtml.push('<button class="pure-button right_foot" id="get_apparatus">Get apparatus</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="get_apparatus">Get apparatus</button>');
       }
-      footerHtml.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
+      footerHtml.push('<select class="right-foot" id="highlighted" name="highlighted"></select>');
       document.getElementById('footer').innerHTML = footerHtml.join('');
       CL.addExtraFooterButtons('approved');
       CL.addStageLinks();
@@ -362,15 +362,15 @@ var OR = (function() {
       }
       if (OR._areAllEmptyReadings(data) && !Object.prototype.hasOwnProperty.call(options, 'created')) {
         html.push('<td class="redips-mark start_' + start + ' " colspan="' + colspan + '">' +
-                  '<div class="drag_div deletable" id="drag_unit_' + id + '">');
+                  '<div class="drag-div deletable" id="drag_unit_' + id + '">');
       } else {
         html.push('<td class="redips-mark start_' + start + ' " colspan="' + colspan + '">' +
-                  '<div class="drag_div" id="drag_unit_' + id + '">');
+                  '<div class="drag-div" id="drag_unit_' + id + '">');
       }
       if (!overlap) {
-        html.push('<table class="variant_unit topline_unit" id="variant_unit_' + id + '">');
+        html.push('<table class="variant-unit topline-unit" id="variant_unit_' + id + '">');
       } else {
-        html.push('<table class="variant_unit overlap_unit" id="variant_unit_' + id + '">');
+        html.push('<table class="variant-unit overlap-unit" id="variant_unit_' + id + '">');
       }
       for (let i = 0; i < data.length; i += 1) {
         // what is the reading text?
@@ -410,13 +410,13 @@ var OR = (function() {
           }
           html.push('<td class="redips-rowhandler"><div class="redips-drag redips-row">+</div></td>');
         }
-        html.push('<td id="' + rowId + '_label" class="reading_label redips-mark"><div class="spanlike">' + readingLabel);
+        html.push('<td id="' + rowId + '_label" class="reading-label redips-mark"><div class="spanlike">' + readingLabel);
         html.push('</div></td>');
         readingClass = [];
         if (!overlap) {
-          readingClass.push('main_reading');
+          readingClass.push('main-reading');
         } else {
-          readingClass.push('overlap_main_reading');
+          readingClass.push('overlap-main-reading');
         }
         if (!hasContextMenu) {
           readingClass.push('ncm');
@@ -426,14 +426,14 @@ var OR = (function() {
           }
           if (i > 0) {
             if (Object.prototype.hasOwnProperty.call(options, 'joinable_backwards') && options.joinable_backwards === true) {
-              readingClass.push('joinable_backwards');
+              readingClass.push('joinable-backwards');
             }
             if (Object.prototype.hasOwnProperty.call(options, 'joinable_forwards') && options.joinable_forwards === true) {
-              readingClass.push('joinable_forwards');
+              readingClass.push('joinable-forwards');
             }
           }
         }
-        html.push('<td class="redips-mark ' + readingClass.join('_') + '">');
+        html.push('<td class="redips-mark ' + readingClass.join('-') + '">');
         html.push('<div class="spanlike">');
         if (Object.prototype.hasOwnProperty.call(data[i], 'join_backwards') && data[i].join_backwards === true) {
           html.push('⇇&nbsp;');
@@ -786,8 +786,8 @@ var OR = (function() {
 
     editLabel: function(rdgDetails, menuPos, saveFunction) {
       let left, top;
-      if (document.getElementById('label_form')) {
-        document.getElementsByTagName('body')[0].removeChild(document.getElementById('label_form'));
+      if (document.getElementById('label-form')) {
+        document.getElementsByTagName('body')[0].removeChild(document.getElementById('label-form'));
       }
       left = menuPos.left;
       top = menuPos.top;
@@ -795,18 +795,18 @@ var OR = (function() {
       const reading = CL.data[rdgDetails[1]][rdgDetails[0]].readings[rdgDetails[2]];
       const currentLabel = reading.label;
       const currentParents = Object.prototype.hasOwnProperty.call(reading, 'parents') ? reading.parents : [];
-      labelForm.setAttribute('id', 'label_form');
-      labelForm.setAttribute('class', 'label_form');
+      labelForm.setAttribute('id', 'label-form');
+      labelForm.setAttribute('class', 'label-form');
       const html = [];
-      html.push('<div class="dialogue_form_header drag-zone">Edit Label</div>');
-      html.push('<form id="label_change_form">');
-      html.push('<label id="new_label_label" for="new_label">New label:<br/><input type="text" id="new_label" name="new_label"/></label><br/><br/>');
+      html.push('<div class="dialogue-form-header drag-zone">Edit Label</div>');
+      html.push('<form id="label-change-form">');
+      html.push('<label id="new-label-label" for="new-label">New label:<br/><input type="text" id="new-label" name="new_label"/></label><br/><br/>');
       if (CL.project.storeMultipleSupportLabelsAsParents === true) {
         html.push('<label for="multiple_support">Multiple support: </label><input type="checkbox" id="multiple_support"/><br/>');
-        html.push('<label id="parent_select_label" for="parent_select" class="top_label disabled">Parents: </label><select class="disabled" disabled="disabled" id="parent_select" name="parent_select" multiple></select><br/><br/>');
+        html.push('<label id="parent-select-label" for="parent-select" class="top-label disabled">Parents: </label><select class="disabled" disabled="disabled" id="parent-select" name="parent_select" multiple></select><br/><br/>');
       }
-      html.push('<input class="pure-button dialogue-form-button" id="close_label_button" type="button" value="Cancel"/>');
-      html.push('<input class="pure-button dialogue-form-button" id="save_label_button" type="button" value="Save"/>');
+      html.push('<input class="pure-button dialogue-form-button" id="close-label-button" type="button" value="Cancel"/>');
+      html.push('<input class="pure-button dialogue-form-button" id="save-label-button" type="button" value="Save"/>');
       html.push('</form>');
       labelForm.innerHTML = html.join('');
       document.getElementsByTagName('body')[0].appendChild(labelForm);
@@ -819,65 +819,65 @@ var OR = (function() {
                                'reading': CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].text_string});
           }
         }
-        cforms.populateSelect(unitReadings, document.getElementById('parent_select'),
+        cforms.populateSelect(unitReadings, document.getElementById('parent-select'),
                               {'value_key': 'reading', 'text_keys': 'reading', 'add_select': false});
       }
-      document.getElementById('new_label').value = currentLabel; // populate field with current label value
+      document.getElementById('new-label').value = currentLabel; // populate field with current label value
       if (currentParents.length > 1) {
         document.getElementById('multiple_support').setAttribute('checked', 'checked');
-        $('#parent_select_label').removeClass('disabled');
-        $('#parent_select').removeClass('disabled');
-        document.getElementById('parent_select').removeAttribute('disabled');
-        $('#new_label_label').addClass('disabled');
-        document.getElementById('new_label').setAttribute('disabled', 'disabled');
+        $('#parent-select-label').removeClass('disabled');
+        $('#parent-select').removeClass('disabled');
+        document.getElementById('parent-select').removeAttribute('disabled');
+        $('#new-label-label').addClass('disabled');
+        document.getElementById('new-label').setAttribute('disabled', 'disabled');
         // select the correct parents
         for (let i = 0; i < currentParents.length; i += 1) {
-          $('#parent_select option[value="' + currentParents[i] + '"]').prop('selected', true);
+          $('#parent-select option[value="' + currentParents[i] + '"]').prop('selected', true);
         }
-        $('#parent_select').focus();
+        $('#parent-select').focus();
       }
       if (document.getElementById('multiple_support')) {
         $('#multiple_support').on('click', function () {
           if (document.getElementById('multiple_support').checked === true) {
-            $('#parent_select_label').removeClass('disabled');
-            $('#parent_select').removeClass('disabled');
-            document.getElementById('parent_select').removeAttribute('disabled');
-            $('#new_label_label').addClass('disabled');
-            document.getElementById('new_label').setAttribute('disabled', 'disabled');
+            $('#parent-select-label').removeClass('disabled');
+            $('#parent-select').removeClass('disabled');
+            document.getElementById('parent-select').removeAttribute('disabled');
+            $('#new-label-label').addClass('disabled');
+            document.getElementById('new-label').setAttribute('disabled', 'disabled');
           } else {
-            $('#parent_select_label').addClass('disabled');
-            $('#parent_select').addClass('disabled');
-            document.getElementById('parent_select').setAttribute('disabled', 'disabled');
-            $('#new_label_label').removeClass('disabled');
-            document.getElementById('new_label').removeAttribute('disabled');
+            $('#parent-select-label').addClass('disabled');
+            $('#parent-select').addClass('disabled');
+            document.getElementById('parent-select').setAttribute('disabled', 'disabled');
+            $('#new-label-label').removeClass('disabled');
+            document.getElementById('new-label').removeAttribute('disabled');
             // unselect all parents
-            $('#parent_select option').prop('selected', false);
+            $('#parent-select option').prop('selected', false);
           }
         });
       }
-      if (document.getElementById('parent_select')) {
-        $('#parent_select').on('change', function () {
+      if (document.getElementById('parent-select')) {
+        $('#parent-select').on('change', function () {
           OR._updateLabel(rdgDetails);
         });
       }
       // the +25 here is to move it out of the way of the other labels and readings so you can still see them
       left = parseInt(left) - document.getElementById('scroller').scrollLeft + 25;
       top = parseInt(top) - document.getElementById('scroller').scrollTop;
-      document.getElementById('label_form').style.left = left + 'px';
-      document.getElementById('label_form').style.top = top + 'px';
-      drag.initDraggable('label_form', true, true);
-      $('#close_label_button').on('click', function() {
-        document.getElementsByTagName('body')[0].removeChild(document.getElementById('label_form'));
+      document.getElementById('label-form').style.left = left + 'px';
+      document.getElementById('label-form').style.top = top + 'px';
+      drag.initDraggable('label-form', true, true);
+      $('#close-label-button').on('click', function() {
+        document.getElementsByTagName('body')[0].removeChild(document.getElementById('label-form'));
       });
       if (saveFunction !== undefined) {
-        $('#save_label_button').on('click', function() {
+        $('#save-label-button').on('click', function() {
           saveFunction();
         });
       } else {
-        $('#save_label_button').on('click', function() {
-          const data = cforms.serialiseForm('label_change_form');
+        $('#save-label-button').on('click', function() {
+          const data = cforms.serialiseForm('label-change-form');
           const newParents = data.parent_select;
-          const newLabel = document.getElementById('new_label').value.replace(/\s+/g, '');
+          const newLabel = document.getElementById('new-label').value.replace(/\s+/g, '');
           if (newLabel !== '') {
             OR._manualChangeLabel(rdgDetails, newLabel, newParents);
           }
@@ -1162,10 +1162,10 @@ var OR = (function() {
       let supportsAll;
       const readings = [];
       const labels = [];
-      for (let i = 0; i < document.getElementById('parent_select').selectedOptions.length; i += 1) {
-        readings.push(document.getElementById('parent_select').selectedOptions[i].value);
+      for (let i = 0; i < document.getElementById('parent-select').selectedOptions.length; i += 1) {
+        readings.push(document.getElementById('parent-select').selectedOptions[i].value);
       }
-      if (readings.length === document.getElementById('parent_select').length) {
+      if (readings.length === document.getElementById('parent-select').length) {
         supportsAll = true;
       } else {
         supportsAll = false;
@@ -1176,9 +1176,9 @@ var OR = (function() {
         }
       }
       if (supportsAll === true && CL.project.useZvForAllReadingsSupport == true) {
-        document.getElementById('new_label').value = 'zv';
+        document.getElementById('new-label').value = 'zv';
       } else {
-        document.getElementById('new_label').value = labels.join('/');
+        document.getElementById('new-label').value = labels.join('/');
       } 
     },
 
@@ -1194,7 +1194,7 @@ var OR = (function() {
       if (parents === undefined) {
         delete reading.parents;
       }
-      document.getElementsByTagName('body')[0].removeChild(document.getElementById('label_form'));
+      document.getElementsByTagName('body')[0].removeChild(document.getElementById('label-form'));
       OR.showOrderReadings({'container': CL.container});
       document.getElementById('scroller').scrollLeft = scrollOffset[0];
       document.getElementById('scroller').scrollTop = scrollOffset[1];
@@ -1223,7 +1223,7 @@ var OR = (function() {
         document.getElementById('context_menu').innerHTML = '<li id="unmark_sub"><span>Make main reading</span></li>';
       } else if (menuName === 'deletable_unit') {
         document.getElementById('context_menu').innerHTML = '<li id="delete_unit"><span>Delete unit</span></li>';
-      } else if (menuName === 'main_reading' || menuName === 'overlap_main_reading' || menuName === 'main_reading_om' || menuName === 'overlap_main_reading_om') {
+      } else if (menuName === 'main-reading' || menuName === 'overlap-main-reading' || menuName === 'main-reading-om' || menuName === 'overlap-main-reading-om') {
         const menu = [];
         menu.push('<li id="split_witnesses"><span>Split Witnesses</span></li>');
         if (menuName.indexOf('_om') !== -1 && CL.project.omCategories.length > 0) {
@@ -1258,13 +1258,13 @@ var OR = (function() {
           menu.push('<li id="mark_as_ORsubreading"><span>Mark as subreading</span></li>');
         }
         document.getElementById('context_menu').innerHTML = menu.join('');
-      } else if (menuName === 'overlap_unit') {
+      } else if (menuName === 'overlap-unit') {
         document.getElementById('context_menu').innerHTML = '<li id="move_up"><span>Move unit up</span></li>' +
                                                             '<li id="move_down"><span>Move unit down</span></li>' +
                                                             '<li id="merge_shared_readings"><span>Merge shared readings</span></li>';
-      } else if (menuName === 'topline_unit') {
+      } else if (menuName === 'topline-unit') {
         document.getElementById('context_menu').innerHTML = '<li id="merge_shared_readings"><span>Merge shared readings</span></li>';
-      } else if (menuName === 'reading_label') {
+      } else if (menuName === 'reading-label') {
         document.getElementById('context_menu').innerHTML = '<li id="edit_label"><span>Edit label</span></li>';
       }
       OR._addContextMenuHandlers();
@@ -1430,7 +1430,7 @@ var OR = (function() {
                             {'value_key': 'value', 'text_keys': 'label'});
       $('#select_button').on('click', function() {
         witnessList = [];
-        data = cforms.serialiseForm('select_wit_form');
+        data = cforms.serialiseForm('select-wit-form');
         if (!$.isEmptyObject(data)) {
           witnessList = [];
           for (const key in data) {
@@ -1443,7 +1443,7 @@ var OR = (function() {
         }
         newReadingId = SV.doSplitReadingWitnesses(readingDetails[0], readingDetails[2], witnessList, readingDetails[1]);
         OR._doCategoriseOm(readingDetails[0], newReadingId, readingDetails[1], scrollOffset);
-        document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
+        document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit-form'));
       });
     },
 

@@ -522,8 +522,8 @@ var SV = (function() {
         }
         if (Object.prototype.hasOwnProperty.call(options, 'split') && options.split === true) {
           if (Object.prototype.hasOwnProperty.call(data[i], 'overlap_status')) {
-            html.push('<div id="' + 'drag_unit_' + id + '_reading_' + i + '" class="redips-drag split_' +
-                      data[i].overlap_status + '_unit">');
+            html.push('<div id="' + 'drag_unit_' + id + '_reading_' + i + '" class="redips-drag split-' +
+                      data[i].overlap_status + '-unit">');
           } else {
             if (Object.prototype.hasOwnProperty.call(options, 'overlap') && options.overlap === true) {
               if (i === 0) {
@@ -4725,10 +4725,9 @@ var SV = (function() {
       // if there is a generic SVsubreading entry in the context menu then we deal with the distinction in a drop down
       if (document.getElementById('mark-as-sv-subreading')) {
         // make menu for mark-as-sv-subreading
-        const key = 'SVsubreading';
-        $('#mark-as-' + key).off('click.' + key + '_c');
-        $('#mark-as-' + key).off('mouseover.' + key + '_mo');
-        $('#mark-as-' + key).on('click.' + key + '_c', function() {
+        $('#mark-as-sv-subreading').off('click.sv-subreading_c');
+        $('#mark-as-sv-subreading').off('mouseover.sv-subreading_mo');
+        $('#mark-as-sv-subreading').on('click.sv-subreading_c', function() {
           var element, div, unit, appId, unitPos, rdgDetails, readingPos, reading, readingDetails,
               readingText, tokenList;
           element = SimpleContextMenu._target_element;
@@ -4760,12 +4759,12 @@ var SV = (function() {
             'reading_id': reading._id,
             'reading_text': readingText
           };
-          CL.markStandoffReading(key, 'Subreading', readingDetails, 'set_variants', {
+          CL.markStandoffReading('SVsubreading', 'Subreading', readingDetails, 'set_variants', {
             'top': SimpleContextMenu._menuElement.style.top,
             'left': SimpleContextMenu._menuElement.style.left
           });
         });
-        $('#mark-as-' + key).on('mouseover.' + key + '_mo', function() {
+        $('#mark-as-sv-subreading').on('mouseover.sv-subreading_mo', function() {
           CL.hideTooltip();
         });
       } else {

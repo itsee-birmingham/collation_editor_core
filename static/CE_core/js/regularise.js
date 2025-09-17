@@ -515,7 +515,7 @@ var RG = (function () {
             if (rules[key].scope === 'always') {
               regClass = 'regularised-global ';
             } else {
-              regClass = 'deletable_rule regularised ';
+              regClass = 'deletable-rule regularised ';
             }
             if (RG._hasDeletionScheduled(key)) {
               regClass += 'deleted ';
@@ -523,7 +523,7 @@ var RG = (function () {
           } else {
             regClass = 'non-deletable-rule ';
           }
-          regClass += 'regclass_' + rules[key].class + ' ';
+          regClass += 'regclass-' + rules[key].class + ' ';
           highlighted = '';
           if (rules[key].witnesses.length > 1) {
             rules[key].witnesses = CL.sortWitnesses(rules[key].witnesses);
@@ -561,7 +561,7 @@ var RG = (function () {
 
     _addMultipleRuleDeletionEvents: function () {
       // NB: in this function we need to add and remove the regularised class because of how the context menus are attached
-      $('.deletable_rule').on('click', function (e) {
+      $('.deletable-rule').on('click', function (e) {
         if (e.shiftKey || e.altKey) {
           // check if there are already words in other variant units selected and remove them.
           const thisVariantUnitId = $(e.target).parents('div').attr('id');

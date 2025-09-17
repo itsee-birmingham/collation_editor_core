@@ -836,9 +836,9 @@ django_services = (function() {
         // then split out the new unit and overlap the witnesses in the corresponding
       });
     }
-    if (document.getElementById('overlap_om_verse')) {
-      $('#overlap_om_verse').off('click.overlap_om');
-      $('#overlap_om_verse').on('click.overlap_om', function() {
+    if (document.getElementById('overlap-om-verse')) {
+      $('#overlap-om-verse').off('click.overlap_om');
+      $('#overlap-om-verse').on('click.overlap_om', function() {
         var data, foundOmVerse, appIds, newunit, textList, newTextObject, unitId;
         //make the new unit for the overlapping reading
         newunit = {};

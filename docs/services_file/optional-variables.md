@@ -125,7 +125,7 @@ An example of how to add a button to the set variants stage is below:
 extraFooterButtons = {
   "set": [
     {
-      "id": "overlap_om_verse",
+      "id": "overlap-om-verse",
       "label": "Overlap om verse"
     }
   ]

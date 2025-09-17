@@ -1720,10 +1720,9 @@ var OR = (function() {
       }
       if (document.getElementById('mark-as-or-subreading')) {
         //make menu for mark-as-or-subreading
-        const key = 'ORsubreading';
-        $('#mark-as-' + key).off('click.' + key + '_c');
-        $('#mark-as-' + key).off('mouseover.' + key + '_mo');
-        $('#mark-as-' + key).on('click.' + key + '_c', function() {
+        $('#mark-as-or-subreading').off('click.or-subreading_c');
+        $('#mark-as-or-subreading').off('mouseover.or-subreading_mo');
+        $('#mark-as-or-subreading').on('click.or-subreading_c', function() {
           var element, appId, div, unit, unitPos, rdgDetails, readingPos, reading, readingDetails;
           element = SimpleContextMenu._target_element;
           div = CL.getSpecifiedAncestor(element, 'TR');
@@ -1742,12 +1741,12 @@ var OR = (function() {
                             'unit_pos': unitPos,
                             'reading_pos': readingPos,
                             'reading_id': reading._id};
-          CL.markStandoffReading(key, 'Subreading', readingDetails, 'order_readings', {
+          CL.markStandoffReading('ORsubreading', 'Subreading', readingDetails, 'order_readings', {
             'top': SimpleContextMenu._menuElement.style.top,
             'left': SimpleContextMenu._menuElement.style.left
           });
         });
-        $('#mark-as-' + key).on('mouseover.' + key + '_mo', function() {
+        $('#mark-as-or-subreading').on('mouseover.or-subreading_mo', function() {
           CL.hideTooltip();
         });
       } else {

@@ -52,7 +52,7 @@ This variable is used to set the starting point for the algorithm settings to be
 
 The default setting in the code will use the Dekker algorithm with fuzzy matching turned on and a distance of 2.
 
-If `CL.loadIndexPage()` or a button with the id *collation_settings* was provided on the index page then the user can override these settings on a unit by unit basis.
+If `CL.loadIndexPage()` or a button with the id *collation-settings* was provided on the index page then the user can override these settings on a unit by unit basis.
 
 **NB:** this setting was new in version 2.0.0 and the default settings have changed from previous versions.
 

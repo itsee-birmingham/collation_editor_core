@@ -112,16 +112,16 @@ var SV = (function() {
         footerHtml.push('<span id="stage-links"></span>');
       }
       if (CL.witnessEditingMode === true) {
-        footerHtml.push('<button class="pure-button right-foot" id="return_to_saved_table_button">Return to summary table</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="return-to-saved-table-button">Return to summary table</button>');
       } else {
-        footerHtml.push('<button class="pure-button right-foot" id="move_to_reorder_button">Move to Reorder Variants</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="move-to-reorder-button">Move to Reorder Variants</button>');
       }
       footerHtml.push('<button class="pure-button right-foot" id="save">Save</button>');
       footerHtml.push('<select class="right-foot" id="highlighted" name="highlighted"></select>');
       if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
-        footerHtml.push('<select class="right-foot" id="added_highlight" name="added_highlight"></select>');
+        footerHtml.push('<select class="right-foot" id="added-highlight" name="added_highlight"></select>');
       }
-      footerHtml.push('<button class="pure-button right-foot" id="undo_button" style="display:none">undo</button>');
+      footerHtml.push('<button class="pure-button right-foot" id="undo-button" style="display:none">undo</button>');
       // this does the styling of the select elements in the footer using pure (they cannot be styled individually)
       $('#footer').addClass('pure-form');
       document.getElementById('footer').innerHTML = footerHtml.join('');
@@ -159,7 +159,7 @@ var SV = (function() {
         } else {
           preselectedAddedHighlight = 'all';
         }
-        cforms.populateSelect(CL.sortWitnesses(CL.witnessesAdded), document.getElementById('added_highlight'), {
+        cforms.populateSelect(CL.sortWitnesses(CL.witnessesAdded), document.getElementById('added-highlight'), {
           'selected': preselectedAddedHighlight,
           'add_select': true,
           'select_label_details': {
@@ -169,7 +169,7 @@ var SV = (function() {
         });
       }
 
-      $('#move_to_reorder_button').on('click', function() {
+      $('#move-to-reorder-button').on('click', function() {
         SV._moveToReorder();
       });
 
@@ -182,7 +182,7 @@ var SV = (function() {
         }
       });
 
-      $('#return_to_saved_table_button').on('click', function() {
+      $('#return-to-saved-table-button').on('click', function() {
         const callback = function() {
           SV.undoStack = [];
           CL.isDirty = false;
@@ -193,13 +193,13 @@ var SV = (function() {
       $('#highlighted').on('change', function(event) {
         SV._highlightWitness(event.target.value);
       });
-      if (document.getElementById('added_highlight')) {
-        $('#added_highlight').on('change', function(event) {
+      if (document.getElementById('added-highlight')) {
+        $('#added-highlight').on('change', function(event) {
           SV._highlightAddedWitness(event.target.value);
         });
       }
-      if (document.getElementById('undo_button')) {
-        $('#undo_button').on('click', function() {
+      if (document.getElementById('undo-button')) {
+        $('#undo-button').on('click', function() {
           spinner.showLoadingOverlay();
           SV._undo();
         });
@@ -282,7 +282,7 @@ var SV = (function() {
         html.push.apply(html, overlaps[0]);
         temp[2].push.apply(temp[2], overlaps[1]);
       }
-      html.push('<ul id="context_menu" class="simple-context-menu"></ul>');
+      html.push('<ul id="context-menu" class="simple-context-menu"></ul>');
       errorPanelHtml = '<div id="error-panel" class="warning dialogue-form" style="display:none">' +
         '<div class="dialogue-form-header drag-zone"><span id="message-summary">Messages</span>' +
         '<span id="error-coll-ex">&#9660;</span></div><div id="error-message-panel">' +
@@ -302,9 +302,9 @@ var SV = (function() {
   
       if (SV.undoStack.length > 0) {
         CL.isDirty = true;
-        document.getElementById("undo_button").style.display = 'inline';
+        document.getElementById("undo-button").style.display = 'inline';
       } else {
-        document.getElementById("undo_button").style.display = 'none';
+        document.getElementById("undo-button").style.display = 'none';
       }
       CL.addTriangleFunctions('list');
       // decide if we need to display any messages and display them if we do
@@ -453,6 +453,7 @@ var SV = (function() {
     getUnitData: function(data, id, start, end, options) {
       let temp, colspan, rowId, text, splitClass, highlightedHand, errorUnit, highlightedClasses, readingSuffix,
           readingLabel, allOverlappedWitnesses;
+      console.log(id)
       const html = [];
       const rowList = [];
       if (typeof options === 'undefined') {
@@ -476,9 +477,9 @@ var SV = (function() {
         }
       }
       if (Object.prototype.hasOwnProperty.call(options, 'td_id')) {
-        html.push('<td id="' + options.td_id + '" class="start_' + start + '" headers="NA_' + start + '" colspan="' + colspan + '">');
+        html.push('<td id="' + options.td_id + '" class="start-' + start + '" headers="overtext-' + start + '" colspan="' + colspan + '">');
       } else {
-        html.push('<td class="start_' + start + '" headers="NA_' + start + '" colspan="' + colspan + '">');
+        html.push('<td class="start-' + start + '" headers="overtext-' + start + '" colspan="' + colspan + '">');
       }
 
       // is the unit highlighted? used for showing errors
@@ -564,7 +565,7 @@ var SV = (function() {
               html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag unit' + errorUnit + '">');
             }
             if (data.length > 1) {
-              html.push('<ul class="variant-unit" id="variant_unit_' + id + '"><span id="toggle_variant_' + id + '" class="triangle">&#9660;</span><br/>');
+              html.push('<ul class="variant-unit" id="variant_unit_' + id + '"><span id="toggle-variant-' + id + '" class="triangle">&#9660;</span><br/>');
             } else {
               html.push('<ul class="variant-unit" id="variant_unit_' + id + '"><br/>');
             }
@@ -811,7 +812,7 @@ var SV = (function() {
           'form_size': 'small',
           'just_split': true
         });
-        $('#select_button').on('click', function() {
+        $('#select-button').on('click', function() {
           witnessList = [];
           data = cforms.serialiseForm('select-wit-form');
           if (!$.isEmptyObject(data)) {
@@ -1419,7 +1420,7 @@ var SV = (function() {
       const rowList = [];
       textString = '';
       if (Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
-        html.push('<ul class="subreading_unit" id="subreading_unit_' + id + '_row_' + i + '">');
+        html.push('<ul class="subreading-unit" id="subreading_unit_' + id + '_row_' + i + '">');
         for (const type in reading.subreadings) {
           if (Object.prototype.hasOwnProperty.call(reading.subreadings, type)) {
             suffix = reading.subreadings[type][0].suffix;
@@ -2263,7 +2264,7 @@ var SV = (function() {
       const unitDetails = CL.getUnitAppReading(rd.obj.firstChild.id);
       const unitNum = unitDetails[0];
       const unit = CL.data[unitDetails[1]][unitNum];
-      const targetLocation = parseInt(rd.td.target.id.replace('num_', ''), 10);
+      const targetLocation = parseInt(rd.td.target.id.replace('num-', ''), 10);
       const originalLocation = CL.data.apparatus[unitNum].start;
       if (targetLocation % 2 === 1) {
         if ((unit.start === unit.end && unit.start % 2 === 1) || typeof unitDetails[2] !== 'undefined') {
@@ -3784,7 +3785,7 @@ var SV = (function() {
               'button': 'Overlap witnesses',
               'form_size': 'small'
             });
-            $('#select_button').on('click', function() {
+            $('#select-button').on('click', function() {
               witnessList = [];
               data = cforms.serialiseForm('select-wit-form');
               if (!$.isEmptyObject(data)) {
@@ -4434,7 +4435,7 @@ var SV = (function() {
           'delete_offset': true
         };
         CL.makeMainReading(unit, parentReading, subtype, subreadingPos, options);
-        // Need to prepare for unsplitting but not for make_main_reading
+        // Need to prepare for unsplitting but not for makeMainReading()
         SV.prepareForOperation();
         SV.unsplitUnitWitnesses(unitNumber, appId);
         SV.unprepareForOperation();
@@ -4511,32 +4512,32 @@ var SV = (function() {
       let menu, subreadings, svRules;
       // menus for full units
       if (menuName === 'unit') {
-        document.getElementById('context_menu').innerHTML = '<li id="split_words"><span>Split words</span></li><li id="split-readings"><span>Split readings</span></li>';
+        document.getElementById('context-menu').innerHTML = '<li id="split-words"><span>Split words</span></li><li id="split-readings"><span>Split readings</span></li>';
       } else if (menuName === 'overlap-unit') {
-        document.getElementById('context_menu').innerHTML = '<li id="split-readings"><span>Split readings</span></li>';
+        document.getElementById('context-menu').innerHTML = '<li id="split-readings"><span>Split readings</span></li>';
       } else if (menuName === 'subreading') {
-        document.getElementById('context_menu').innerHTML = '<li id="make_main_reading"><span>Make main reading</span></li>';
+        document.getElementById('context-menu').innerHTML = '<li id="make-main-reading"><span>Make main reading</span></li>';
       } else if (menuName === 'split-duplicate-unit') {
         // used for reading in top line labelled 'duplicate' when the unit is in split readings state
-        menu = ['<li id="treat_as_main"><span>Make main reading</span></li>'];
+        menu = ['<li id="treat-as-main"><span>Make main reading</span></li>'];
         for (let i = 0; i < CL.overlappedOptions.length; i += 1) {
           menu.push('<li id="' + CL.overlappedOptions[i].id + '"><span>' + CL.overlappedOptions[i].label + '</span></li>');
         }
-        document.getElementById('context_menu').innerHTML = menu.join('');
+        document.getElementById('context-menu').innerHTML = menu.join('');
       } else if (menuName === 'split-overlapped-change-unit') {
         menu = [];
         for (let i = 0; i < CL.overlappedOptions.length; i += 1) {
           menu.push('<li id="' + CL.overlappedOptions[i].id + '"><span>' + CL.overlappedOptions[i].label + '</span></li>');
         }
-        document.getElementById('context_menu').innerHTML = menu.join('');
+        document.getElementById('context-menu').innerHTML = menu.join('');
       } else {
         menu = [];
-        menu.push('<li id="recombine_readings"><span>Recombine</span></li>');
+        menu.push('<li id="recombine-readings"><span>Recombine</span></li>');
         if (menuName === 'split-unit' || menuName === 'split-unit-a') {
           menu.push('<li id="overlap"><span>Overlap</span></li>');
         }
         if (menuName === 'split-unit' || menuName === 'split-unit-a' || menuName === 'overlap-split-unit') {
-          menu.push('<li id="split_witnesses"><span>Split Witnesses</span></li>');
+          menu.push('<li id="split-witnesses"><span>Split Witnesses</span></li>');
         }
 
         if (menuName === 'split-unit' || menuName === 'split-omlac-unit' || menuName === 'overlap-split-unit') {
@@ -4545,7 +4546,7 @@ var SV = (function() {
           for (const key in svRules) {
             if (Object.prototype.hasOwnProperty.call(svRules, key)) {
               if (svRules[key][3]) {
-                menu.push('<li id="mark_as_' + svRules[key][1] + '"><span>Mark/Unmark as ' + key + '</span></li>');
+                menu.push('<li id="mark-as-' + svRules[key][1] + '"><span>Mark/Unmark as ' + key + '</span></li>');
               } else {
                 subreadings.push([key, svRules[key][1], svRules[key][2]]);
               }
@@ -4553,26 +4554,26 @@ var SV = (function() {
           }
           if (subreadings.length === 1) {
             if (typeof subreadings[0][2] !== 'undefined') {
-              menu.push('<li id="mark_as_' + subreadings[0][1] + '"><span>Mark as ' + subreadings[0][0] + ' (' + subreadings[0][2] + ')</span></li>');
+              menu.push('<li id="mark-as-' + subreadings[0][1] + '"><span>Mark as ' + subreadings[0][0] + ' (' + subreadings[0][2] + ')</span></li>');
             } else {
-              menu.push('<li id="mark_as_' + subreadings[0][1] + '"><span>Mark as ' + subreadings[0][0] + '</span></li>');
+              menu.push('<li id="mark-as-' + subreadings[0][1] + '"><span>Mark as ' + subreadings[0][0] + '</span></li>');
             }
           } else if (subreadings.length > 1) {
-            menu.push('<li id="mark_as_SVsubreading"><span>Mark as subreading</span></li>');
+            menu.push('<li id="mark-as-sv-subreading"><span>Mark as subreading</span></li>');
           }
         }
-        document.getElementById('context_menu').innerHTML = menu.join('');
+        document.getElementById('context-menu').innerHTML = menu.join('');
       }
       SV._addContextMenuHandlers();
-      return 'context_menu';
+      return 'context-menu';
     },
 
     /**adds events for context menu */
     _addContextMenuHandlers: function() {
-      if (document.getElementById('split_words')) {
-        $('#split_words').off('click.swd_c');
-        $('#split_words').off('mouseover.swd_mo');
-        $('#split_words').on('click.swd_c', function() {
+      if (document.getElementById('split-words')) {
+        $('#split-words').off('click.swd_c');
+        $('#split-words').off('mouseover.swd_mo');
+        $('#split-words').on('click.swd_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -4583,7 +4584,7 @@ var SV = (function() {
           const unitNumber = div.id.replace('drag_unit_', '');
           SV._splitUnit(unitNumber);
         });
-        $('#split_words').on('mouseover.swd_mo', function() {
+        $('#split-words').on('mouseover.swd_mo', function() {
           CL.hideTooltip();
         });
       }
@@ -4605,23 +4606,23 @@ var SV = (function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('make_main_reading')) {
-        $('#make_main_reading').off('click.mmr_c');
-        $('#make_main_reading').off('mouseover.mmr_mo');
-        $('#make_main_reading').on('click.mmr_c', function() {
+      if (document.getElementById('make-main-reading')) {
+        $('#make-main-reading').off('click.mmr_c');
+        $('#make-main-reading').off('mouseover.mmr_mo');
+        $('#make-main-reading').on('click.mmr_c', function() {
           const element = SimpleContextMenu._target_element;
           const li = CL.getSpecifiedAncestor(element, 'LI');
           const idString = li.id.replace('subreading_', '');
           SV._makeMainReading(idString);
         });
-        $('#make_main_reading').on('mouseover.mmr_mo', function() {
+        $('#make-main-reading').on('mouseover.mmr_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('recombine_readings')) {
-        $('#recombine_readings').off('click.rr_c');
-        $('#recombine_readings').off('mouseover.rr_mo');
-        $('#recombine_readings').on('click.rr_c', function() {
+      if (document.getElementById('recombine-readings')) {
+        $('#recombine-readings').off('click.rr_c');
+        $('#recombine-readings').off('mouseover.rr_mo');
+        $('#recombine-readings').on('click.rr_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -4632,7 +4633,7 @@ var SV = (function() {
           const rdgDetails = CL.getUnitAppReading(div.id);
           SV._unsplitReadings(rdgDetails);
         });
-        $('#recombine_readings').on('mouseover.rr_mo', function() {
+        $('#recombine-readings').on('mouseover.rr_mo', function() {
           CL.hideTooltip();
         });
       }
@@ -4657,10 +4658,10 @@ var SV = (function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('split_witnesses')) {
-        $('#split_witnesses').off('click.sw_c');
-        $('#split_witnesses').off('mouseover.sw_mo');
-        $('#split_witnesses').on('click.sw_c', function() {
+      if (document.getElementById('split-witnesses')) {
+        $('#split-witnesses').off('click.sw_c');
+        $('#split-witnesses').off('mouseover.sw_mo');
+        $('#split-witnesses').on('click.sw_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -4674,15 +4675,15 @@ var SV = (function() {
             'left': SimpleContextMenu._menuElement.style.left
           });
         });
-        $('#split_witnesses').on('mouseover.sw_mo', function() {
+        $('#split-witnesses').on('mouseover.sw_mo', function() {
           CL.hideTooltip();
         });
       }
       // next if and for deal with overlapped options
-      if (document.getElementById('treat_as_main')) {
-        $('#treat_as_main').off('click.tam_c');
-        $('#treat_as_main').off('mouseover.tam_mo');
-        $('#treat_as_main').on('click.tam_c', function() {
+      if (document.getElementById('treat-as-main')) {
+        $('#treat-as-main').off('click.tam_c');
+        $('#treat-as-main').off('mouseover.tam_mo');
+        $('#treat-as-main').on('click.tam_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -4698,7 +4699,7 @@ var SV = (function() {
           SV._removeReadingFlag(readingDetails, reading);
           SV.unprepareForOperation();
         });
-        $('#treat_as_main').on('mouseover.tam_mo', function() {
+        $('#treat-as-main').on('mouseover.tam_mo', function() {
           CL.hideTooltip();
         });
       }
@@ -4714,7 +4715,7 @@ var SV = (function() {
       for (const key in svRules) {
         if (Object.prototype.hasOwnProperty.call(svRules, key)) {
           if (!svRules[key][0]) {
-            if (document.getElementById('mark_as_' + svRules[key][1])) {
+            if (document.getElementById('mark-as-' + svRules[key][1])) {
               // add event decides if its a keep as main reading or not and adds correct handler
               SV._addEvent(svRules, key);
             }
@@ -4722,12 +4723,12 @@ var SV = (function() {
         }
       }
       // if there is a generic SVsubreading entry in the context menu then we deal with the distinction in a drop down
-      if (document.getElementById('mark_as_SVsubreading')) {
-        // make menu for mark_as_SVsubreading
+      if (document.getElementById('mark-as-sv-subreading')) {
+        // make menu for mark-as-sv-subreading
         const key = 'SVsubreading';
-        $('#mark_as_' + key).off('click.' + key + '_c');
-        $('#mark_as_' + key).off('mouseover.' + key + '_mo');
-        $('#mark_as_' + key).on('click.' + key + '_c', function() {
+        $('#mark-as-' + key).off('click.' + key + '_c');
+        $('#mark-as-' + key).off('mouseover.' + key + '_mo');
+        $('#mark-as-' + key).on('click.' + key + '_c', function() {
           var element, div, unit, appId, unitPos, rdgDetails, readingPos, reading, readingDetails,
               readingText, tokenList;
           element = SimpleContextMenu._target_element;
@@ -4764,14 +4765,14 @@ var SV = (function() {
             'left': SimpleContextMenu._menuElement.style.left
           });
         });
-        $('#mark_as_' + key).on('mouseover.' + key + '_mo', function() {
+        $('#mark-as-' + key).on('mouseover.' + key + '_mo', function() {
           CL.hideTooltip();
         });
       } else {
         for (const key in svRules) {
           if (Object.prototype.hasOwnProperty.call(svRules, key)) {
             if (svRules[key][0]) {  // if this is a subreading (hence dealt with as subreading in menu)
-              if (document.getElementById('mark_as_' + svRules[key][1])) {
+              if (document.getElementById('mark-as-' + svRules[key][1])) {
                 SV._addEvent(svRules, key);
               }
             }
@@ -4804,9 +4805,9 @@ var SV = (function() {
     _addEvent: function(svRules, key) {
       //if this reading is not marked to be kept as a main reading then use stand_off marking
       if (!svRules[key][3]) {
-        $('#mark_as_' + svRules[key][1]).off('click.' + key + '_c');
-        $('#mark_as_' + svRules[key][1]).off('mouseover.' + key + '_mo');
-        $('#mark_as_' + svRules[key][1]).on('click.' + key + '_c', function() {
+        $('#mark-as-' + svRules[key][1]).off('click.' + key + '_c');
+        $('#mark-as-' + svRules[key][1]).off('mouseover.' + key + '_mo');
+        $('#mark-as-' + svRules[key][1]).on('click.' + key + '_c', function() {
           let readingText, tokenList;
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
@@ -4842,14 +4843,14 @@ var SV = (function() {
             'left': SimpleContextMenu._menuElement.style.left
           });
         });
-        $('#mark_as_' + svRules[key][1]).on('mouseover.' + key + '_mo', function() {
+        $('#mark-as-' + svRules[key][1]).on('mouseover.' + key + '_mo', function() {
           CL.hideTooltip();
         });
       } else {
         // else just add the marker and allow its removal
-        $('#mark_as_' + svRules[key][1]).off('click.' + key + '_c');
-        $('#mark_as_' + svRules[key][1]).off('mouseover.' + key + '_mo');
-        $('#mark_as_' + svRules[key][1]).on('click.' + key + '_c', function() {
+        $('#mark-as-' + svRules[key][1]).off('click.' + key + '_c');
+        $('#mark-as-' + svRules[key][1]).off('mouseover.' + key + '_mo');
+        $('#mark-as-' + svRules[key][1]).on('click.' + key + '_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -4864,7 +4865,7 @@ var SV = (function() {
           const reading = CL.data[appId][unitPos].readings[readingPos];
           SV._markReading(svRules[key][1], reading);
         });
-        $('#mark_as_' + svRules[key][1]).on('mouseover.' + key + '_mo', function() {
+        $('#mark-as-' + svRules[key][1]).on('mouseover.' + key + '_mo', function() {
           CL.hideTooltip();
         });
       }

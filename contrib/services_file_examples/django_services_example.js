@@ -341,11 +341,11 @@ django_services = (function() {
 
   getWitnessesFromInputForm = function() {
     var witnessList, data, key;
-    if (document.getElementById('preselected_witnesses')) {
-      witnessList = document.getElementById('preselected_witnesses').value.split(',');
+    if (document.getElementById('preselected-witnesses')) {
+      witnessList = document.getElementById('preselected-witnesses').value.split(',');
     } else {
       witnessList = [];
-      data = cforms.serialiseForm('collation_form');
+      data = cforms.serialiseForm('collation-form');
       if (!$.isEmptyObject(data)) {
         witnessList = [];
         for (key in data) {

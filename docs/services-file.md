@@ -72,7 +72,7 @@ The only requirement for this function is that it set `CL.managingEditor` to eit
 
 If the index page is to be set up with JavaScript using the optional settings provided in the `contextInput` variable in the services file then the function should call `CL.loadIndexPage()` with the current project as the only argument. If the index page is to be provided in an alternative way they this function must show the index page and set any other platform requirements for its use.
 
-If `CL.loadIndexPage()` is not used as part of the index page setup then this function also needs to add a button with the id *switch_project_button* and one with the id *project_summary* if those functions are required on the platform. In addition, if you want users to be able to change the collation algorithm settings then a button with the id *collation_settings* should also be added. Details of how to activate the buttons can be found in the relevant entries in the Optional Functions page in the configuration section.
+If `CL.loadIndexPage()` is not used as part of the index page setup then this function also needs to add a button with the id *switch-project-button* and one with the id *project-summary* if those functions are required on the platform. In addition, if you want users to be able to change the collation algorithm settings then a button with the id *collation-settings* should also be added. Details of how to activate the buttons can be found in the relevant entries in the Optional Functions page in the configuration section.
 
 ### `getUserInfo()`
 

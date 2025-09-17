@@ -134,7 +134,7 @@ var OR = (function() {
         html.push.apply(html, overlaps[0]);
         temp[2].push.apply(temp[2], overlaps[1]);
       }
-      html.push('<ul id="context_menu" class="simple-context-menu"></ul>');
+      html.push('<ul id="context-menu" class="simple-context-menu"></ul>');
       document.getElementById('header').innerHTML = CL.getHeaderHtml('Order Readings', CL.context);
       if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
         CL.services.showLoginStatus();
@@ -144,7 +144,7 @@ var OR = (function() {
         html.join('') + '</table></div><div id="single-witness-reading"></div>';
       CL.expandFillPageClients();
       if (OR.undoStack.length > 0) {
-        undoButton = '<button class="pure-button right-foot" id="undo_button">undo</button>';
+        undoButton = '<button class="pure-button right-foot" id="undo-button">undo</button>';
       } else {
         undoButton = '';
       }
@@ -217,8 +217,8 @@ var OR = (function() {
           }
         }
       }
-      if (document.getElementById('undo_button')) {
-        $('#undo_button').on('click', function() {
+      if (document.getElementById('undo-button')) {
+        $('#undo-button').on('click', function() {
           spinner.showLoadingOverlay();
           OR._undo();
         });
@@ -297,7 +297,7 @@ var OR = (function() {
       footerHtml.push('<span id="extra-buttons"></span>');
       footerHtml.push('<span id="stage-links"></span>');
       if (CL.project.showGetApparatusButton === true) {
-        footerHtml.push('<button class="pure-button right-foot" id="get_apparatus">Get apparatus</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="get-apparatus">Get apparatus</button>');
       }
       footerHtml.push('<select class="right-foot" id="highlighted" name="highlighted"></select>');
       document.getElementById('footer').innerHTML = footerHtml.join('');
@@ -320,9 +320,9 @@ var OR = (function() {
         OR._highlightWitness(event.target.value, 'approved');
       });
       CL.addSubreadingEvents('approved', CL.getRuleClasses('subreading', true, 'value', ['identifier', 'subreading']));
-      if (document.getElementById('get_apparatus')) {
-        $('#get_apparatus').off('click.download_link');
-        $('#get_apparatus').on('click.download_link', function() {
+      if (document.getElementById('get-apparatus')) {
+        $('#get-apparatus').off('click.download_link');
+        $('#get-apparatus').on('click.download_link', function() {
           OR._getApparatusForContext();
         });
       }
@@ -361,10 +361,10 @@ var OR = (function() {
         }
       }
       if (OR._areAllEmptyReadings(data) && !Object.prototype.hasOwnProperty.call(options, 'created')) {
-        html.push('<td class="redips-mark start_' + start + ' " colspan="' + colspan + '">' +
+        html.push('<td class="redips-mark start-' + start + ' " colspan="' + colspan + '">' +
                   '<div class="drag-div deletable" id="drag_unit_' + id + '">');
       } else {
-        html.push('<td class="redips-mark start_' + start + ' " colspan="' + colspan + '">' +
+        html.push('<td class="redips-mark start-' + start + ' " colspan="' + colspan + '">' +
                   '<div class="drag-div" id="drag_unit_' + id + '">');
       }
       if (!overlap) {
@@ -394,7 +394,7 @@ var OR = (function() {
         rowId = 'variant_unit_' + id + '_row_' + i;
         rowList.push(rowId);
         if (i === 0) {
-          html.push('<tr><td colspan="3" class="redips-mark"><span id="toggle_variant_' + id +
+          html.push('<tr><td colspan="3" class="redips-mark"><span id="toggle-variant-' + id +
                     '" class="triangle">&#9650;</span></td></tr>');
           if (data[i].witnesses.indexOf(hand) != -1) {
             html.push('<tr id="' + rowId + '" class="top highlighted">');
@@ -447,7 +447,7 @@ var OR = (function() {
         }
         html.push('</div>');
         if (Object.prototype.hasOwnProperty.call(data[i], 'subreadings')) {
-          html.push('<table class="subreading_unit" id="subreading_unit_' + id + '_row_' + i + '">');
+          html.push('<table class="subreading-unit" id="subreading_unit_' + id + '_row_' + i + '">');
           overlapped = false;
           if (Object.prototype.hasOwnProperty.call(data[i], 'overlap_status')) {
             overlapped = true;
@@ -802,7 +802,7 @@ var OR = (function() {
       html.push('<form id="label-change-form">');
       html.push('<label id="new-label-label" for="new-label">New label:<br/><input type="text" id="new-label" name="new_label"/></label><br/><br/>');
       if (CL.project.storeMultipleSupportLabelsAsParents === true) {
-        html.push('<label for="multiple_support">Multiple support: </label><input type="checkbox" id="multiple_support"/><br/>');
+        html.push('<label for="multiple-support">Multiple support: </label><input type="checkbox" id="multiple-support"/><br/>');
         html.push('<label id="parent-select-label" for="parent-select" class="top-label disabled">Parents: </label><select class="disabled" disabled="disabled" id="parent-select" name="parent_select" multiple></select><br/><br/>');
       }
       html.push('<input class="pure-button dialogue-form-button" id="close-label-button" type="button" value="Cancel"/>');
@@ -824,7 +824,7 @@ var OR = (function() {
       }
       document.getElementById('new-label').value = currentLabel; // populate field with current label value
       if (currentParents.length > 1) {
-        document.getElementById('multiple_support').setAttribute('checked', 'checked');
+        document.getElementById('multiple-support').setAttribute('checked', 'checked');
         $('#parent-select-label').removeClass('disabled');
         $('#parent-select').removeClass('disabled');
         document.getElementById('parent-select').removeAttribute('disabled');
@@ -836,9 +836,9 @@ var OR = (function() {
         }
         $('#parent-select').focus();
       }
-      if (document.getElementById('multiple_support')) {
-        $('#multiple_support').on('click', function () {
-          if (document.getElementById('multiple_support').checked === true) {
+      if (document.getElementById('multiple-support')) {
+        $('#multiple-support').on('click', function () {
+          if (document.getElementById('multiple-support').checked === true) {
             $('#parent-select-label').removeClass('disabled');
             $('#parent-select').removeClass('disabled');
             document.getElementById('parent-select').removeAttribute('disabled');
@@ -1220,20 +1220,20 @@ var OR = (function() {
     _makeMenu: function(menuName, addBackwardsJoin, addForwardsJoin) {
       // menus for full units
       if (menuName === 'subreading') {
-        document.getElementById('context_menu').innerHTML = '<li id="unmark_sub"><span>Make main reading</span></li>';
+        document.getElementById('context-menu').innerHTML = '<li id="unmark-sub"><span>Make main reading</span></li>';
       } else if (menuName === 'deletable_unit') {
-        document.getElementById('context_menu').innerHTML = '<li id="delete_unit"><span>Delete unit</span></li>';
+        document.getElementById('context-menu').innerHTML = '<li id="delete-unit"><span>Delete unit</span></li>';
       } else if (menuName === 'main-reading' || menuName === 'overlap-main-reading' || menuName === 'main-reading-om' || menuName === 'overlap-main-reading-om') {
         const menu = [];
-        menu.push('<li id="split_witnesses"><span>Split Witnesses</span></li>');
+        menu.push('<li id="split-witnesses"><span>Split Witnesses</span></li>');
         if (menuName.indexOf('_om') !== -1 && CL.project.omCategories.length > 0) {
-          menu.push('<li id="categorise_om"><span>Categorise Om</span></li>');
+          menu.push('<li id="categorise-om"><span>Categorise Om</span></li>');
         }
         if (addBackwardsJoin) {
-          menu.push('<li id="backwards_join"><span>Add/Remove Join ⇇</span></li>');
+          menu.push('<li id="backwards-join"><span>Add/Remove Join ⇇</span></li>');
         }
         if (addForwardsJoin) {
-          menu.push('<li id="forwards_join"><span>Add/Remove Join ⇉</span></li>');
+          menu.push('<li id="forwards-join"><span>Add/Remove Join ⇉</span></li>');
         }
         const subreadings = [];
         const orRules = CL.getRuleClasses('create_in_OR', true, 'name', ['subreading', 'value', 'identifier',
@@ -1241,7 +1241,7 @@ var OR = (function() {
         for (const key in orRules) {
           if (Object.prototype.hasOwnProperty.call(orRules, key)) {
             if (orRules[key][3]) {
-              menu.push('<li id="mark_as_' + orRules[key][1] + '"><span>Mark/Unmark as ' + key + '</span></li>');
+              menu.push('<li id="mark-as-' + orRules[key][1] + '"><span>Mark/Unmark as ' + key + '</span></li>');
             } else {
               subreadings.push([key, orRules[key][1], orRules[key][2]]);
             }
@@ -1249,26 +1249,26 @@ var OR = (function() {
         }
         if (subreadings.length === 1) {
           if (typeof subreadings[0][2] !== 'undefined') {
-            menu.push('<li id="mark_as_' + subreadings[0][1] + '"><span>Mark as ' + subreadings[0][0] + ' (' +
+            menu.push('<li id="mark-as-' + subreadings[0][1] + '"><span>Mark as ' + subreadings[0][0] + ' (' +
                       subreadings[0][2] + ')</span></li>');
           } else {
-            menu.push('<li id="mark_as_' + subreadings[0][1] + '"><span>Mark as ' + subreadings[0][0] + '</span></li>');
+            menu.push('<li id="mark-as-' + subreadings[0][1] + '"><span>Mark as ' + subreadings[0][0] + '</span></li>');
           }
         } else if (subreadings.length > 1) {
-          menu.push('<li id="mark_as_ORsubreading"><span>Mark as subreading</span></li>');
+          menu.push('<li id="mark-as-or-subreading"><span>Mark as subreading</span></li>');
         }
-        document.getElementById('context_menu').innerHTML = menu.join('');
+        document.getElementById('context-menu').innerHTML = menu.join('');
       } else if (menuName === 'overlap-unit') {
-        document.getElementById('context_menu').innerHTML = '<li id="move_up"><span>Move unit up</span></li>' +
-                                                            '<li id="move_down"><span>Move unit down</span></li>' +
-                                                            '<li id="merge_shared_readings"><span>Merge shared readings</span></li>';
+        document.getElementById('context-menu').innerHTML = '<li id="move-up"><span>Move unit up</span></li>' +
+                                                            '<li id="move-down"><span>Move unit down</span></li>' +
+                                                            '<li id="merge-shared-readings"><span>Merge shared readings</span></li>';
       } else if (menuName === 'topline-unit') {
-        document.getElementById('context_menu').innerHTML = '<li id="merge_shared_readings"><span>Merge shared readings</span></li>';
+        document.getElementById('context-menu').innerHTML = '<li id="merge-shared-readings"><span>Merge shared readings</span></li>';
       } else if (menuName === 'reading-label') {
-        document.getElementById('context_menu').innerHTML = '<li id="edit_label"><span>Edit label</span></li>';
+        document.getElementById('context-menu').innerHTML = '<li id="edit-label"><span>Edit label</span></li>';
       }
       OR._addContextMenuHandlers();
-      return 'context_menu';
+      return 'context-menu';
     },
 
     _makeMainReading: function(idString) {
@@ -1426,9 +1426,9 @@ var OR = (function() {
         selectData.push({'value': 'om', 'label': 'om.'});
       }
       cforms.populateSelect(selectData,
-                            document.getElementById('om_category'),
+                            document.getElementById('om-category'),
                             {'value_key': 'value', 'text_keys': 'label'});
-      $('#select_button').on('click', function() {
+      $('#select-button').on('click', function() {
         witnessList = [];
         data = cforms.serialiseForm('select-wit-form');
         if (!$.isEmptyObject(data)) {
@@ -1455,12 +1455,12 @@ var OR = (function() {
           reading = unit.readings[i];
         }
       }
-      if (document.getElementById('om_category').value == 'om') {
+      if (document.getElementById('om-category').value == 'om') {
         delete reading.details;
-      } else if (document.getElementById('om_category').value == 'om_verse') {
+      } else if (document.getElementById('om-category').value == 'om_verse') {
         reading.details = 'om verse';
       } else {
-        reading.details = document.getElementById('om_category').value;
+        reading.details = document.getElementById('om-category').value;
       }
       // now we need to check if we have a standoff marked reading which needs the om details changing
       if (Object.prototype.hasOwnProperty.call(reading, 'created') && reading.created == true &&
@@ -1469,7 +1469,7 @@ var OR = (function() {
           for (let i = 0; i < reading.standoff_subreadings.length; i += 1) {
             standoffEntry = SR.getMatchingStandoffReading(reading.standoff_subreadings[i], unit);
             // change the parent_text value
-            standoffEntry.parent_text = '&lt;' + document.getElementById('om_category').value +'&gt;';
+            standoffEntry.parent_text = '&lt;' + document.getElementById('om-category').value +'&gt;';
           }
       }
       OR.relabelReadings(CL.data[apparatus][unitNumber].readings, true);
@@ -1482,9 +1482,9 @@ var OR = (function() {
     _addEvent: function(orRules, key) {
       // if this reading is not marked to be kept as a main reading then use stand_off marking
       if (!orRules[key][3]) {
-        $('#mark_as_' + orRules[key][1]).off('click.' + key + '_c');
-        $('#mark_as_' + orRules[key][1]).off('mouseover.' + key + '_mo');
-        $('#mark_as_' + orRules[key][1]).on('click.' + key + '_c', function() {
+        $('#mark-as-' + orRules[key][1]).off('click.' + key + '_c');
+        $('#mark-as-' + orRules[key][1]).off('mouseover.' + key + '_mo');
+        $('#mark-as-' + orRules[key][1]).on('click.' + key + '_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'TR');
           const rdgDetails = CL.getUnitAppReading(div.id);
@@ -1503,14 +1503,14 @@ var OR = (function() {
             'left': SimpleContextMenu._menuElement.style.left
           });
         });
-        $('#mark_as_' + orRules[key][1]).on('mouseover.' + key + '_mo', function() {
+        $('#mark-as-' + orRules[key][1]).on('mouseover.' + key + '_mo', function() {
           CL.hideTooltip();
         });
       } else {
         // else just add the marker and allow its removal
-        $('#mark_as_' + orRules[key][1]).off('click.' + key + '_c');
-        $('#mark_as_' + orRules[key][1]).off('mouseover.' + key + '_mo');
-        $('#mark_as_' + orRules[key][1]).on('click.' + key + '_c', function() {
+        $('#mark-as-' + orRules[key][1]).off('click.' + key + '_c');
+        $('#mark-as-' + orRules[key][1]).off('mouseover.' + key + '_mo');
+        $('#mark-as-' + orRules[key][1]).on('click.' + key + '_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'TR');
           const rdgDetails = CL.getUnitAppReading(div.id);
@@ -1520,29 +1520,29 @@ var OR = (function() {
           const reading = CL.data[appId][unitPos].readings[readingPos];
           OR._markReading(orRules[key][1], reading);
         });
-        $('#mark_as_' + orRules[key][1]).on('mouseover.' + key + '_mo', function() {
+        $('#mark-as-' + orRules[key][1]).on('mouseover.' + key + '_mo', function() {
           CL.hideTooltip();
         });
       }
     },
 
     _addContextMenuHandlers: function() {
-      if (document.getElementById('unmark_sub')) {
-        $('#unmark_sub').off('click.ums_c');
-        $('#unmark_sub').off('mouseover.ums_mo');
-        $('#unmark_sub').on('click.ums_c', function() {
+      if (document.getElementById('unmark-sub')) {
+        $('#unmark-sub').off('click.ums_c');
+        $('#unmark-sub').off('mouseover.ums_mo');
+        $('#unmark-sub').on('click.ums_c', function() {
           const element = SimpleContextMenu._target_element;
           const rowElem = CL.getSpecifiedAncestor(element, 'TR');
           OR._makeMainReading(rowElem.id);
         });
-        $('#unmark_sub').on('mouseover.ums_mo', function() {
+        $('#unmark-sub').on('mouseover.ums_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('split_witnesses')) {
-        $('#split_witnesses').off('click.sw_c');
-        $('#split_witnesses').off('mouseover.sw_mo');
-        $('#split_witnesses').on('click.sw_c', function() {
+      if (document.getElementById('split-witnesses')) {
+        $('#split-witnesses').off('click.sw_c');
+        $('#split-witnesses').off('mouseover.sw_mo');
+        $('#split-witnesses').on('click.sw_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'TR');
           const readingDetails = CL.getUnitAppReading(div.id);
@@ -1551,14 +1551,14 @@ var OR = (function() {
             'left': SimpleContextMenu._menuElement.style.left
           });
         });
-        $('#split_witnesses').on('mouseover.sw_mo', function() {
+        $('#split-witnesses').on('mouseover.sw_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('categorise_om')) {
-        $('#categorise_om').off('click.co_c');
-        $('#categorise_om').off('mouseover.co_mo');
-        $('#categorise_om').on('click.co_c', function() {
+      if (document.getElementById('categorise-om')) {
+        $('#categorise-om').off('click.co_c');
+        $('#categorise-om').off('mouseover.co_mo');
+        $('#categorise-om').on('click.co_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'TR');
           const readingDetails = CL.getUnitAppReading(div.id);
@@ -1567,14 +1567,14 @@ var OR = (function() {
             'left': SimpleContextMenu._menuElement.style.left
           });
         });
-        $('#categorise_om').on('mouseover.co_mo', function() {
+        $('#categorise-om').on('mouseover.co_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('backwards_join')) {
-        $('#backwards_join').off('click.bj_c');
-        $('#backwards_join').off('mouseover.bj_mo');
-        $('#backwards_join').on('click.bj_c', function() {
+      if (document.getElementById('backwards-join')) {
+        $('#backwards-join').off('click.bj_c');
+        $('#backwards-join').off('mouseover.bj_mo');
+        $('#backwards-join').on('click.bj_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'TR');
           const rdgDetails = CL.getUnitAppReading(div.id);
@@ -1590,14 +1590,14 @@ var OR = (function() {
           document.getElementById('scroller').scrollLeft = scrollOffset[0];
           document.getElementById('scroller').scrollTop = scrollOffset[1];
         });
-        $('#backwards_join').on('mouseover.bj_mo', function() {
+        $('#backwards-join').on('mouseover.bj_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('forwards_join')) {
-        $('#forwards_join').off('click.fj_c');
-        $('#forwards_join').off('mouseover.fj_mo');
-        $('#forwards_join').on('click.fj_c', function() {
+      if (document.getElementById('forwards-join')) {
+        $('#forwards-join').off('click.fj_c');
+        $('#forwards-join').off('mouseover.fj_mo');
+        $('#forwards-join').on('click.fj_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'TR');
           const rdgDetails = CL.getUnitAppReading(div.id);
@@ -1613,14 +1613,14 @@ var OR = (function() {
           document.getElementById('scroller').scrollLeft = scrollOffset[0];
           document.getElementById('scroller').scrollTop = scrollOffset[1];
         });
-        $('#forwards_join').on('mouseover.fj_mo', function() {
+        $('#forwards-join').on('mouseover.fj_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('move_up')) {
-        $('#move_up').off('click.mu_c');
-        $('#move_up').off('mouseover.mu_mo');
-        $('#move_up').on('click.mu_c', function() {
+      if (document.getElementById('move-up')) {
+        $('#move-up').off('click.mu_c');
+        $('#move-up').off('mouseover.mu_mo');
+        $('#move-up').on('click.mu_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -1630,14 +1630,14 @@ var OR = (function() {
           });
           OR._moveOverlapUp(div);
         });
-        $('#move_up').on('mouseover.mu_mo', function() {
+        $('#move-up').on('mouseover.mu_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('move_down')) {
-        $('#move_down').off('click.md_c');
-        $('#move_down').off('mouseover.md_mo');
-        $('#move_down').on('click.md_c', function() {
+      if (document.getElementById('move-down')) {
+        $('#move-down').off('click.md_c');
+        $('#move-down').off('mouseover.md_mo');
+        $('#move-down').on('click.md_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -1647,14 +1647,14 @@ var OR = (function() {
           });
           OR._moveOverlapDown(div);
         });
-        $('#move_down').on('mouseover.md_mo', function() {
+        $('#move-down').on('mouseover.md_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('merge_shared_readings')) {
-        $('#merge_shared_readings').off('click.msr_c');
-        $('#merge_shared_readings').off('mouseover.msr_mo');
-        $('#merge_shared_readings').on('click.msr_c', function() {
+      if (document.getElementById('merge-shared-readings')) {
+        $('#merge-shared-readings').off('click.msr_c');
+        $('#merge-shared-readings').off('mouseover.msr_mo');
+        $('#merge-shared-readings').on('click.msr_c', function() {
           let idString, appId, unitNumber;
           const element = SimpleContextMenu._target_element;
           const table = CL.getSpecifiedAncestor(element, 'TABLE');
@@ -1671,28 +1671,28 @@ var OR = (function() {
           SV.unprepareForOperation();
           OR.showOrderReadings({'container': CL.container});
         });
-        $('#merge_shared_readings').on('mouseover.msr_mo', function() {
+        $('#merge-shared-readings').on('mouseover.msr_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('edit_label')) {
-        $('#edit_label').off('click.el_c');
-        $('#edit_label').off('mouseover.el_mo');
-        $('#edit_label').on('click.el_c', function() {
+      if (document.getElementById('edit-label')) {
+        $('#edit-label').off('click.el_c');
+        $('#edit-label').off('mouseover.el_mo');
+        $('#edit-label').on('click.el_c', function() {
           const element = SimpleContextMenu._target_element;
           const labelCell = CL.getSpecifiedAncestor(element, 'TD');
           const rdgDetails = CL.getUnitAppReading(labelCell.id);
           OR.editLabel(rdgDetails, {'top': SimpleContextMenu._menuElement.style.top,
                                     'left': SimpleContextMenu._menuElement.style.left});
         });
-        $('#edit_label').on('mouseover.el_mo', function() {
+        $('#edit-label').on('mouseover.el_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('delete_unit')) {
-        $('#delete_unit').off('click.du_c');
-        $('#delete_unit').off('mouseover.du_mo');
-        $('#delete_unit').on('click.du_c', function() {
+      if (document.getElementById('delete-unit')) {
+        $('#delete-unit').off('click.du_c');
+        $('#delete-unit').off('mouseover.du_mo');
+        $('#delete-unit').on('click.du_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -1702,7 +1702,7 @@ var OR = (function() {
           });
           OR._getDeleteUnit(div);
         });
-        $('#delete_unit').on('mouseover.du_mo', function() {
+        $('#delete-unit').on('mouseover.du_mo', function() {
           CL.hideTooltip();
         });
       }
@@ -1712,18 +1712,18 @@ var OR = (function() {
       for (const key in orRules) {
         if (Object.prototype.hasOwnProperty.call(orRules, key)) {
           if (!orRules[key][0]) {
-            if (document.getElementById('mark_as_' + orRules[key][1])) {
+            if (document.getElementById('mark-as-' + orRules[key][1])) {
               OR._addEvent(orRules, key);
             }
           }
         }
       }
-      if (document.getElementById('mark_as_ORsubreading')) {
-        //make menu for mark_as_ORsubreading
+      if (document.getElementById('mark-as-or-subreading')) {
+        //make menu for mark-as-or-subreading
         const key = 'ORsubreading';
-        $('#mark_as_' + key).off('click.' + key + '_c');
-        $('#mark_as_' + key).off('mouseover.' + key + '_mo');
-        $('#mark_as_' + key).on('click.' + key + '_c', function() {
+        $('#mark-as-' + key).off('click.' + key + '_c');
+        $('#mark-as-' + key).off('mouseover.' + key + '_mo');
+        $('#mark-as-' + key).on('click.' + key + '_c', function() {
           var element, appId, div, unit, unitPos, rdgDetails, readingPos, reading, readingDetails;
           element = SimpleContextMenu._target_element;
           div = CL.getSpecifiedAncestor(element, 'TR');
@@ -1747,7 +1747,7 @@ var OR = (function() {
             'left': SimpleContextMenu._menuElement.style.left
           });
         });
-        $('#mark_as_' + key).on('mouseover.' + key + '_mo', function() {
+        $('#mark-as-' + key).on('mouseover.' + key + '_mo', function() {
           CL.hideTooltip();
         });
       } else {
@@ -1755,13 +1755,13 @@ var OR = (function() {
         for (const key in orRules) {
           if (Object.prototype.hasOwnProperty.call(orRules, key)) {
             if (orRules[key][0]) {
-              if (document.getElementById('mark_as_' + orRules[key][1])) {
+              if (document.getElementById('mark-as-' + orRules[key][1])) {
                 rule = JSON.parse(JSON.stringify(orRules[key]));
                 ruleName = key;
                 //mark the reading as subreading
-                $('#mark_as_' + orRules[key][1]).off('click.' + key + '_c');
-                $('#mark_as_' + orRules[key][1]).off('mouseover.' + key + '_mo');
-                $('#mark_as_' + orRules[key][1]).on('click.' + key + '_c', function() {
+                $('#mark-as-' + orRules[key][1]).off('click.' + key + '_c');
+                $('#mark-as-' + orRules[key][1]).off('mouseover.' + key + '_mo');
+                $('#mark-as-' + orRules[key][1]).on('click.' + key + '_c', function() {
                   const element = SimpleContextMenu._target_element;
                   const div = CL.getSpecifiedAncestor(element, 'TR');
                   const rdgDetails = CL.getUnitAppReading(div.id);
@@ -1785,7 +1785,7 @@ var OR = (function() {
                     'left': SimpleContextMenu._menuElement.style.left
                   });
                 });
-                $('#mark_as_' + orRules[key][1]).on('mouseover.' + key + '_mo', function() {
+                $('#mark-as-' + orRules[key][1]).on('mouseover.' + key + '_mo', function() {
                   CL.hideTooltip();
                 });
               }

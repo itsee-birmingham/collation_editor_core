@@ -66,9 +66,9 @@ var RG = (function () {
         if (i === 0) {
           cells.push('<tr><td class="redips-mark" colspan="MX_LN">');
           if (CL.project.showSelectAllVariantsOption === true) {
-            cells.push('<img class="select_all" src="' + staticUrl + 'CE_core/images/checkall.png" height="16px">');
+            cells.push('<img class="select-all" src="' + staticUrl + 'CE_core/images/checkall.png" height="16px">');
           }
-          cells.push('<span id="toggle_variant_' + id + '" class="triangle">&#9650;</span></td></tr>');
+          cells.push('<span id="toggle-variant-' + id + '" class="triangle">&#9650;</span></td></tr>');
         }
         classes = [];
         if (i === 0) {
@@ -219,7 +219,7 @@ var RG = (function () {
         cells.push('</tr>');
         rows.push(cells.join(''));
       }
-      html.push('<td class="start_' + start + '" colspan="' + (end - start + 1) + '"><div class="drag-div" id="redips-drag' + id + '">');
+      html.push('<td class="start-' + start + '" colspan="' + (end - start + 1) + '"><div class="drag-div" id="redips-drag' + id + '">');
       html.push('<table class="variant-unit" id="variant_unit_' + id + '">');
       html.push(rows.join('').replace(/MX_LN/g, String(maxLength + 1)));
       html.push('<tr><td class="redips-mark" colspan="' + (maxLength + 1) + '"><span id="add_reading_' + id + '">+</span></td></tr>');
@@ -318,7 +318,7 @@ var RG = (function () {
       const header = CL.getCollationHeader(CL.data, temp[1], false);
       const html = header[0];
       html.push.apply(html, temp[0]);
-      html.push('<ul id="context_menu" class="simple-context-menu"></ul>');
+      html.push('<ul id="context-menu" class="simple-context-menu"></ul>');
       document.getElementById('header').innerHTML = CL.getHeaderHtml('Regulariser', CL.context);
       //TODO: this might need to be improved everywhere it has been done if it turns out we need this in the services
       if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
@@ -361,19 +361,19 @@ var RG = (function () {
         footerHtml.push('<span id="stage-links"></span>');
       }
       if (CL.witnessEditingMode === true) {
-        footerHtml.push('<button class="pure-button right-foot" id="return_to_saved_table_button">' +
+        footerHtml.push('<button class="pure-button right-foot" id="return-to-saved-table-button">' +
           'Return to summary table</button>');
       } else {
-        footerHtml.push('<button class="pure-button right-foot" id="go_to_sv_button">move to set variants</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="go-to-sv-button">move to set variants</button>');
       }
-      footerHtml.push('<button class="pure-button right-foot" id="save_button">save</button>');
+      footerHtml.push('<button class="pure-button right-foot" id="save-button">save</button>');
       if (CL.witnessEditingMode === false || CL.witnessAddingMode === true) {
-        footerHtml.push('<button class="pure-button right-foot" id="recollate_button" type="button">recollate</button>');
-        footerHtml.push('<button class="pure-button right-foot" id="settings_button">settings</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="recollate-button" type="button">recollate</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="settings-button">settings</button>');
       }
       footerHtml.push('<select class="right-foot" id="highlighted" name="highlighted"></select>');
       if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
-        footerHtml.push('<select class="right-foot" id="added_highlight" name="added_highlight"></select>');
+        footerHtml.push('<select class="right-foot" id="added-highlight" name="added_highlight"></select>');
       }
       document.getElementById('footer').innerHTML = footerHtml.join('');
 
@@ -402,7 +402,7 @@ var RG = (function () {
         }
         cforms.populateSelect(
           CL.sortWitnesses(CL.witnessesAdded),
-          document.getElementById('added_highlight'),
+          document.getElementById('added-highlight'),
           {
             'selected': preselectedAddedHighlight,
             'add_select': true,
@@ -429,8 +429,8 @@ var RG = (function () {
       $('#highlighted').on('change', function (event) {
         RG._highlightWitness(event.target.value);
       });
-      if (document.getElementById('added_highlight')) {
-        $('#added_highlight').on('change', function (event) { RG._highlightAddedWitness(event.target.value); });
+      if (document.getElementById('added-highlight')) {
+        $('#added-highlight').on('change', function (event) { RG._highlightAddedWitness(event.target.value); });
       }
       RG._showRegularisations();
 
@@ -445,7 +445,7 @@ var RG = (function () {
         }
       }
       if (CL.project.showSelectAllVariantsOption === true) {
-        $('.select_all').on('click', function (event) {
+        $('.select-all').on('click', function (event) {
           RG._doSelectAll(event.target);
         });
       }
@@ -495,7 +495,7 @@ var RG = (function () {
         currentState = 'selected';
       }
       // first reset all the other images to unselected and unselect any selected words
-      $('.select_all').attr('src', unselectedImage);
+      $('.select-all').attr('src', unselectedImage);
       $(".selected-reg-word").removeClass("selected-reg-word");
       // now change the selected one and select the words or don't if we are unselecting it
       if (currentState === 'unselected') {
@@ -631,7 +631,7 @@ var RG = (function () {
     },
 
     _addFooterFunctions: function () {
-      $('#return_to_saved_table_button').on('click', function () {
+      $('#return-to-saved-table-button').on('click', function () {
         const callback = function () {
           _rules = {};
           _forDeletion = [];
@@ -640,7 +640,7 @@ var RG = (function () {
         };
         CL.returnToSummaryTable(callback);
       });
-      $('#go_to_sv_button').on('click',
+      $('#go-to-sv-button').on('click',
         function () {
           let extraResults;
           spinner.showLoadingOverlay();
@@ -678,15 +678,15 @@ var RG = (function () {
             spinner.removeLoadingOverlay();
           }
         });
-      $('#settings_button').on('click',
+      $('#settings-button').on('click',
         function () {
           RG._showSettings();
         });
-      $('#recollate_button').on('click',
+      $('#recollate-button').on('click',
         function () {
           RG.recollate();
         });
-      $('#save_button').on('click',
+      $('#save-button').on('click',
         function () {
           CL.saveCollation('regularised');
         });
@@ -907,8 +907,8 @@ var RG = (function () {
       const settingsDiv = document.createElement('div');
       settingsDiv.setAttribute('id', 'settings');
       settingsDiv.setAttribute('class', 'settings-dialogue dialogue-form');
-      settingsDiv.innerHTML = '<div class="dialogue-form-header"><span id="settings_title">Settings</span></div>' +
-        '<form id="settings_form"></form>';
+      settingsDiv.innerHTML = '<div class="dialogue-form-header"><span id="settings-title">Settings</span></div>' +
+        '<form id="settings-form"></form>';
       const settingsHtml = [];
       CL.displaySettingsDetails.configs.sort(function (a, b) {
         return a.menu_pos - b.menu_pos;
@@ -926,17 +926,17 @@ var RG = (function () {
           settingsHtml.push('<br/>');
         }
       }
-      settingsHtml.push('<input class="pure-button dialogue-form-button" type="button" id="save_settings" value="save and recollate"/>');
-      settingsHtml.push('<input class="pure-button dialogue-form-button" type="button" id="close_settings" value="cancel"/>');
+      settingsHtml.push('<input class="pure-button dialogue-form-button" type="button" id="save-settings" value="save and recollate"/>');
+      settingsHtml.push('<input class="pure-button dialogue-form-button" type="button" id="close-settings" value="cancel"/>');
       document.getElementsByTagName('body')[0].appendChild(settingsDiv);
-      document.getElementById('settings_form').innerHTML = settingsHtml.join('');
+      document.getElementById('settings-form').innerHTML = settingsHtml.join('');
       for (let i = 0; i < CL.displaySettingsDetails.configs.length; i += 1) {
         if (document.getElementById(CL.displaySettingsDetails.configs[i].id)) {
           document.getElementById(CL.displaySettingsDetails.configs[i].id).checked = CL.displaySettings[CL.displaySettingsDetails.configs[i].id];
         }
       }
-      $('#save_settings').on('click', function () {
-        const data = cforms.serialiseForm('settings_form');
+      $('#save-settings').on('click', function () {
+        const data = cforms.serialiseForm('settings-form');
         for (const setting in CL.displaySettings) {
           if (Object.prototype.hasOwnProperty.call(CL.displaySettings, setting)) {
             if (Object.prototype.hasOwnProperty.call(data, setting) && data[setting] !== null) {
@@ -950,7 +950,7 @@ var RG = (function () {
         CL.isDirty = true; // may not have changed but let's be safe
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('settings'));
       });
-      $('#close_settings').on('click', function () {
+      $('#close-settings').on('click', function () {
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('settings'));
       });
     },
@@ -1412,21 +1412,21 @@ var RG = (function () {
 
     _makeMenu: function (menuName) {
       if (menuName === 'regularised') {
-        document.getElementById('context_menu').innerHTML = '<li id="delete_rule"><span>Delete rule</span></li>' +
-          '<li id="delete_variant_unit_rules"><span>Delete rule for all witnesses</span></li>';
+        document.getElementById('context-menu').innerHTML = '<li id="delete-rule"><span>Delete rule</span></li>' +
+          '<li id="delete-variant-unit-rules"><span>Delete rule for all witnesses</span></li>';
       }
       if (menuName === 'regularised-global') {
-        document.getElementById('context_menu').innerHTML = '<li id="add_exception"><span>Add exception</span></li>' +
-          '<li id="delete_rule"><span>Delete rule</span></li>';
+        document.getElementById('context-menu').innerHTML = '<li id="add-exception"><span>Add exception</span></li>' +
+          '<li id="delete-rule"><span>Delete rule</span></li>';
       }
       if (menuName === 'regularisation-staged') {
-        document.getElementById('context_menu').innerHTML = '<li id="delete_unapplied_rule"><span>Delete rule</span></li>';
+        document.getElementById('context-menu').innerHTML = '<li id="delete-unapplied-rule"><span>Delete rule</span></li>';
       }
       if (menuName === 'group_delete') {
-        document.getElementById('context_menu').innerHTML = '<li id="delete-selected-rules"><span>Delete selected rules</span></li>';
+        document.getElementById('context-menu').innerHTML = '<li id="delete-selected-rules"><span>Delete selected rules</span></li>';
       }
       RG._addContextMenuHandlers();
-      return 'context_menu';
+      return 'context-menu';
     },
 
     _getAncestorRow: function (element) {
@@ -1450,10 +1450,10 @@ var RG = (function () {
       html.push('<form id="global-exceptions-form" class="pure-form">');
       html.push('<span>To remove an exception check the box<br/> and click the \'Remove exceptions\' button.</span><br/><ul>');
       for (let i = 0; i < rules.length; i += 1) {
-        html.push('<li><input type="checkbox" name="' + rules[i].id + '" id="checkbox_' + rules[i].id + '"/>');
-        html.push('<label class="checkbox-label" for="checkbox_' + rules[i].id + '">' + rules[i].t + ' &gt; ' + rules[i].n + '</label></li>');
+        html.push('<li><input type="checkbox" name="' + rules[i].id + '" id="checkbox-' + rules[i].id + '"/>');
+        html.push('<label class="checkbox-label" for="checkbox-' + rules[i].id + '">' + rules[i].t + ' &gt; ' + rules[i].n + '</label></li>');
       }
-      html.push('</ul><input class="pure-button dialogue-form-button" type="button" value="Remove exceptions" id="remove_exception_button"/>');
+      html.push('</ul><input class="pure-button dialogue-form-button" type="button" value="Remove exceptions" id="remove-exception-button"/>');
       html.push('</form>');
       document.getElementById('global-exceptions-list').innerHTML = html.join('');
       document.getElementById('global-exceptions-list').style.height = document.getElementById('global-exceptions').offsetHeight - 35 + 'px';
@@ -1462,8 +1462,8 @@ var RG = (function () {
         document.getElementById('global-exceptions').offsetHeight + 15 + 'px';
       document.getElementById('global-exceptions').style.left = 15 + 'px';
 
-      $('#remove_exception_button').off('click.rem_ge');
-      $('#remove_exception_button').on('click.rem_ge', function () {
+      $('#remove-exception-button').off('click.rem_ge');
+      $('#remove-exception-button').on('click.rem_ge', function () {
         RG._removeGlobalExceptions();
       });
       $('#global-exceptions-ex').on('click', function () {
@@ -1593,39 +1593,39 @@ var RG = (function () {
     },
 
     _addContextMenuHandlers: function () {
-      if (document.getElementById('delete_rule')) {
-        $('#delete_rule').off('click.dr_c');
-        $('#delete_rule').off('mouseover.dr_mo');
-        $('#delete_rule').on('click.dr_c', function () {
+      if (document.getElementById('delete-rule')) {
+        $('#delete-rule').off('click.dr_c');
+        $('#delete-rule').off('mouseover.dr_mo');
+        $('#delete-rule').on('click.dr_c', function () {
           RG._scheduleRuleDeletion();
         });
-        $('#delete_rule').on('mouseover.dr_mo', function () {
+        $('#delete-rule').on('mouseover.dr_mo', function () {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('delete_variant_unit_rules')) {
-        $('#delete_variant_unit_rules').off('click.dar_c');
-        $('#delete_variant_unit_rules').off('mouseover.dar_mo');
-        $('#delete_variant_unit_rules').on('click.dar_c', function () { RG._scheduleAllRuleDeletion(); });
-        $('#delete_variant_unit_rules').on('mouseover.dar_mo', function () { CL.hideTooltip(); });
+      if (document.getElementById('delete-variant-unit-rules')) {
+        $('#delete-variant-unit-rules').off('click.dar_c');
+        $('#delete-variant-unit-rules').off('mouseover.dar_mo');
+        $('#delete-variant-unit-rules').on('click.dar_c', function () { RG._scheduleAllRuleDeletion(); });
+        $('#delete-variant-unit-rules').on('mouseover.dar_mo', function () { CL.hideTooltip(); });
       }
-      if (document.getElementById('add_exception')) {
-        $('#add_exception').off('click.ae_c');
-        $('#add_exception').off('mouseover.ae_mo');
-        $('#add_exception').on('click.ae_c', function () {
+      if (document.getElementById('add-exception')) {
+        $('#add-exception').off('click.ae_c');
+        $('#add-exception').off('mouseover.ae_mo');
+        $('#add-exception').on('click.ae_c', function () {
           RG._scheduleAddGlobalException();
         });
-        $('#add_exception').on('mouseover.ae_mo', function () {
+        $('#add-exception').on('mouseover.ae_mo', function () {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('delete_unapplied_rule')) {
-        $('#delete_unapplied_rule').off('click.dur_c');
-        $('#delete_unapplied_rule').off('mouseover.dur_mo');
-        $('#delete_unapplied_rule').on('click.dur_c', function () {
+      if (document.getElementById('delete-unapplied-rule')) {
+        $('#delete-unapplied-rule').off('click.dur_c');
+        $('#delete-unapplied-rule').off('mouseover.dur_mo');
+        $('#delete-unapplied-rule').on('click.dur_c', function () {
           RG._deleteUnappliedRule();
         });
-        $('#delete_unapplied_rule').on('mouseover.dur_mo', function () {
+        $('#delete-unapplied-rule').on('mouseover.dur_mo', function () {
           CL.hideTooltip();
         });
       }

@@ -72,7 +72,7 @@ This function is used to sort the witness sigla into the desired order. It is us
 
 **There is a default in the core code which is explained below**
 
-This function tells the collation editor how to extract the list of witnesses from the index page. If there is an element on the page with the id *preselected_witnesses* the default code will take that value and split on commas. If there is no such element the default will assume that there is a form with the id *collation_form* which has a series of checkboxes for the witnesses and it will use any values that are selected.
+This function tells the collation editor how to extract the list of witnesses from the index page. If there is an element on the page with the id *preselected_witnesses* the default code will take that value and split on commas. If there is no such element the default will assume that there is a form with the id *collation-form* which has a series of checkboxes for the witnesses and it will use any values that are selected.
 
 This default behaviour can be overridden by providing this function in the services. It cannot be overridden in the project settings so the function must work for all projects you host. The function must return an array containing the ids of the documents selected for collation.
 

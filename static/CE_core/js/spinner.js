@@ -9,7 +9,7 @@ var spinner = (function() {
         overlay = document.createElement('div');
         overlay.id = 'overlay';
         messageDiv = document.createElement('div');
-        messageDiv.id = 'overlay_message';
+        messageDiv.id = 'overlay-message';
         if (typeof message !== 'undefined') {
           messageDiv.innerHTML = '<p class="center">' + message + '</p>';
         }
@@ -27,8 +27,8 @@ var spinner = (function() {
       if (document.getElementById('overlay')) {
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('overlay'));
       }
-      if (document.getElementById('overlay_message')) {
-        document.getElementsByTagName('body')[0].removeChild(document.getElementById('overlay_message'));
+      if (document.getElementById('overlay-message')) {
+        document.getElementsByTagName('body')[0].removeChild(document.getElementById('overlay-message'));
       }
     }
 

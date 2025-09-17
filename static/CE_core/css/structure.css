@@ -3,7 +3,8 @@ body {
     padding: 0px 0px 0px 0px;
 }
 
-body.waiting,  body.waiting div input {
+body.waiting,
+body.waiting div input {
     cursor: wait;
 }
 
@@ -25,7 +26,7 @@ body.waiting,  body.waiting div input {
 }
 
 #header h1#verse_ref {
-    float:left;
+    float: left;
     padding-left: 20px;
 }
 
@@ -49,8 +50,6 @@ body.waiting,  body.waiting div input {
     background: silver;
 }
 
-
-
 .project_header {
     background: #CC99FF;
 }
@@ -59,12 +58,9 @@ body.waiting,  body.waiting div input {
     background: lightblue;
 }
 
-
 .admin_header {
     background: #CCCCFF;
 }
-
-
 
 #header {
     /*position: fixed;*/
@@ -84,12 +80,12 @@ body.waiting,  body.waiting div input {
 }
 
 
-#header h1#version_language, #header h1#other_versions_displayed, #header h1#read_status {
+#header h1#version_language,
+#header h1#other_versions_displayed,
+#header h1#read_status {
     float: left;
     padding-left: 20px;
 }
-
-
 
 div#login_status {
     float: right;
@@ -101,8 +97,8 @@ div#login_status {
     padding-bottom: 50px;
 }
 
-
-#container, #scroller {
+#container,
+#scroller {
     overflow: auto;
     position: relative;
 }
@@ -111,6 +107,7 @@ div#scroller {
     padding-left: 10px;
     padding-right: 10px;
 }
+
 /*
 #footer {
     position: fixed;
@@ -137,9 +134,6 @@ div#scroller {
     margin-right: 15px;
 }*/
 
-
-
-
 div#footer {
     position: fixed;
     clear: both;
@@ -159,18 +153,19 @@ div#footer select {
     padding: 0;
 }
 
-div#footer .pure-button, div#footer .btn {
-	margin-top: 8px;
+div#footer .pure-button,
+div#footer .btn {
+    margin-top: 8px;
 }
 
 div#footer .left_foot {
-	float:left;
-	margin-left: 10px;
-	margin-right: 5px;
+    float: left;
+    margin-left: 10px;
+    margin-right: 5px;
 }
 
 div#footer .right_foot {
-  float: right;
-  margin-right: 10px;
-	margin-left: 5px;
+    float: right;
+    margin-right: 10px;
+    margin-left: 5px;
 }

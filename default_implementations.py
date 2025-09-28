@@ -2,7 +2,6 @@
 
 
 class RuleConditions(object):
-
     def ignore_unclear(self, decision_word, token_words):
         decision_word = decision_word.replace('̣', '')
         token_words = [w.replace('̣', '') for w in token_words]
@@ -15,7 +14,6 @@ class RuleConditions(object):
 
 
 class ApplySettings(object):
-
     def lower_case(self, token):
         token['interface'] = token['interface'].lower()
         return token

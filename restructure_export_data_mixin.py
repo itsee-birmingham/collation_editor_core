@@ -34,9 +34,11 @@ class RestructureExportDataMixin(object):
                     try:
                         self._clean_variant_unit(variant_unit)
                     except MissingSuffixesException:
-                        raise MissingSuffixesException(f'At least one of the readings in {collation_unit["context"]} '
-                                                       f'is missing the suffixes data. Reapproving this unit will '
-                                                       f'probably fix the problem.')
+                        raise MissingSuffixesException(
+                            f'At least one of the readings in {collation_unit["context"]} '
+                            f'is missing the suffixes data. Reapproving this unit will '
+                            f'probably fix the problem.'
+                        )
         return collation_unit
 
     def _clean_variant_unit(self, variant_unit):

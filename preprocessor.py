@@ -94,9 +94,11 @@ class PreProcessor(Regulariser):
         # this means we don't have to use the numerical pk
         # it must match with whatever is used in the services 'get_siglum_map' code
         if 'transcription_id' in data[0]:
-            warnings.warn('''The use of 'transcription_id' as a key in the collation unit object is deprecated
+            warnings.warn(
+                '''The use of 'transcription_id' as a key in the collation unit object is deprecated
                           in favour of 'transcription'. Support will be removed in future releases''',
-                          PendingDeprecationWarning)
+                PendingDeprecationWarning,
+            )
         # Add all the witness texts and keep record of witnesses omitting the verse and lacunose witnesses
         for transcription_verse in data:
             # TODO: remove legacy support when ready
@@ -125,12 +127,15 @@ class PreProcessor(Regulariser):
             # it is not clear how the NTVMR will supply duplicate verses because I don't think they
             # have thought about it yet so this may not work accurately for their stuff
             # however it shouldn't break it just might not always select the first occurrence.
-            if (transcription_verse['transcription'] == basetext_transcription
-                    or ('transcription_identifier' in transcription_verse
-                        and transcription_verse['transcription_identifier'] == basetext_transcription)):
-                if verse is None and ('duplicate_position' not in transcription_verse
-                                      or transcription_verse['duplicate_position'] is None
-                                      or transcription_verse['duplicate_position'] == 1):
+            if transcription_verse['transcription'] == basetext_transcription or (
+                'transcription_identifier' in transcription_verse
+                and transcription_verse['transcription_identifier'] == basetext_transcription
+            ):
+                if verse is None and (
+                    'duplicate_position' not in transcription_verse
+                    or transcription_verse['duplicate_position'] is None
+                    or transcription_verse['duplicate_position'] == 1
+                ):
                     verse = transcription_verse
                     basetext_siglum = verse['siglum']
 
@@ -158,8 +163,9 @@ class PreProcessor(Regulariser):
             except (KeyError, TypeError):
                 om_witnesses.append(transcription_verse['siglum'])
                 if 'transcription_identifier' in transcription_verse:
-                    hand_to_transcript_map[transcription_verse['siglum']] = \
-                            transcription_verse['transcription_identifier']
+                    hand_to_transcript_map[transcription_verse['siglum']] = transcription_verse[
+                        'transcription_identifier'
+                    ]
                 else:
                     hand_to_transcript_map[transcription_verse['siglum']] = transcription_verse['transcription']
             else:
@@ -188,10 +194,7 @@ class PreProcessor(Regulariser):
                 missing_reason = 'om'
             else:
                 missing_reason = 'unknown'
-            verse = {'siglum': basetext_siglum,
-                     'missing_reason': missing_reason,
-                     'index': 1
-                     }
+            verse = {'siglum': basetext_siglum, 'missing_reason': missing_reason, 'index': 1}
         return self.regularise(rules, witnesses, verse, accept)
 
     def add_to_special_categories(self, special_categories, reading):
@@ -201,9 +204,7 @@ class PreProcessor(Regulariser):
                 entry['witnesses'].append(reading['id'])
                 added = True
         if not added:
-            special_categories.append({'label': reading['gap_reading'],
-                                       'witnesses': [reading['id']],
-                                       'type': 'lac'})
+            special_categories.append({'label': reading['gap_reading'], 'witnesses': [reading['id']], 'type': 'lac'})
         return special_categories
 
     def regularise(self, decisions, witnesses, verse, accept):
@@ -243,7 +244,7 @@ class PreProcessor(Regulariser):
 
         if len(witnesses['collatable']) > 0:
             witness_list = {'witnesses': witnesses['collatable']}
-            if (algorithm == 'auto'):
+            if algorithm == 'auto':
                 algorithm = 'needleman-wunsch'
                 for witness in witness_list['witnesses']:
                     if len(witness['tokens']) > 0 and 'gap_after' in witness['tokens'][-1].keys():
@@ -251,10 +252,7 @@ class PreProcessor(Regulariser):
                         break
 
             print('preprocessing complete', file=sys.stderr)
-            options = {'outputFormat': accept,
-                       'algorithm': algorithm,
-                       'tokenComparator': tokenComparator
-                       }
+            options = {'outputFormat': accept, 'algorithm': algorithm, 'tokenComparator': tokenComparator}
             collatex_response = self.do_collate(witness_list, options)
 
             # these options are not currently used but could be useful later
@@ -281,17 +279,28 @@ class PreProcessor(Regulariser):
             # get overtext details
             overtext_details = self.get_overtext(verse)
             print('collation done', file=sys.stderr)
-            return self.do_post_processing(alignment_table,
-                                           decisions, overtext_details[0],
-                                           overtext_details[1],
-                                           witnesses['om'],
-                                           witnesses['lac'],
-                                           witnesses['hand_id_map'],
-                                           witnesses['special_categories'])
+            return self.do_post_processing(
+                alignment_table,
+                decisions,
+                overtext_details[0],
+                overtext_details[1],
+                witnesses['om'],
+                witnesses['lac'],
+                witnesses['hand_id_map'],
+                witnesses['special_categories'],
+            )
 
-    def do_post_processing(self, alignment_table, decisions, overtext_name, overtext, om_readings,
-                           lac_readings, hand_id_map, special_categories):
-
+    def do_post_processing(
+        self,
+        alignment_table,
+        decisions,
+        overtext_name,
+        overtext,
+        om_readings,
+        lac_readings,
+        hand_id_map,
+        special_categories,
+    ):
         pp = PostProcessor(
             alignment_table=alignment_table,
             overtext_name=overtext_name,
@@ -305,8 +314,8 @@ class PreProcessor(Regulariser):
             display_settings_config=self.display_settings_config,
             local_python_functions=self.local_python_functions,
             rule_conditions_config=self.rule_conds_config,
-            split_single_reading_units=self.split_single_reading_units
-            )
+            split_single_reading_units=self.split_single_reading_units,
+        )
         try:
             output = pp.produce_variant_units()
         except DataInputException:
@@ -314,7 +323,6 @@ class PreProcessor(Regulariser):
         return output
 
     def get_overtext(self, verse):
-
         if 'witnesses' not in verse.keys():
             try:
                 return [verse['siglum'], verse['missing_reason']]
@@ -327,13 +335,15 @@ class PreProcessor(Regulariser):
             for witness in verse['witnesses']:
                 readings.append(witness['id'])
             if '{}*'.format(verse['siglum']) in readings:
-                return ['{}*'.format(verse['siglum']),
-                        [verse['witnesses'][readings.index('{}*'.format(verse['siglum']))]]
-                        ]
+                return [
+                    '{}*'.format(verse['siglum']),
+                    [verse['witnesses'][readings.index('{}*'.format(verse['siglum']))]],
+                ]
             elif '{}T'.format(verse['siglum']) in readings:
-                return ['{}T'.format(verse['siglum']),
-                        [verse['witnesses'][readings.index('{}T'.format(verse['siglum']))]]
-                        ]
+                return [
+                    '{}T'.format(verse['siglum']),
+                    [verse['witnesses'][readings.index('{}T'.format(verse['siglum']))]],
+                ]
             else:
                 return [verse['witnesses'][0]['id'], [verse['witnesses'][0]]]
 
@@ -352,18 +362,20 @@ class PreProcessor(Regulariser):
                     if token['t'] == '':
                         problem_wits.append(wit['id'])
             if len(problem_wits) > 0:
-                raise DataInputException('There is a problem with an empty token in the following '
-                                         'witness(es): {}'.format(', '.join(problem_wits)))
+                raise DataInputException(
+                    'There is a problem with an empty token in the following ' 'witness(es): {}'.format(
+                        ', '.join(problem_wits)
+                    )
+                )
 
-        if (self.local_python_functions
-                and 'local_collation_function' in self.local_python_functions):
+        if self.local_python_functions and 'local_collation_function' in self.local_python_functions:
             module_name = self.local_python_functions['local_collation_function']['python_file']
             class_name = self.local_python_functions['local_collation_function']['class_name']
             MyClass = getattr(importlib.import_module(module_name), class_name)
             collation_class = MyClass()
-            return getattr(collation_class,
-                           self.local_python_functions['local_collation_function']['function']
-                           )(data, options)
+            return getattr(collation_class, self.local_python_functions['local_collation_function']['function'])(
+                data, options
+            )
         else:
             # use collateX Java microservices
             if 'algorithm' in options:

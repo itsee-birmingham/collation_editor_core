@@ -36,9 +36,12 @@ class SettingsApplier(object):
 
         # display_settings_config is already in execution order
         for setting in self.display_settings_config['configs']:
-            if (setting['id'] in self.settings and setting['apply_when'] is True
-                    or setting['id'] not in self.settings and setting['apply_when'] is False):
-
+            if (
+                setting['id'] in self.settings
+                and setting['apply_when'] is True
+                or setting['id'] not in self.settings
+                and setting['apply_when'] is False
+            ):
                 token = getattr(self.apply_settings_instance, setting['function'])(token)
         token['interface'] = token['interface'].replace('<', '&lt;').replace('>', '&gt;')
         return token

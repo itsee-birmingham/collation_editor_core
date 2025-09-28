@@ -39,14 +39,20 @@ class Regulariser(object):
         token_matches = token['rule_match']
         for condition in self.rule_conditions_config['configs']:
             if 'conditions' in decision and decision['conditions'] is not None:
-                if ((condition['id'] in decision['conditions'].keys()
+                if (
+                    condition['id'] in decision['conditions'].keys()
                     and decision['conditions'][condition['id']] is True
-                    and condition['apply_when'] is True)
-                    or
-                    ((condition['id'] not in decision['conditions'].keys()
-                        or (condition['id'] in decision['conditions'].keys()
-                            and decision['conditions'][condition['id']] is False))
-                        and condition['apply_when'] is False)):
+                    and condition['apply_when'] is True
+                ) or (
+                    (
+                        condition['id'] not in decision['conditions'].keys()
+                        or (
+                            condition['id'] in decision['conditions'].keys()
+                            and decision['conditions'][condition['id']] is False
+                        )
+                    )
+                    and condition['apply_when'] is False
+                ):
                     if condition['type'] == 'boolean':
                         result = getattr(self.instance, condition['function'])(token, decision)
                         if result is False:
@@ -54,8 +60,9 @@ class Regulariser(object):
                             # irrelevant so we can return false already
                             return (False, None, None, None, None, None, None)
                     if condition['type'] == 'string_application':
-                        decision_word, token_matches = getattr(self.instance, condition['function'])(decision_word,
-                                                                                                     token_matches)
+                        decision_word, token_matches = getattr(self.instance, condition['function'])(
+                            decision_word, token_matches
+                        )
         for word in token_matches:
             if word == decision_word:
                 return (True, decision['n'], decision['class'], decision['scope'], decision['id'], decision['t'])
@@ -66,10 +73,13 @@ class Regulariser(object):
 
         Args:
             token (dict): The token to be regualised.
-            decisions (list): _description_
+            decisions (list): The relevant rules for this collation unit retrieved from the database. Each rule in the
+                list is a dictionary.
 
         Returns:
-           tuple: _description_
+            tuple (boolean, string|None, list|None): Details of any matching rules. The boolean says whether at least
+                one rule matched the token. If this is True then the n of the
+
         """
         decision_matches = []
         for decision in decisions:
@@ -77,13 +87,18 @@ class Regulariser(object):
                 print('deprecated - use \'id\' for rules not \'_id\'', file=sys.stderr)
                 decision['id'] = decision['_id']
 
-            if (decision['scope'] == u'always'
-                or decision['scope'] == u'verse'
-                or (decision['scope'] == u'manuscript'
-                    and token['reading'] == decision['context']['witness'])
-                or (decision['scope'] == u'once'
-                    and (token['index'] == str(decision['context']['word'])
-                    and token['reading'] == decision['context']['witness']))):
+            if (
+                decision['scope'] == 'always'
+                or decision['scope'] == 'verse'
+                or (decision['scope'] == 'manuscript' and token['reading'] == decision['context']['witness'])
+                or (
+                    decision['scope'] == 'once'
+                    and (
+                        token['index'] == str(decision['context']['word'])
+                        and token['reading'] == decision['context']['witness']
+                    )
+                )
+            ):
                 decision_matches.append(decision)
         # order by time last modified or created for newer data
         # TODO: perhaps always better to do created time otherwise adding exception
@@ -109,5 +124,7 @@ class Regulariser(object):
                 classes.append({'class': match[2], 'scope': match[3], 'id': match[4], 't': match[5], 'n': match[1]})
             if i + 1 == len(decision_matches):
                 if matched is True:
+                    print(last_match[1])
+                    print(classes)
                     return (True, last_match[1], classes)
         return (False, None, None)

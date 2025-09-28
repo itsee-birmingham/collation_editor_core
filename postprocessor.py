@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Algorithm for post-collate processing."""
+
 import copy
 import sys
 
@@ -12,22 +13,22 @@ from .exceptions import DataInputException
 class PostProcessor(Regulariser, SettingsApplier):
     """Convert alignment table into variant units."""
 
-    def __init__(self,
-                 alignment_table,
-                 overtext_name,
-                 overtext,
-                 om_readings,
-                 lac_readings,
-                 hand_id_map,
-                 special_categories,
-                 display_settings,
-                 decisions,
-                 display_settings_config,
-                 local_python_functions,
-                 rule_conditions_config,
-                 split_single_reading_units
-                 ):
-
+    def __init__(
+        self,
+        alignment_table,
+        overtext_name,
+        overtext,
+        om_readings,
+        lac_readings,
+        hand_id_map,
+        special_categories,
+        display_settings,
+        decisions,
+        display_settings_config,
+        local_python_functions,
+        rule_conditions_config,
+        split_single_reading_units,
+    ):
         self.alignment_table = alignment_table
         self.overtext_name = overtext_name
         self.overtext = overtext
@@ -45,8 +46,9 @@ class PostProcessor(Regulariser, SettingsApplier):
             self.local_python_functions = None
         self.split_single_reading_units = split_single_reading_units
         Regulariser.__init__(self, rule_conditions_config, local_python_functions)
-        SettingsApplier.__init__(self, {'display_settings': self.display_settings,
-                                        'display_settings_config': self.display_settings_config})
+        SettingsApplier.__init__(
+            self, {'display_settings': self.display_settings, 'display_settings_config': self.display_settings_config}
+        )
 
     ###########################################################
     # this is the starting function
@@ -81,7 +83,7 @@ class PostProcessor(Regulariser, SettingsApplier):
     def extract_text_with_gaps(self, text_list, witness):
         text = []
         for i, token in enumerate(text_list):
-            if i == 0 or i == len(text_list)-1:
+            if i == 0 or i == len(text_list) - 1:
                 text.append(token['interface'])
             else:
                 text.append(token['interface'])
@@ -110,9 +112,10 @@ class PostProcessor(Regulariser, SettingsApplier):
                     readings[reading]['witnesses'].append(self.alignment_table['witnesses'][i])
                     readings[reading]['text'] = self.combine_readings(readings[reading]['text'], witness)
                 else:
-                    readings[reading] = {'witnesses': [self.alignment_table['witnesses'][i]],
-                                         'text': self.restructure_tokens(witness)
-                                         }
+                    readings[reading] = {
+                        'witnesses': [self.alignment_table['witnesses'][i]],
+                        'text': self.restructure_tokens(witness),
+                    }
             # now check to see if these units need to be smaller and split if needed
             readings_list = self.check_unit_splits(readings)
             # now build the variant reading structure
@@ -180,13 +183,16 @@ class PostProcessor(Regulariser, SettingsApplier):
                         text = ''
                 if text in new_readings.keys():
                     if text == '':
-                        new_readings[text]['witnesses'] = self.combine_lists(new_readings[text]['witnesses'],
-                                                                             readings_list[j]['witnesses'])
+                        new_readings[text]['witnesses'] = self.combine_lists(
+                            new_readings[text]['witnesses'], readings_list[j]['witnesses']
+                        )
                     else:
-                        new_readings[text]['text'] = self.vertically_merge_tokens(new_readings[text]['text'],
-                                                                                  [readings_list[j]['text'][i]])
-                        new_readings[text]['witnesses'] = self.combine_lists(new_readings[text]['witnesses'],
-                                                                             readings_list[j]['witnesses'])
+                        new_readings[text]['text'] = self.vertically_merge_tokens(
+                            new_readings[text]['text'], [readings_list[j]['text'][i]]
+                        )
+                        new_readings[text]['witnesses'] = self.combine_lists(
+                            new_readings[text]['witnesses'], readings_list[j]['witnesses']
+                        )
                 else:
                     if text == '':
                         new_readings[text] = {'text': []}
@@ -194,8 +200,12 @@ class PostProcessor(Regulariser, SettingsApplier):
                         try:
                             new_readings[text] = {'text': [readings_list[j]['text'][i]]}
                         except Exception:
-                            print('**** Problem with readings_list[j][text] ({2}) array max: {0}; i: {1}'
-                                  .format(len(readings_list[j]['text']), i, readings_list[j]['text']), file=sys.stderr)
+                            print(
+                                '**** Problem with readings_list[j][text] ({2}) array max: {0}; i: {1}'.format(
+                                    len(readings_list[j]['text']), i, readings_list[j]['text']
+                                ),
+                                file=sys.stderr,
+                            )
                             raise DataInputException('Error likely to have been caused by input data')
                     new_readings[text]['witnesses'] = readings_list[j]['witnesses']
             all_witnesses = copy.copy(witnesses)
@@ -260,11 +270,12 @@ class PostProcessor(Regulariser, SettingsApplier):
     def check_unit_splits(self, readings):
         """Work out whether any units need further splitting and if so send them off to restructure_unit."""
         # if we have at least two actual readings (not including empty readings)
-        if ((len(readings.keys()) > 1 and ('_' not in readings.keys())) or
-                (len(readings.keys()) > 2 and ('_' in readings.keys()))):
+        if (len(readings.keys()) > 1 and ('_' not in readings.keys())) or (
+            len(readings.keys()) > 2 and ('_' in readings.keys())
+        ):
             return self.split_unit(readings)
         # we have at least one real reading and we have asked to split these
-        elif (len([x for x in readings.keys() if x != '_']) == 1 and self.split_single_reading_units is True):
+        elif len([x for x in readings.keys() if x != '_']) == 1 and self.split_single_reading_units is True:
             return self.split_unit(readings)
         else:
             return [readings]
@@ -273,7 +284,6 @@ class PostProcessor(Regulariser, SettingsApplier):
     def horizontal_combine(self, units):
         new_unit = [units[0]]
         for i in range(1, len(units)):
-
             new_unit['text'].append(units[i]['text'])
         return new_unit
 
@@ -355,14 +365,15 @@ class PostProcessor(Regulariser, SettingsApplier):
         for i, unit in enumerate(variant_units):
             base_reading = unit[0]['text']
             if not len(base_reading) or (
-                    (self.lac_readings is not None and self.overtext_name in self.lac_readings)
-                    or (self.om_readings is not None and self.overtext_name in self.om_readings)):
+                (self.lac_readings is not None and self.overtext_name in self.lac_readings)
+                or (self.om_readings is not None and self.overtext_name in self.om_readings)
+            ):
                 # we are looking at an addition so odd numbers
                 start_index = previous_index + 1
                 end_index = previous_index + 1
                 if start_index == last_addition:
                     # get the next sub index
-                    sub_index = self.get_next_sub_index(variant_units[i-1])
+                    sub_index = self.get_next_sub_index(variant_units[i - 1])
                 last_addition = previous_index + 1
             else:
                 # this is an even numbered unit so reset subindex
@@ -386,8 +397,8 @@ class PostProcessor(Regulariser, SettingsApplier):
                 'readings': unit,
                 'start': start_index,
                 'end': end_index,
-                'first_word_index': first_word_index
-                }
+                'first_word_index': first_word_index,
+            }
             anchored_readings.append(anchored_reading)
 
         return anchored_readings
@@ -413,13 +424,15 @@ class PostProcessor(Regulariser, SettingsApplier):
 
     def format_output(self, anchored_readings):
         """Format it nicely."""
-        return {'overtext': self.overtext,
-                'overtext_name': self.overtext_name,
-                'apparatus': anchored_readings,
-                'om_readings': self.om_readings,
-                'lac_readings': self.lac_readings,
-                'special_categories': self.special_categories,
-                'hand_id_map': self.hand_id_map}
+        return {
+            'overtext': self.overtext,
+            'overtext_name': self.overtext_name,
+            'apparatus': anchored_readings,
+            'om_readings': self.om_readings,
+            'lac_readings': self.lac_readings,
+            'special_categories': self.special_categories,
+            'hand_id_map': self.hand_id_map,
+        }
 
     def process_witness_tokens(self, witness):
         if witness is None:

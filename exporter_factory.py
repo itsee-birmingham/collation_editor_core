@@ -2,8 +2,7 @@
 import importlib
 
 
-class ExporterFactory (object):
-
+class ExporterFactory(object):
     def __init__(self, exporter_settings=None, options={}):
         if exporter_settings and 'python_file' in exporter_settings:
             module_name = exporter_settings['python_file']

@@ -1501,10 +1501,10 @@ var SV = (function() {
             }
           } else {
             if (_selectedVariantUnits[0][1] !== 'apparatus') {
-              sourceCol = parseInt(rd.td.source.id.substring(rd.td.source.id.indexOf('_') + 1));
-              targetCol = parseInt(rd.td.target.id.substring(rd.td.target.id.indexOf('_') + 1));
+              sourceCol = parseInt(rd.td.source.id.substring(rd.td.source.id.indexOf('-') + 1));
+              targetCol = parseInt(rd.td.target.id.substring(rd.td.target.id.indexOf('-') + 1));
               if (sourceCol === targetCol) {
-                targetRow = rd.td.target.id.substring(0, rd.td.target.id.indexOf('_'));
+                targetRow = rd.td.target.id.substring(0, rd.td.target.id.indexOf('-'));
                 isSpace = OR.canUnitMoveTo(CL.data[_selectedVariantUnits[0][1]][_selectedVariantUnits[0][0]]._id, targetRow);
                 if (isSpace) {
                   // move it to the target row or combine if there are two

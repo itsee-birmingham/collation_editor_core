@@ -718,7 +718,7 @@ var CL = (function() {
         delete options.error_unit;
       }
       while (i <= overtextLength) {
-        tdId = app + '_' + i;
+        tdId = app + '-' + i;
         unitIndex = null;
         unit = apparatus[j];
         if (unit !== undefined) {

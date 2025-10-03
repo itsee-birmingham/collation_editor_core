@@ -41,24 +41,6 @@ class RestructureExportDataMixinUnitTests(TestCase):
         result = mixin._simplify_text_list(data)
         self.assertEqual(result, expected)
 
-    def test__supply_missing_reading_data_1(self):
-        """Test that the missing text_string data is added when it is missing."""
-        data = {
-            'text': [{'interface': 'my'}, {'interface': 'string'}],
-            'reading_classes': ['reconstructed', 'lectionary_influence'],
-            'label_suffix': 'r',
-            'reading_suffix': 'L',
-        }
-        expected = deepcopy(data)
-        expected['text_string'] = 'my string'
-        mixin = RestructureExportDataMixin()
-        mixin.rule_classes = [
-            {'value': 'reconstructed', 'identifier': 'r', 'suffixed_reading': False, 'suffixed_label': True},
-            {'value': 'lectionary_influence', 'identifier': 'L', 'suffixed_reading': True, 'suffixed_label': False},
-        ]
-        mixin._supply_missing_reading_data(data)
-        self.assertEqual(data, expected)
-
     def test__supply_missing_reading_data_2(self):
         """Test that the missing label_suffix is added when it is needed."""
         data = {

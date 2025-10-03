@@ -9,14 +9,14 @@ class RestructureExportDataMixin(object):
 
         Args:
             collation_unit (dict): The collation unit structure which has two keys (context, structure) where structure
-            is the JSON that comes out of the collation editor.
+                is the JSON that comes out of the collation editor.
 
         Returns:
             dict: The transformed collation_unit dictionary.
 
         Raises:
             MissingSuffixesException: raised if any of the readings in this collation unit are missing the list of
-            witness suffixes.
+                witness suffixes.
         """
         structure = collation_unit['structure']
         # remove the data we don't need (without raising an error if it isn't there)
@@ -26,7 +26,6 @@ class RestructureExportDataMixin(object):
         # unrequired keys
         to_remove = ['reading', 'siglum', 'rule_match', 'verse', 't']
         structure['overtext'] = [self._strip_keys(x, to_remove) for x in structure['overtext'][0]['tokens']]
-
         # now do the variant units
         for key in structure:
             if 'apparatus' in key:

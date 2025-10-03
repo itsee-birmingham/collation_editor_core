@@ -87,7 +87,7 @@ class Exporter(RestructureExportDataMixin, object):
             if self.witness_decorators is not None:
                 restructured_collation_unit = self.add_witness_decorators(restructured_collation_unit)
             output.append(etree.tostring(self.get_unit_xml(restructured_collation_unit), 'utf-8').decode())
-        return '<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0">{}' '</TEI>'.format(
+        return '<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0">{}</TEI>'.format(
             '\n'.join(output).replace('<?xml version=\'1.0\' encoding=\'utf-8\'?>', '')
         )
 
@@ -482,7 +482,7 @@ class Exporter(RestructureExportDataMixin, object):
         missing = []
         if self.consolidate_om_verse or self.consolidate_lac_verse:
             app = etree.fromstring(
-                '<app type="lac" n="{}">' '<lem wit="editorial">Whole verse</lem>' '</app>'.format(context)
+                '<app type="lac" n="{}"><lem wit="editorial">Whole verse</lem></app>'.format(context)
             )
             add_whole_verse_app = False
 

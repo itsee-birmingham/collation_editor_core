@@ -363,7 +363,7 @@ class PreProcessor(Regulariser):
                         problem_wits.append(wit['id'])
             if len(problem_wits) > 0:
                 raise DataInputException(
-                    'There is a problem with an empty token in the following ' 'witness(es): {}'.format(
+                    'There is a problem with an empty token in the following witness(es): {}'.format(
                         ', '.join(problem_wits)
                     )
                 )

@@ -5,11 +5,12 @@ class RuleConditions(object):
     """The default rule conditions to use if services file or project do not supply any."""
 
     def ignore_unclear(self, decision_word, token_words):
-        """_summary_
+        """Ignore unclear text by replacing underdots with empty strings.
 
         Args:
             decision_word (str): The string representing the decision word
-            token_words (list): _description_
+            token_words (list): A list of strings where each string is an acceptable form of the token for applying the
+                rule.
 
         Returns:
             tuple (str, list): The input words with underdots removed.
@@ -21,6 +22,16 @@ class RuleConditions(object):
         return (decision_word, token_words)
 
     def ignore_supplied(self, decision_word, token_words):
+        """Ignore supplied text by replacing square brackets with empty strings.
+
+        Args:
+            decision_word (str): The string representing the decision word
+            token_words (list): A list of strings where each string is an acceptable form of the token for applying the
+                rule.
+
+        Returns:
+            tuple (str, list): The input words with square brackets removed.
+        """
         decision_word = decision_word.replace('[', '').replace(']', '')
         token_words = [w.replace('[', '').replace(']', '') for w in token_words]
         return (decision_word, token_words)

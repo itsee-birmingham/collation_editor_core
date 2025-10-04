@@ -21,19 +21,20 @@ class RegulariserTests(TestCase):
                 "setting_id": "view_supplied",
             },
             {
-                "id": "only_nomsac",
-                "label": "Only apply to Nomina Sacra",
-                "linked_to_settings": False,
-                "function": "match_nomsac",
+                "id": "ignore_unclear",
+                "label": "Ignore unclear markers",
+                "linked_to_settings": True,
+                "setting_id": "view_unclear",
+                "function": "ignore_unclear",
                 "apply_when": True,
                 "check_by_default": False,
-                "type": "boolean",
+                "type": "string_application"
             },
         ],
     }
 
     def test_regularise_token_two_rules_one_matches_word(self):
-        """Test regularise token with multiple rules for the verse but only one matches based on word pos."""
+        """Test regularise token with multiple rules for the verse but only one matches because of word pos."""
         token = {'index': 2, 'rule_match': ['+', '&']}
         decisions = [
             {
@@ -88,8 +89,8 @@ class RegulariserTests(TestCase):
         expected = (True, 'plus', [{'class': 'none', 'scope': 'always', 'id': '124', 't': '+', 'n': 'plus'}])
         self.assertEqual(result, expected)
 
-    def test_regularise_token_two_rules_both_could_match(self):
-        """Test regularise token with multiple rules for the verse where both could match and order is reversed."""
+    def test_regularise_token_two_rules_both_match(self):
+        """Test regularise token with multiple rules for the verse where both match and order is reversed."""
         token = {'index': 2, 'rule_match': ['+', '&']}
         decisions = [
             {
@@ -159,7 +160,7 @@ class RegulariserTests(TestCase):
         self.assertEqual(result, expected)
 
     def test_regularise_token_two_rules_neither_match(self):
-        """Test regularise token with multiple rules for the verse where both could match and order is reversed."""
+        """Test regularise token with multiple rules where none match."""
         token = {'index': 2, 'rule_match': ['none', 'fail']}
         decisions = [
             {
@@ -222,7 +223,7 @@ class RegulariserTests(TestCase):
         self.assertEqual(result, expected)
 
     def test_regularise_token_two_rules_chained(self):
-        """Test regularise token with multiple rules for the verse where both could match and order is reversed."""
+        """Test regularise token with chained rules."""
         token = {'index': 2, 'rule_match': ['+', '&']}
         decisions = [
             {

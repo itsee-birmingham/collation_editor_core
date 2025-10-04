@@ -28,7 +28,7 @@ class RegulariserTests(TestCase):
                 "function": "ignore_unclear",
                 "apply_when": True,
                 "check_by_default": False,
-                "type": "string_application"
+                "type": "string_application",
             },
         ],
     }

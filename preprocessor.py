@@ -292,7 +292,6 @@ class PreProcessor(Regulariser):
             print('collation done', file=sys.stderr)
             return self._do_post_processing(
                 alignment_table,
-                decisions,
                 overtext_details[0],
                 overtext_details[1],
                 witnesses['om'],
@@ -304,7 +303,6 @@ class PreProcessor(Regulariser):
     def _do_post_processing(
         self,
         alignment_table,
-        decisions,
         overtext_name,
         overtext,
         om_readings,
@@ -321,7 +319,6 @@ class PreProcessor(Regulariser):
             hand_id_map=hand_id_map,
             special_categories=special_categories,
             display_settings=self.display_settings,
-            decisions=decisions,
             display_settings_config=self.display_settings_config,
             local_python_functions=self.local_python_functions,
             rule_conditions_config=self.rule_conds_config,

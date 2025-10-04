@@ -22,8 +22,8 @@ class Regulariser(object):
         else:
             self.local_python_functions = None
 
-    def _match_tokens(self, token, decision):
-        """."""
+    def _match_token(self, token, decision):
+        """Check the decision still matches after any rule conditions have been applied."""
         if '_id' in decision:
             print('deprecated - use \'id\' for rules not \'_id\'', file=sys.stderr)
             decision['id'] = decision['_id']
@@ -70,7 +70,8 @@ class Regulariser(object):
 
         Returns:
             tuple (boolean, string|None, list|None): Details of any matching rules in application order. The boolean
-                says whether at least one rule matched the token.
+                says whether at least one rule matched the token. The string is the n value of the last rule in the
+                chain. The list gives simplified details of all rules that were applied.
 
         """
         decision_matches = []
@@ -110,7 +111,7 @@ class Regulariser(object):
                 # if its not in there in the token to allow chaining
                 if last_match[1]['n'] not in token['rule_match']:
                     token['rule_match'].append(last_match[1]['n'])
-            match = self._match_tokens(token, match_d)
+            match = self._match_token(token, match_d)
             if match[0] is True:
                 last_match = match
                 matched = True

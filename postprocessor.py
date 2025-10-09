@@ -19,13 +19,13 @@ class PostProcessor(Regulariser, SettingsApplier):
         overtext (_type_): _description_
         om_readings (_type_): _description_
         lac_readings (_type_): _description_
-        hand_id_map (_type_): _description_
+        hand_id_map (dict): _description_
         special_categories (_type_): _description_
         display_settings (_type_): _description_
         display_settings_config (_type_): _description_
         local_python_functions (_type_): _description_
         rule_conditions_config (_type_): _description_
-        split_single_reading_units (_type_): _description_
+        split_single_reading_units (bool): _description_
 
     """
 

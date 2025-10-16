@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Algorithm for post-collate processing."""
+
 import copy
 import sys
 
@@ -10,24 +11,39 @@ from .exceptions import DataInputException
 
 
 class PostProcessor(Regulariser, SettingsApplier):
-    """Convert alignment table into variant units."""
+    """Convert alignment from collateX into the variant unit structure required for the collation editor.
 
-    def __init__(self,
-                 alignment_table,
-                 overtext_name,
-                 overtext,
-                 om_readings,
-                 lac_readings,
-                 hand_id_map,
-                 special_categories,
-                 display_settings,
-                 decisions,
-                 display_settings_config,
-                 local_python_functions,
-                 rule_conditions_config,
-                 split_single_reading_units
-                 ):
+    Attributes:
+        alignment_table (_type_): _description_
+        overtext_name (_type_): _description_
+        overtext (_type_): _description_
+        om_readings (_type_): _description_
+        lac_readings (_type_): _description_
+        hand_id_map (dict): _description_
+        special_categories (_type_): _description_
+        display_settings (_type_): _description_
+        display_settings_config (_type_): _description_
+        local_python_functions (_type_): _description_
+        rule_conditions_config (_type_): _description_
+        split_single_reading_units (bool): _description_
 
+    """
+
+    def __init__(
+        self,
+        alignment_table,
+        overtext_name,
+        overtext,
+        om_readings,
+        lac_readings,
+        hand_id_map,
+        special_categories,
+        display_settings,
+        display_settings_config,
+        local_python_functions,
+        rule_conditions_config,
+        split_single_reading_units,
+    ):
         self.alignment_table = alignment_table
         self.overtext_name = overtext_name
         self.overtext = overtext
@@ -36,7 +52,6 @@ class PostProcessor(Regulariser, SettingsApplier):
         self.special_categories = special_categories
         self.hand_id_map = hand_id_map
         self.display_settings = display_settings
-        self.decisions = decisions
         self.display_settings_config = display_settings_config
         self.display_settings_config['configs'].sort(key=lambda k: k['execution_pos'])
         if local_python_functions:
@@ -45,51 +60,20 @@ class PostProcessor(Regulariser, SettingsApplier):
             self.local_python_functions = None
         self.split_single_reading_units = split_single_reading_units
         Regulariser.__init__(self, rule_conditions_config, local_python_functions)
-        SettingsApplier.__init__(self, {'display_settings': self.display_settings,
-                                        'display_settings_config': self.display_settings_config})
+        SettingsApplier.__init__(
+            self, {'display_settings': self.display_settings, 'display_settings_config': self.display_settings_config}
+        )
 
-    ###########################################################
-    # this is the starting function
     def produce_variant_units(self):
-        """Produce variant units for display and editing."""
-        variant_readings = self.create_readings_sets()
-        return self.format_output(self.anchor_readings(variant_readings))
+        """Produce variant units for display and editing.
 
-    def create_extra_reading(self, text_list, witness):
-        new = {'witnesses': [witness], 'text': []}
-        for token in text_list:
-            new_word = {}
-            for item in ['t', 'interface', 'verse', witness]:
-                if item in token:
-                    new_word[item] = token[item]
-            new_word['reading'] = [witness]
-            token['reading'].remove(witness)
-            new['text'].append(new_word)
-        return new
+        Returns:
+            dict: The collation format required for the collation editor display.
+        """
+        variant_readings = self._create_readings_sets()
+        return self._format_output(self._anchor_readings(variant_readings))
 
-    # def merge_extra_reading(self, text_list, witness, reading):
-    #     reading['witnesses'].append(witness)
-    #     for token in text_list:
-    #         if witness in token:
-    #             new_word[witness] = token[witness]
-    #         new_word['reading'].append(witness)
-    #         token['reading'].remove(witness)
-    #     return reading
-
-    # in the python we only care about embedded gaps not the ones at the edge of each unit
-    # so we don't need to worry about gap_before as they are always before the first word and never embedded
-    def extract_text_with_gaps(self, text_list, witness):
-        text = []
-        for i, token in enumerate(text_list):
-            if i == 0 or i == len(text_list)-1:
-                text.append(token['interface'])
-            else:
-                text.append(token['interface'])
-                if 'gap_after' in token[witness].keys():
-                    text.append('<' + token[witness]['gap_details'] + '>')
-        return ' '.join(text)
-
-    def create_readings_sets(self):
+    def _create_readings_sets(self):
         """Turn alignment table into our variant readings structure."""
         readings = {}
         reading_sets = []
@@ -99,8 +83,8 @@ class PostProcessor(Regulariser, SettingsApplier):
             variant_unit = []
             readings = {}
             for i, witness in enumerate(unit):
-                witness = self.process_witness_tokens(witness)
-                reading = ' '.join([self.get_token_text(token) for token in witness])
+                witness = self._process_witness_tokens(witness)
+                reading = ' '.join([self._get_token_text(token) for token in witness])
                 # empty string not a valid key in python dict so change to underscore
                 # this is only used internally in this class and does not get passed out to js
                 if reading == '':
@@ -108,13 +92,14 @@ class PostProcessor(Regulariser, SettingsApplier):
 
                 if reading in readings.keys():
                     readings[reading]['witnesses'].append(self.alignment_table['witnesses'][i])
-                    readings[reading]['text'] = self.combine_readings(readings[reading]['text'], witness)
+                    readings[reading]['text'] = self._combine_readings(readings[reading]['text'], witness)
                 else:
-                    readings[reading] = {'witnesses': [self.alignment_table['witnesses'][i]],
-                                         'text': self.restructure_tokens(witness)
-                                         }
+                    readings[reading] = {
+                        'witnesses': [self.alignment_table['witnesses'][i]],
+                        'text': self._restructure_tokens(witness),
+                    }
             # now check to see if these units need to be smaller and split if needed
-            readings_list = self.check_unit_splits(readings)
+            readings_list = self._check_unit_splits(readings)
             # now build the variant reading structure
             for unit in readings_list:
                 variant_unit = []
@@ -126,10 +111,10 @@ class PostProcessor(Regulariser, SettingsApplier):
                 reading_sets.append(variant_unit)
 
         # next line was an experiment to try chunking myself.
-        # reading_sets = self.check_adjacent_shared_units(reading_sets)
+        # reading_sets = self._check_adjacent_shared_units(reading_sets)
         return reading_sets
 
-    def get_token_text(self, token):
+    def _get_token_text(self, token):
         """Turn a token into a string."""
         if isinstance(token, dict):
             try:
@@ -139,24 +124,11 @@ class PostProcessor(Regulariser, SettingsApplier):
         else:
             return None
 
-    def extract_witnesses(self, data):
-        """Extract witnesses from a token or list of tokens and return."""
-        witnesses = []
-        try:
-            for witness in data['reading']:
-                if witness not in witnesses:
-                    witnesses.append(witness)
-        except KeyError:
-            for token in data:
-                for witness in token['reading']:
-                    if witness not in witnesses:
-                        witnesses.append(witness)
-        return witnesses
-
-    def combine_lists(self, list1, list2):
+    def _combine_lists(self, list1, list2):  # TODO: do we need this?
+        """Combine 2 lists while removing duplicates."""
         return list1 + list(set(list2) - set(list1))
 
-    def split_unit_into_single_words(self, readings_list, matrix, highest):
+    def _split_unit_into_single_words(self, readings_list, matrix, highest):
         """Split unit into single words and use vertically_combine_readings to combine any resulting shared units.
 
         The single words are the columns of the matrix. (NB: not an actual matrix object just a list of lists.)
@@ -180,13 +152,16 @@ class PostProcessor(Regulariser, SettingsApplier):
                         text = ''
                 if text in new_readings.keys():
                     if text == '':
-                        new_readings[text]['witnesses'] = self.combine_lists(new_readings[text]['witnesses'],
-                                                                             readings_list[j]['witnesses'])
+                        new_readings[text]['witnesses'] = self._combine_lists(
+                            new_readings[text]['witnesses'], readings_list[j]['witnesses']
+                        )
                     else:
-                        new_readings[text]['text'] = self.vertically_merge_tokens(new_readings[text]['text'],
-                                                                                  [readings_list[j]['text'][i]])
-                        new_readings[text]['witnesses'] = self.combine_lists(new_readings[text]['witnesses'],
-                                                                             readings_list[j]['witnesses'])
+                        new_readings[text]['text'] = self._vertically_merge_tokens(
+                            new_readings[text]['text'], [readings_list[j]['text'][i]]
+                        )
+                        new_readings[text]['witnesses'] = self._combine_lists(
+                            new_readings[text]['witnesses'], readings_list[j]['witnesses']
+                        )
                 else:
                     if text == '':
                         new_readings[text] = {'text': []}
@@ -194,8 +169,12 @@ class PostProcessor(Regulariser, SettingsApplier):
                         try:
                             new_readings[text] = {'text': [readings_list[j]['text'][i]]}
                         except Exception:
-                            print('**** Problem with readings_list[j][text] ({2}) array max: {0}; i: {1}'
-                                  .format(len(readings_list[j]['text']), i, readings_list[j]['text']), file=sys.stderr)
+                            print(
+                                '**** Problem with readings_list[j][text] ({2}) array max: {0}; i: {1}'.format(
+                                    len(readings_list[j]['text']), i, readings_list[j]['text']
+                                ),
+                                file=sys.stderr,
+                            )
                             raise DataInputException('Error likely to have been caused by input data')
                     new_readings[text]['witnesses'] = readings_list[j]['witnesses']
             all_witnesses = copy.copy(witnesses)
@@ -214,14 +193,14 @@ class PostProcessor(Regulariser, SettingsApplier):
             readings.append(new_readings)
         return readings
 
-    def vertically_merge_tokens(self, existing_tokens, new_tokens):
+    def _vertically_merge_tokens(self, existing_tokens, new_tokens):
         for i, token in enumerate(new_tokens):
             for reading in token['reading']:
                 existing_tokens[i][reading] = token[reading]
                 existing_tokens[i]['reading'].append(reading)
         return existing_tokens
 
-    def split_unit(self, readings):
+    def _split_unit(self, readings):
         matrix = []  # a token matrix one row per reading one column per token
         readings_list = []  # the full reading data in same order as matrix
         for reading in readings.keys():
@@ -241,15 +220,15 @@ class PostProcessor(Regulariser, SettingsApplier):
                 if row[0] != '_' and row[0] is not None:
                     lowest = min(len(row), lowest)
         if highest > 1:  # if at least one reading has more than one word
-            # return self.split_unit_into_single_words(readings_list, matrix, highest)
+            # return self._split_unit_into_single_words(readings_list, matrix, highest)
             # TODO: remove this condition once split unit into single words works with differing lengths
             if lowest == highest:
                 # if all the readings are the same length
-                return self.split_unit_into_single_words(readings_list, matrix, highest)
+                return self._split_unit_into_single_words(readings_list, matrix, highest)
             else:
                 if base_text is not None:
                     # if its not an addition
-                    return self.split_unit_into_single_words(readings_list, matrix, highest)
+                    return self._split_unit_into_single_words(readings_list, matrix, highest)
                 else:
                     # this is an addition so doesn't need splitting
                     return [readings]
@@ -257,50 +236,20 @@ class PostProcessor(Regulariser, SettingsApplier):
             # this is a single word unit so just return existing readings
             return [readings]
 
-    def check_unit_splits(self, readings):
+    def _check_unit_splits(self, readings):
         """Work out whether any units need further splitting and if so send them off to restructure_unit."""
         # if we have at least two actual readings (not including empty readings)
-        if ((len(readings.keys()) > 1 and ('_' not in readings.keys())) or
-                (len(readings.keys()) > 2 and ('_' in readings.keys()))):
-            return self.split_unit(readings)
+        if (len(readings.keys()) > 1 and ('_' not in readings.keys())) or (
+            len(readings.keys()) > 2 and ('_' in readings.keys())
+        ):
+            return self._split_unit(readings)
         # we have at least one real reading and we have asked to split these
-        elif (len([x for x in readings.keys() if x != '_']) == 1 and self.split_single_reading_units is True):
-            return self.split_unit(readings)
+        elif len([x for x in readings.keys() if x != '_']) == 1 and self.split_single_reading_units is True:
+            return self._split_unit(readings)
         else:
             return [readings]
 
-    # may not ever need this actually
-    def horizontal_combine(self, units):
-        new_unit = [units[0]]
-        for i in range(1, len(units)):
-
-            new_unit['text'].append(units[i]['text'])
-        return new_unit
-
-    # TODO: may not even need this - wait for example to switch on
-    def check_adjacent_shared_units(self, reading_sets):
-        new_readings = []
-        saved = []
-        for reading in reading_sets:
-            if len(reading) == 1:
-                saved.append(reading)
-            else:
-                if len(saved) == 1:
-                    new_readings.append(saved[0])
-                    saved = []
-                elif len(saved) > 0:
-                    new_readings.append(self.horizontal_combine(saved))
-                    saved = []
-                new_readings.append(reading)
-        if len(saved) == 1:
-            new_readings.append(saved[0])
-            saved = []
-        elif len(saved) > 0:
-            new_readings.append(self.horizontal_combine(saved))
-            saved = []
-        return new_readings
-
-    def restructure_tokens(self, witness):
+    def _restructure_tokens(self, witness):
         """Restructure the tokens so to move MS specific details into a secondary level."""
         new_witness = []
         if witness is None:
@@ -316,16 +265,16 @@ class PostProcessor(Regulariser, SettingsApplier):
             new_witness.append(token)
         return new_witness
 
-    def combine_readings(self, existing_reading, new_reading):
+    def _combine_readings(self, existing_reading, new_reading):
         """Combine a new readings with an existing reading token by token."""
         combined_reading = []
         if existing_reading is None:
             return None
         for i, token in enumerate(existing_reading):
-            combined_reading.append(self.combine_tokens(token, new_reading[i]))
+            combined_reading.append(self._combine_tokens(token, new_reading[i]))
         return combined_reading
 
-    def combine_tokens(self, token, new_token):
+    def _combine_tokens(self, token, new_token):
         """Combine token dictionaries."""
         reading = new_token['reading']
         token['reading'].append(new_token['reading'])
@@ -335,7 +284,7 @@ class PostProcessor(Regulariser, SettingsApplier):
                 token[reading][key] = new_token[key]
         return token
 
-    def get_next_sub_index(self, unit):
+    def _get_next_sub_index(self, unit):
         highest_sub_index = 0
         for reading in unit:
             for word in reading['text']:
@@ -344,7 +293,7 @@ class PostProcessor(Regulariser, SettingsApplier):
                     highest_sub_index = sub_index
         return highest_sub_index + 1
 
-    def anchor_readings(self, variant_units):
+    def _anchor_readings(self, variant_units):
         """Match readings to the overtext."""
         anchored_readings = []
         start_index = 0
@@ -355,14 +304,15 @@ class PostProcessor(Regulariser, SettingsApplier):
         for i, unit in enumerate(variant_units):
             base_reading = unit[0]['text']
             if not len(base_reading) or (
-                    (self.lac_readings is not None and self.overtext_name in self.lac_readings)
-                    or (self.om_readings is not None and self.overtext_name in self.om_readings)):
+                (self.lac_readings is not None and self.overtext_name in self.lac_readings)
+                or (self.om_readings is not None and self.overtext_name in self.om_readings)
+            ):
                 # we are looking at an addition so odd numbers
                 start_index = previous_index + 1
                 end_index = previous_index + 1
                 if start_index == last_addition:
                     # get the next sub index
-                    sub_index = self.get_next_sub_index(variant_units[i-1])
+                    sub_index = self._get_next_sub_index(variant_units[i - 1])
                 last_addition = previous_index + 1
             else:
                 # this is an even numbered unit so reset subindex
@@ -381,18 +331,18 @@ class PostProcessor(Regulariser, SettingsApplier):
                     end_index = previous_index + 1
                 previous_index = end_index
 
-            first_word_index = self.reindex_unit(unit, start_index, end_index, sub_index)
+            first_word_index = self._reindex_unit(unit, start_index, end_index, sub_index)
             anchored_reading = {
                 'readings': unit,
                 'start': start_index,
                 'end': end_index,
-                'first_word_index': first_word_index
-                }
+                'first_word_index': first_word_index,
+            }
             anchored_readings.append(anchored_reading)
 
         return anchored_readings
 
-    def reindex_unit(self, unit, start, end, sub_index_start=1):
+    def _reindex_unit(self, unit, start, end, sub_index_start=1):
         """Make the token indexes match the anchored reading."""
         if start % 2 == 0 and start != end:
             for reading in unit:
@@ -411,17 +361,19 @@ class PostProcessor(Regulariser, SettingsApplier):
                 i += 1
         return '{}.{}'.format(start, sub_index_start)
 
-    def format_output(self, anchored_readings):
+    def _format_output(self, anchored_readings):
         """Format it nicely."""
-        return {'overtext': self.overtext,
-                'overtext_name': self.overtext_name,
-                'apparatus': anchored_readings,
-                'om_readings': self.om_readings,
-                'lac_readings': self.lac_readings,
-                'special_categories': self.special_categories,
-                'hand_id_map': self.hand_id_map}
+        return {
+            'overtext': self.overtext,
+            'overtext_name': self.overtext_name,
+            'apparatus': anchored_readings,
+            'om_readings': self.om_readings,
+            'lac_readings': self.lac_readings,
+            'special_categories': self.special_categories,
+            'hand_id_map': self.hand_id_map,
+        }
 
-    def process_witness_tokens(self, witness):
+    def _process_witness_tokens(self, witness):
         if witness is None:
             return []
         elif not isinstance(witness, list):  # not sure what this one does but don't want to break anything
@@ -436,3 +388,82 @@ class PostProcessor(Regulariser, SettingsApplier):
                     self.apply_settings(token)
                 new_witness.append(token)
             return new_witness
+
+    # Not currently used
+    # may not ever need this actually
+    def _horizontal_combine(self, units):
+        new_unit = [units[0]]
+        for i in range(1, len(units)):
+            new_unit['text'].append(units[i]['text'])
+        return new_unit
+
+    # TODO: may not even need this - wait for example to switch on
+    def _check_adjacent_shared_units(self, reading_sets):
+        new_readings = []
+        saved = []
+        for reading in reading_sets:
+            if len(reading) == 1:
+                saved.append(reading)
+            else:
+                if len(saved) == 1:
+                    new_readings.append(saved[0])
+                    saved = []
+                elif len(saved) > 0:
+                    new_readings.append(self._horizontal_combine(saved))
+                    saved = []
+                new_readings.append(reading)
+        if len(saved) == 1:
+            new_readings.append(saved[0])
+            saved = []
+        elif len(saved) > 0:
+            new_readings.append(self._horizontal_combine(saved))
+            saved = []
+        return new_readings
+
+    # def create_extra_reading(self, text_list, witness):
+    #     new = {'witnesses': [witness], 'text': []}
+    #     for token in text_list:
+    #         new_word = {}
+    #         for item in ['t', 'interface', 'verse', witness]:
+    #             if item in token:
+    #                 new_word[item] = token[item]
+    #         new_word['reading'] = [witness]
+    #         token['reading'].remove(witness)
+    #         new['text'].append(new_word)
+    #     return new
+
+    # def merge_extra_reading(self, text_list, witness, reading):
+    #     reading['witnesses'].append(witness)
+    #     for token in text_list:
+    #         if witness in token:
+    #             new_word[witness] = token[witness]
+    #         new_word['reading'].append(witness)
+    #         token['reading'].remove(witness)
+    #     return reading
+
+    # in the python we only care about embedded gaps not the ones at the edge of each unit
+    # so we don't need to worry about gap_before as they are always before the first word and never embedded
+    # def extract_text_with_gaps(self, text_list, witness):
+    #     text = []
+    #     for i, token in enumerate(text_list):
+    #         if i == 0 or i == len(text_list) - 1:
+    #             text.append(token['interface'])
+    #         else:
+    #             text.append(token['interface'])
+    #             if 'gap_after' in token[witness].keys():
+    #                 text.append('<' + token[witness]['gap_details'] + '>')
+    #     return ' '.join(text)
+
+    # def extract_witnesses(self, data):
+    #     """Extract witnesses from a token or list of tokens and return."""
+    #     witnesses = []
+    #     try:
+    #         for witness in data['reading']:
+    #             if witness not in witnesses:
+    #                 witnesses.append(witness)
+    #     except KeyError:
+    #         for token in data:
+    #             for witness in token['reading']:
+    #                 if witness not in witnesses:
+    #                     witnesses.append(witness)
+    #     return witnesses

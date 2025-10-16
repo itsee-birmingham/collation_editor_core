@@ -39,18 +39,19 @@ class Exporter(RestructureExportDataMixin, object):
 
     """
 
-    def __init__(self,
-                 format='positive_xml',
-                 include_punctuation=False,
-                 ignore_basetext=False,
-                 overlap_status_to_ignore=['overlapped', 'deleted'],
-                 consolidate_om_verse=True,
-                 consolidate_lac_verse=True,
-                 include_lemma_when_no_variants=False,
-                 exclude_lemma_entry=False,
-                 rule_classes={},
-                 witness_decorators=[],
-                 ):
+    def __init__(
+        self,
+        format='positive_xml',
+        include_punctuation=False,
+        ignore_basetext=False,
+        overlap_status_to_ignore=['overlapped', 'deleted'],
+        consolidate_om_verse=True,
+        consolidate_lac_verse=True,
+        include_lemma_when_no_variants=False,
+        exclude_lemma_entry=False,
+        rule_classes={},
+        witness_decorators=[],
+    ):
         self.format = format
         self.include_punctuation = include_punctuation
         if 'negative' in self.format:
@@ -86,8 +87,9 @@ class Exporter(RestructureExportDataMixin, object):
             if self.witness_decorators is not None:
                 restructured_collation_unit = self.add_witness_decorators(restructured_collation_unit)
             output.append(etree.tostring(self.get_unit_xml(restructured_collation_unit), 'utf-8').decode())
-        return '<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0">{}' \
-               '</TEI>'.format('\n'.join(output).replace('<?xml version=\'1.0\' encoding=\'utf-8\'?>', ''))
+        return '<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0">{}</TEI>'.format(
+            '\n'.join(output).replace('<?xml version=\'1.0\' encoding=\'utf-8\'?>', '')
+        )
 
     def add_witness_decorators(self, unit):
         """Add any prescribed witness decorators to the specified witnesses.
@@ -107,19 +109,20 @@ class Exporter(RestructureExportDataMixin, object):
                     decorated_hands.append(hand)
             all_decorators[label] = decorated_hands
         if 'lac_readings' in unit['structure']:
-            unit['structure']['lac_readings'] = self._decorate_witnesses(unit['structure']['lac_readings'],
-                                                                         all_decorators)
+            unit['structure']['lac_readings'] = self._decorate_witnesses(
+                unit['structure']['lac_readings'], all_decorators
+            )
         if 'om_readings' in unit['structure']:
-            unit['structure']['om_readings'] = self._decorate_witnesses(unit['structure']['om_readings'],
-                                                                        all_decorators)
+            unit['structure']['om_readings'] = self._decorate_witnesses(
+                unit['structure']['om_readings'], all_decorators
+            )
         for collation_unit in unit['structure']['apparatus']:
             for reading in collation_unit['readings']:
                 reading['witnesses'] = self._decorate_witnesses(reading['witnesses'], all_decorators)
                 if 'subreadings' in reading:
                     for type in reading['subreadings']:
                         for subreading in reading['subreadings'][type]:
-                            subreading['witnesses'] = self._decorate_witnesses(subreading['witnesses'],
-                                                                               all_decorators)
+                            subreading['witnesses'] = self._decorate_witnesses(subreading['witnesses'], all_decorators)
         return unit
 
     def _decorate_witnesses(self, witnesses, all_decorators):
@@ -189,11 +192,11 @@ class Exporter(RestructureExportDataMixin, object):
             return ['', 'om']
         if start % 2 == 1:
             start += 1
-        real_start = int(start/2)-1
-        real_end = int(end/2)-1
+        real_start = int(start / 2) - 1
+        real_end = int(end / 2) - 1
         if real_start < 0:
             real_start = 0
-        required_text = overtext['current'][real_start:real_end+1]
+        required_text = overtext['current'][real_start : real_end + 1]
         words = []
         for token in required_text:
             word = []
@@ -382,9 +385,10 @@ class Exporter(RestructureExportDataMixin, object):
             for i, reading in enumerate(unit['readings']):
                 wits = self.get_witnesses(reading, missing)
                 if self.negative_apparatus is True:
-                    if ((len(wits) > 0 or reading['label'] == 'a' or 'subreadings' in reading)
-                            and ('overlap_status' not in reading
-                                 or reading['overlap_status'] not in self.overlap_status_to_ignore)):
+                    if (len(wits) > 0 or reading['label'] == 'a' or 'subreadings' in reading) and (
+                        'overlap_status' not in reading
+                        or reading['overlap_status'] not in self.overlap_status_to_ignore
+                    ):
                         if reading['label'] == 'a':
                             wits = []
                         if len(wits) > 0:
@@ -404,9 +408,10 @@ class Exporter(RestructureExportDataMixin, object):
                                     app.append(self.make_reading(subreading, i, subreading_label, wits, True, key))
 
                 else:
-                    if ((len(wits) > 0 or reading['label'] == 'a' or 'subreadings' in reading)
-                            and ('overlap_status' not in reading
-                                 or reading['overlap_status'] not in self.overlap_status_to_ignore)):
+                    if (len(wits) > 0 or reading['label'] == 'a' or 'subreadings' in reading) and (
+                        'overlap_status' not in reading
+                        or reading['overlap_status'] not in self.overlap_status_to_ignore
+                    ):
                         if len(wits) > 0:
                             readings = True
                         subtype = None
@@ -476,9 +481,9 @@ class Exporter(RestructureExportDataMixin, object):
         # here deal with the whole verse lac and om and only use witnesses elsewhere not in these lists
         missing = []
         if self.consolidate_om_verse or self.consolidate_lac_verse:
-            app = etree.fromstring('<app type="lac" n="{}">'
-                                   '<lem wit="editorial">Whole verse</lem>'
-                                   '</app>'.format(context))
+            app = etree.fromstring(
+                '<app type="lac" n="{}"><lem wit="editorial">Whole verse</lem></app>'.format(context)
+            )
             add_whole_verse_app = False
 
             if self.consolidate_lac_verse:

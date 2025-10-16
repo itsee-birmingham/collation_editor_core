@@ -61,7 +61,7 @@ var RG = (function () {
       const rows = [];
       for (let i = 0; i < data.length; i += 1) {
         cells = [];
-        rowId = 'variant_unit_' + id + '_row_' + i;
+        rowId = 'variant-unit-' + id + '-row-' + i;
         rowList.push(rowId);
         if (i === 0) {
           cells.push('<tr><td class="redips-mark" colspan="MX_LN">');
@@ -99,7 +99,7 @@ var RG = (function () {
             maxLength = data[i].text.length;
           }
           for (let j = 0; j < data[i].text.length; j += 1) {
-            variantUnitId = 'variant_unit_' + id + '_r' + i + '_w' + j;
+            variantUnitId = 'variant-unit-' + id + '-r' + i + '-w' + j;
             divClassString = '';
 
             classList = [];
@@ -178,7 +178,7 @@ var RG = (function () {
                   }
                 }
               }
-              rowIdBase = rowId + '_word_' + j;
+              rowIdBase = rowId + '-word-' + j;
               ruleCells = RG._getRulesForDisplay(deletableRules, events, true, highlightedHand, rowIdBase);
               keysToSort = ruleCells[0];
               cellsDict = ruleCells[1];
@@ -220,9 +220,9 @@ var RG = (function () {
         rows.push(cells.join(''));
       }
       html.push('<td class="start-' + start + '" colspan="' + (end - start + 1) + '"><div class="drag-div" id="redips-drag' + id + '">');
-      html.push('<table class="variant-unit" id="variant_unit_' + id + '">');
+      html.push('<table class="variant-unit" id="variant-unit-' + id + '">');
       html.push(rows.join('').replace(/MX_LN/g, String(maxLength + 1)));
-      html.push('<tr><td class="redips-mark" colspan="' + (maxLength + 1) + '"><span id="add_reading_' + id + '">+</span></td></tr>');
+      html.push('<tr><td class="redips-mark" colspan="' + (maxLength + 1) + '"><span id="add-reading-' + id + '">+</span></td></tr>');
       html.push('</table>');
       html.push('</div></td>');
       return [html, rowList, events];
@@ -418,8 +418,8 @@ var RG = (function () {
           if (document.getElementById('redips-drag' + i) !== null) {
             RG._redipsInitRegularise('redips-drag' + i);
           }
-          if (document.getElementById('add_reading_' + i) !== null) {
-            RG._addNewToken(document.getElementById('add_reading_' + i));
+          if (document.getElementById('add-reading-' + i) !== null) {
+            RG._addNewToken(document.getElementById('add-reading-' + i));
           }
           i += 1;
         }
@@ -534,7 +534,7 @@ var RG = (function () {
           if (rules[key].witnesses.indexOf(highlightedHand) !== -1) {
             highlighted = 'highlighted ';
           }
-          subrowId = rowIdBase + '_rule_' + key;
+          subrowId = rowIdBase + '-rule-' + key;
           ruleCells.push('<tr class="' + regClass + highlighted + '" id="' + subrowId + '"><td id="' + key + '">');
           if (rules[key].witnesses.indexOf(highlightedHand) !== -1) {
             ruleCells.push('<div class="spanlike">');
@@ -1186,9 +1186,9 @@ var RG = (function () {
           selectedWords[i].objOld = { id: $(selectedWords[i]).attr("id") };
           selectedWords[i].unit_data = $(selectedWords[i]).attr("id");
           selectedWords[i].original = $(selectedWords[i]).attr("id");
-          selectedWords[i].unit = parseInt(selectedWords[i].unit_data.substring(0, selectedWords[i].unit_data.indexOf('_r')).replace('variant_unit_', ''), 10);
-          selectedWords[i].reading = parseInt(selectedWords[i].unit_data.substring(selectedWords[i].unit_data.indexOf('_r') + 2, selectedWords[i].unit_data.indexOf('_w')), 10);
-          selectedWords[i].word = parseInt(selectedWords[i].unit_data.substring(selectedWords[i].unit_data.indexOf('_w') + 2), 10);
+          selectedWords[i].unit = parseInt(selectedWords[i].unit_data.substring(0, selectedWords[i].unit_data.indexOf('-r')).replace('variant-unit-', ''), 10);
+          selectedWords[i].reading = parseInt(selectedWords[i].unit_data.substring(selectedWords[i].unit_data.indexOf('-r') + 2, selectedWords[i].unit_data.indexOf('-w')), 10);
+          selectedWords[i].word = parseInt(selectedWords[i].unit_data.substring(selectedWords[i].unit_data.indexOf('-w') + 2), 10);
           selectedWords[i].original_text = CL.data.apparatus[selectedWords[i].unit].readings[selectedWords[i].reading].text[selectedWords[i].word];
           if (CL.witnessAddingMode !== true) {
             selectedWords[i].witnesses = CL.data.apparatus[selectedWords[i].unit].readings[selectedWords[i].reading].witnesses;
@@ -1199,7 +1199,7 @@ var RG = (function () {
         }
 
         unitData = rd.objOld.id;
-        unit = parseInt(unitData.substring(0, unitData.indexOf('_r')).replace('variant_unit_', ''), 10);
+        unit = parseInt(unitData.substring(0, unitData.indexOf('-r')).replace('variant-unit-', ''), 10);
 
         if (selectedWords.length > 0) {
           let originalWords = []
@@ -1209,8 +1209,8 @@ var RG = (function () {
           originalDisplayText = originalWords.join(', ');
         } else {
           // get the unit, reading and word data to lookup stuff in data structure
-          reading = parseInt(unitData.substring(unitData.indexOf('_r') + 2, unitData.indexOf('_w')), 10);
-          word = parseInt(unitData.substring(unitData.indexOf('_w') + 2), 10);
+          reading = parseInt(unitData.substring(unitData.indexOf('-r') + 2, unitData.indexOf('-w')), 10);
+          word = parseInt(unitData.substring(unitData.indexOf('-w') + 2), 10);
           if (CL.witnessAddingMode !== true) {
             witnesses = CL.data.apparatus[unit].readings[reading].witnesses;
           } else {
@@ -1271,8 +1271,8 @@ var RG = (function () {
           // add witnesses to normalised form in data structure
           const newUnitData = rd.td.target.firstChild.id;
           if (newUnitData !== '') {  // only try this if it is not a user added reading
-            newUnit = parseInt(newUnitData.substring(0, newUnitData.indexOf('_r')).replace('variant_unit_', ''), 10);
-            newReading = parseInt(newUnitData.substring(newUnitData.indexOf('_r') + 2, newUnitData.indexOf('_w')), 10);
+            newUnit = parseInt(newUnitData.substring(0, newUnitData.indexOf('-r')).replace('variant-unit-', ''), 10);
+            newReading = parseInt(newUnitData.substring(newUnitData.indexOf('-r') + 2, newUnitData.indexOf('-w')), 10);
             if (CL.witnessAddingMode !== true) {
               newWitnesses = collectedWitnesses;
             } else {
@@ -1513,7 +1513,7 @@ var RG = (function () {
     _scheduleAddGlobalException: function () {
       const element = SimpleContextMenu._target_element;
       const row = RG._getAncestorRow(element);
-      const ruleId = row.id.substring(row.id.indexOf('_rule_') + 6);
+      const ruleId = row.id.substring(row.id.indexOf('-rule-') + 6);
       _forGlobalExceptions.push({ 'id': ruleId });
       $(row).addClass('deleted');
     },
@@ -1540,8 +1540,8 @@ var RG = (function () {
         element = SimpleContextMenu._target_element;
       }
       const row = RG._getAncestorRow(element);
-      const unitNum = row.id.substring(row.id.indexOf('_unit_') + 6, row.id.indexOf('_row_'));
-      const ruleId = row.id.substring(row.id.indexOf('_rule_') + 6);
+      const unitNum = row.id.substring(row.id.indexOf('-unit-') + 6, row.id.indexOf('-row-'));
+      const ruleId = row.id.substring(row.id.indexOf('-rule-') + 6);
       const rule = RG._allDeletableRules[unitNum][ruleId];
       const ruleType = rule.scope;
       if (ruleType === 'always') {
@@ -1570,8 +1570,8 @@ var RG = (function () {
       /* schedule the deletion of all rules in the unit which match the n, t and scope of the clicked rule */
       const element = SimpleContextMenu._target_element;
       const row = RG._getAncestorRow(element);
-      const unitNum = row.id.substring(row.id.indexOf('_unit_') + 6, row.id.indexOf('_row_'));
-      const ruleId = row.id.substring(row.id.indexOf('_rule_') + 6);
+      const unitNum = row.id.substring(row.id.indexOf('-unit-') + 6, row.id.indexOf('-row-'));
+      const ruleId = row.id.substring(row.id.indexOf('-rule-') + 6);
       const rule = RG._allDeletableRules[unitNum][ruleId];
       const ok = confirm(
         'You are asking to delete all regularisations of "' + rule.t + '" to "' + rule.n + '".\n' +

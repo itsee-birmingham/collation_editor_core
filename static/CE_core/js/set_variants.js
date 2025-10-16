@@ -507,7 +507,7 @@ var SV = (function() {
         readingLabel = CL.getReadingLabel(i, data[i], svRules);
         readingSuffix = CL.getReadingSuffix(data[i], svRules);
         // what is the row id? (and add it to the list for adding events)
-        rowId = 'variant_unit_' + id + '_row_' + i;
+        rowId = 'variant-unit-' + id + '-row-' + i;
         rowList.push(rowId);
 
         // Work out what reading highlighting classes we need
@@ -522,7 +522,7 @@ var SV = (function() {
         }
         if (Object.prototype.hasOwnProperty.call(options, 'split') && options.split === true) {
           if (Object.prototype.hasOwnProperty.call(data[i], 'overlap_status')) {
-            html.push('<div id="' + 'drag_unit_' + id + '_reading_' + i + '" class="redips-drag split-' +
+            html.push('<div id="' + 'drag-unit-' + id + '-reading-' + i + '" class="redips-drag split-' +
                       data[i].overlap_status + '-unit">');
           } else {
             if (Object.prototype.hasOwnProperty.call(options, 'overlap') && options.overlap === true) {
@@ -543,9 +543,9 @@ var SV = (function() {
                 }
               }
             }
-            html.push('<div id="' + 'drag_unit_' + id + '_reading_' + i + '" class="' + splitClass + '">');
+            html.push('<div id="' + 'drag-unit-' + id + '-reading-' + i + '" class="' + splitClass + '">');
           }
-          html.push('<ul class="variant-unit" id="variant_unit_' + id + '_reading_' + i + '">');
+          html.push('<ul class="variant-unit" id="variant-unit-' + id + '-reading-' + i + '">');
 
           html.push('<li id="' + rowId + '" class="' + highlightedClasses.join(' ') + '">');
           html.push('<div class="spanlike">' + readingLabel + ' ' + text + readingSuffix + '  </div>');
@@ -558,16 +558,16 @@ var SV = (function() {
         } else {
           if (i === 0) {
             if (Object.prototype.hasOwnProperty.call(options, 'overlap') && options.overlap === true) {
-              html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag overlap-unit' + errorUnit + '">');
+              html.push('<div id="' + 'drag-unit-' + id + '" class="redips-drag overlap-unit' + errorUnit + '">');
             } else if (Object.prototype.hasOwnProperty.call(options, 'gap_unit') && options.gap_unit === true) {
-              html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag gap-unit' + errorUnit + '">');
+              html.push('<div id="' + 'drag-unit-' + id + '" class="redips-drag gap-unit' + errorUnit + '">');
             } else {
-              html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag unit' + errorUnit + '">');
+              html.push('<div id="' + 'drag-unit-' + id + '" class="redips-drag unit' + errorUnit + '">');
             }
             if (data.length > 1) {
-              html.push('<ul class="variant-unit" id="variant_unit_' + id + '"><span id="toggle-variant-' + id + '" class="triangle">&#9660;</span><br/>');
+              html.push('<ul class="variant-unit" id="variant-unit-' + id + '"><span id="toggle-variant-' + id + '" class="triangle">&#9660;</span><br/>');
             } else {
-              html.push('<ul class="variant-unit" id="variant_unit_' + id + '"><br/>');
+              html.push('<ul class="variant-unit" id="variant-unit-' + id + '"><br/>');
             }
             html.push('<li id="' + rowId + '" class="top ' + highlightedClasses.join(' ') + '">');
           } else {
@@ -1420,13 +1420,13 @@ var SV = (function() {
       const rowList = [];
       textString = '';
       if (Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
-        html.push('<ul class="subreading-unit" id="subreading_unit_' + id + '_row_' + i + '">');
+        html.push('<ul class="subreading-unit" id="subreading-unit-' + id + '-row-' + i + '">');
         for (const type in reading.subreadings) {
           if (Object.prototype.hasOwnProperty.call(reading.subreadings, type)) {
             suffix = reading.subreadings[type][0].suffix;
             for (let j = 0; j < reading.subreadings[type].length; j += 1) {
               highlightedClasses = [];
-              subrowId = 'subreading_unit_' + id + '_row_' + i + '_type_' + type + '_subrow_' + j;
+              subrowId = 'subreading-unit-' + id + '-row-' + i + '-type-' + type + '-subrow-' + j;
               rowList.push(subrowId);
               if (reading.subreadings[type][j].witnesses.indexOf(hand) !== -1) {
                 highlightedClasses.push('highlighted');
@@ -1460,8 +1460,8 @@ var SV = (function() {
       rd.init();
       rd.event.clicked = function() {
         width = document.getElementById(rd.obj.id).offsetWidth;
-        if (document.getElementById(rd.obj.id.replace('drag_unit', 'spacer'))) {
-          document.getElementById(rd.obj.id.replace('drag_unit', 'spacer')).style.width = width + 'px';
+        if (document.getElementById(rd.obj.id.replace('drag-unit', 'spacer'))) {
+          document.getElementById(rd.obj.id.replace('drag-unit', 'spacer')).style.width = width + 'px';
         }
       };
       rd.event.dropped = function() {
@@ -1501,10 +1501,10 @@ var SV = (function() {
             }
           } else {
             if (_selectedVariantUnits[0][1] !== 'apparatus') {
-              sourceCol = parseInt(rd.td.source.id.substring(rd.td.source.id.indexOf('_') + 1));
-              targetCol = parseInt(rd.td.target.id.substring(rd.td.target.id.indexOf('_') + 1));
+              sourceCol = parseInt(rd.td.source.id.substring(rd.td.source.id.indexOf('-') + 1));
+              targetCol = parseInt(rd.td.target.id.substring(rd.td.target.id.indexOf('-') + 1));
               if (sourceCol === targetCol) {
-                targetRow = rd.td.target.id.substring(0, rd.td.target.id.indexOf('_'));
+                targetRow = rd.td.target.id.substring(0, rd.td.target.id.indexOf('-'));
                 isSpace = OR.canUnitMoveTo(CL.data[_selectedVariantUnits[0][1]][_selectedVariantUnits[0][0]]._id, targetRow);
                 if (isSpace) {
                   // move it to the target row or combine if there are two
@@ -3657,7 +3657,7 @@ var SV = (function() {
       const scrollOffset = [document.getElementById('scroller').scrollLeft,
                             document.getElementById('scroller').scrollTop];
       // find the correct apparatus
-      if (index.match(/_app_/g)) {
+      if (index.match(/-app-/g)) {
         apparatusNum = parseInt(index.match(/\d+/g)[1], 10);
         index = parseInt(index.match(/\d+/g)[0], 10);
         appId = 'apparatus' + apparatusNum;
@@ -4335,14 +4335,14 @@ var SV = (function() {
                             if (key === 'apparatus') {
                               appString = '';
                             } else {
-                              appString = 'app_' + key.replace('apparatus', '') + '_';
+                              appString = 'app-' + key.replace('apparatus', '') + '-';
                             }
                             for (const sr in readings[rowNum].subreadings) {
                               if (Object.prototype.hasOwnProperty.call(readings[rowNum].subreadings, sr)) {
                                 if (sr === type) { //this may need to change if we allow chaining here
                                   for (let l = 0; l < readings[rowNum].subreadings[sr].length; l += 1) {
                                     if (readings[rowNum].subreadings[sr][l].witnesses.indexOf(data.marked_readings[type][k].witness) !== -1) {
-                                      subreadingId = 'unit_' + i + '_' + appString + 'row_' + rowNum + '_type_' + type + '_subrow_' + l;
+                                      subreadingId = 'unit-' + i + '-' + appString + 'row-' + rowNum + '-type-' + type + '-subrow-' + l;
                                       if (Object.prototype.hasOwnProperty.call(makeMainIds, subreadingId)) {
                                         makeMainIds[subreadingId].push(data.marked_readings[type][k].witness);
                                       } else {
@@ -4396,17 +4396,17 @@ var SV = (function() {
         // send each item on list in turn to CL.makeMainReading(idString, false);
         // false stops the standoff record from being deleted
         for (let i = 0; i < idString.length; i += 1) {
-          if (idString[i].indexOf('_app_') === -1) {
+          if (idString[i].indexOf('-app-') === -1) {
             appId = 'apparatus';
-            unitNumber = parseInt(idString[i].substring(idString[i].indexOf('unit_') + 5, idString[i].indexOf('_row_')));
+            unitNumber = parseInt(idString[i].substring(idString[i].indexOf('unit-') + 5, idString[i].indexOf('-row-')));
           } else {
-            unitNumber = parseInt(idString[i].substring(idString[i].indexOf('unit_') + 5, idString[i].indexOf('_app_')));
-            appId = 'apparatus' + idString[i].substring(idString[i].indexOf('_app_') + 5, idString[i].indexOf('_row_'));
+            unitNumber = parseInt(idString[i].substring(idString[i].indexOf('unit-') + 5, idString[i].indexOf('-app-')));
+            appId = 'apparatus' + idString[i].substring(idString[i].indexOf('-app-') + 5, idString[i].indexOf('-row-'));
           }
           unit = CL.data[appId][unitNumber];
-          subtype = idString[i].substring(idString[i].indexOf('_type_') + 6, idString[i].indexOf('_subrow_'));
-          parentPos = parseInt(idString[i].substring(idString[i].indexOf('_row_') + 5, idString[i].indexOf('_type_')));
-          subreadingPos = parseInt(idString[i].substring(idString[i].indexOf('_subrow_') + 8));
+          subtype = idString[i].substring(idString[i].indexOf('-type-') + 6, idString[i].indexOf('-subrow-'));
+          parentPos = parseInt(idString[i].substring(idString[i].indexOf('-row-') + 5, idString[i].indexOf('-type-')));
+          subreadingPos = parseInt(idString[i].substring(idString[i].indexOf('-subrow-') + 8));
           parentReading = unit.readings[parentPos];
           options = {
             'delete_offset': false,
@@ -4419,17 +4419,17 @@ var SV = (function() {
                         document.getElementById('scroller').scrollTop];
         SV._addToUndoStack(CL.data);
 
-        if (idString.indexOf('_app_') === -1) {
+        if (idString.indexOf('-app-') === -1) {
           appId = 'apparatus';
-          unitNumber = parseInt(idString.substring(idString.indexOf('unit_') + 5, idString.indexOf('_row_')));
+          unitNumber = parseInt(idString.substring(idString.indexOf('unit-') + 5, idString.indexOf('-row-')));
         } else {
-          unitNumber = parseInt(idString.substring(idString.indexOf('unit_') + 5, idString.indexOf('_app_')));
-          appId = 'apparatus' + idString.substring(idString.indexOf('_app_') + 5, idString.indexOf('_row_'));
+          unitNumber = parseInt(idString.substring(idString.indexOf('unit-') + 5, idString.indexOf('-app-')));
+          appId = 'apparatus' + idString.substring(idString.indexOf('-app-') + 5, idString.indexOf('-row-'));
         }
         unit = CL.data[appId][unitNumber];
-        subtype = idString.substring(idString.indexOf('_type_') + 6, idString.indexOf('_subrow_'));
-        parentPos = parseInt(idString.substring(idString.indexOf('_row_') + 5, idString.indexOf('_type_')));
-        subreadingPos = parseInt(idString.substring(idString.indexOf('_subrow_') + 8));
+        subtype = idString.substring(idString.indexOf('-type-') + 6, idString.indexOf('-subrow-'));
+        parentPos = parseInt(idString.substring(idString.indexOf('-row-') + 5, idString.indexOf('-type-')));
+        subreadingPos = parseInt(idString.substring(idString.indexOf('-subrow-') + 8));
         parentReading = unit.readings[parentPos];
         options = {
           'delete_offset': true
@@ -4483,20 +4483,20 @@ var SV = (function() {
 
     _subreadingIdSort: function(a, b) {
       // row first
-      const rowA = parseInt(a.substring(a.indexOf('_row_') + 5, a.indexOf('_type_')));
-      const rowB = parseInt(b.substring(b.indexOf('_row_') + 5, b.indexOf('_type_')));
+      const rowA = parseInt(a.substring(a.indexOf('-row-') + 5, a.indexOf('-type-')));
+      const rowB = parseInt(b.substring(b.indexOf('-row-') + 5, b.indexOf('-type-')));
       if (rowA !== rowB) {
         return rowB - rowA;
       }
       // then type
-      const typeA = a.substring(a.indexOf('_type_') + 6, a.indexOf('_subrow_'));
-      const typeB = b.substring(b.indexOf('_type_') + 6, b.indexOf('_subrow_'));
+      const typeA = a.substring(a.indexOf('-type-') + 6, a.indexOf('-subrow-'));
+      const typeB = b.substring(b.indexOf('-type-') + 6, b.indexOf('-subrow-'));
       if (typeA !== typeB) {
         return a < b ? -1 : 1;
       }
       // then subrow
-      const subRowA = parseInt(a.substring(a.indexOf('_subrow_') + 8));
-      const subRowB = parseInt(b.substring(b.indexOf('_subrow_') + 8));
+      const subRowA = parseInt(a.substring(a.indexOf('-subrow-') + 8));
+      const subRowB = parseInt(b.substring(b.indexOf('-subrow-') + 8));
       if (subRowA !== subRowB) {
         return subRowB - subRowA;
       }
@@ -4581,7 +4581,7 @@ var SV = (function() {
             }
             return true;
           });
-          const unitNumber = div.id.replace('drag_unit_', '');
+          const unitNumber = div.id.replace('drag-unit-', '');
           SV._splitUnit(unitNumber);
         });
         $('#split-words').on('mouseover.swd_mo', function() {
@@ -4612,7 +4612,7 @@ var SV = (function() {
         $('#make-main-reading').on('click.mmr_c', function() {
           const element = SimpleContextMenu._target_element;
           const li = CL.getSpecifiedAncestor(element, 'LI');
-          const idString = li.id.replace('subreading_', '');
+          const idString = li.id.replace('subreading-', '');
           SV._makeMainReading(idString);
         });
         $('#make-main-reading').on('mouseover.mmr_mo', function() {

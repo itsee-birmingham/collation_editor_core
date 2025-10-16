@@ -1306,10 +1306,13 @@ class ExporterUnitTests(TestCase):
             etree.fromstring('<ab n="Gal.1.1-APP" />'),
             etree.fromstring('<ab n="Gal.1.2-APP" />'),
         ]
-        # by the time this is called the overtext_name will be set so we don't need it here
-        mocked_clean_collation_unit.side_effect = [{}, {}]
+        # by the time this is called the overtext_name will be set so we don't need it here but we do need 'structure
+        mocked_clean_collation_unit.side_effect = [{'structure': {'apparatus': []}}, {'structure': {'apparatus': []}}]
         # just enough to get the loops working and set the overtext_name
-        data = [{'structure': {'overtext_name': 'basetext'}}, {}]
+        data = [
+            {'structure': {'overtext_name': 'basetext', 'lac_readings': [], 'apparatus': [{}, {}]}},
+            {'structure': {}},
+        ]
         expected_xml = (
             '<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0">'
             '<ab n="Gal.1.1-APP" />\n<ab n="Gal.1.2-APP" /></TEI>'

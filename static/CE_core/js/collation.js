@@ -718,7 +718,7 @@ var CL = (function() {
         delete options.error_unit;
       }
       while (i <= overtextLength) {
-        tdId = app + '_' + i;
+        tdId = app + '-' + i;
         unitIndex = null;
         unit = apparatus[j];
         if (unit !== undefined) {
@@ -755,7 +755,7 @@ var CL = (function() {
               unit.readings = CL.sortReadings(unit.readings);
             }
             if (app > 1) {
-              idString = j + '_app_' + app;
+              idString = j + '-app-' + app;
             } else {
               idString = String(j);
             }
@@ -1089,7 +1089,7 @@ var CL = (function() {
             }
 
             if (app > 1) {
-              idString = j + '_app_' + app;
+              idString = j + '-app-' + app;
             } else {
               idString = String(j);
             }
@@ -1550,7 +1550,7 @@ var CL = (function() {
     },
 
     getUnitAppReading: function(id) {
-      const unitDetailsRegex = /(variant|drag)_unit_(\d+)(_app_)?(\d+)?(_reading_|_row_)?(\d+)?/;
+      const unitDetailsRegex = /(variant|drag)-unit-(\d+)(-app-)?(\d+)?(-reading-|-row-)?(\d+)?/;
       const m = id.match(unitDetailsRegex);
       if (m === null) {
         console.log(unitDetailsRegex);
@@ -4312,10 +4312,10 @@ var CL = (function() {
     _collapseUnit: function(id, format) {
       const idno = id.replace('toggle-variant-', '');
       if (format === 'table') {
-        $('#variant_unit_' + idno).find('TR:gt(1)').addClass('hidden');
+        $('#variant-unit-' + idno).find('TR:gt(1)').addClass('hidden');
       } else {
-        $('#variant_unit_' + idno).find('LI:first').removeClass('top');
-        $('#variant_unit_' + idno).find('LI:gt(0)').addClass('hidden');
+        $('#variant-unit-' + idno).find('LI:first').removeClass('top');
+        $('#variant-unit-' + idno).find('LI:gt(0)').addClass('hidden');
       }
       const span = document.getElementById('toggle-variant-' + idno);
       span.innerHTML = '&#9660;';
@@ -4329,10 +4329,10 @@ var CL = (function() {
     _expandUnit: function(id, format) {
       const idno = id.replace('toggle-variant-', '');
       if (format === 'table') {
-        $('#variant_unit_' + idno).find('TR').removeClass('hidden');
+        $('#variant-unit-' + idno).find('TR').removeClass('hidden');
       } else {
-        $('#variant_unit_' + idno).find('LI:first').addClass('top');
-        $('#variant_unit_' + idno).find('LI').removeClass('hidden');
+        $('#variant-unit-' + idno).find('LI:first').addClass('top');
+        $('#variant-unit-' + idno).find('LI').removeClass('hidden');
       }
       const span = document.getElementById('toggle-variant-' + idno);
       span.innerHTML = '&#9650;';
@@ -4447,9 +4447,9 @@ var CL = (function() {
         }
       }
       html.push('<td class="mark start-' + start + ' " colspan="' + (end - start + 1) + '">');
-      html.push('<table class="variant-unit" id="variant_unit_' + id + '">');
+      html.push('<table class="variant-unit" id="variant-unit-' + id + '">');
       for (let i = 0; i < data.length; i += 1) {
-        rowId = 'variant_unit_' + id + '_row_' + i;
+        rowId = 'variant-unit-' + id + '-row-' + i;
         rowList.push(rowId);
         if (i === 0) {
           html.push('<tr><td colspan="3" ><span id="toggle-variant-' + id +
@@ -4474,7 +4474,7 @@ var CL = (function() {
         readingSuffix = CL.getReadingSuffix(data[i], rules);
   
         html.push('<td></td>');
-        html.push('<td id="' + rowId + '_label">' + readingLabel);
+        html.push('<td id="' + rowId + '-label">' + readingLabel);
         html.push('</td>');
         html.push('<td class="main-reading">');
         html.push(text);
@@ -5383,24 +5383,24 @@ var CL = (function() {
 
     _getWitnessesForReading: function(idString) {
       let unit, reading, app;
-      if (idString.indexOf('_app_') !== -1) {
-        app = 'apparatus' + idString.substring(idString.indexOf('app_') + 4, idString.indexOf('_row'));
+      if (idString.indexOf('-app-') !== -1) {
+        app = 'apparatus' + idString.substring(idString.indexOf('app-') + 4, idString.indexOf('-row'));
       } else {
         app = 'apparatus';
       }
-      if (idString.indexOf('variant_unit') !== -1) {
-        unit = parseInt(idString.substring(0, idString.indexOf('_row')).replace('variant_unit_', ''), 10);
-        reading = parseInt(idString.substring(idString.indexOf('row_') + 4), 10);
+      if (idString.indexOf('variant-unit') !== -1) {
+        unit = parseInt(idString.substring(0, idString.indexOf('-row')).replace('variant-unit-', ''), 10);
+        reading = parseInt(idString.substring(idString.indexOf('row-') + 4), 10);
         if (!isNaN(unit) && !isNaN(reading)) {
           return CL.getReadingWitnesses(CL.data[app][unit].readings[reading], app, CL.data[app][unit].start,
                                         CL.data[app][unit].end, CL.data[app][unit].first_word_index).join(', ');
         }
         return null;
       }
-      unit = parseInt(idString.substring(0, idString.indexOf('_row')).replace('subreading_unit_', ''), 10);
-      reading = parseInt(idString.substring(idString.indexOf('row_') + 4, idString.indexOf('_type_')), 10);
-      const type = idString.substring(idString.indexOf('type_') + 5, idString.indexOf('_subrow_'));
-      const subrow = parseInt(idString.substring(idString.indexOf('subrow_') + 7), 10);
+      unit = parseInt(idString.substring(0, idString.indexOf('-row')).replace('subreading-unit-', ''), 10);
+      reading = parseInt(idString.substring(idString.indexOf('row-') + 4, idString.indexOf('-type-')), 10);
+      const type = idString.substring(idString.indexOf('type-') + 5, idString.indexOf('-subrow-'));
+      const subrow = parseInt(idString.substring(idString.indexOf('subrow-') + 7), 10);
       if (!isNaN(unit) && !isNaN(reading) && !isNaN(subrow)) {
         return CL.getReadingWitnesses(CL.data[app][unit].readings[reading].subreadings[type][subrow], app,
                                       CL.data[app][unit].start, CL.data[app][unit].end,

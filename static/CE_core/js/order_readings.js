@@ -202,16 +202,16 @@ var OR = (function() {
         });
       }
       for (let i = 0; i < highestUnit; i += 1) {
-        if (document.getElementById('drag_unit_' + i) !== null) {
-          OR.redipsInitOrderReadings('drag_unit_' + i);
+        if (document.getElementById('drag-unit-' + i) !== null) {
+          OR.redipsInitOrderReadings('drag-unit-' + i);
         }
       }
       for (const key in CL.data) {
         if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
           if (key.match(/apparatus\d/g) !== null) {
             for (let i = 0; i < CL.data[key].length; i += 1) {
-              if (document.getElementById('drag_unit_' + i + '_app_' + key.replace('apparatus', '')) !== null) {
-                OR.redipsInitOrderReadings('drag_unit_' + i + '_app_' + key.replace('apparatus', ''));
+              if (document.getElementById('drag-unit-' + i + '-app-' + key.replace('apparatus', '')) !== null) {
+                OR.redipsInitOrderReadings('drag-unit-' + i + '-app-' + key.replace('apparatus', ''));
               }
             }
           }
@@ -340,7 +340,7 @@ var OR = (function() {
       const rowList = [];
       hasContextMenu = true;
       overlap = false;
-      if (id.indexOf('_app_') !== -1) {
+      if (id.indexOf('-app-') !== -1) {
         overlap = true;
       }
       if (Object.prototype.hasOwnProperty.call(options, 'highlighted_wit')) {
@@ -362,15 +362,15 @@ var OR = (function() {
       }
       if (OR._areAllEmptyReadings(data) && !Object.prototype.hasOwnProperty.call(options, 'created')) {
         html.push('<td class="redips-mark start-' + start + ' " colspan="' + colspan + '">' +
-                  '<div class="drag-div deletable" id="drag_unit_' + id + '">');
+                  '<div class="drag-div deletable" id="drag-unit-' + id + '">');
       } else {
         html.push('<td class="redips-mark start-' + start + ' " colspan="' + colspan + '">' +
-                  '<div class="drag-div" id="drag_unit_' + id + '">');
+                  '<div class="drag-div" id="drag-unit-' + id + '">');
       }
       if (!overlap) {
-        html.push('<table class="variant-unit topline-unit" id="variant_unit_' + id + '">');
+        html.push('<table class="variant-unit topline-unit" id="variant-unit-' + id + '">');
       } else {
-        html.push('<table class="variant-unit overlap-unit" id="variant_unit_' + id + '">');
+        html.push('<table class="variant-unit overlap-unit" id="variant-unit-' + id + '">');
       }
       for (let i = 0; i < data.length; i += 1) {
         // what is the reading text?
@@ -391,7 +391,7 @@ var OR = (function() {
         readingLabel = CL.getReadingLabel(i, data[i], orRules);
         readingSuffix = CL.getReadingSuffix(data[i], orRules);
         // what is the row id? (and add it to the list for adding events)
-        rowId = 'variant_unit_' + id + '_row_' + i;
+        rowId = 'variant-unit-' + id + '-row-' + i;
         rowList.push(rowId);
         if (i === 0) {
           html.push('<tr><td colspan="3" class="redips-mark"><span id="toggle-variant-' + id +
@@ -410,7 +410,7 @@ var OR = (function() {
           }
           html.push('<td class="redips-rowhandler"><div class="redips-drag redips-row">+</div></td>');
         }
-        html.push('<td id="' + rowId + '_label" class="reading-label redips-mark"><div class="spanlike">' + readingLabel);
+        html.push('<td id="' + rowId + '-label" class="reading-label redips-mark"><div class="spanlike">' + readingLabel);
         html.push('</div></td>');
         readingClass = [];
         if (!overlap) {
@@ -447,7 +447,7 @@ var OR = (function() {
         }
         html.push('</div>');
         if (Object.prototype.hasOwnProperty.call(data[i], 'subreadings')) {
-          html.push('<table class="subreading-unit" id="subreading_unit_' + id + '_row_' + i + '">');
+          html.push('<table class="subreading-unit" id="subreading-unit-' + id + '-row-' + i + '">');
           overlapped = false;
           if (Object.prototype.hasOwnProperty.call(data[i], 'overlap_status')) {
             overlapped = true;
@@ -758,12 +758,12 @@ var OR = (function() {
       const table = document.getElementById(rd.obj.id);
       const temp = table.getElementsByTagName('TR');
       const rows = [];
-      if (rd.obj.id.indexOf('_app_') === -1) {
+      if (rd.obj.id.indexOf('-app-') === -1) {
         app = 'apparatus';
-        unit = parseInt(rd.obj.id.replace('variant_unit_', ''), 10);
+        unit = parseInt(rd.obj.id.replace('variant-unit-', ''), 10);
       } else {
-        app = 'apparatus' + rd.obj.id.substring(rd.obj.id.indexOf('_app_') + 5);
-        unit = parseInt(rd.obj.id.substring(rd.obj.id.indexOf('unit_') + 5, rd.obj.id.indexOf('_app_')), 10);
+        app = 'apparatus' + rd.obj.id.substring(rd.obj.id.indexOf('-app-') + 5);
+        unit = parseInt(rd.obj.id.substring(rd.obj.id.indexOf('unit-') + 5, rd.obj.id.indexOf('-app-')), 10);
       }
       for (let i = 0; i < temp.length; i += 1) {
         if (temp[i].id.indexOf('subreading') === -1) {
@@ -774,7 +774,7 @@ var OR = (function() {
       for (let i = 0; i < rows.length; i += 1) {
         if (rows[i].id) {
           readingId = rows[i].id;
-          order.push(parseInt(readingId.substring(readingId.indexOf('row_') + 4), 10));
+          order.push(parseInt(readingId.substring(readingId.indexOf('row-') + 4), 10));
         }
       }
       readings = CL.data[app][unit].readings;
@@ -1133,8 +1133,8 @@ var OR = (function() {
       for (const type in data) {
         if (Object.prototype.hasOwnProperty.call(data, type)) {
           for (let i = 0; i < data[type].length; i += 1) {
-            subRowId = 'subreading_unit_' + parentId + '_row_' + parentIndex + '_type_' + type + '_' +
-                       rowTypeId + '_' + i;
+            subRowId = 'subreading-unit-' + parentId + '-row-' + parentIndex + '-type-' + type + '-' +
+                       rowTypeId + '-' + i;
             rowList.push(subRowId);
             if (data[type][i].witnesses.indexOf(hand) != -1) {
               html.push('<tr class="' + subtype + ' highlighted" id="' + subRowId + '">');
@@ -1276,17 +1276,17 @@ var OR = (function() {
       const scrollOffset = [document.getElementById('scroller').scrollLeft,
                             document.getElementById('scroller').scrollTop];
       OR.addToUndoStack(CL.data);
-      if (idString.indexOf('_app_') === -1) {
+      if (idString.indexOf('-app-') === -1) {
         appId = 'apparatus';
-        unitNumber = parseInt(idString.substring(idString.indexOf('unit_') + 5, idString.indexOf('_row_')));
+        unitNumber = parseInt(idString.substring(idString.indexOf('unit-') + 5, idString.indexOf('-row-')));
       } else {
-        unitNumber = parseInt(idString.substring(idString.indexOf('unit_') + 5, idString.indexOf('_app_')));
-        appId = 'apparatus' + idString.substring(idString.indexOf('_app_') + 5, idString.indexOf('_row_'));
+        unitNumber = parseInt(idString.substring(idString.indexOf('unit-') + 5, idString.indexOf('-app-')));
+        appId = 'apparatus' + idString.substring(idString.indexOf('-app-') + 5, idString.indexOf('-row-'));
       }
       const unit = CL.data[appId][unitNumber];
-      const subtype = idString.substring(idString.indexOf('_type_') + 6, idString.indexOf('_subrow_'));
-      const parentPos = parseInt(idString.substring(idString.indexOf('_row_') + 5, idString.indexOf('_type_')));
-      const subreadingPos = parseInt(idString.substring(idString.indexOf('_subrow_') + 8));
+      const subtype = idString.substring(idString.indexOf('-type-') + 6, idString.indexOf('-subrow-'));
+      const parentPos = parseInt(idString.substring(idString.indexOf('-row-') + 5, idString.indexOf('-type-')));
+      const subreadingPos = parseInt(idString.substring(idString.indexOf('-subrow-') + 8));
       const parentReading = unit.readings[parentPos];
       const options = {'delete_offset': true};
       CL.makeMainReading(unit, parentReading, subtype, subreadingPos, options);
@@ -1659,12 +1659,12 @@ var OR = (function() {
           const element = SimpleContextMenu._target_element;
           const table = CL.getSpecifiedAncestor(element, 'TABLE');
           idString = table.id;
-          if (idString.indexOf('_app_') === -1) {
+          if (idString.indexOf('-app-') === -1) {
             appId = 'apparatus';
-            unitNumber = parseInt(idString.substring(idString.indexOf('unit_') + 5));
+            unitNumber = parseInt(idString.substring(idString.indexOf('unit-') + 5));
           } else {
-            unitNumber = parseInt(idString.substring(idString.indexOf('unit_') + 5, idString.indexOf('_app_')));
-            appId = 'apparatus' + idString.substring(idString.indexOf('_app_') + 5);
+            unitNumber = parseInt(idString.substring(idString.indexOf('unit-') + 5, idString.indexOf('-app-')));
+            appId = 'apparatus' + idString.substring(idString.indexOf('-app-') + 5);
           }
           SV.prepareForOperation();
           SV.unsplitUnitWitnesses(unitNumber, appId);

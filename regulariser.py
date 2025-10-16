@@ -6,7 +6,7 @@ class Regulariser(object):
     """Apply regularisation rules.
 
     Attributes:
-        rule_conditions_config (_type_): _description_
+        rule_conditions_config (dict): The dictionary for the rule conditions configuration.
         local_python_functions (_type_): _description_
 
     """
@@ -22,16 +22,8 @@ class Regulariser(object):
         else:
             self.local_python_functions = None
 
-    def match_tokens(self, token, decision):
-        """_summary_
-
-        Args:
-            token (_type_): _description_
-            decision (_type_): _description_
-
-        Returns:
-            _type_: _description_
-        """
+    def _match_token(self, token, decision):
+        """Check the decision still matches after any rule conditions have been applied."""
         if '_id' in decision:
             print('deprecated - use \'id\' for rules not \'_id\'', file=sys.stderr)
             decision['id'] = decision['_id']
@@ -58,15 +50,15 @@ class Regulariser(object):
                         if result is False:
                             # if any of these don't match then we know the rule is
                             # irrelevant so we can return false already
-                            return (False, None, None, None, None, None, None)
+                            return (False, None)
                     if condition['type'] == 'string_application':
                         decision_word, token_matches = getattr(self.instance, condition['function'])(
                             decision_word, token_matches
                         )
         for word in token_matches:
             if word == decision_word:
-                return (True, decision['n'], decision['class'], decision['scope'], decision['id'], decision['t'])
-        return (False, None, None, None, None, None, None)
+                return (True, decision)
+        return (False, None)
 
     def regularise_token(self, token, decisions):
         """Check the token against the rules.
@@ -77,11 +69,13 @@ class Regulariser(object):
                 list is a dictionary.
 
         Returns:
-            tuple (boolean, string|None, list|None): Details of any matching rules. The boolean says whether at least
-                one rule matched the token. If this is True then the n of the
+            tuple (boolean, string|None, list|None): Details of any matching rules in application order. The boolean
+                says whether at least one rule matched the token. The string is the n value of the last rule in the
+                chain. The list gives simplified details of all rules that were applied.
 
         """
         decision_matches = []
+        # filter the rules so based on applicability to this token (including word number and witness is appropriate)
         for decision in decisions:
             if '_id' in decision:
                 print('deprecated - use \'id\' for rules not \'_id\'', file=sys.stderr)
@@ -115,16 +109,22 @@ class Regulariser(object):
             if last_match and last_match[0] is True:
                 # append the last matched n to the list of match word
                 # if its not in there in the token to allow chaining
-                if last_match[1] not in token['rule_match']:
-                    token['rule_match'].append(last_match[1])
-            match = self.match_tokens(token, match_d)
+                if last_match[1]['n'] not in token['rule_match']:
+                    token['rule_match'].append(last_match[1]['n'])
+            match = self._match_token(token, match_d)
             if match[0] is True:
                 last_match = match
                 matched = True
-                classes.append({'class': match[2], 'scope': match[3], 'id': match[4], 't': match[5], 'n': match[1]})
+                classes.append(
+                    {
+                        'class': match[1]['class'],
+                        'scope': match[1]['scope'],
+                        'id': match[1]['id'],
+                        't': match[1]['t'],
+                        'n': match[1]['n'],
+                    }
+                )
             if i + 1 == len(decision_matches):
                 if matched is True:
-                    print(last_match[1])
-                    print(classes)
-                    return (True, last_match[1], classes)
+                    return (True, last_match[1]['n'], classes)
         return (False, None, None)

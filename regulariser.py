@@ -7,7 +7,7 @@ class Regulariser(object):
 
     Attributes:
         rule_conditions_config (dict): The dictionary for the rule conditions configuration.
-        local_python_functions (_type_): _description_
+        local_python_functions (dict): Additional python functions for this installation.
 
     """
 

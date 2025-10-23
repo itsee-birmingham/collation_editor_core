@@ -173,7 +173,7 @@ class Exporter(RestructureExportDataMixin, object):
                 return ['lac.', 'lac']
 
     def get_lemma_text(self, overtext, start, end):
-        """Function to get the text of the lemma within the specified range in the overtext.
+        """Get the text of the lemma within the specified range in the overtext.
 
         Args:
             overtext (dict): The JSON segment representing the overtext tokens for this unit. The data should be
@@ -209,7 +209,7 @@ class Exporter(RestructureExportDataMixin, object):
         return [' '.join(words)]
 
     def get_witnesses(self, reading, to_remove):
-        """Function to return the witnesses that should be reported for the given reading.
+        """Return the witnesses that should be reported for the given reading.
 
         Args:
             reading (dict): The JSON segment representing the reading.
@@ -227,7 +227,7 @@ class Exporter(RestructureExportDataMixin, object):
         return witnesses
 
     def get_label(self, label, is_subreading, reading):
-        """Function to get the correct label to display for the reading.
+        """Get the correct label to display for the reading.
 
         Args:
             label (str): The current label of the reading (the basic form for a main reading or the full label
@@ -245,7 +245,7 @@ class Exporter(RestructureExportDataMixin, object):
         return label
 
     def check_for_suffixed_reading_marker(self, text, reading):
-        """Function to add any required reading suffixes to the text of the reading.
+        """Add any required reading suffixes to the text of the reading.
 
         Args:
             text (str): The extracted text of the current reading.
@@ -260,7 +260,7 @@ class Exporter(RestructureExportDataMixin, object):
         return text
 
     def make_reading(self, reading, index_position, label, witnesses, is_subreading=False, subtype=None):
-        """Function to make the TEI XML version of a reading.
+        """Make the TEI XML version of a reading.
 
         Args:
             reading (dict): The JSON segment representing the reading.
@@ -436,7 +436,7 @@ class Exporter(RestructureExportDataMixin, object):
         """Get the overtext data in a specfic format.
 
         The format required for the overtext is in expectation of exporters which inherit this exporter and which
-        implement joins across collation unit boundaries. In these cases the overtext need to be concatenated from all
+        implement joins across collation unit boundaries. In these cases the overtext needs to be concatenated from all
         of the joined units.
 
         Args:
@@ -448,18 +448,20 @@ class Exporter(RestructureExportDataMixin, object):
         return {'current': entry['structure']['overtext']}
 
     def sort_units(self, unit):
-        """Sort function to sort units by start value in reverse order of end value (used as sort key).
+        """Extract a sort tuple from the unit which is used as a sort key when sorting the apparatus.
+
+         Units are sorted by start value and in reverse order of end value.
 
         Args:
             unit (dict): The dictionary representing a collation unit
 
         Returns:
-            tuple: The indexes data to sort by.
+            tuple: Integers describing the sort position for this unit.
         """
         return (unit['start'], -unit['end'])
 
     def get_unit_xml(self, entry):
-        """Function to turn the JSON apparatus of the collation unit into TEI XML.
+        """Turn the JSON apparatus of the collation unit into TEI XML.
 
         Args:
             entry (dict): The JSON fragment representing the apparatus of a collation unit.

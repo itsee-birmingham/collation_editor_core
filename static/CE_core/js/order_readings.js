@@ -1226,7 +1226,7 @@ var OR = (function() {
       } else if (menuName === 'main-reading' || menuName === 'overlap-main-reading' || menuName === 'main-reading-om' || menuName === 'overlap-main-reading-om') {
         const menu = [];
         menu.push('<li id="split-witnesses"><span>Split Witnesses</span></li>');
-        if (menuName.indexOf('_om') !== -1 && CL.project.omCategories.length > 0) {
+        if (menuName.indexOf('-om') !== -1 && CL.project.omCategories.length > 0) {
           menu.push('<li id="categorise-om"><span>Categorise Om</span></li>');
         }
         if (addBackwardsJoin) {

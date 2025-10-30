@@ -4,6 +4,11 @@
 }
 */
 
+div#test_this_fails {
+    display:none;
+}
+
+
 textarea {
     resize: vertical;
 }

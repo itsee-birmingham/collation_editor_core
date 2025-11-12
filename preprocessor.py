@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import sys
+from openai import OpenAI
 import importlib
 import json
+import time
 import warnings
 from .exceptions import DataInputException
 from collation.core.postprocessor import PostProcessor
@@ -30,7 +32,9 @@ class PreProcessor(Regulariser):
             self.rule_conds_config = None
 
         if 'algorithm_settings' in configs:
-            algorithm_settings = {}
+            algorithm_settings = configs['algorithm_settings']
+            if not algorithm_settings:
+                algorithm_settings = {}
             algorithm_settings['algorithm'] = configs['algorithm_settings']['algorithm']
             algorithm_settings['tokenComparator'] = {}
             if 'fuzzy_match' in configs['algorithm_settings']:
@@ -187,6 +191,9 @@ class PreProcessor(Regulariser):
                      'missing_reason': missing_reason,
                      'index': 1
                      }
+
+        self.basetext_siglum = basetext_siglum
+
         return self.regularise(rules, witnesses, verse, accept)
 
     def add_to_special_categories(self, special_categories, reading):
@@ -230,7 +237,7 @@ class PreProcessor(Regulariser):
             algorithm = self.algorithm_settings['algorithm']
         if self.algorithm_settings['tokenComparator'] and self.algorithm_settings['tokenComparator']['type']:
             tokenComparator['type'] = 'levenshtein'
-            if self.algorithm_settings['tokenComparator'] and self.algorithm_settings['tokenComparator']['distance']:
+            if 'tokenComparator' in self.algorithm_settings and 'distance' in self.algorithm_settings['tokenComparator']:
                 tokenComparator['distance'] = self.algorithm_settings['tokenComparator']['distance']
             else:
                 # default to 2
@@ -306,8 +313,12 @@ class PreProcessor(Regulariser):
             )
         try:
             output = pp.produce_variant_units()
-        except DataInputException:
-            raise DataInputException
+        except DataInputException as e:
+#            pp.alignment_table = []
+            output = pp.produce_variant_units()
+            print('FAILURE: ' + str(e), file=sys.stderr)
+            pass
+#            raise DataInputException
         return output
 
     def get_overtext(self, verse):
@@ -378,12 +389,94 @@ class PreProcessor(Regulariser):
             else:
                 accept_header = "application/json"
 
-            req = urllib.request.Request(target)
-            req.add_header('content-type', 'application/json')
-            req.add_header('Accept', accept_header)
+#            try:
+#                with open('/tmp/to_collatex.log', 'a', encoding="utf-8") as file:
+#                    file.write('\n\n====\n')
+#                    file.write(json.dumps(data, ensure_ascii=False, indent=4))
+#                    file.write('\n====\n\n')
+#            except Exception as e:
+#                print('======= error writing log: ' + str(e), file=sys.stderr)
+#                pass
 
-            response = urllib.request.urlopen(req, json_witnesses.encode('utf-8'))
-            return response.read()
+
+            openai_data = {
+                "input" : data,
+                "basetext_siglum" : self.basetext_siglum,
+                "output" : {
+                    "ai_comments" : "",
+                    "ai_alignment_table" : "",
+                    "witnesses" : [ self.basetext_siglum ],
+                    "table" : []
+                }
+            }
+
+            del openai_data['input']['tokenComparator']
+
+            if data['algorithm'] == 'openai':
+                start_time = int(time.time())
+                print('running openai collate', file=sys.stderr)
+                openai_client = OpenAI(api_key=self.algorithm_settings['OPENAI_API_KEY'])
+                assistant_id = self.algorithm_settings['ASSISTANT_ID']
+
+                thread = openai_client.beta.threads.create()
+
+
+                openai_client.beta.threads.messages.create(thread_id=thread.id, role="user", content=json.dumps(openai_data, ensure_ascii=False, indent=4))
+                run = openai_client.beta.threads.runs.create(thread_id=thread.id, assistant_id=assistant_id)
+
+                while True:
+                    run_status = openai_client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+                    if run_status.status in ["completed", "failed", "cancelled", "expired"]:
+                        break
+                    time.sleep(1)
+
+                messages = openai_client.beta.threads.messages.list(thread_id=thread.id)
+
+                # let's default to the last message
+                response_body = messages.data[0].content[0].text.value
+                print('finished running openai collate. messages: ', file=sys.stderr)
+                j = 0
+                response_json = False;
+                # let's see if we can find a message that assures we have both output and output.table in the response
+                for message in messages.data:
+                    for content in message.content:
+#                        print('messages.content ' + str(j) + ': ' + content.text.value, file=sys.stderr)
+                        try:
+                            response_j = json.loads(content.text.value)
+                            if (not response_json) and 'output' in response_j and 'table' in response_j['output']:
+                                response_j['output']['ai_processing_duration'] = (int(time.time()) - start_time)
+                                response_json = response_j
+                        except Exception as e:
+                            print('======= error retreiving json response from ai: ' + str(e), file=sys.stderr)
+                            pass
+                        j+=1
+
+            else:
+                req = urllib.request.Request(target)
+                req.add_header('content-type', 'application/json')
+                req.add_header('Accept', accept_header)
+
+                response = urllib.request.urlopen(req, json_witnesses.encode('utf-8'))
+                response_body = response.read()
+                try:
+                    response_output_json = json.loads(response_body)
+                    openai_data['output'] = response_output_json
+                    response_json = openai_data
+                except Exception as e:
+                    print('======= error parsing collatex result as json: ' + str(e), file=sys.stderr)
+                    pass
+
+
+            try:
+                with open('/home/ntvmr/src/community/webapp/tmp/post_collation.json', 'w', encoding="utf-8") as file:
+                    file.write(json.dumps(response_json, ensure_ascii=False, indent=4))
+                response_body = json.dumps(response_json["output"], ensure_ascii=False, indent=4)
+            except Exception as e:
+                print('======= error writing log: ' + str(e), file=sys.stderr)
+                pass
+
+
+        return response_body
 
     def convert_header_argument(self, accept):
         """Convert shortname to MIME type."""

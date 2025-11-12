@@ -1,0 +1,390 @@
+{                         
+  "name": "CollatexResult",
+  "strict": false,          
+  "schema": {                 
+    "$id": "https://example.com/hebrew-text-comparison.schema.json",
+    "title": "Hebrew Text Comparison",
+    "description": "Schema for comparing ancient textual witnesses with tokenized analysis",
+    "type": "object",
+    "required": [         
+      "input",            
+      "basetext_siglum",    
+      "output"              
+    ],                        
+    "properties": {           
+      "input": {              
+        "type": "object",     
+        "description": "Input configuration and witness data",
+        "required": [     
+          "witnesses",    
+          "algorithm",      
+          "tokenComparator"
+        ],                
+        "properties": {
+          "witnesses": {  
+            "type": "array",
+            "description": "Array of textual witnesses to compare",
+            "minItems": 1,
+            "items": {  
+              "type": "object",
+              "required": [
+                "tokens",
+                "id"
+              ],
+              "properties": {
+                "tokens": {
+                  "type": "array",
+                  "description": "Tokenized text elements",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "original",
+                      "t",
+                      "siglum",
+                      "index",
+                      "reading",
+                      "verse",
+                      "rule_match"
+                    ],
+                    "properties": {
+                      "original": {
+                        "type": "string",
+                        "description": "Original text token"
+                      },
+                      "t": {
+                        "type": "string",
+                        "description": "Transcribed or normalized token"
+                      },
+                      "siglum": {
+                        "type": "string",
+                        "description": "Manuscript or witness abbreviation"
+                      },
+                      "index": {
+                        "type": "string",
+                        "description": "Position index of the token relative to this witness; even number",
+                        "pattern": "^[0-9]+$"
+                      },
+                      "reading": {
+                        "type": "string",
+                        "description": "Reading identifier for the witness"
+                      },
+                      "verse": {
+                        "type": "string",
+                        "description": "Biblical verse reference. OSIS ID",
+                        "pattern": "^[A-Za-z0-9]+\\.[0-9]+\\.[0-9]+$"
+                      },
+                      "rule_match": {
+                        "type": "array",
+                        "description": "Array of matching rules or variants",
+                        "items": {
+                          "type": "string"
+                        },
+                        "minItems": 1
+                      },
+                      "n": {
+                       "type": "string",
+                        "description": "Normalized form (optional)"
+                      },
+                      "decision_class": {
+                        "type": "array",
+                        "description": "Classification of editorial decisions",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "regularised",
+                            "emended",
+                            "conjectured",
+                            "original"
+                          ]
+                        }
+                      },
+                      "decision_details": {
+                        "type": "array",
+                        "description": "Detailed decision information",
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "class",
+                            "scope",
+                            "id",
+                            "t"
+                          ],
+                          "properties": {
+                            "class": {
+                              "type": "string",
+                              "enum": [
+                                "regularised",
+                                "emended",
+                                "conjectured",
+                                "original"
+                              ]
+                            },
+                            "scope": {
+                              "type": "string",
+                              "enum": [
+                                "verse",
+                                "chapter",
+                                "book",
+                                "global"
+                              ]
+                            },
+                            "id": {
+                              "type": "string",
+                              "description": "Unique identifier for the decision"
+                            },
+                            "t": {
+                              "type": "string",
+                              "description": "Text form after decision"
+                            },
+                            "n": {
+                              "type": "string",
+                              "description": "Normalized form after decision"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "description": "Unique identifier for the witness"
+                }
+              }
+            }
+          },
+          "algorithm": {
+            "type": "string",
+            "description": "Algorithm used for text comparison",
+            "enum": [
+              "dekker",
+              "needleman-wunsch",
+              "smith-waterman",
+              "myers"
+            ]
+          },
+          "tokenComparator": {
+            "type": "object",
+            "description": "Configuration for token comparison",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "levenshtein",
+                  "exact",
+                  "phonetic",
+                  "semantic"
+                ]
+              },
+              "distance": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Maximum allowed distance for matching"
+              },
+              "threshold": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Similarity threshold for matching"
+              }
+            }
+          }
+        }
+      },
+      "basetext_siglum": {
+        "type": "string",
+        "description": "Identifier of the base text witness used for comparison"
+      },
+      "output": {
+        "type": "object",
+        "description": "Comparison results and analysis",
+        "required": [
+          "witnesses",
+          "table"
+        ],
+        "properties": {
+          "ai_comments": {
+            "type": "string",
+            "description": "AI-generated comments or analysis (optional)"
+          },
+          "ai_alignment_table": {
+            "type": "string",
+            "description": "AI-generated HTML representation of the AlignmentTable (optional)"
+          },
+          "ai_processing_duration": {
+            "type": "string",
+            "description": "Milliseconds AI-generated response took to generate (optional)"
+          },
+          "witnesses": {
+            "type": "array",
+            "description": "Ordered list of witness identifiers",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "table": {
+            "type": "array",
+            "description": "Comparison table with aligned tokens",
+            "items": {
+              "type": "array",
+              "description": "Alignment group containing tokens from all witnesses",
+              "items": {
+                "type": "array",
+                "description": "Tokens from a specific witness for this alignment position",
+                "items": {
+                  "type": "object",
+                  "description": "Token object (same structure as in input)",
+                  "required": [
+                    "original",
+                    "t",
+                    "siglum",
+                    "index",
+                    "reading",
+                    "verse",
+                    "rule_match"
+                  ],
+                  "properties": {
+                    "original": {
+                      "type": "string"
+                    },
+                    "t": {
+                      "type": "string"
+                    },
+                    "siglum": {
+                      "type": "string"
+                    },
+                    "index": {
+                      "type": "string",
+                      "pattern": "^[0-9]+$"
+                    },
+                    "reading": {
+                      "type": "string"
+                    },
+                    "verse": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9]+\\.[0-9]+\\.[0-9]+$"
+                    },
+                    "rule_match": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "minItems": 1
+                    },
+                    "n": {
+                      "type": "string"
+                    },
+                    "decision_class": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "regularised",
+                          "emended",
+                          "conjectured",
+                          "original"
+                        ]
+                      }
+                    },
+                    "decision_details": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "class",
+                          "scope",
+                          "id",
+                          "t"
+                        ],
+                        "properties": {
+                          "class": {
+                            "type": "string",
+                            "enum": [
+                              "regularised",
+                              "emended",
+                              "conjectured",
+                              "original"
+                            ]
+                          },
+                          "scope": {
+                            "type": "string",
+                            "enum": [
+                              "verse",
+                              "chapter",
+                              "book",
+                              "global"
+                            ]
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "t": {
+                            "type": "string"
+                          },
+                          "n": {
+                            "type": "string"
+                          }
+                       }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "statistics": {
+            "type": "object",
+            "description": "Optional comparison statistics",
+            "properties": {
+              "total_tokens": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "variations_found": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "agreement_percentage": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              }
+            }
+          }
+        }
+      },
+      "metadata": {
+        "type": "object",
+        "description": "Optional metadata about the comparison",
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "hebrew",
+              "aramaic",
+              "greek",
+              "latin",
+              "other"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+

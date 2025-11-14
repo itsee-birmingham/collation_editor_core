@@ -718,7 +718,7 @@ var SV = (function() {
       for (let i = 0; i < unit.readings.length; i += 1) {
         reading = unit.readings[i];
         // get the text and add '_a' if it is the first reading of an overlapped unit (although I don't
-        // think we ever call this on overlapped units anymore)
+        // think we ever call this on overlapped units anymore) - actually we do on the right click menu in OR!
         text = CL.extractWitnessText(reading, {
           'app_id': appId,
           'unit_id': unit._id
@@ -741,6 +741,13 @@ var SV = (function() {
         }
         if (Object.prototype.hasOwnProperty.call(reading, 'type') && reading.type === 'lac_verse') {
           text = text + '_lac_verse';
+        }
+        // When used in OR it is important to respect cross collation unit joins
+        if (Object.prototype.hasOwnProperty.call(reading, 'join_forwards') && reading.join_forwards === true) {
+          text = text + '_join_forwards';
+        }
+        if (Object.prototype.hasOwnProperty.call(reading, 'join_backwards') && reading.join_backwards === true) {
+          text = text + '_join_backwards';
         }
         // find out if this is a standoff reading
         // at this point all witnesses to the reading should be standoff if it is a standoff reading made into a main

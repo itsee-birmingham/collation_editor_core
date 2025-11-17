@@ -453,7 +453,6 @@ var SV = (function() {
     getUnitData: function(data, id, start, end, options) {
       let temp, colspan, rowId, text, splitClass, highlightedHand, errorUnit, highlightedClasses, readingSuffix,
           readingLabel, allOverlappedWitnesses;
-      console.log(id)
       const html = [];
       const rowList = [];
       if (typeof options === 'undefined') {

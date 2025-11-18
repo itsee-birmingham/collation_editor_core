@@ -716,12 +716,11 @@ var SV = (function() {
 
       for (let i = 0; i < unit.readings.length; i += 1) {
         reading = unit.readings[i];
-        // get the text and add '_a' if it is the first reading of an overlapped unit (although I don't
-        // think we ever call this on overlapped units anymore) - actually we do on the right click menu in OR!
         text = CL.extractWitnessText(reading, {
           'app_id': appId,
           'unit_id': unit._id
         });
+        // add '_a' if it is the first reading of an overlapped unit
         if (i === 0 && appId !== 'apparatus') {
           text = text + '_a';
         }

@@ -453,7 +453,6 @@ var SV = (function() {
     getUnitData: function(data, id, start, end, options) {
       let temp, colspan, rowId, text, splitClass, highlightedHand, errorUnit, highlightedClasses, readingSuffix,
           readingLabel, allOverlappedWitnesses;
-      console.log(id)
       const html = [];
       const rowList = [];
       if (typeof options === 'undefined') {
@@ -1561,7 +1560,7 @@ var SV = (function() {
         if (CL.data.apparatus[i].start === location) {
           unit = CL.data.apparatus[i];
           unit.first_word_index = location + '.' + firstWordIndex;  // set the first word index for the unit
-          // for each witness in the list
+          // for each witness in the list find the reading that the witness supports
           for (let j = 0; j < witnesses.length; j += 1) {
             found = false;
             k = 0;
@@ -1580,13 +1579,91 @@ var SV = (function() {
                                                                              firstWordIndex);
                     }
                   }
-                }
+                } 
               }
               k += 1;
             }
           }
         }
       }
+    },
+
+    _reindexMovedReadingByMatching: function (location, witnesses) {
+      let movedReading,movedReadingText, needsReindexing;
+      needsReindexing = false;
+      // find the unit 
+      const unit = CL.data.apparatus.filter(x => x.start === location )[0];
+      const readingTexts = [];  
+      for (let i = 0; i < unit.readings.length; i += 1) {
+        // all the witnesses will be in the same reading because we only move one reading so just check the first one
+        if (unit.readings[i].witnesses.indexOf(witnesses[0]) !== -1) {
+          if (typeof unit.readings[i].text[0].index === 'undefined') {
+            needsReindexing = true;
+            movedReading = unit.readings[i];
+            movedReadingText = unit.readings[i].text.map(x => x.interface).join(' ');
+            readingTexts.push('');
+          }
+        } else {
+          readingTexts.push(unit.readings[i].text.map(x => x.interface).join(' '));
+        }
+      }
+      if (!needsReindexing) {
+        return;
+      }
+      const distances = readingTexts.map(x => SV._levenstein(x, movedReadingText));
+      const closestReading = unit.readings[distances.indexOf(Math.min(...distances))];
+      if (movedReading.text.length === closestReading.text.length) {
+        // then just steal the indexes from the closest reading
+        for (let i = 0; i < movedReading.text.length; i += 1) {
+          movedReading.text[i].index = closestReading.text[i].index;
+        }
+      } else if (movedReading.text.length > closestReading.text.length) {
+        // steal what we have and put the rest in a gap - could be better
+        let remainderStart;
+        for (let i = 0; i < closestReading.text.length; i += 1) {
+          movedReading.text[i].index = closestReading.text[i].index;
+          remainderStart = i + 1;
+        }
+        for (let i = remainderStart; i < movedReading.text.length; i += 1) {
+          movedReading.text[i].index = movedReading.text[i-1] + 0.1;
+        }
+      } else {
+        // find the shared words
+        const closestReadingText = closestReading.text.map(x => x.interface);
+        const shared = movedReadingText.split(' ').filter(x => closestReadingText.includes(x));
+        const sharedClosestIndexes = shared.map(x => closestReadingText.indexOf(x));
+        const sharedMovedIndexes = shared.map(x => movedReadingText.split(' ').indexOf(x));
+        console.log(sharedClosestIndexes);
+        console.log(sharedMovedIndexes);
+        for (let i = 0; i < movedReading.text.length; i += 1) {
+          if (sharedMovedIndexes.indexOf(i) !== -1) {
+            movedReading.text[i].index = closestReading.text[sharedClosestIndexes[i]].index;
+          } else {
+            if (i === 0) {
+
+            } else {
+              movedReading.text[i].index = movedReading.text[i-1].index + 0.1;
+            }     
+          }
+        }
+      }
+    },
+
+    _levenstein: function (s1, s2) {
+      if (s1 === '') {
+        return s2.length;
+      }
+      if (s2 === '') {
+        return s1.length;
+      }
+      const matrix = [];
+      for (let i = 0; i <= s2.length; i += 1) {
+        matrix[i] = [i];
+        for (let j = 1; j <= s1.length; j += 1) {
+          matrix[i][j] = i === 0 ? j : Math.min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j - 1] + (s1[j - 1] === s2[i - 1] ? 0 : 1));
+        }
+      }
+      return matrix[s2.length][s1.length];
     },
 
     // TODO: this could do with a better name
@@ -2985,7 +3062,8 @@ var SV = (function() {
           if (unit1.start === unit1.end) {
             SV.reindexUnit(unit1.start);
           } else {
-            SV._reindexMovedReading(unit1.start, reading[0].witnesses);
+            SV._reindexMovedReadingByMatching(unit1.start, reading[0].witnesses);
+            // SV._reindexMovedReading(unit1.start, reading[0].witnesses);
           }
           SV.separateOverlapWitnesses(units[0][0]);
           problems = SV._checkWordOrderIntegrity(unit2.start, unit1.start, reading[0].witnesses);
@@ -3400,7 +3478,7 @@ var SV = (function() {
           }
         }
       }
-      //make a sets of all of witnesses
+      //make a set of all of witnesses
       witnesses = CL.setList(witnesses);
       //remove any om and lac verse witnesses
       if (Object.prototype.hasOwnProperty.call(CL.data, 'om_readings')) {

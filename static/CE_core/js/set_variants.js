@@ -1567,19 +1567,26 @@ var SV = (function() {
             while (!found && k < unit.readings.length) {
               if (unit.readings[k].witnesses.indexOf(witnesses[j]) !== -1) {
                 found = true;
-                for (let m = 0; m < unit.readings[k].text.length; m += 1) {
-                  if (!Object.prototype.hasOwnProperty.call(unit.readings[k].text[m], 'index') ||
-                            typeof unit.readings[k].text[m].index === 'undefined' ||
-                            (m > 0 && SV._indexLessThanOrEqualTo(unit.readings[k].text[m].index,
-                                                                unit.readings[k].text[m - 1].index))) {
-                    if (m === 0) {
-                      unit.readings[k].text[m].index = location + '.' + firstWordIndex;
-                    } else {
-                      unit.readings[k].text[m].index = SV._incrementSubIndex(unit.readings[k].text[m - 1].index,
-                                                                             firstWordIndex);
+                // check to see if the whole reading needs reindexing and if so use the matching function
+                const undefinedIndexes = unit.readings[k].text.map(x => x.index).filter(x => typeof x === 'undefined');
+                if (undefinedIndexes.length === unit.readings[k].text.length && unit.readings[k].text.length > 0) {
+                  SV._reindexMovedReadingByMatching(location, witnesses[j]);
+                } else {
+                  // if the whole reading doesn't need reindexing then use the other words in the reading to fix it
+                  for (let m = 0; m < unit.readings[k].text.length; m += 1) {
+                    if (!Object.prototype.hasOwnProperty.call(unit.readings[k].text[m], 'index') ||
+                              typeof unit.readings[k].text[m].index === 'undefined' ||
+                              (m > 0 && SV._indexLessThanOrEqualTo(unit.readings[k].text[m].index,
+                                                                   unit.readings[k].text[m - 1].index))) {
+                      if (m === 0) {
+                        unit.readings[k].text[m].index = location + '.' + firstWordIndex;
+                      } else {
+                        unit.readings[k].text[m].index = SV._incrementSubIndex(unit.readings[k].text[m - 1].index,
+                                                                              firstWordIndex);
+                      }
                     }
-                  }
-                } 
+                  } 
+                }
               }
               k += 1;
             }
@@ -1588,15 +1595,14 @@ var SV = (function() {
       }
     },
 
-    _reindexMovedReadingByMatching: function (location, witnesses) {
+    _reindexMovedReadingByMatching: function (location, witness) {
       let movedReading,movedReadingText, needsReindexing;
       needsReindexing = false;
       // find the unit 
       const unit = CL.data.apparatus.filter(x => x.start === location )[0];
       const readingTexts = [];  
       for (let i = 0; i < unit.readings.length; i += 1) {
-        // all the witnesses will be in the same reading because we only move one reading so just check the first one
-        if (unit.readings[i].witnesses.indexOf(witnesses[0]) !== -1) {
+        if (unit.readings[i].witnesses.indexOf(witness) !== -1) {
           if (typeof unit.readings[i].text[0].index === 'undefined') {
             needsReindexing = true;
             movedReading = unit.readings[i];
@@ -1617,44 +1623,48 @@ var SV = (function() {
         for (let i = 0; i < movedReading.text.length; i += 1) {
           movedReading.text[i].index = closestReading.text[i].index;
         }
-      } else if (movedReading.text.length > closestReading.text.length) {
-        // steal what we have and put the rest in a gap - could be better
-        let remainderStart;
-        for (let i = 0; i < closestReading.text.length; i += 1) {
-          movedReading.text[i].index = closestReading.text[i].index;
-          remainderStart = i + 1;
-        }
-        for (let i = remainderStart; i < movedReading.text.length; i += 1) {
-          movedReading.text[i].index = movedReading.text[i-1] + 0.1;
-        }
       } else {
         // find the shared words
         const closestReadingText = closestReading.text.map(x => x.interface);
         const shared = movedReadingText.split(' ').filter(x => closestReadingText.includes(x));
         const sharedClosestIndexes = shared.map(x => closestReadingText.indexOf(x));
         const sharedMovedIndexes = shared.map(x => movedReadingText.split(' ').indexOf(x));
-        console.log(sharedClosestIndexes);
-        console.log(sharedMovedIndexes);
-        for (let i = 0; i < movedReading.text.length; i += 1) {
-          if (sharedMovedIndexes.indexOf(i) !== -1) {
-            movedReading.text[i].index = closestReading.text[sharedClosestIndexes[i]].index;
-          } else {
-            if (i === 0) {
-
+        if (sharedMovedIndexes.length === 0) {
+          const firstWordIndex = 1;
+          for (let m = 0; m < movedReading.text.length; m += 1) {
+            if (m === 0) {
+              movedReading.text[m].index = location + '.' + firstWordIndex;
             } else {
-              movedReading.text[i].index = movedReading.text[i-1].index + 0.1;
-            }     
+              movedReading.text[m].index = SV._incrementSubIndex(movedReading.text[m - 1].index, firstWordIndex);
+            }
+          }
+        } else {
+          for (let i = 0; i < movedReading.text.length; i += 1) {
+            if (sharedMovedIndexes.indexOf(i) !== -1) {
+              movedReading.text[i].index = closestReading.text[sharedClosestIndexes[sharedMovedIndexes.indexOf(i)]].index;
+              // check we are always increasing the index numbers
+              if (i > 0) {
+                if (movedReading.text[i].index === movedReading.text[i-1].index) {
+                  movedReading.text[i].index = SV._incrementSubIndex(movedReading.text[i].index, 1);
+                }
+              }
+            } else {
+              // if we don't have a match then make something up based on the other positions in the moved reading
+              if (i === 0) {
+                movedReading.text[i].index = (parseInt(closestReading.text[0].index) - 1) + '.' + '1000';
+              } else {
+                movedReading.text[i].index = SV._incrementSubIndex(movedReading.text[i-1].index, 1);
+              }     
+            }
           }
         }
       }
     },
 
     _levenstein: function (s1, s2) {
-      if (s1 === '') {
-        return s2.length;
-      }
-      if (s2 === '') {
-        return s1.length;
+      // returning a high number here because otherwise short readings will have lowest distance to empty string
+      if (s1 === '' || s2 === '') {
+        return 1000;
       }
       const matrix = [];
       for (let i = 0; i <= s2.length; i += 1) {
@@ -1735,7 +1745,7 @@ var SV = (function() {
   
     _decrementSubIndex: function(current, decrement) {
       let subIndex;
-      const mainIndex = parseInt(current.split('.')[0]);
+      let mainIndex = parseInt(current.split('.')[0]);
       subIndex = parseInt(current.split('.')[1]);
       subIndex = subIndex - decrement;
       return mainIndex + '.' + subIndex;
@@ -3062,8 +3072,7 @@ var SV = (function() {
           if (unit1.start === unit1.end) {
             SV.reindexUnit(unit1.start);
           } else {
-            SV._reindexMovedReadingByMatching(unit1.start, reading[0].witnesses);
-            // SV._reindexMovedReading(unit1.start, reading[0].witnesses);
+            SV._reindexMovedReading(unit1.start, reading[0].witnesses);
           }
           SV.separateOverlapWitnesses(units[0][0]);
           problems = SV._checkWordOrderIntegrity(unit2.start, unit1.start, reading[0].witnesses);

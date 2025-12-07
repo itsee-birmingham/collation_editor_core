@@ -1568,8 +1568,9 @@ var SV = (function() {
               if (unit.readings[k].witnesses.indexOf(witnesses[j]) !== -1) {
                 found = true;
                 // check to see if the whole reading needs reindexing and if so use the matching function
+                // check to see if at least half of the reading needs reindexing and if so use the matching function
                 const undefinedIndexes = unit.readings[k].text.map(x => x.index).filter(x => typeof x === 'undefined');
-                if (undefinedIndexes.length === unit.readings[k].text.length && unit.readings[k].text.length > 0) {
+                if (unit.readings[k].text.length > 0 && undefinedIndexes.length > unit.readings[k].text.length / 2) {
                   SV._reindexMovedReadingByMatching(location, witnesses[j]);
                 } else {
                   // if the whole reading doesn't need reindexing then use the other words in the reading to fix it
@@ -1596,25 +1597,22 @@ var SV = (function() {
     },
 
     _reindexMovedReadingByMatching: function (location, witness) {
-      let movedReading,movedReadingText, needsReindexing;
-      needsReindexing = false;
+      /* A function to attempt to recollate a moved reading based on the closest reading in the new unit. It attempts
+      to match words with that reading and determine indexes based on those in that reading. it is only called if at
+      least half of the words in the resulting reading in the target unit has undefined indexes in  at least half of
+      its words. It is called for a single witness at a time. */
+      let movedReading, movedReadingText;
       // find the unit 
       const unit = CL.data.apparatus.filter(x => x.start === location )[0];
       const readingTexts = [];  
       for (let i = 0; i < unit.readings.length; i += 1) {
         if (unit.readings[i].witnesses.indexOf(witness) !== -1) {
-          if (typeof unit.readings[i].text[0].index === 'undefined') {
-            needsReindexing = true;
-            movedReading = unit.readings[i];
-            movedReadingText = unit.readings[i].text.map(x => x.interface).join(' ');
-            readingTexts.push('');
-          }
+          movedReading = unit.readings[i];
+          movedReadingText = unit.readings[i].text.map(x => x.interface).join(' ');
+          readingTexts.push('');
         } else {
           readingTexts.push(unit.readings[i].text.map(x => x.interface).join(' '));
         }
-      }
-      if (!needsReindexing) {
-        return;
       }
       const distances = readingTexts.map(x => SV._levenstein(x, movedReadingText));
       const closestReading = unit.readings[distances.indexOf(Math.min(...distances))];
@@ -1662,8 +1660,9 @@ var SV = (function() {
     },
 
     _levenstein: function (s1, s2) {
-      // returning a high number here because otherwise short readings will have lowest distance to empty string
+      /* A JavaScript implementation of the levenstein distance algorithm - originally adapted from a tutorial online */
       if (s1 === '' || s2 === '') {
+        // returning a high number here because otherwise short readings will have lowest distance to empty string
         return 1000;
       }
       const matrix = [];

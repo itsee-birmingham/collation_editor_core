@@ -1585,7 +1585,7 @@ var SV = (function() {
                                                                               firstWordIndex);
                       }
                     }
-                  } 
+                  }
                 }
               }
               k += 1;
@@ -1743,7 +1743,7 @@ var SV = (function() {
   
     _decrementSubIndex: function(current, decrement) {
       let subIndex;
-      let mainIndex = parseInt(current.split('.')[0]);
+      const mainIndex = parseInt(current.split('.')[0]);
       subIndex = parseInt(current.split('.')[1]);
       subIndex = subIndex - decrement;
       return mainIndex + '.' + subIndex;

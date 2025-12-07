@@ -1648,6 +1648,7 @@ var SV = (function() {
             } else {
               // if we don't have a match then make something up based on the other positions in the moved reading
               if (i === 0) {
+                // 1000 here just makes sure it is always the last thing in the previous unit.
                 movedReading.text[i].index = (parseInt(closestReading.text[0].index) - 1) + '.' + '1000';
               } else {
                 movedReading.text[i].index = SV._incrementSubIndex(movedReading.text[i-1].index, 1);
@@ -1661,8 +1662,8 @@ var SV = (function() {
     _levenstein: function (s1, s2) {
       /* A JavaScript implementation of the levenstein distance algorithm - originally adapted from a tutorial online */
       if (s1 === '' || s2 === '') {
-        // returning a high number here because otherwise short readings will have lowest distance to empty string
-        return 1000;
+        // returning infinity here because otherwise short readings will have lowest distance to empty string
+        return Infinity;
       }
       const matrix = [];
       for (let i = 0; i <= s2.length; i += 1) {

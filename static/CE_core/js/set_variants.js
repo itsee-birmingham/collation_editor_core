@@ -1567,7 +1567,6 @@ var SV = (function() {
             while (!found && k < unit.readings.length) {
               if (unit.readings[k].witnesses.indexOf(witnesses[j]) !== -1) {
                 found = true;
-                // check to see if the whole reading needs reindexing and if so use the matching function
                 // check to see if at least half of the reading needs reindexing and if so use the matching function
                 const undefinedIndexes = unit.readings[k].text.map(x => x.index).filter(x => typeof x === 'undefined');
                 if (unit.readings[k].text.length > 0 && undefinedIndexes.length > unit.readings[k].text.length / 2) {

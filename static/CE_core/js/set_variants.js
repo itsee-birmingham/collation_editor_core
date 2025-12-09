@@ -1614,7 +1614,13 @@ var SV = (function() {
         }
       }
       const distances = readingTexts.map(x => SV._levenstein(x, movedReadingText));
-      const closestReading = unit.readings[distances.indexOf(Math.min(...distances))];
+      let shortestDistance = distances.indexOf(Math.min(...distances));
+      let closestReading = unit.readings[shortestDistance];
+      while (closestReading.text[0].index === undefined) {
+        distances[shortestDistance] = Infinity;
+        shortestDistance = distances.indexOf(Math.min(...distances));
+        closestReading = unit.readings[shortestDistance];
+      }
       if (movedReading.text.length === closestReading.text.length) {
         // then just steal the indexes from the closest reading
         for (let i = 0; i < movedReading.text.length; i += 1) {

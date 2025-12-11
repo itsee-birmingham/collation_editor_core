@@ -146,7 +146,7 @@ var CL = (function() {
       });
     },
   
-    getHeaderHtml: function(stage, context) {
+    getHeaderHtml: function(stage) {
       let html;
       if (['Regulariser', 'Set Variants'].indexOf(stage) !== -1 && CL.witnessEditingMode === true) {
         if (CL.witnessAddingMode === true) {
@@ -156,8 +156,7 @@ var CL = (function() {
         }
       }
       html = '<span id="stage-id" class="title">' + stage + '</span>' +
-        '<span id="unit-ref" class="title">' + context +
-        '</span><span id="project-name" class="title">';
+        '<span id="unit-ref" class="title"></span><span id="project-name" class="title">';
       if (Object.prototype.hasOwnProperty.call(CL.project, 'name')) {
         html += CL.project.name;
       }
@@ -3826,7 +3825,8 @@ var CL = (function() {
         document.getElementById('witnesses').innerHTML = '';
       }
       document.getElementById('saved-collations-div').innerHTML = html.join('');
-      document.getElementById('header').innerHTML = CL.getHeaderHtml('Collation', context);
+      document.getElementById('header').innerHTML = CL.getHeaderHtml('Collation');
+      document.getElementById('unit-ref').textContent = context;
   
       if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
         CL.services.showLoginStatus();

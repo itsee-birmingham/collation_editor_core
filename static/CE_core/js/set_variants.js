@@ -1599,7 +1599,8 @@ var SV = (function() {
       /* A function to attempt to recollate a moved reading based on the closest reading in the new unit. It attempts
       to match words with that reading and determine indexes based on those in that reading. it is only called if at
       least half of the words in the resulting reading in the target unit has undefined indexes in  at least half of
-      its words. It is called for a single witness at a time. */
+      its words. It is called for a single witness at a time. If no pre-indexed closest reading is found then it will
+      index from the start position. */
       let movedReading, movedReadingText;
       // find the unit 
       const unit = CL.data.apparatus.filter(x => x.start === location )[0];
@@ -1616,50 +1617,88 @@ var SV = (function() {
       const distances = readingTexts.map(x => SV._levenstein(x, movedReadingText));
       let shortestDistance = distances.indexOf(Math.min(...distances));
       let closestReading = unit.readings[shortestDistance];
-      while (closestReading.text[0].index === undefined) {
+
+      console.log(closestReading.text.map(x => x.index))
+      // if the reading we found is not yet indexed itself and options are still available then keep looking
+      while (
+        distances.filter(x => x === Infinity).length < distances.length - 1 && 
+        closestReading.text.map(x => x.index).filter(x => x === undefined).length === 0
+      ) {
         distances[shortestDistance] = Infinity;
         shortestDistance = distances.indexOf(Math.min(...distances));
         closestReading = unit.readings[shortestDistance];
       }
-      if (movedReading.text.length === closestReading.text.length) {
-        // then just steal the indexes from the closest reading
-        for (let i = 0; i < movedReading.text.length; i += 1) {
-          movedReading.text[i].index = closestReading.text[i].index;
+      // if no suitable closest reading was found just reindex from the start point
+      if (closestReading.text.map(x => x.index).filter(x => x === undefined).length > 0) {
+        movedReading.text[0].index = location + '.1';
+        for (let i = 1; i < movedReading.text.length; i += 1) {
+          movedReading.text[i].index = SV._incrementSubIndex(movedReading.text[i - 1].index, 1);
+        }
+        //SV._checkAndFixRecalculatedIndexes(movedReading, location, unit.end);
+        return;
+      }
+      // find the shared words
+      const closestReadingText = closestReading.text.map(x => x.interface);
+      const shared = movedReadingText.split(' ').filter(x => closestReadingText.includes(x));
+      console.log(shared)
+      //const sharedClosestIndexes = shared.map(x => closestReadingText.indexOf(x));
+      const sharedClosestIndexes = shared.map((x, pos) => closestReadingText.indexOf(x, pos)).filter(x => x > -1);
+      console.log(sharedClosestIndexes)
+      //const sharedMovedIndexes = shared.map(x => movedReadingText.split(' ').indexOf(x));
+      const sharedMovedIndexes = shared.map((x, pos) => movedReadingText.split(' ').indexOf(x, pos)).filter(x => x > -1);
+      console.log(sharedMovedIndexes)
+      if (sharedMovedIndexes.length === 0) {
+        const firstWordIndex = 1;
+        movedReading.text[0].index = location + '.' + firstWordIndex;
+        for (let i = 1; i < movedReading.text.length; i += 1) {
+          movedReading.text[i].index = SV._incrementSubIndex(movedReading.text[i - 1].index, firstWordIndex);
         }
       } else {
-        // find the shared words
-        const closestReadingText = closestReading.text.map(x => x.interface);
-        const shared = movedReadingText.split(' ').filter(x => closestReadingText.includes(x));
-        const sharedClosestIndexes = shared.map(x => closestReadingText.indexOf(x));
-        const sharedMovedIndexes = shared.map(x => movedReadingText.split(' ').indexOf(x));
-        if (sharedMovedIndexes.length === 0) {
-          const firstWordIndex = 1;
-          for (let m = 0; m < movedReading.text.length; m += 1) {
-            if (m === 0) {
-              movedReading.text[m].index = location + '.' + firstWordIndex;
-            } else {
-              movedReading.text[m].index = SV._incrementSubIndex(movedReading.text[m - 1].index, firstWordIndex);
-            }
-          }
-        } else {
-          for (let i = 0; i < movedReading.text.length; i += 1) {
-            if (sharedMovedIndexes.indexOf(i) !== -1) {
-              movedReading.text[i].index = closestReading.text[sharedClosestIndexes[sharedMovedIndexes.indexOf(i)]].index;
-              // check we are always increasing the index numbers
-              if (i > 0) {
-                if (movedReading.text[i].index === movedReading.text[i-1].index) {
-                  movedReading.text[i].index = SV._incrementSubIndex(movedReading.text[i].index, 1);
-                }
+        for (let i = 0; i < movedReading.text.length; i += 1) {
+          if (sharedMovedIndexes.indexOf(i) !== -1) {
+            movedReading.text[i].index = closestReading.text[sharedClosestIndexes[sharedMovedIndexes.indexOf(i)]].index;
+            // check we are always increasing the index numbers
+            if (i > 0) {
+              if (movedReading.text[i].index === movedReading.text[i-1].index) {
+                movedReading.text[i].index = SV._incrementSubIndex(movedReading.text[i].index, 1);
               }
-            } else {
-              // if we don't have a match then make something up based on the other positions in the moved reading
-              if (i === 0) {
-                // 1000 here just makes sure it is always the last thing in the previous unit.
-                movedReading.text[i].index = (parseInt(closestReading.text[0].index) - 1) + '.' + '1000';
-              } else {
-                movedReading.text[i].index = SV._incrementSubIndex(movedReading.text[i-1].index, 1);
-              }     
             }
+          } else {
+            // if we don't have a match then make something up based on the other positions in the moved reading
+            if (i === 0) {
+              // 1000 here just makes sure it is always the last thing in the previous unit.
+              movedReading.text[i].index = (parseInt(closestReading.text[0].index) - 1) + '.' + '1000';
+            } else {
+              movedReading.text[i].index = SV._incrementSubIndex(movedReading.text[i-1].index, 1);
+            }     
+          }
+        }
+      }
+      //SV._checkAndFixRecalculatedIndexes(movedReading, location, unit.end);
+    },
+
+    _checkAndFixRecalculatedIndexes: function (movedReading, unitStart, unitEnd) {
+      // check that there are no gaps between words that should be filled by adapting indexes to words rather than gaps
+      const mainIndexes = movedReading.text.map(x => parseInt(x.index.split('.')[0]));
+      const subIndexes = movedReading.text.map(x => parseInt(x.index.split('.')[1]));
+      for (let i = 0; i < mainIndexes.length; i += 1) {
+        if (i === 0) {
+          if (mainIndexes[i] < unitStart && mainIndexes[i + 1] > unitStart) {
+            mainIndexes[i] = unitStart;
+            subIndexes[i] = 1;
+            movedReading.text[i].index = mainIndexes[i] + '.' + subIndexes[i];
+          }
+        } else if (i === mainIndexes.length - 1) {
+          if (mainIndexes[i] < unitEnd && subIndexes[i] > 1) {
+            mainIndexes[i] = unitEnd;
+            subIndexes[i] = 1;
+            movedReading.text[i].index = mainIndexes[i] + '.' + subIndexes[i];
+          }
+        } else {     
+          if (mainIndexes[i + 1] - 2 > mainIndexes[i] && subIndexes[i] > 1) {
+            mainIndexes[i] = mainIndexes[i + 1] - 2;
+            subIndexes[i] = 1;
+            movedReading.text[i].index = mainIndexes[i] + '.' + subIndexes[i];
           }
         }
       }

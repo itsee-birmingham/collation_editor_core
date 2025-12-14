@@ -1617,8 +1617,6 @@ var SV = (function() {
       const distances = readingTexts.map(x => SV._levenstein(x, movedReadingText));
       let shortestDistance = distances.indexOf(Math.min(...distances));
       let closestReading = unit.readings[shortestDistance];
-
-      console.log(closestReading.text.map(x => x.index))
       // if the reading we found is not yet indexed itself and options are still available then keep looking
       while (
         distances.filter(x => x === Infinity).length < distances.length - 1 && 
@@ -1634,19 +1632,14 @@ var SV = (function() {
         for (let i = 1; i < movedReading.text.length; i += 1) {
           movedReading.text[i].index = SV._incrementSubIndex(movedReading.text[i - 1].index, 1);
         }
-        //SV._checkAndFixRecalculatedIndexes(movedReading, location, unit.end);
+        SV._checkAndFixRecalculatedIndexes(movedReading, location, unit.end);
         return;
       }
       // find the shared words
       const closestReadingText = closestReading.text.map(x => x.interface);
-      const shared = movedReadingText.split(' ').filter(x => closestReadingText.includes(x));
-      console.log(shared)
-      //const sharedClosestIndexes = shared.map(x => closestReadingText.indexOf(x));
+      const shared = SV._getSharedWordsList(JSON.parse(JSON.stringify(closestReadingText)), movedReadingText.split(' '));
       const sharedClosestIndexes = shared.map((x, pos) => closestReadingText.indexOf(x, pos)).filter(x => x > -1);
-      console.log(sharedClosestIndexes)
-      //const sharedMovedIndexes = shared.map(x => movedReadingText.split(' ').indexOf(x));
       const sharedMovedIndexes = shared.map((x, pos) => movedReadingText.split(' ').indexOf(x, pos)).filter(x => x > -1);
-      console.log(sharedMovedIndexes)
       if (sharedMovedIndexes.length === 0) {
         const firstWordIndex = 1;
         movedReading.text[0].index = location + '.' + firstWordIndex;
@@ -1655,7 +1648,7 @@ var SV = (function() {
         }
       } else {
         for (let i = 0; i < movedReading.text.length; i += 1) {
-          if (sharedMovedIndexes.indexOf(i) !== -1) {
+          if (sharedMovedIndexes.indexOf(i) !== -1 && sharedClosestIndexes[sharedMovedIndexes.indexOf(i)] !== undefined) {
             movedReading.text[i].index = closestReading.text[sharedClosestIndexes[sharedMovedIndexes.indexOf(i)]].index;
             // check we are always increasing the index numbers
             if (i > 0) {
@@ -1674,33 +1667,86 @@ var SV = (function() {
           }
         }
       }
-      //SV._checkAndFixRecalculatedIndexes(movedReading, location, unit.end);
+      SV._checkAndFixRecalculatedIndexes(movedReading, location, unit.end);
+    },
+
+    _getSharedWordsList: function (closestReadingWords, movedReadingWords) {
+      // work out which readings are shared in the correct order
+      const shared = [];
+      for (const word of movedReadingWords) {
+        if (closestReadingWords.indexOf(word) !== -1) {
+          shared.push(word);
+          closestReadingWords = closestReadingWords.slice(closestReadingWords.indexOf(word) + 1);
+        }
+      }
+      return shared;
     },
 
     _checkAndFixRecalculatedIndexes: function (movedReading, unitStart, unitEnd) {
       // check that there are no gaps between words that should be filled by adapting indexes to words rather than gaps
       const mainIndexes = movedReading.text.map(x => parseInt(x.index.split('.')[0]));
       const subIndexes = movedReading.text.map(x => parseInt(x.index.split('.')[1]));
-      for (let i = 0; i < mainIndexes.length; i += 1) {
-        if (i === 0) {
-          if (mainIndexes[i] < unitStart && mainIndexes[i + 1] > unitStart) {
-            mainIndexes[i] = unitStart;
-            subIndexes[i] = 1;
-            movedReading.text[i].index = mainIndexes[i] + '.' + subIndexes[i];
-          }
-        } else if (i === mainIndexes.length - 1) {
-          if (mainIndexes[i] < unitEnd && subIndexes[i] > 1) {
-            mainIndexes[i] = unitEnd;
-            subIndexes[i] = 1;
-            movedReading.text[i].index = mainIndexes[i] + '.' + subIndexes[i];
-          }
-        } else {     
-          if (mainIndexes[i + 1] - 2 > mainIndexes[i] && subIndexes[i] > 1) {
-            mainIndexes[i] = mainIndexes[i + 1] - 2;
-            subIndexes[i] = 1;
-            movedReading.text[i].index = mainIndexes[i] + '.' + subIndexes[i];
-          }
+      // set up the first one
+      if (mainIndexes[0] < unitStart && mainIndexes[1] > unitStart) {
+        mainIndexes[0] = unitStart;
+        subIndexes[0] = 1;
+        movedReading.text[0].index = mainIndexes[0] + '.' + subIndexes[0];
+      }
+      // if we have a clear run of even numbers from unitStart to unitEnd (ignoring any odd ones) then we are fine
+      const expectedIndexes = [];
+      for (let i = unitStart; i <= unitEnd; i += 2) {
+        expectedIndexes.push(i);
+      }
+      const missingIndexes = [];
+      for (let index of expectedIndexes) {
+        if (mainIndexes.indexOf(index) === -1) {
+          missingIndexes.push(index);
         }
+      }
+      if (missingIndexes.length === 0) {
+        // then there is nothing to fix
+        return;
+      }
+      let changes = false;
+      let previousIndex, nextIndex;
+      for (let i = 0; i < missingIndexes.length; i += 1) {
+        previousIndex = mainIndexes.indexOf(missingIndexes[i] - 1);
+        if (previousIndex === -1) {
+          previousIndex = mainIndexes.indexOf(missingIndexes[i] - 2);
+        }
+        nextIndex = -1
+        nextIndex = mainIndexes.indexOf(missingIndexes[i] + 1);
+        if (nextIndex === -1) {
+          nextIndex = mainIndexes.indexOf(missingIndexes[i] + 2);
+        } else {
+          continue;
+        }
+        if (previousIndex !== -1 && nextIndex % 2 !== 1 && nextIndex - previousIndex !== 1) {
+          if (mainIndexes.filter(x => x === mainIndexes[previousIndex + 1]).length > 1) {
+            mainIndexes[previousIndex + 1] = missingIndexes[i];
+            for (let j = previousIndex + 2; j < mainIndexes.length; j += 1) {
+              if (mainIndexes[j] < mainIndexes[previousIndex + 1]) {
+                mainIndexes[j] = mainIndexes[previousIndex + 1];
+              }
+            }
+            changes = true;
+          }  
+        }
+      }
+      if (changes) {
+        // then we need to update the subindexes (first one already done above)
+        let currentMain = mainIndexes[0];
+        for (let i = 1; i < mainIndexes.length; i += 1) {
+          if (mainIndexes[i] !== currentMain) {
+            subIndexes[i] = 1;
+          } else {
+            subIndexes[i] = subIndexes[i - 1] + 1;
+          }
+          currentMain = mainIndexes[i];
+        }
+      }
+      for (let i = 0; i < movedReading.text.length; i += 1) {
+        movedReading.text[i].index = mainIndexes[i] + '.' + subIndexes[i];
       }
     },
 

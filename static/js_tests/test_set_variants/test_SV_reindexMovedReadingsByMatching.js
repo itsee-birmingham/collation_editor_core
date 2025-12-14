@@ -26,7 +26,6 @@ QUnit.module('SV _reindexMovedReadingByMatching', function(hooks) {
             ]
         };
         SV._reindexMovedReadingByMatching(2, 'P45');
-        // TODO: this ideally should be ['2.1', '4.1']
         assert.deepEqual(readings[1].text.map(x => x.index), ['2.1', '4.1'])
     });
 
@@ -50,7 +49,6 @@ QUnit.module('SV _reindexMovedReadingByMatching', function(hooks) {
             ]
         };
         SV._reindexMovedReadingByMatching(2, 'P45');
-        // TODO: this ideally should be ['2.1', '4.1']
         assert.deepEqual(readings[1].text.map(x => x.index), ['2.1', '4.1'])
     });
 
@@ -75,7 +73,6 @@ QUnit.module('SV _reindexMovedReadingByMatching', function(hooks) {
         };
 
         SV._reindexMovedReadingByMatching(2, 'P45');
-        // TODO: this ideally should be ['2.1', '4.1']
         assert.deepEqual(readings[1].text.map(x => x.index), ['2.1', '4.1'])
     });
 
@@ -222,7 +219,6 @@ QUnit.module('SV _reindexMovedReadingByMatching', function(hooks) {
             ]
         };
         SV._reindexMovedReadingByMatching(2, 'P45');
-        // TODO: would ideally be 2.1, 4.1, 6.1
         assert.deepEqual(readings[1].text.map(x => x.index), ['2.1', '4.1', '6.1'])
     });
 
@@ -248,7 +244,6 @@ QUnit.module('SV _reindexMovedReadingByMatching', function(hooks) {
             ]
         };
         SV._reindexMovedReadingByMatching(2, 'P45');
-        // TODO: would ideally be 2.1, 4.1, 6.1
         assert.deepEqual(readings[1].text.map(x => x.index), ['2.1', '4.1', '6.1'])
     });
 

@@ -4691,7 +4691,7 @@ var SV = (function() {
       if (menuName === 'unit') {
         document.getElementById('context-menu').innerHTML = '<li id="split-words"><span>Split words</span></li><li id="split-readings"><span>Split readings</span></li>';
       } else if (menuName === 'overlap-unit') {
-        document.getElementById('context-menu').innerHTML = '<li id="split-readings"><span>Split readings</span></li>';
+        document.getElementById('context-menu').innerHTML = '<li id="split-readings"><span>Split readings</span></li><li id="remove-overlap"><span>Remove overlap</span></li>';
       } else if (menuName === 'subreading') {
         document.getElementById('context-menu').innerHTML = '<li id="make-main-reading"><span>Make main reading</span></li>';
       } else if (menuName === 'split-duplicate-unit') {
@@ -4762,6 +4762,32 @@ var SV = (function() {
           SV._splitUnit(unitNumber);
         });
         $('#split-words').on('mouseover.swd_mo', function() {
+          CL.hideTooltip();
+        });
+      }
+      if (document.getElementById('remove-overlap')) {
+        $('#remove-overlap').off('click.ro_c');
+        $('#remove-overlap').off('mouseover.ro_mo');
+        $('#remove-overlap').on('click.ro_c', function() {
+          const element = SimpleContextMenu._target_element;
+          const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
+            if ($(e).hasClass('spanlike')) {
+              return false;
+            }
+            return true;
+          });
+          const unitNumber = div.id.replace('drag-unit-', '');
+          const dataCopy = JSON.parse(JSON.stringify(CL.data));
+          try {
+            SV._removeOverlap(unitNumber);
+          } catch (err) {
+            console.log(err);
+            alert('The overlapping unit could not be deleted.');
+            CL.data = dataCopy;
+            SV.showSetVariantsData();
+          } 
+        });
+        $('#remove-overlap').on('mouseover.ro_mo', function() {
           CL.hideTooltip();
         });
       }
@@ -4955,6 +4981,121 @@ var SV = (function() {
           }
         }
       }
+    },
+
+    _removeOverlap: function(index) {
+      let apparatusNum, appId;
+      spinner.showLoadingOverlay();
+      // find the correct apparatus
+      if (index.match(/-app-/g)) {
+        apparatusNum = parseInt(index.match(/\d+/g)[1], 10);
+        index = parseInt(index.match(/\d+/g)[0], 10);
+        appId = 'apparatus' + apparatusNum;
+      } else {
+        console.log('removeOverlap function makes no sense for a top line unit.');
+        return;
+      }
+      const overlapUnit = CL.data[appId][index];
+      const overlapId = overlapUnit._id;
+      const range = SV._findOverlappedRange(overlapId);
+      const witnesses = SV._getAllUnitWitnesses(overlapUnit).filter(x => x !== CL.data.overtext_name);
+      const wordRanges = {};
+      wordRanges['basetext'] = SV._getWitnessIndexesForHand(overlapUnit, 'basetext');
+      for (const hand of witnesses) {
+        wordRanges[hand] = SV._getWitnessIndexesForHand(overlapUnit, hand);
+        // deal with the overlap unit - needs to be returned because it isn't passing as reference through the full function chain
+        CL.data[appId][index] = SV._removeWitnessFromUnitAndSortRemainder(overlapUnit, hand, appId);
+        CL.removeNullItems(CL.data[appId]);  
+        for (let i = range[0]; i <= range[1]; i += 1) {       
+          CL.data.apparatus[i] = SV._removeWitnessFromUnitAndSortRemainder(CL.data.apparatus[i], hand, 'apparatus');
+          CL.removeNullItems(CL.data.apparatus);
+        }
+      }
+      console.log(wordRanges)
+      console.log('+++++++')
+      console.log(CL.data)
+      // now add them back in!
+      // get the data and split out just the sections we need (details in wordRanges)
+      CL.dataSettings.witness_list = [];
+      for (const wit of witnesses) {
+        CL.dataSettings.witness_list.push(CL.data.hand_id_map[wit]);
+      }
+      if (CL.dataSettings.witness_list.indexOf(CL.dataSettings.base_text) === -1) {
+        CL.dataSettings.witness_list.push(CL.dataSettings.base_text);
+      }
+      console.log(CL.dataSettings.witness_list);
+      CL.services.getUnitData(CL.context, CL.dataSettings.witness_list, function (collationData) {
+        // collate just the hands we need
+
+        // collate just the word chunk we need
+
+        console.log(collationData);
+      });
+      // add the data back in
+
+      SV.showSetVariantsData();
+    },
+
+    _getWitnessIndexesForHand: function(unit, hand) {
+      const indexes = [null, null, null];
+      for (const reading of unit.readings) {
+        if (reading.witnesses.indexOf(hand) !== -1) { // this is the right reading
+          for (const word of reading.text) {
+            if (Object.prototype.hasOwnProperty.call(word, hand)) {             
+              if (indexes[0] === null) {
+                indexes[0] = word[hand].index;
+                indexes[1] = word[hand].index;
+              } else {
+                indexes[1] = word[hand].index;
+              }
+            }
+          }
+          if (indexes[0] === null) {
+            // then this is lac or om and we need details
+            indexes[2] = [reading.type, reading.details];
+          }
+        }
+      }
+      return indexes;
+    },
+
+    _removeWitnessFromUnitAndSortRemainder: function(unit, hand, apparatus) {
+      let genuineReadingFound;
+      CL._removeWitnessFromUnit(unit, hand);
+      if (apparatus === 'apparatus') { // this is a main apparatus unit so delete if only om and lac readings remain
+        genuineReadingFound = false;
+        for (let j = 0; j < unit.readings.length; j += 1) {
+          if (unit.readings[j].text.length > 0 ||
+            Object.prototype.hasOwnProperty.call(unit.readings[j], 'SR_text')) {
+            genuineReadingFound = true;
+          }
+        }
+        if (genuineReadingFound === false) {
+          unit = null;
+        }
+      } else { // this is an overlapped unit so if only one reading remains delete it
+        if (unit.readings.length === 1) {
+          unit = null;
+        }
+      }
+      return unit;
+    },
+
+    _findOverlappedRange: function(overlappingId) {
+      let startIndex, endIndex;
+      startIndex = null;
+      endIndex = null;
+      for (let i = 0; i < CL.data.apparatus.length; i += 1) {
+        if (Object.prototype.hasOwnProperty.call(CL.data.apparatus[i], 'overlap_units') && Object.prototype.hasOwnProperty.call(CL.data.apparatus[i].overlap_units, overlappingId)) {
+          if (startIndex === null) {
+            startIndex = i;
+            endIndex = i;
+          } else {
+            endIndex = i;
+          }
+        }
+      }
+      return [startIndex, endIndex];
     },
 
     _addOverlappedEvent: function(id, flag) {

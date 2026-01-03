@@ -1,5 +1,5 @@
 /* exported SV */
-/* global CL, OR, SR, REDIPS SimpleContextMenu cforms, staticUrl, spinner, drag */
+/* global CL, RG, OR, SR, REDIPS SimpleContextMenu cforms, staticUrl, spinner, drag */
 var SV = (function() {
 
   /** Major operations in this file (by which I mean ones directly called by the user interface) are:
@@ -4984,7 +4984,7 @@ var SV = (function() {
     },
 
     _removeOverlap: function(index) {
-      let apparatusNum, appId;
+      let apparatusNum, appId, witId, tokens;
       spinner.showLoadingOverlay();
       // find the correct apparatus
       if (index.match(/-app-/g)) {
@@ -5011,9 +5011,6 @@ var SV = (function() {
           CL.removeNullItems(CL.data.apparatus);
         }
       }
-      console.log(wordRanges)
-      console.log('+++++++')
-      console.log(CL.data)
       // now add them back in!
       // get the data and split out just the sections we need (details in wordRanges)
       CL.dataSettings.witness_list = [];
@@ -5023,13 +5020,45 @@ var SV = (function() {
       if (CL.dataSettings.witness_list.indexOf(CL.dataSettings.base_text) === -1) {
         CL.dataSettings.witness_list.push(CL.dataSettings.base_text);
       }
-      console.log(CL.dataSettings.witness_list);
       CL.services.getUnitData(CL.context, CL.dataSettings.witness_list, function (collationData) {
-        // collate just the hands we need
-
-        // collate just the word chunk we need
-
-        console.log(collationData);
+        for (let entry of collationData.results) {
+          for (let j = 0; j < entry.witnesses.length; j += 1) {
+            // collate just the hands we need
+            witId = entry.witnesses[j].id;
+            if (witId !== CL.data.overtext_name && witnesses.indexOf(witId) === -1) {
+              entry.witnesses[j] = null;
+            } else if (witId !== CL.data.overtext_name && wordRanges[witId][2] !== null) { // this is lac or om for the chunk so don't collate
+              entry.witnesses[j] = null;
+            } else {
+              // collate just the text chunk we need
+              tokens = entry.witnesses[j].tokens.filter(
+                x => parseInt(x.index) >= wordRanges[entry.witnesses[j].id][0] && parseInt(x.index) <= wordRanges[entry.witnesses[j].id][1]
+              );
+              entry.witnesses[j].tokens = tokens;
+            }
+          } 
+        }
+        const filteredCollationData = {'results': []};
+        for (let entry of collationData.results) {
+          if (entry.witnesses.filter(x => x !== null).length > 0) {
+            filteredCollationData.results.push(entry);
+          }
+        }
+        if (filteredCollationData.results.length === 1) {
+          // then there is no point collating because this is just the basetext
+          console.log(filteredCollationData);
+          console.log('not collating this')
+        } else {
+          console.log(filteredCollationData);
+          console.log('I will collate this');
+          CL.collateData = {
+            'data': filteredCollationData.results,
+            'lac_witnesses': {}
+          };
+          RG.runCollation(CL.collateData, 'remove_overlap', 0, function(data) {
+            console.log(data)
+          });
+        }  
       });
       // add the data back in
 

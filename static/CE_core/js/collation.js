@@ -3942,10 +3942,12 @@ var CL = (function() {
         }
       }
       // update hand_id_map
-      for (const key in newData.hand_id_map) {
-        if (Object.prototype.hasOwnProperty.call(newData.hand_id_map, key)) {
-          if (!Object.prototype.hasOwnProperty.call(mainCollation.structure.hand_id_map, key)) {
-            mainCollation.structure.hand_id_map[key] = newData.hand_id_map[key];
+      if (addedWits.length > 0) {
+        for (const key in newData.hand_id_map) {
+          if (Object.prototype.hasOwnProperty.call(newData.hand_id_map, key)) {
+            if (!Object.prototype.hasOwnProperty.call(mainCollation.structure.hand_id_map, key)) {
+              mainCollation.structure.hand_id_map[key] = newData.hand_id_map[key];
+            }
           }
         }
       }
@@ -3973,6 +3975,7 @@ var CL = (function() {
           } else {
             if (newUnit === null) {
               omReading = null;
+              console.log(existingUnit)
               for (let i = 0; i < existingUnit.readings.length; i += 1) {
                 // NB: this last condition should not be needed but before 26/09/21 the code was incorrectly
                 // adding type="om" to readings even if they had text when they were combined/moved above an overlap
@@ -3983,7 +3986,7 @@ var CL = (function() {
                   omReading = existingUnit.readings[i];
                 }
               }
-  
+
               if (omReading) {
                 // addedWits is identifiers rather than sigla for readings so use hand_id_map here instead
                 // we can assume that basetext is om in both cases as it is the same text so the check of exisitng

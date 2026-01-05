@@ -5044,10 +5044,11 @@ var SV = (function() {
             filteredCollationData.results.push(entry);
           }
         }
+        CL.existingCollation = JSON.parse(JSON.stringify(CL.data));
         if (filteredCollationData.results.length === 1) {
           // then there is no point collating because this is just the basetext
           console.log(filteredCollationData);
-          console.log('not collating this')
+          console.log('not collating this');
         } else {
           console.log(filteredCollationData);
           console.log('I will collate this');
@@ -5056,13 +5057,42 @@ var SV = (function() {
             'lac_witnesses': {}
           };
           RG.runCollation(CL.collateData, 'remove_overlap', 0, function(data) {
-            console.log(data)
+            console.log(data);
+            // set up
+            CL.data = data; // temporary assignment to allow all the cleaning functions to work
+            CL.lacOmFix();
+            // copy so we can change CL.data without screwing this up
+            data = JSON.parse(JSON.stringify(CL.data));
+            console.log(CL.existingCollation);
+            const originalApparatus = JSON.parse(JSON.stringify(CL.existingCollation.apparatus));
+            const preChunk = originalApparatus.slice(0, range[0] + 1);
+            const postChunk = originalApparatus.slice(range[1]);
+            // add the data back in
+            // just get the chunk we need to change
+            //const chunk = CL.existingCollation.apparatus.slice(range[0], range[1] + 1);
+            
+            console.log(CL.existingCollation);
+            const mergedCollationChunk = CL._mergeCollationObjects({'structure': CL.existingCollation}, data, []);
+            console.log(mergedCollationChunk);
+            if (mergedCollationChunk[0].start === 1 && preChunk.length > 0) {
+              if (preChunk[preChunk.length -1].end%2 === 0) {
+                mergedCollationChunk[0].start === preChunk[preChunk.length -1].end + 1;
+                mergedCollationChunk[0].end === preChunk[preChunk.length -1].end + 1;
+                mergedCollationChunk[0].first_word_index = mergedCollationChunk[0].end + '.1';
+              } else {
+                mergedCollationChunk[0].start === preChunk[preChunk.length -1].end;
+                mergedCollationChunk[0].end === preChunk[preChunk.length -1].end;
+                mergedCollationChunk[0].first_word_index = SV._incrementSubIndex(preChunk[preChunk.length -1].first_word_index, 1);
+              }
+            }
+            console.log(mergedCollationChunk);
+            CL.existingCollation.apparatus = preChunk.concat(mergedCollationChunk, postChunk);
+            console.log(CL.existingCollation.apparatus);
+            CL.data = JSON.parse(JSON.stringify(CL.existingCollation));
+            SV.showSetVariantsData();
           });
         }  
       });
-      // add the data back in
-
-      SV.showSetVariantsData();
     },
 
     _getWitnessIndexesForHand: function(unit, hand) {

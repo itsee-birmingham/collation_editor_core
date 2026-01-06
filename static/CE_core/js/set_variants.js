@@ -4984,7 +4984,7 @@ var SV = (function() {
     },
 
     _removeOverlap: function(index) {
-      let apparatusNum, appId, witId, tokens;
+      let apparatusNum, appId, witId, tokens, lacOmDetails;
       spinner.showLoadingOverlay();
       // find the correct apparatus
       if (index.match(/-app-/g)) {
@@ -4995,6 +4995,7 @@ var SV = (function() {
         console.log('removeOverlap function makes no sense for a top line unit.');
         return;
       }
+      // remove the relevant witnesses from the section of the collation representing the overlap
       const overlapUnit = CL.data[appId][index];
       const overlapId = overlapUnit._id;
       const range = SV._findOverlappedRange(overlapId);
@@ -5011,16 +5012,22 @@ var SV = (function() {
           CL.removeNullItems(CL.data.apparatus);
         }
       }
-      // now add them back in!
+      // now add them back in
       // get the data and split out just the sections we need (details in wordRanges)
       CL.dataSettings.witness_list = [];
+      const lacWitnesses = {};
       for (const wit of witnesses) {
         CL.dataSettings.witness_list.push(CL.data.hand_id_map[wit]);
+        // if (wordRanges[wit][2] !== null) {
+        //   lacWitnesses[wit] = CL.data.hand_id_map[wit];
+        // }
       }
       if (CL.dataSettings.witness_list.indexOf(CL.dataSettings.base_text) === -1) {
         CL.dataSettings.witness_list.push(CL.dataSettings.base_text);
       }
       CL.services.getUnitData(CL.context, CL.dataSettings.witness_list, function (collationData) {
+        console.log(JSON.parse(JSON.stringify(collationData)))
+        console.log('^^^^^^^^^')
         for (let entry of collationData.results) {
           for (let j = 0; j < entry.witnesses.length; j += 1) {
             // collate just the hands we need
@@ -5028,7 +5035,8 @@ var SV = (function() {
             if (witId !== CL.data.overtext_name && witnesses.indexOf(witId) === -1) {
               entry.witnesses[j] = null;
             } else if (witId !== CL.data.overtext_name && wordRanges[witId][2] !== null) { // this is lac or om for the chunk so don't collate
-              entry.witnesses[j] = null;
+              entry.witnesses[j].tokens = [];
+              lacOmDetails = wordRanges[witId][2]; // they should all be the same
             } else {
               // collate just the text chunk we need
               tokens = entry.witnesses[j].tokens.filter(
@@ -5038,68 +5046,72 @@ var SV = (function() {
             }
           } 
         }
+        console.log(JSON.parse(JSON.stringify(collationData)))
+        console.log('~~~~~~~~~~~~')
         const filteredCollationData = {'results': []};
         for (let entry of collationData.results) {
           if (entry.witnesses.filter(x => x !== null).length > 0) {
             filteredCollationData.results.push(entry);
           }
         }
+        
+        console.log(JSON.parse(JSON.stringify(filteredCollationData)))
+        console.log('##########')
         CL.existingCollation = JSON.parse(JSON.stringify(CL.data));
-        if (filteredCollationData.results.length === 1) {
-          // then there is no point collating because this is just the basetext
-          console.log(filteredCollationData);
-          console.log('not collating this');
-        } else {
-          console.log(filteredCollationData);
-          console.log('I will collate this');
-          CL.collateData = {
-            'data': filteredCollationData.results,
-            'lac_witnesses': {}
-          };
-          RG.runCollation(CL.collateData, 'remove_overlap', 0, function(data) {
-            console.log(data);
-            // set up
-            CL.data = data; // temporary assignment to allow all the cleaning functions to work
-            CL.lacOmFix();
-            // copy so we can change CL.data without screwing this up
-            data = JSON.parse(JSON.stringify(CL.data));
-            console.log(CL.existingCollation);
-            const originalApparatus = JSON.parse(JSON.stringify(CL.existingCollation.apparatus));
-            const preChunk = originalApparatus.slice(0, range[0]);
-            const postChunk = originalApparatus.slice(range[1]+ 1);
-            // add the data back in
-            // just get the chunk we need to change
-            const chunk = CL.existingCollation.apparatus.slice(range[0], range[1] + 1);
-            if (data.apparatus[0].start === 1 && preChunk.length > 0) {
-              if (preChunk[preChunk.length -1].end % 2 === 0) {
-                data.apparatus[0].start = preChunk[preChunk.length -1].end + 1;
-                data.apparatus[0].end = preChunk[preChunk.length -1].end + 1;
-                data.apparatus[0].first_word_index = data.apparatus[0].end + '.1';
-              } else {
-                data.apparatus[0].start = preChunk[preChunk.length -1].end;
-                data.apparatus[0].end = preChunk[preChunk.length -1].end;
-                data.apparatus[0].first_word_index = SV._incrementSubIndex(preChunk[preChunk.length -1].first_word_index, 1);
-              }
+        CL.collateData = {
+          'data': filteredCollationData.results,
+          'lac_witnesses': lacWitnesses
+        };
+        RG.runCollation(CL.collateData, 'remove_overlap', 0, function(data) {
+          // set up
+          CL.data = data; // temporary assignment to allow all the cleaning functions to work
+          console.log(JSON.parse(JSON.stringify(data)));
+          console.log('****')
+          CL.lacOmFix();
+
+          // copy so we can change CL.data without screwing this up
+          data = JSON.parse(JSON.stringify(CL.data));
+          const originalApparatus = JSON.parse(JSON.stringify(CL.existingCollation.apparatus));
+          const preChunk = originalApparatus.slice(0, range[0]);
+          const postChunk = originalApparatus.slice(range[1]+ 1);
+          // add the data back in
+          // just get the chunk we need to change
+          const chunk = CL.existingCollation.apparatus.slice(range[0], range[1] + 1);
+          if (data.apparatus[0].start === 1 && preChunk.length > 0) {
+            if (preChunk[preChunk.length -1].end % 2 === 0) {
+              data.apparatus[0].start = preChunk[preChunk.length -1].end + 1;
+              data.apparatus[0].end = preChunk[preChunk.length -1].end + 1;
+              data.apparatus[0].first_word_index = data.apparatus[0].end + '.1';
+            } else {
+              data.apparatus[0].start = preChunk[preChunk.length -1].end;
+              data.apparatus[0].end = preChunk[preChunk.length -1].end;
+              data.apparatus[0].first_word_index = SV._incrementSubIndex(preChunk[preChunk.length -1].first_word_index, 1);
             }
-            const mergedCollationChunk = CL._mergeCollationObjects(
-              {'structure': {'apparatus': chunk, 'lac_readings': [], 'om_readings': []}}, data, [], data.apparatus[0].start, data.apparatus[data.apparatus.length - 1].end
-            );
-            CL.existingCollation.apparatus = preChunk.concat(mergedCollationChunk.structure.apparatus, postChunk);
-            console.log(CL.existingCollation.apparatus);
-            CL.data = JSON.parse(JSON.stringify(CL.existingCollation));
-            console.log('#############')
-            console.log(JSON.parse(JSON.stringify(CL.data)));
-            console.log('#############')
-            const options = {};
-            if (SV.checkIds()[0]) {
-              CL.addUnitAndReadingIds();
-            }
-            SV.checkBugStatus('loaded', 'saved version');
-            options.container = CL.container;
-            SV.showSetVariants(options);
-            
-          });
-        }  
+          }
+          const mergedCollationChunk = CL._mergeCollationObjects(
+            {'structure': {'apparatus': chunk, 'lac_readings': [], 'om_readings': []}},
+            data,
+            [],
+            data.apparatus[0].start,
+            data.apparatus[data.apparatus.length - 1].end,
+            lacOmDetails
+          );
+          CL.existingCollation.apparatus = preChunk.concat(mergedCollationChunk.structure.apparatus, postChunk);
+          CL.data = JSON.parse(JSON.stringify(CL.existingCollation));
+          console.log('######################')
+          console.log(CL.data);
+          console.log('######################')
+          CL.lacOmFix(); // call this again on the full collation
+          const options = {};
+          // add in any missing _ids attributes
+          if (SV.checkIds()[0]) {
+            CL.addUnitAndReadingIds();
+          }
+          SV.checkBugStatus('loaded', 'saved version');
+          options.container = CL.container;
+          SV.showSetVariants(options);
+        });
+        
       });
     },
 

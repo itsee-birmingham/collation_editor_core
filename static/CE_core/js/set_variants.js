@@ -5065,31 +5065,39 @@ var SV = (function() {
             data = JSON.parse(JSON.stringify(CL.data));
             console.log(CL.existingCollation);
             const originalApparatus = JSON.parse(JSON.stringify(CL.existingCollation.apparatus));
-            const preChunk = originalApparatus.slice(0, range[0] + 1);
-            const postChunk = originalApparatus.slice(range[1]);
+            const preChunk = originalApparatus.slice(0, range[0]);
+            const postChunk = originalApparatus.slice(range[1]+ 1);
             // add the data back in
             // just get the chunk we need to change
-            //const chunk = CL.existingCollation.apparatus.slice(range[0], range[1] + 1);
-            
-            console.log(CL.existingCollation);
-            const mergedCollationChunk = CL._mergeCollationObjects({'structure': CL.existingCollation}, data, []);
-            console.log(mergedCollationChunk);
-            if (mergedCollationChunk[0].start === 1 && preChunk.length > 0) {
-              if (preChunk[preChunk.length -1].end%2 === 0) {
-                mergedCollationChunk[0].start === preChunk[preChunk.length -1].end + 1;
-                mergedCollationChunk[0].end === preChunk[preChunk.length -1].end + 1;
-                mergedCollationChunk[0].first_word_index = mergedCollationChunk[0].end + '.1';
+            const chunk = CL.existingCollation.apparatus.slice(range[0], range[1] + 1);
+            if (data.apparatus[0].start === 1 && preChunk.length > 0) {
+              if (preChunk[preChunk.length -1].end % 2 === 0) {
+                data.apparatus[0].start = preChunk[preChunk.length -1].end + 1;
+                data.apparatus[0].end = preChunk[preChunk.length -1].end + 1;
+                data.apparatus[0].first_word_index = data.apparatus[0].end + '.1';
               } else {
-                mergedCollationChunk[0].start === preChunk[preChunk.length -1].end;
-                mergedCollationChunk[0].end === preChunk[preChunk.length -1].end;
-                mergedCollationChunk[0].first_word_index = SV._incrementSubIndex(preChunk[preChunk.length -1].first_word_index, 1);
+                data.apparatus[0].start = preChunk[preChunk.length -1].end;
+                data.apparatus[0].end = preChunk[preChunk.length -1].end;
+                data.apparatus[0].first_word_index = SV._incrementSubIndex(preChunk[preChunk.length -1].first_word_index, 1);
               }
             }
-            console.log(mergedCollationChunk);
-            CL.existingCollation.apparatus = preChunk.concat(mergedCollationChunk, postChunk);
+            const mergedCollationChunk = CL._mergeCollationObjects(
+              {'structure': {'apparatus': chunk, 'lac_readings': [], 'om_readings': []}}, data, [], data.apparatus[0].start, data.apparatus[data.apparatus.length - 1].end
+            );
+            CL.existingCollation.apparatus = preChunk.concat(mergedCollationChunk.structure.apparatus, postChunk);
             console.log(CL.existingCollation.apparatus);
             CL.data = JSON.parse(JSON.stringify(CL.existingCollation));
-            SV.showSetVariantsData();
+            console.log('#############')
+            console.log(JSON.parse(JSON.stringify(CL.data)));
+            console.log('#############')
+            const options = {};
+            if (SV.checkIds()[0]) {
+              CL.addUnitAndReadingIds();
+            }
+            SV.checkBugStatus('loaded', 'saved version');
+            options.container = CL.container;
+            SV.showSetVariants(options);
+            
           });
         }  
       });

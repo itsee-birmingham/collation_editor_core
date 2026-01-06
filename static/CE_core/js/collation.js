@@ -3918,7 +3918,9 @@ var CL = (function() {
       }
     },
 
-    _mergeCollationObjects: function(mainCollation, newData, addedWits) {
+    _mergeCollationObjects: function(mainCollation, newData, addedWits, startIndex, endIndex) {
+      // start and end index must be supplied if we are merging a partial section (used when removing
+      // overlappingreadings) for full verse merges we can calculate from the data.
       let index, newUnit, existingUnit, newUnits, existingUnits, newReadingText,
         matchingReadingFound, unitQueue, nextUnits, unit1, unit2, tempUnit, omReading,
         existingWitnesses, before, after, beforeIds, afterIds,
@@ -3955,10 +3957,14 @@ var CL = (function() {
       // if in existing and not new add new as om/lac verse/om_verse
       // if in new and not existing all existing needs to be om lac verse/om verse
       // make reading for any combined or shared units and check against existing readings
-      index = 1;  // this refers to the position indicated by numbers under the basetext
-      while (index <= (newData.overtext[0].tokens.length * 2) + 1) {
+      if (startIndex === undefined) {
+        index = 1; // this refers to the position indicated by numbers under the basetext
+        endIndex = (newData.overtext[0].tokens.length * 2) + 1
+      } else {
+        index = startIndex;
+      } 
+      while (index <= endIndex) {
         // if new data has one then
-  
         newUnits = CL._getUnitsByStartIndex(index, newData.apparatus);
         existingUnits = CL._getUnitsByStartIndex(index, mainCollation.structure.apparatus);
         if (newUnits.length === 0 && existingUnits.length === 0) {
@@ -3975,7 +3981,6 @@ var CL = (function() {
           } else {
             if (newUnit === null) {
               omReading = null;
-              console.log(existingUnit)
               for (let i = 0; i < existingUnit.readings.length; i += 1) {
                 // NB: this last condition should not be needed but before 26/09/21 the code was incorrectly
                 // adding type="om" to readings even if they had text when they were combined/moved above an overlap

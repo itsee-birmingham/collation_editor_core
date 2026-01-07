@@ -4779,7 +4779,7 @@ var SV = (function() {
           const unitNumber = div.id.replace('drag-unit-', '');
           const dataCopy = JSON.parse(JSON.stringify(CL.data));
           try {
-            SV._removeOverlap(unitNumber);
+            SV._removeOverlap(unitNumber, dataCopy);
           } catch (err) {
             console.log(err);
             alert('The overlapping unit could not be deleted.');
@@ -4983,8 +4983,8 @@ var SV = (function() {
       }
     },
 
-    _removeOverlap: function(index) {
-      let apparatusNum, appId, witId, tokens, lacOmDetails;
+    _removeOverlap: function(index, originalData) {
+      let apparatusNum, appId, witId, tokens;
       spinner.showLoadingOverlay();
       // find the correct apparatus
       if (index.match(/-app-/g)) {
@@ -5001,6 +5001,7 @@ var SV = (function() {
       const range = SV._findOverlappedRange(overlapId);
       const witnesses = SV._getAllUnitWitnesses(overlapUnit).filter(x => x !== CL.data.overtext_name);
       const wordRanges = {};
+      const lacOmDetails = [];
       wordRanges['basetext'] = SV._getWitnessIndexesForHand(overlapUnit, 'basetext');
       for (const hand of witnesses) {
         wordRanges[hand] = SV._getWitnessIndexesForHand(overlapUnit, hand);
@@ -5018,13 +5019,11 @@ var SV = (function() {
       const lacWitnesses = {};
       for (const wit of witnesses) {
         CL.dataSettings.witness_list.push(CL.data.hand_id_map[wit]);
-        // if (wordRanges[wit][2] !== null) {
-        //   lacWitnesses[wit] = CL.data.hand_id_map[wit];
-        // }
       }
       if (CL.dataSettings.witness_list.indexOf(CL.dataSettings.base_text) === -1) {
         CL.dataSettings.witness_list.push(CL.dataSettings.base_text);
       }
+
       CL.services.getUnitData(CL.context, CL.dataSettings.witness_list, function (collationData) {
         console.log(JSON.parse(JSON.stringify(collationData)))
         console.log('^^^^^^^^^')
@@ -5036,7 +5035,10 @@ var SV = (function() {
               entry.witnesses[j] = null;
             } else if (witId !== CL.data.overtext_name && wordRanges[witId][2] !== null) { // this is lac or om for the chunk so don't collate
               entry.witnesses[j].tokens = [];
-              lacOmDetails = wordRanges[witId][2]; // they should all be the same
+              entry.witnesses[j].gap_reading = 'for_fixing';
+              if (lacOmDetails.indexOf(wordRanges[witId][2].join('|')) === -1) {
+                lacOmDetails.push(wordRanges[witId][2].join('|'));
+              }
             } else {
               // collate just the text chunk we need
               tokens = entry.witnesses[j].tokens.filter(
@@ -5046,6 +5048,12 @@ var SV = (function() {
             }
           } 
         }
+        if (lacOmDetails.length > 1) {
+          alert('This overlapping unit cannot be removed because it contains different types of empty readings.');
+          CL.data = originalData;
+          SV.showSetVariantsData();
+          return;
+        }
         console.log(JSON.parse(JSON.stringify(collationData)))
         console.log('~~~~~~~~~~~~')
         const filteredCollationData = {'results': []};
@@ -5053,8 +5061,7 @@ var SV = (function() {
           if (entry.witnesses.filter(x => x !== null).length > 0) {
             filteredCollationData.results.push(entry);
           }
-        }
-        
+        }  
         console.log(JSON.parse(JSON.stringify(filteredCollationData)))
         console.log('##########')
         CL.existingCollation = JSON.parse(JSON.stringify(CL.data));
@@ -5067,6 +5074,31 @@ var SV = (function() {
           CL.data = data; // temporary assignment to allow all the cleaning functions to work
           console.log(JSON.parse(JSON.stringify(data)));
           console.log('****')
+          // now sort out the gaps if we have an all gap chunk - they will always come back as lac but
+          // we need to check the original overlap info and change things accordingly
+          // if we have got this far then we only have a single category of gap reading to worry about
+          if (data.special_categories && data.special_categories.length > 0) {
+            const newReading = {
+              'text': [],
+              'type': lacOmDetails[0].split('|')[0],
+              'witnesses': JSON.parse(JSON.stringify(data.special_categories[0].witnesses))
+            };
+            if (lacOmDetails[0].split('|')[1] !== '') {
+              newReading.details = lacOmDetails[0].split('|')[1];
+            }
+            for (const unit of data.apparatus) {
+              console.log(unit)
+              unit.readings.push(JSON.parse(JSON.stringify(newReading)));
+            }
+            for (const hand of data.special_categories[0].witnesses) {
+              if (data.lac_readings.indexOf(hand) !== -1) {
+                data.lac_readings.splice(data.lac_readings.indexOf(hand), 1);
+              }
+            }
+          }
+          console.log(JSON.parse(JSON.stringify(data)));
+          console.log('POST OM FIX ABOVE')
+          
           CL.lacOmFix();
 
           // copy so we can change CL.data without screwing this up
@@ -5093,8 +5125,7 @@ var SV = (function() {
             data,
             [],
             data.apparatus[0].start,
-            data.apparatus[data.apparatus.length - 1].end,
-            lacOmDetails
+            data.apparatus[data.apparatus.length - 1].end
           );
           CL.existingCollation.apparatus = preChunk.concat(mergedCollationChunk.structure.apparatus, postChunk);
           CL.data = JSON.parse(JSON.stringify(CL.existingCollation));
@@ -5111,7 +5142,6 @@ var SV = (function() {
           options.container = CL.container;
           SV.showSetVariants(options);
         });
-        
       });
     },
 

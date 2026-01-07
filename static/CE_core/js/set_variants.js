@@ -4777,6 +4777,7 @@ var SV = (function() {
             return true;
           });
           const unitNumber = div.id.replace('drag-unit-', '');
+          SV._addToUndoStack(CL.data);
           const dataCopy = JSON.parse(JSON.stringify(CL.data));
           try {
             SV._removeOverlap(unitNumber, dataCopy);

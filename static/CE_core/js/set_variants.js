@@ -5016,7 +5016,6 @@ var SV = (function() {
       // now add them back in
       // get the data and split out just the sections we need (details in wordRanges)
       CL.dataSettings.witness_list = [];
-      const lacWitnesses = {};
       for (const wit of witnesses) {
         CL.dataSettings.witness_list.push(CL.data.hand_id_map[wit]);
       }
@@ -5025,8 +5024,7 @@ var SV = (function() {
       }
 
       CL.services.getUnitData(CL.context, CL.dataSettings.witness_list, function (collationData) {
-        console.log(JSON.parse(JSON.stringify(collationData)))
-        console.log('^^^^^^^^^')
+        const witnessesInData = [];
         for (let entry of collationData.results) {
           for (let j = 0; j < entry.witnesses.length; j += 1) {
             // collate just the hands we need
@@ -5039,13 +5037,21 @@ var SV = (function() {
               if (lacOmDetails.indexOf(wordRanges[witId][2].join('|')) === -1) {
                 lacOmDetails.push(wordRanges[witId][2].join('|'));
               }
+              witnessesInData.push(witId);
             } else {
               // collate just the text chunk we need
               tokens = entry.witnesses[j].tokens.filter(
                 x => parseInt(x.index) >= wordRanges[entry.witnesses[j].id][0] && parseInt(x.index) <= wordRanges[entry.witnesses[j].id][1]
               );
               entry.witnesses[j].tokens = tokens;
+              witnessesInData.push(witId);
             }
+          } 
+        }
+        const lacWitnesses = {};
+        for (const wit of witnesses) {
+          if (witnessesInData.indexOf(wit) === -1) {
+            lacWitnesses[wit] = CL.data.hand_id_map[wit];
           } 
         }
         if (lacOmDetails.length > 1) {
@@ -5054,16 +5060,13 @@ var SV = (function() {
           SV.showSetVariantsData();
           return;
         }
-        console.log(JSON.parse(JSON.stringify(collationData)))
-        console.log('~~~~~~~~~~~~')
         const filteredCollationData = {'results': []};
         for (let entry of collationData.results) {
-          if (entry.witnesses.filter(x => x !== null).length > 0) {
+          entry.witnesses = entry.witnesses.filter(x => x !== null)
+          if (entry.witnesses.length > 0) {         
             filteredCollationData.results.push(entry);
           }
-        }  
-        console.log(JSON.parse(JSON.stringify(filteredCollationData)))
-        console.log('##########')
+        }
         CL.existingCollation = JSON.parse(JSON.stringify(CL.data));
         CL.collateData = {
           'data': filteredCollationData.results,
@@ -5072,8 +5075,6 @@ var SV = (function() {
         RG.runCollation(CL.collateData, 'remove_overlap', 0, function(data) {
           // set up
           CL.data = data; // temporary assignment to allow all the cleaning functions to work
-          console.log(JSON.parse(JSON.stringify(data)));
-          console.log('****')
           // now sort out the gaps if we have an all gap chunk - they will always come back as lac but
           // we need to check the original overlap info and change things accordingly
           // if we have got this far then we only have a single category of gap reading to worry about
@@ -5087,7 +5088,6 @@ var SV = (function() {
               newReading.details = lacOmDetails[0].split('|')[1];
             }
             for (const unit of data.apparatus) {
-              console.log(unit)
               unit.readings.push(JSON.parse(JSON.stringify(newReading)));
             }
             for (const hand of data.special_categories[0].witnesses) {
@@ -5095,12 +5095,8 @@ var SV = (function() {
                 data.lac_readings.splice(data.lac_readings.indexOf(hand), 1);
               }
             }
-          }
-          console.log(JSON.parse(JSON.stringify(data)));
-          console.log('POST OM FIX ABOVE')
-          
+          }          
           CL.lacOmFix();
-
           // copy so we can change CL.data without screwing this up
           data = JSON.parse(JSON.stringify(CL.data));
           const originalApparatus = JSON.parse(JSON.stringify(CL.existingCollation.apparatus));
@@ -5129,9 +5125,6 @@ var SV = (function() {
           );
           CL.existingCollation.apparatus = preChunk.concat(mergedCollationChunk.structure.apparatus, postChunk);
           CL.data = JSON.parse(JSON.stringify(CL.existingCollation));
-          console.log('######################')
-          console.log(CL.data);
-          console.log('######################')
           CL.lacOmFix(); // call this again on the full collation
           const options = {};
           // add in any missing _ids attributes

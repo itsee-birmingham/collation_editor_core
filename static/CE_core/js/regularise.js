@@ -869,7 +869,6 @@ var RG = (function () {
         }
       }
       options.configs.algorithm_settings = algorithmSettings;
-      console.log(options.configs.algorithm_settings);
       if (output === 'remove_overlap') {
         options.configs.algorithm_settings.algorithm = 'dekker';
       }

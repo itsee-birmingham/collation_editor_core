@@ -3919,8 +3919,11 @@ var CL = (function() {
     },
 
     _mergeCollationObjects: function(mainCollation, newData, addedWits, startIndex, endIndex) {
-      // start and end index must be supplied if we are merging a partial section (used when removing
-      // overlappingreadings) for full verse merges we can calculate from the data.
+      /** This merges a new collation into an existing collation. This might be a full verse if we are in add witness
+      /* mode or a small chunk of a verse if we are removing an overlapping unit.
+      /* AddedWits should be an empty list if removing an overlapping unit.
+      /* start and end index must be supplied if we are merging a partial section (used when removing
+      /* overlappingreadings) for full verse merges we can calculate from the data. */
       let index, newUnit, existingUnit, newUnits, existingUnits, newReadingText,
         matchingReadingFound, unitQueue, nextUnits, unit1, unit2, tempUnit, omReading,
         existingWitnesses, before, after, beforeIds, afterIds,
@@ -3964,7 +3967,6 @@ var CL = (function() {
         index = startIndex;
       } 
       while (index <= endIndex) {
-        // if new data has one then
         newUnits = CL._getUnitsByStartIndex(index, newData.apparatus);
         existingUnits = CL._getUnitsByStartIndex(index, mainCollation.structure.apparatus);
         if (newUnits.length === 0 && existingUnits.length === 0) {
@@ -3974,7 +3976,6 @@ var CL = (function() {
           newUnit = z < newUnits.length ? newUnits[z] : null;
           existingUnit = z < existingUnits.length ? existingUnits[z] : null;
           if (existingUnit !== null && (newData.lac_readings.length > 0 || newData.om_readings.length > 0)) {
-            console.log('I am here and will run now')
             CL._mergeNewLacOmVerseReadings(existingUnit, newData);
           }
           if (newUnit === null && existingUnit === null) {
@@ -3992,7 +3993,6 @@ var CL = (function() {
                   omReading = existingUnit.readings[i];
                 }
               }
-
               if (omReading) {
                 // addedWits is identifiers rather than sigla for readings so use hand_id_map here instead
                 // we can assume that basetext is om in both cases as it is the same text so the check of exisitng
@@ -4193,7 +4193,8 @@ var CL = (function() {
     },
 
     _mergeNewLacOmVerseReadings: function(unit, newData) {
-      /** Merge any lac/om verse readings from the new data into the unit or add if no appropriate reading exists */
+      /** Merge any lac/om verse readings from the new data into the provided unit or add a new reading if no
+       * appropriate reading exists. */
       let lacsAdded, omsAdded;
       if (newData.lac_readings.length > 0) {
         lacsAdded = false;

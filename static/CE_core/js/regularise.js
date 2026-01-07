@@ -869,14 +869,9 @@ var RG = (function () {
         }
       }
       options.configs.algorithm_settings = algorithmSettings;
-      if (output === 'remove_overlap') {
-        options.configs.algorithm_settings.algorithm = 'dekker';
-      }
-
       if (Object.prototype.hasOwnProperty.call(CL.services, 'collatexHost')) {
         options.configs.collatexHost = CL.services.collatexHost;
       }
-
       if (output === 'add_witnesses' || output === 'remove_overlap') {
         options.configs.split_single_reading_units = true;
         resultCallback = function (data) {

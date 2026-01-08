@@ -1,6 +1,6 @@
 /* global QUnit, sinon, SV */
 
-QUnit.module('SV _reindexMovedReadingByMatching', function(hooks) {
+QUnit.module('SV _getSharedWordsList', function(hooks) {
 
     hooks.afterEach(function () {
         sinon.restore();

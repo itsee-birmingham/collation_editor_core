@@ -4985,6 +4985,15 @@ var SV = (function() {
     },
 
     _removeOverlap: function(index, originalData) {
+      /** Remove a current overlapping unit (activated from the right click context menu). Index is the id of the unit
+       * being removed. The witnesses in this reading are removed from the section of text included in the overlap and
+       * then that same chunk of text is recollated and merged back into the collation data. This reuses the code for
+       * removing and adding witnesses from a collation where ever possible. 
+       * 
+       * The originalData argument is a copy of the full CL.data structure from before we start the process so we
+       * can restore it if any errors happen along the way. Ideally the error could be thrown back to the place this
+       * function is called but the callback chain doesn't seem to allow that.
+       */
       let apparatusNum, appId, witId, tokens;
       spinner.showLoadingOverlay();
       // find the correct apparatus
@@ -4993,7 +5002,7 @@ var SV = (function() {
         index = parseInt(index.match(/\d+/g)[0], 10);
         appId = 'apparatus' + apparatusNum;
       } else {
-        console.log('removeOverlap function makes no sense for a top line unit.');
+        // removeOverlap function makes no sense for a top line unit.
         return;
       }
       // remove the relevant witnesses from the section of the collation representing the overlap
@@ -5075,10 +5084,11 @@ var SV = (function() {
         };
         RG.runCollation(CL.collateData, 'remove_overlap', 0, function(data) {
           // set up
-          CL.data = data; // temporary assignment to allow all the cleaning functions to work
-          // now sort out the gaps if we have an all gap chunk - they will always come back as lac but
-          // we need to check the original overlap info and change things accordingly
-          // if we have got this far then we only have a single category of gap reading to worry about
+          CL.data = data; // temporary assignment to allow all the cleaning functions to work.
+          /** Now sort out the gaps if we have an all gap chunk - they will always come back as lac but
+           * we need to check the original overlap info and change things accordingly.
+           * NB: If we have got this far then we only have a single category of gap reading to worry about.
+           */
           if (data.special_categories && data.special_categories.length > 0) {
             const newReading = {
               'text': [],

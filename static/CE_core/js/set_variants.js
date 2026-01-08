@@ -1617,7 +1617,7 @@ var SV = (function() {
       const distances = readingTexts.map(x => SV._levenstein(x, movedReadingText));
       let shortestDistance = distances.indexOf(Math.min(...distances));
       let closestReading = unit.readings[shortestDistance];
-      // if the reading we found is not yet indexed itself and options are still available then keep looking
+      // if the reading we found does not yet have index numbers for all of its words and other reading options are still available then keep looking
       while (
         distances.filter(x => x === Infinity).length < distances.length - 1 && 
         closestReading.text.map(x => x.index).filter(x => x === undefined).length === 0

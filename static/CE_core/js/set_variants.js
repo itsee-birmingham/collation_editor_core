@@ -1714,7 +1714,7 @@ var SV = (function() {
         if (previousIndex === -1) {
           previousIndex = mainIndexes.indexOf(missingIndexes[i] - 2);
         }
-        nextIndex = -1
+        nextIndex = -1;
         nextIndex = mainIndexes.indexOf(missingIndexes[i] + 1);
         if (nextIndex === -1) {
           nextIndex = mainIndexes.indexOf(missingIndexes[i] + 2);

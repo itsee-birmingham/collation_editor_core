@@ -5005,6 +5005,7 @@ var SV = (function() {
        */
       let apparatusNum, appId, witId, tokens;
       spinner.showLoadingOverlay();
+      SV.prepareForOperation();
       // find the correct apparatus
       if (index.match(/-app-/g)) {
         apparatusNum = parseInt(index.match(/\d+/g)[1], 10);

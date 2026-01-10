@@ -1036,6 +1036,15 @@ var SV = (function() {
             }
           }
           console.log('witnesses missing in unit ' + i);
+          const missing = [];
+          for (const sigla of totalSigla) {
+            if (witnesses.indexOf(sigla) === -1) {
+              if (sigla !== null) {
+                missing.push(sigla);
+              }
+            }
+          }
+          console.log('missing witnesses are ' + missing.join(', '));
           return false;
         }
       }

@@ -4700,7 +4700,11 @@ var SV = (function() {
       if (menuName === 'unit') {
         document.getElementById('context-menu').innerHTML = '<li id="split-words"><span>Split words</span></li><li id="split-readings"><span>Split readings</span></li>';
       } else if (menuName === 'overlap-unit') {
-        document.getElementById('context-menu').innerHTML = '<li id="split-readings"><span>Split readings</span></li><li id="remove-overlap"><span>Remove overlap</span></li>';
+        if (CL.witnessEditingMode === false) {
+          document.getElementById('context-menu').innerHTML = '<li id="split-readings"><span>Split readings</span></li><li id="remove-overlap"><span>Remove overlap</span></li>';
+        } else {
+          document.getElementById('context-menu').innerHTML = '<li id="split-readings"><span>Split readings</span></li>';
+        }
       } else if (menuName === 'subreading') {
         document.getElementById('context-menu').innerHTML = '<li id="make-main-reading"><span>Make main reading</span></li>';
       } else if (menuName === 'split-duplicate-unit') {

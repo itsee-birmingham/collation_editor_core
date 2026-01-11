@@ -5156,6 +5156,7 @@ var SV = (function() {
           if (SV.checkIds()[0]) {
             CL.addUnitAndReadingIds();
           }
+          SV.unprepareForOperation();
           SV.checkBugStatus('loaded', 'saved version');
           options.container = CL.container;
           SV.showSetVariants(options);

@@ -3991,6 +3991,7 @@ var CL = (function() {
                       !Object.prototype.hasOwnProperty.call(existingUnit.readings[i], 'overlap_status') &&
                       existingUnit.readings[i].text.length === 0) {
                   omReading = existingUnit.readings[i];
+                  break;  // if we don't break here then we might end up with regularised oms as the hit if the basetext is om
                 }
               }
               if (omReading) {

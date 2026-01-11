@@ -1,0 +1,1264 @@
+{
+	"input" : {
+		"witnesses": [
+		{
+			"tokens": [
+			{
+				"original": "כִּ֤י",
+				"t": "כִּ֤י",
+				"siglum": "HBCE Psalms (critical text)",
+				"index": "2",
+				"reading": "HBCE Psalms (critical text)",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"כִּ֤י"
+				]
+			},
+			{
+				"original": "אִ֥ם",
+				"t": "אִ֥ם",
+				"siglum": "HBCE Psalms (critical text)",
+				"index": "4",
+				"reading": "HBCE Psalms (critical text)",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"אִ֥ם"
+				]
+			},
+			{
+				"original": "בְּתוֹרַ֥ת",
+				"t": "בְּתוֹרַ֥ת",
+				"siglum": "HBCE Psalms (critical text)",
+				"index": "6",
+				"reading": "HBCE Psalms (critical text)",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"בְּתוֹרַ֥ת"
+				]
+			},
+			{
+				"original": "יְהוָ֗ה",
+				"t": "יְהוָ֗ה",
+				"siglum": "HBCE Psalms (critical text)",
+				"index": "8",
+				"reading": "HBCE Psalms (critical text)",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"יְהוָ֗ה"
+				]
+			},
+			{
+				"original": "חֶ֫פְצ֥וֹ",
+				"t": "חֶ֫פְצ֥וֹ",
+				"siglum": "HBCE Psalms (critical text)",
+				"index": "10",
+				"reading": "HBCE Psalms (critical text)",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"חֶ֫פְצ֥וֹ"
+				]
+			},
+			{
+				"original": "וּֽבְתוֹרָת֥וֹ",
+				"t": "וּֽבְתוֹרָת֥וֹ",
+				"siglum": "HBCE Psalms (critical text)",
+				"index": "12",
+				"reading": "HBCE Psalms (critical text)",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"וּֽבְתוֹרָת֥וֹ"
+				]
+			},
+			{
+				"original": "יֶהְגֶּ֗ה",
+				"t": "יֶהְגֶּ֗ה",
+				"siglum": "HBCE Psalms (critical text)",
+				"index": "14",
+				"reading": "HBCE Psalms (critical text)",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"יֶהְגֶּ֗ה"
+				]
+			},
+			{
+				"original": "יוֹמָ֥ם",
+				"t": "יוֹמָ֥ם",
+				"siglum": "HBCE Psalms (critical text)",
+				"index": "16",
+				"reading": "HBCE Psalms (critical text)",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"יוֹמָ֥ם"
+				]
+			},
+			{
+				"original": "וָלָֽיְלָה",
+				"t": "וָלָֽיְלָה",
+				"siglum": "HBCE Psalms (critical text)",
+				"index": "18",
+				"reading": "HBCE Psalms (critical text)",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"וָלָֽיְלָה"
+				]
+			}
+			],
+			"id": "HBCE Psalms (critical text)"
+		},
+		{
+			"tokens": [
+			{
+				"original": "כִּ֤י",
+				"t": "כִּ֤י",
+				"siglum": "ML",
+				"index": "2",
+				"reading": "ML",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"כִּ֤י"
+				]
+			},
+			{
+				"original": "אִ֥ם",
+				"t": "אִ֥ם",
+				"siglum": "ML",
+				"index": "4",
+				"reading": "ML",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"אִ֥ם"
+				]
+			},
+			{
+				"original": "בְּתוֹרַ֥ת",
+				"t": "בְּתוֹרַ֥ת",
+				"siglum": "ML",
+				"index": "6",
+				"reading": "ML",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"בְּתוֹרַ֥ת"
+				]
+			},
+			{
+				"original": "יְהוָ֗ה",
+				"t": "יְהוָ֗ה",
+				"siglum": "ML",
+				"index": "8",
+				"reading": "ML",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"יְהוָ֗ה"
+				]
+			},
+			{
+				"original": "חֶ֫פְצ֥וֹ",
+				"t": "חֶ֫פְצ֥וֹ",
+				"siglum": "ML",
+				"index": "10",
+				"reading": "ML",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"חֶ֫פְצ֥וֹ"
+				]
+			},
+			{
+				"original": "וּֽבְתוֹרָת֥וֹ",
+				"t": "וּֽבְתוֹרָת֥וֹ",
+				"siglum": "ML",
+				"index": "12",
+				"reading": "ML",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"וּֽבְתוֹרָת֥וֹ"
+				]
+			},
+			{
+				"original": "יֶהְגֶּ֗ה",
+				"t": "יֶהְגֶּ֗ה",
+				"siglum": "ML",
+				"index": "14",
+				"reading": "ML",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"יֶהְגֶּ֗ה"
+				]
+			},
+			{
+				"original": "יוֹמָ֥ם",
+				"t": "יוֹמָ֥ם",
+				"siglum": "ML",
+				"index": "16",
+				"reading": "ML",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"יוֹמָ֥ם"
+				]
+			},
+			{
+				"original": "וָלָֽיְלָה",
+				"t": "וָלָֽיְלָה",
+				"siglum": "ML",
+				"index": "18",
+				"reading": "ML",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"וָלָֽיְלָה"
+				]
+			}
+			],
+			"id": "ML"
+		},
+		{
+			"tokens": [
+			{
+				"original": "כִּ֤י",
+				"t": "כִּ֤י",
+				"siglum": "MA",
+				"index": "2",
+				"reading": "MA",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"כִּ֤י"
+				]
+			},
+			{
+				"original": "אִ֥ם",
+				"t": "אִ֥ם",
+				"siglum": "MA",
+				"index": "4",
+				"reading": "MA",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"אִ֥ם"
+				]
+			},
+			{
+				"original": "בְּתוֹרַ֥ת",
+				"t": "בְּתוֹרַ֥ת",
+				"siglum": "MA",
+				"index": "6",
+				"reading": "MA",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"בְּתוֹרַ֥ת"
+				]
+			},
+			{
+				"original": "יְהוָ֗ה",
+				"t": "יְהוָ֗ה",
+				"siglum": "MA",
+				"index": "8",
+				"reading": "MA",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"יְהוָ֗ה"
+				]
+			},
+			{
+				"original": "חֶ֫פְצ֥וֹ",
+				"t": "חֶ֫פְצ֥וֹ",
+				"siglum": "MA",
+				"index": "10",
+				"reading": "MA",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"חֶ֫פְצ֥וֹ"
+				]
+			},
+			{
+				"original": "וּֽבְתוֹרָת֥וֹ",
+				"t": "וּֽבְתוֹרָת֥וֹ",
+				"siglum": "MA",
+				"index": "12",
+				"reading": "MA",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"וּֽבְתוֹרָת֥וֹ"
+				]
+			},
+			{
+				"original": "יֶהְגֶּ֗ה",
+				"t": "יֶהְגֶּ֗ה",
+				"siglum": "MA",
+				"index": "14",
+				"reading": "MA",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"יֶהְגֶּ֗ה"
+				]
+			},
+			{
+				"original": "יוֹמָ֥ם",
+				"t": "יוֹמָ֥ם",
+				"siglum": "MA",
+				"index": "16",
+				"reading": "MA",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"יוֹמָ֥ם"
+				]
+			},
+			{
+				"original": "וָלָֽיְלָה",
+				"t": "וָלָֽיְלָה",
+				"siglum": "MA",
+				"index": "18",
+				"reading": "MA",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"וָלָֽיְלָה"
+				]
+			}
+			],
+			"id": "MA"
+		},
+		{
+			"tokens": [
+			{
+				"original": "כִּ֤י",
+				"t": "כִּ֤י",
+				"siglum": "ME",
+				"index": "2",
+				"reading": "ME",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"כִּ֤י"
+				]
+			},
+			{
+				"original": "אִ֥ם",
+				"t": "אִ֥ם",
+				"siglum": "ME",
+				"index": "4",
+				"reading": "ME",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"אִ֥ם"
+				]
+			},
+			{
+				"original": "בְּֽתּוֹרַ֬ת",
+				"t": "בְּֽתּוֹרַ֬ת",
+				"siglum": "ME",
+				"index": "6",
+				"reading": "ME",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"בְּֽתּוֹרַ֬ת",
+				"בְּתוֹרַ֥ת"
+				],
+				"n": "בְּתוֹרַ֥ת",
+				"decision_class": [
+				"regularised"
+				],
+				"decision_details": [
+				{
+					"class": "regularised",
+					"scope": "verse",
+					"id": "218704",
+					"t": "בְּֽתּוֹרַ֬ת",
+					"n": "בְּתוֹרַ֥ת"
+				}
+				]
+			},
+			{
+				"original": "יְהוָ֗ה",
+				"t": "יְהוָ֗ה",
+				"siglum": "ME",
+				"index": "8",
+				"reading": "ME",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"יְהוָ֗ה"
+				]
+			},
+			{
+				"original": "חֶ֫פְצ֥וֹ",
+				"t": "חֶ֫פְצ֥וֹ",
+				"siglum": "ME",
+				"index": "10",
+				"reading": "ME",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"חֶ֫פְצ֥וֹ"
+				]
+			},
+			{
+				"original": "וּבְתֽוֹרָת֥וֹ",
+				"t": "וּבְתֽוֹרָת֥וֹ",
+				"siglum": "ME",
+				"index": "12",
+				"reading": "ME",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"וּבְתֽוֹרָת֥וֹ",
+				"וּֽבְתוֹרָת֥וֹ"
+				],
+				"n": "וּֽבְתוֹרָת֥וֹ",
+				"decision_class": [
+				"regularised"
+				],
+				"decision_details": [
+				{
+					"class": "regularised",
+					"scope": "verse",
+					"id": "218708",
+					"t": "וּבְתֽוֹרָת֥וֹ",
+					"n": "וּֽבְתוֹרָת֥וֹ"
+				}
+				]
+			},
+			{
+				"original": "יֶהְגֶּ֗ה",
+				"t": "יֶהְגֶּ֗ה",
+				"siglum": "ME",
+				"index": "14",
+				"reading": "ME",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"יֶהְגֶּ֗ה"
+				]
+			},
+			{
+				"original": "יוֹמָ֥ם",
+				"t": "יוֹמָ֥ם",
+				"siglum": "ME",
+				"index": "16",
+				"reading": "ME",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"יוֹמָ֥ם"
+				]
+			},
+			{
+				"original": "וָלָֽיְלָה",
+				"t": "וָלָֽיְלָה",
+				"siglum": "ME",
+				"index": "18",
+				"reading": "ME",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"וָלָֽיְלָה"
+				]
+			}
+			],
+			"id": "ME"
+		},
+		{
+			"tokens": [
+			{
+				"original": "אילהן",
+				"t": "אילהן",
+				"siglum": "T",
+				"index": "2",
+				"reading": "T-firsthand",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"אילהן"
+				]
+			},
+			{
+				"original": "בנמוסא",
+				"t": "בנמוסא",
+				"siglum": "T",
+				"index": "4",
+				"reading": "T-firsthand",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"בנמוסא"
+				]
+			},
+			{
+				"original": "דייי",
+				"t": "דייי",
+				"siglum": "T",
+				"index": "6",
+				"reading": "T-firsthand",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"דייי"
+				]
+			},
+			{
+				"original": "רעותיה",
+				"t": "רעותיה",
+				"siglum": "T",
+				"index": "8",
+				"reading": "T-firsthand",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"רעותיה"
+				]
+			},
+			{
+				"original": "ובאוריתיה",
+				"t": "ובאוריתיה",
+				"siglum": "T",
+				"index": "10",
+				"reading": "T-firsthand",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"ובאוריתיה"
+				]
+			},
+			{
+				"original": "מרנין",
+				"t": "מרנין",
+				"siglum": "T",
+				"index": "12",
+				"reading": "T-firsthand",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"מרנין"
+				]
+			},
+			{
+				"original": "יומם",
+				"t": "יומם",
+				"siglum": "T",
+				"index": "14",
+				"reading": "T-firsthand",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"יומם"
+				]
+			},
+			{
+				"original": "ולילי",
+				"t": "ולילי",
+				"siglum": "T",
+				"index": "16",
+				"reading": "T-firsthand",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"ולילי"
+				]
+			}
+			],
+			"id": "T-firsthand"
+		},
+		{
+			"tokens": [
+			{
+				"original": "אילהן",
+				"t": "אילהן",
+				"siglum": "T",
+				"index": "2",
+				"reading": "T-corrector",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"אילהן"
+				]
+			},
+			{
+				"original": "בנמוסא",
+				"t": "בנמוסא",
+				"siglum": "T",
+				"index": "4",
+				"reading": "T-corrector",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"בנמוסא"
+				]
+			},
+			{
+				"original": "דייי",
+				"t": "דייי",
+				"siglum": "T",
+				"index": "6",
+				"reading": "T-corrector",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"דייי"
+				]
+			},
+			{
+				"original": "רעותיה",
+				"t": "רעותיה",
+				"siglum": "T",
+				"index": "8",
+				"reading": "T-corrector",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"רעותיה"
+				]
+			},
+			{
+				"original": "ובאוריתיה",
+				"t": "ובאוריתיה",
+				"siglum": "T",
+				"index": "10",
+				"reading": "T-corrector",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"ובאוריתיה"
+				]
+			},
+			{
+				"original": "מרנין",
+				"t": "מרנין",
+				"siglum": "T",
+				"index": "12",
+				"reading": "T-corrector",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"מרנין"
+				]
+			},
+			{
+				"original": "יימם",
+				"t": "יימם",
+				"siglum": "T",
+				"index": "14",
+				"reading": "T-corrector",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"יימם"
+				]
+			},
+			{
+				"original": "ולילי",
+				"t": "ולילי",
+				"siglum": "T",
+				"index": "16",
+				"reading": "T-corrector",
+				"verse": "Ps.1.2",
+				"rule_match": [
+				"ולילי"
+				]
+			}
+			],
+			"id": "T-corrector"
+		}
+		]
+	},
+	"basetext_siglum" : "HBCE Psalms (critical text)",
+	"ai_comments" : "",
+	"output" : {
+		"witnesses": [
+			"HBCE Psalms (critical text)",
+			"MA",
+			"ME",
+			"ML",
+			"T-corrector",
+			"T-firsthand"
+		],
+		"table": [
+			[
+				[
+					{
+						"original": "כִּ֤י",
+						"t": "כִּ֤י",
+						"siglum": "HBCE Psalms (critical text)",
+						"index": "2",
+						"reading": "HBCE Psalms (critical text)",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"כִּ֤י"
+						]
+					},
+					{
+						"original": "אִ֥ם",
+						"t": "אִ֥ם",
+						"siglum": "HBCE Psalms (critical text)",
+						"index": "4",
+						"reading": "HBCE Psalms (critical text)",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"אִ֥ם"
+						]
+					},
+					{
+						"original": "בְּתוֹרַ֥ת",
+						"t": "בְּתוֹרַ֥ת",
+						"siglum": "HBCE Psalms (critical text)",
+						"index": "6",
+						"reading": "HBCE Psalms (critical text)",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"בְּתוֹרַ֥ת"
+						]
+					},
+					{
+						"original": "יְהוָ֗ה",
+						"t": "יְהוָ֗ה",
+						"siglum": "HBCE Psalms (critical text)",
+						"index": "8",
+						"reading": "HBCE Psalms (critical text)",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"יְהוָ֗ה"
+						]
+					},
+					{
+						"original": "חֶ֫פְצ֥וֹ",
+						"t": "חֶ֫פְצ֥וֹ",
+						"siglum": "HBCE Psalms (critical text)",
+						"index": "10",
+						"reading": "HBCE Psalms (critical text)",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"חֶ֫פְצ֥וֹ"
+						]
+					},
+					{
+						"original": "וּֽבְתוֹרָת֥וֹ",
+						"t": "וּֽבְתוֹרָת֥וֹ",
+						"siglum": "HBCE Psalms (critical text)",
+						"index": "12",
+						"reading": "HBCE Psalms (critical text)",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"וּֽבְתוֹרָת֥וֹ"
+						]
+					},
+					{
+						"original": "יֶהְגֶּ֗ה",
+						"t": "יֶהְגֶּ֗ה",
+						"siglum": "HBCE Psalms (critical text)",
+						"index": "14",
+						"reading": "HBCE Psalms (critical text)",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"יֶהְגֶּ֗ה"
+						]
+					},
+					{
+						"original": "יוֹמָ֥ם",
+						"t": "יוֹמָ֥ם",
+						"siglum": "HBCE Psalms (critical text)",
+						"index": "16",
+						"reading": "HBCE Psalms (critical text)",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"יוֹמָ֥ם"
+						]
+					},
+					{
+						"original": "וָלָֽיְלָה",
+						"t": "וָלָֽיְלָה",
+						"siglum": "HBCE Psalms (critical text)",
+						"index": "18",
+						"reading": "HBCE Psalms (critical text)",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"וָלָֽיְלָה"
+						]
+					}
+				],
+				[
+					{
+						"original": "כִּ֤י",
+						"t": "כִּ֤י",
+						"siglum": "MA",
+						"index": "2",
+						"reading": "MA",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"כִּ֤י"
+						]
+					},
+					{
+						"original": "אִ֥ם",
+						"t": "אִ֥ם",
+						"siglum": "MA",
+						"index": "4",
+						"reading": "MA",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"אִ֥ם"
+						]
+					},
+					{
+						"original": "בְּתוֹרַ֥ת",
+						"t": "בְּתוֹרַ֥ת",
+						"siglum": "MA",
+						"index": "6",
+						"reading": "MA",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"בְּתוֹרַ֥ת"
+						]
+					},
+					{
+						"original": "יְהוָ֗ה",
+						"t": "יְהוָ֗ה",
+						"siglum": "MA",
+						"index": "8",
+						"reading": "MA",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"יְהוָ֗ה"
+						]
+					},
+					{
+						"original": "חֶ֫פְצ֥וֹ",
+						"t": "חֶ֫פְצ֥וֹ",
+						"siglum": "MA",
+						"index": "10",
+						"reading": "MA",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"חֶ֫פְצ֥וֹ"
+						]
+					},
+					{
+						"original": "וּֽבְתוֹרָת֥וֹ",
+						"t": "וּֽבְתוֹרָת֥וֹ",
+						"siglum": "MA",
+						"index": "12",
+						"reading": "MA",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"וּֽבְתוֹרָת֥וֹ"
+						]
+					},
+					{
+						"original": "יֶהְגֶּ֗ה",
+						"t": "יֶהְגֶּ֗ה",
+						"siglum": "MA",
+						"index": "14",
+						"reading": "MA",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"יֶהְגֶּ֗ה"
+						]
+					},
+					{
+						"original": "יוֹמָ֥ם",
+						"t": "יוֹמָ֥ם",
+						"siglum": "MA",
+						"index": "16",
+						"reading": "MA",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"יוֹמָ֥ם"
+						]
+					},
+					{
+						"original": "וָלָֽיְלָה",
+						"t": "וָלָֽיְלָה",
+						"siglum": "MA",
+						"index": "18",
+						"reading": "MA",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"וָלָֽיְלָה"
+						]
+					}
+				],
+				[
+					{
+						"original": "כִּ֤י",
+						"t": "כִּ֤י",
+						"siglum": "ME",
+						"index": "2",
+						"reading": "ME",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"כִּ֤י"
+						]
+					},
+					{
+						"original": "אִ֥ם",
+						"t": "אִ֥ם",
+						"siglum": "ME",
+						"index": "4",
+						"reading": "ME",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"אִ֥ם"
+						]
+					},
+					{
+						"original": "בְּֽתּוֹרַ֬ת",
+						"t": "בְּֽתּוֹרַ֬ת",
+						"siglum": "ME",
+						"index": "6",
+						"reading": "ME",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"בְּֽתּוֹרַ֬ת",
+							"בְּתוֹרַ֥ת"
+						],
+						"n": "בְּתוֹרַ֥ת",
+						"decision_class": [
+							"regularised"
+						],
+						"decision_details": [
+							{
+								"class": "regularised",
+								"scope": "verse",
+								"id": "218704",
+								"t": "בְּֽתּוֹרַ֬ת",
+								"n": "בְּתוֹרַ֥ת"
+							}
+						]
+					},
+					{
+						"original": "יְהוָ֗ה",
+						"t": "יְהוָ֗ה",
+						"siglum": "ME",
+						"index": "8",
+						"reading": "ME",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"יְהוָ֗ה"
+						]
+					},
+					{
+						"original": "חֶ֫פְצ֥וֹ",
+						"t": "חֶ֫פְצ֥וֹ",
+						"siglum": "ME",
+						"index": "10",
+						"reading": "ME",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"חֶ֫פְצ֥וֹ"
+						]
+					},
+					{
+						"original": "וּבְתֽוֹרָת֥וֹ",
+						"t": "וּבְתֽוֹרָת֥וֹ",
+						"siglum": "ME",
+						"index": "12",
+						"reading": "ME",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"וּבְתֽוֹרָת֥וֹ",
+							"וּֽבְתוֹרָת֥וֹ"
+						],
+						"n": "וּֽבְתוֹרָת֥וֹ",
+						"decision_class": [
+							"regularised"
+						],
+						"decision_details": [
+							{
+								"class": "regularised",
+								"scope": "verse",
+								"id": "218708",
+								"t": "וּבְתֽוֹרָת֥וֹ",
+								"n": "וּֽבְתוֹרָת֥וֹ"
+							}
+						]
+					},
+					{
+						"original": "יֶהְגֶּ֗ה",
+						"t": "יֶהְגֶּ֗ה",
+						"siglum": "ME",
+						"index": "14",
+						"reading": "ME",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"יֶהְגֶּ֗ה"
+						]
+					},
+					{
+						"original": "יוֹמָ֥ם",
+						"t": "יוֹמָ֥ם",
+						"siglum": "ME",
+						"index": "16",
+						"reading": "ME",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"יוֹמָ֥ם"
+						]
+					},
+					{
+						"original": "וָלָֽיְלָה",
+						"t": "וָלָֽיְלָה",
+						"siglum": "ME",
+						"index": "18",
+						"reading": "ME",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"וָלָֽיְלָה"
+						]
+					}
+				],
+				[
+					{
+						"original": "כִּ֤י",
+						"t": "כִּ֤י",
+						"siglum": "ML",
+						"index": "2",
+						"reading": "ML",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"כִּ֤י"
+						]
+					},
+					{
+						"original": "אִ֥ם",
+						"t": "אִ֥ם",
+						"siglum": "ML",
+						"index": "4",
+						"reading": "ML",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"אִ֥ם"
+						]
+					},
+					{
+						"original": "בְּתוֹרַ֥ת",
+						"t": "בְּתוֹרַ֥ת",
+						"siglum": "ML",
+						"index": "6",
+						"reading": "ML",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"בְּתוֹרַ֥ת"
+						]
+					},
+					{
+						"original": "יְהוָ֗ה",
+						"t": "יְהוָ֗ה",
+						"siglum": "ML",
+						"index": "8",
+						"reading": "ML",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"יְהוָ֗ה"
+						]
+					},
+					{
+						"original": "חֶ֫פְצ֥וֹ",
+						"t": "חֶ֫פְצ֥וֹ",
+						"siglum": "ML",
+						"index": "10",
+						"reading": "ML",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"חֶ֫פְצ֥וֹ"
+						]
+					},
+					{
+						"original": "וּֽבְתוֹרָת֥וֹ",
+						"t": "וּֽבְתוֹרָת֥וֹ",
+						"siglum": "ML",
+						"index": "12",
+						"reading": "ML",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"וּֽבְתוֹרָת֥וֹ"
+						]
+					},
+					{
+						"original": "יֶהְגֶּ֗ה",
+						"t": "יֶהְגֶּ֗ה",
+						"siglum": "ML",
+						"index": "14",
+						"reading": "ML",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"יֶהְגֶּ֗ה"
+						]
+					},
+					{
+						"original": "יוֹמָ֥ם",
+						"t": "יוֹמָ֥ם",
+						"siglum": "ML",
+						"index": "16",
+						"reading": "ML",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"יוֹמָ֥ם"
+						]
+					},
+					{
+						"original": "וָלָֽיְלָה",
+						"t": "וָלָֽיְלָה",
+						"siglum": "ML",
+						"index": "18",
+						"reading": "ML",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"וָלָֽיְלָה"
+						]
+					}
+				],
+				[
+					{
+						"original": "אילהן",
+						"t": "אילהן",
+						"siglum": "T",
+						"index": "2",
+						"reading": "T-corrector",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"אילהן"
+						]
+					},
+					{
+						"original": "בנמוסא",
+						"t": "בנמוסא",
+						"siglum": "T",
+						"index": "4",
+						"reading": "T-corrector",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"בנמוסא"
+						]
+					},
+					{
+						"original": "דייי",
+						"t": "דייי",
+						"siglum": "T",
+						"index": "6",
+						"reading": "T-corrector",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"דייי"
+						]
+					},
+					{
+						"original": "רעותיה",
+						"t": "רעותיה",
+						"siglum": "T",
+						"index": "8",
+						"reading": "T-corrector",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"רעותיה"
+						]
+					},
+					{
+						"original": "ובאוריתיה",
+						"t": "ובאוריתיה",
+						"siglum": "T",
+						"index": "10",
+						"reading": "T-corrector",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"ובאוריתיה"
+						]
+					},
+					{
+						"original": "מרנין",
+						"t": "מרנין",
+						"siglum": "T",
+						"index": "12",
+						"reading": "T-corrector",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"מרנין"
+						]
+					},
+					{
+						"original": "יימם",
+						"t": "יימם",
+						"siglum": "T",
+						"index": "14",
+						"reading": "T-corrector",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"יימם"
+						]
+					},
+					{
+						"original": "ולילי",
+						"t": "ולילי",
+						"siglum": "T",
+						"index": "16",
+						"reading": "T-corrector",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"ולילי"
+						]
+					}
+				],
+				[
+					{
+						"original": "אילהן",
+						"t": "אילהן",
+						"siglum": "T",
+						"index": "2",
+						"reading": "T-firsthand",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"אילהן"
+						]
+					},
+					{
+						"original": "בנמוסא",
+						"t": "בנמוסא",
+						"siglum": "T",
+						"index": "4",
+						"reading": "T-firsthand",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"בנמוסא"
+						]
+					},
+					{
+						"original": "דייי",
+						"t": "דייי",
+						"siglum": "T",
+						"index": "6",
+						"reading": "T-firsthand",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"דייי"
+						]
+					},
+					{
+						"original": "רעותיה",
+						"t": "רעותיה",
+						"siglum": "T",
+						"index": "8",
+						"reading": "T-firsthand",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"רעותיה"
+						]
+					},
+					{
+						"original": "ובאוריתיה",
+						"t": "ובאוריתיה",
+						"siglum": "T",
+						"index": "10",
+						"reading": "T-firsthand",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"ובאוריתיה"
+						]
+					},
+					{
+						"original": "מרנין",
+						"t": "מרנין",
+						"siglum": "T",
+						"index": "12",
+						"reading": "T-firsthand",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"מרנין"
+						]
+					},
+					{
+						"original": "יומם",
+						"t": "יומם",
+						"siglum": "T",
+						"index": "14",
+						"reading": "T-firsthand",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"יומם"
+						]
+					},
+					{
+						"original": "ולילי",
+						"t": "ולילי",
+						"siglum": "T",
+						"index": "16",
+						"reading": "T-firsthand",
+						"verse": "Ps.1.2",
+						"rule_match": [
+							"ולילי"
+						]
+					}
+				]
+			]
+		]
+	}
+}

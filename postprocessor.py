@@ -53,7 +53,14 @@ class PostProcessor(Regulariser, SettingsApplier):
     def produce_variant_units(self):
         """Produce variant units for display and editing."""
         variant_readings = self.create_readings_sets()
-        return self.format_output(self.anchor_readings(variant_readings))
+        variant_units = self.format_output(self.anchor_readings(variant_readings))
+        if 'ai_comments' in self.alignment_table:
+            variant_units['ai_comments'] = self.alignment_table['ai_comments']
+        if 'ai_alignment_table' in self.alignment_table:
+            variant_units['ai_alignment_table'] = self.alignment_table['ai_alignment_table']
+        if 'ai_processing_duration' in self.alignment_table:
+            variant_units['ai_processing_duration'] = self.alignment_table['ai_processing_duration']
+        return variant_units
 
     def create_extra_reading(self, text_list, witness):
         new = {'witnesses': [witness], 'text': []}
@@ -431,6 +438,9 @@ class PostProcessor(Regulariser, SettingsApplier):
                     token['interface'] = token['decision_details'][-1]['n'].replace('<', '&lt;').replace('>', '&gt;')
                 else:
                     # create the word we will see in the interface
-                    self.apply_settings(token)
+                    try:
+                        self.apply_settings(token)
+                    except:
+                        pass
                 new_witness.append(token)
             return new_witness

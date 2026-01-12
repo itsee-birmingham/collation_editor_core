@@ -5120,7 +5120,7 @@ var SV = (function() {
                 data.lac_readings.splice(data.lac_readings.indexOf(hand), 1);
               }
             }
-          }          
+          }
           CL.lacOmFix();
           // copy so we can change CL.data without screwing this up
           data = JSON.parse(JSON.stringify(CL.data));
@@ -5145,8 +5145,8 @@ var SV = (function() {
             {'structure': {'apparatus': chunk, 'lac_readings': [], 'om_readings': []}},
             data,
             [],
-            data.apparatus[0].start,
-            data.apparatus[data.apparatus.length - 1].end
+            data.apparatus[0].start - 1,
+            data.apparatus[data.apparatus.length - 1].end + 1
           );
           CL.existingCollation.apparatus = preChunk.concat(mergedCollationChunk.structure.apparatus, postChunk);
           CL.data = JSON.parse(JSON.stringify(CL.existingCollation));

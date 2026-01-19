@@ -399,13 +399,21 @@ class Exporter(RestructureExportDataMixin, object):
                         app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
 
                     if 'subreadings' in reading:
-                        for key in reading['subreadings']:
-                            for subreading in reading['subreadings'][key]:
+                        if isinstance(reading['subreadings'], list):
+                            for subreading in reading['subreadings']:
                                 wits = self.get_witnesses(subreading, missing)
                                 if len(wits) > 0:
                                     readings = True
                                     subreading_label = self.get_subreading_label(reading['label'], subreading)
-                                    app.append(self.make_reading(subreading, i, subreading_label, wits, True, key))
+                                    app.append(self.make_reading(subreading, i, subreading_label, wits, True, subreading['suffix']))
+                        else:
+                            for key in reading['subreadings']:
+                                for subreading in reading['subreadings'][key]:
+                                    wits = self.get_witnesses(subreading, missing)
+                                    if len(wits) > 0:
+                                        readings = True
+                                        subreading_label = self.get_subreading_label(reading['label'], subreading)
+                                        app.append(self.make_reading(subreading, i, subreading_label, wits, True, key))
 
                 else:
                     if (len(wits) > 0 or reading['label'] == 'a' or 'subreadings' in reading) and (
@@ -420,13 +428,21 @@ class Exporter(RestructureExportDataMixin, object):
                         app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
 
                     if 'subreadings' in reading:
-                        for key in reading['subreadings']:
-                            for subreading in reading['subreadings'][key]:
+                        if isinstance(reading['subreadings'], list):
+                            for subreading in reading['subreadings']:
                                 wits = self.get_witnesses(subreading, missing)
                                 if len(wits) > 0:
                                     readings = True
                                     subreading_label = self.get_subreading_label(reading['label'], subreading)
-                                    app.append(self.make_reading(subreading, i, subreading_label, wits, True, key))
+                                    app.append(self.make_reading(subreading, i, subreading_label, wits, True, subreading['suffix']))
+                        else:
+                            for key in reading['subreadings']:
+                                for subreading in reading['subreadings'][key]:
+                                    wits = self.get_witnesses(subreading, missing)
+                                    if len(wits) > 0:
+                                        readings = True
+                                        subreading_label = self.get_subreading_label(reading['label'], subreading)
+                                        app.append(self.make_reading(subreading, i, subreading_label, wits, True, key))
 
             if readings:
                 app_list.append(app)

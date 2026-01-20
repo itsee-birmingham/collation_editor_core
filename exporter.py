@@ -422,14 +422,15 @@ class Exporter(RestructureExportDataMixin, object):
         """Create the subreading XML for this reading and add it to the provided apparatus unit.
 
         Args:
-            reading (_type_): _description_
-            index_position (_type_): _description_
-            app (_type_): _description_
-            missing (_type_): _description_
-            readings (_type_): _description_
+            reading (dict): The JSON dictionary representing a reading.
+            index_position (int): The position of this reading in the readings of this unit.
+            app (xml.etree.ElementTree.Element): The XML tree being created for this apparatus unit.
+            missing (list): A list of witnesses to remove from the apparatus (because they are being reported separately
+                or of no interest for another reason.)
+            readings (bool): A boolean to determine if this unit should be included in the apparatus output.
 
         Returns:
-            bool: _description_
+            bool: The reading boolean updated if required.
         """
         for key in reading['subreadings']:
             for subreading in reading['subreadings'][key]:

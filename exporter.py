@@ -405,7 +405,11 @@ class Exporter(RestructureExportDataMixin, object):
                                 if len(wits) > 0:
                                     readings = True
                                     subreading_label = self.get_subreading_label(reading['label'], subreading)
-                                    app.append(self.make_reading(subreading, i, subreading_label, wits, True, subreading['suffix']))
+                                    app.append(
+                                        self.make_reading(
+                                            subreading, i, subreading_label, wits, True, subreading['suffix']
+                                        )
+                                    )
                         else:
                             for key in reading['subreadings']:
                                 for subreading in reading['subreadings'][key]:
@@ -434,7 +438,11 @@ class Exporter(RestructureExportDataMixin, object):
                                 if len(wits) > 0:
                                     readings = True
                                     subreading_label = self.get_subreading_label(reading['label'], subreading)
-                                    app.append(self.make_reading(subreading, i, subreading_label, wits, True, subreading['suffix']))
+                                    app.append(
+                                        self.make_reading(
+                                            subreading, i, subreading_label, wits, True, subreading['suffix']
+                                        )
+                                    )
                         else:
                             for key in reading['subreadings']:
                                 for subreading in reading['subreadings'][key]:

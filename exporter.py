@@ -399,14 +399,7 @@ class Exporter(RestructureExportDataMixin, object):
                         app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
 
                     if 'subreadings' in reading:
-                        for key in reading['subreadings']:
-                            for subreading in reading['subreadings'][key]:
-                                wits = self.get_witnesses(subreading, missing)
-                                if len(wits) > 0:
-                                    readings = True
-                                    subreading_label = self.get_subreading_label(reading['label'], subreading)
-                                    app.append(self.make_reading(subreading, i, subreading_label, wits, True, key))
-
+                        readings = self.get_subreadings(reading, i, app, missing, readings)
                 else:
                     if (len(wits) > 0 or reading['label'] == 'a' or 'subreadings' in reading) and (
                         'overlap_status' not in reading
@@ -420,17 +413,33 @@ class Exporter(RestructureExportDataMixin, object):
                         app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
 
                     if 'subreadings' in reading:
-                        for key in reading['subreadings']:
-                            for subreading in reading['subreadings'][key]:
-                                wits = self.get_witnesses(subreading, missing)
-                                if len(wits) > 0:
-                                    readings = True
-                                    subreading_label = self.get_subreading_label(reading['label'], subreading)
-                                    app.append(self.make_reading(subreading, i, subreading_label, wits, True, key))
-
+                        readings = self.get_subreadings(reading, i, app, missing, readings)
             if readings:
                 app_list.append(app)
         return app_list
+
+    def get_subreadings(self, reading, index_position, app, missing, readings):
+        """Create the subreading XML for this reading and add it to the provided apparatus unit.
+
+        Args:
+            reading (dict): The JSON dictionary representing a reading.
+            index_position (int): The position of this reading in the readings of this unit.
+            app (xml.etree.ElementTree.Element): The XML tree being created for this apparatus unit.
+            missing (list): A list of witnesses to remove from the apparatus (because they are being reported separately
+                or of no interest for another reason.)
+            readings (bool): A boolean to determine if this unit should be included in the apparatus output.
+
+        Returns:
+            bool: The reading boolean updated if required.
+        """
+        for key in reading['subreadings']:
+            for subreading in reading['subreadings'][key]:
+                wits = self.get_witnesses(subreading, missing)
+                if len(wits) > 0:
+                    readings = True
+                    subreading_label = self.get_subreading_label(reading['label'], subreading)
+                    app.append(self.make_reading(subreading, index_position, subreading_label, wits, True, key))
+        return readings
 
     def get_overtext_data(self, entry):
         """Get the overtext data in a specfic format.

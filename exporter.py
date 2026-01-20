@@ -399,26 +399,7 @@ class Exporter(RestructureExportDataMixin, object):
                         app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
 
                     if 'subreadings' in reading:
-                        if isinstance(reading['subreadings'], list):
-                            for subreading in reading['subreadings']:
-                                wits = self.get_witnesses(subreading, missing)
-                                if len(wits) > 0:
-                                    readings = True
-                                    subreading_label = self.get_subreading_label(reading['label'], subreading)
-                                    app.append(
-                                        self.make_reading(
-                                            subreading, i, subreading_label, wits, True, subreading['suffix']
-                                        )
-                                    )
-                        else:
-                            for key in reading['subreadings']:
-                                for subreading in reading['subreadings'][key]:
-                                    wits = self.get_witnesses(subreading, missing)
-                                    if len(wits) > 0:
-                                        readings = True
-                                        subreading_label = self.get_subreading_label(reading['label'], subreading)
-                                        app.append(self.make_reading(subreading, i, subreading_label, wits, True, key))
-
+                        readings = self.get_subreadings(reading, i, app, missing, readings)
                 else:
                     if (len(wits) > 0 or reading['label'] == 'a' or 'subreadings' in reading) and (
                         'overlap_status' not in reading
@@ -432,29 +413,32 @@ class Exporter(RestructureExportDataMixin, object):
                         app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
 
                     if 'subreadings' in reading:
-                        if isinstance(reading['subreadings'], list):
-                            for subreading in reading['subreadings']:
-                                wits = self.get_witnesses(subreading, missing)
-                                if len(wits) > 0:
-                                    readings = True
-                                    subreading_label = self.get_subreading_label(reading['label'], subreading)
-                                    app.append(
-                                        self.make_reading(
-                                            subreading, i, subreading_label, wits, True, subreading['suffix']
-                                        )
-                                    )
-                        else:
-                            for key in reading['subreadings']:
-                                for subreading in reading['subreadings'][key]:
-                                    wits = self.get_witnesses(subreading, missing)
-                                    if len(wits) > 0:
-                                        readings = True
-                                        subreading_label = self.get_subreading_label(reading['label'], subreading)
-                                        app.append(self.make_reading(subreading, i, subreading_label, wits, True, key))
-
+                        readings = self.get_subreadings(reading, i, app, missing, readings)
             if readings:
                 app_list.append(app)
         return app_list
+
+    def get_subreadings(self, reading, index_position, app, missing, readings):
+        """Create the subreading XML for this reading and add it to the provided apparatus unit.
+
+        Args:
+            reading (_type_): _description_
+            index_position (_type_): _description_
+            app (_type_): _description_
+            missing (_type_): _description_
+            readings (_type_): _description_
+
+        Returns:
+            bool: _description_
+        """
+        for key in reading['subreadings']:
+            for subreading in reading['subreadings'][key]:
+                wits = self.get_witnesses(subreading, missing)
+                if len(wits) > 0:
+                    readings = True
+                    subreading_label = self.get_subreading_label(reading['label'], subreading)
+                    app.append(self.make_reading(subreading, index_position, subreading_label, wits, True, key))
+        return readings
 
     def get_overtext_data(self, entry):
         """Get the overtext data in a specfic format.

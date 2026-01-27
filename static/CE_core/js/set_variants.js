@@ -4792,8 +4792,9 @@ var SV = (function() {
           const unitNumber = div.id.replace('drag-unit-', '');
           SV._addToUndoStack(CL.data);
           const dataCopy = JSON.parse(JSON.stringify(CL.data));
+          const settingsCopy = JSON.parse(JSON.stringify(CL.dataSettings));
           try {
-            SV._removeOverlap(unitNumber, dataCopy);
+            SV._removeOverlap(unitNumber, dataCopy, settingsCopy);
           } catch (err) {
             console.log(err);
             alert('The overlapping unit could not be deleted.');
@@ -4997,7 +4998,7 @@ var SV = (function() {
       }
     },
 
-    _removeOverlap: function(index, originalData) {
+    _removeOverlap: function(index, originalData, originalSettings) {
       /** Remove a current overlapping unit (activated from the right click context menu). Index is the id of the unit
        * being removed. The witnesses in this reading are removed from the section of text included in the overlap and
        * then that same chunk of text is recollated and merged back into the collation data. This reuses the code for
@@ -5006,6 +5007,9 @@ var SV = (function() {
        * The originalData argument is a copy of the full CL.data structure from before we start the process so we
        * can restore it if any errors happen along the way. Ideally the error could be thrown back to the place this
        * function is called but the callback chain doesn't seem to allow that.
+       *
+       * The originalSettings argument is a copy of the settings for the full unit which will be restored once the
+       * overlap removal is complete because we have to modify the witness list as part of the recollation process.
        */
       let apparatusNum, appId, witId, tokens;
       spinner.showLoadingOverlay();
@@ -5081,6 +5085,7 @@ var SV = (function() {
         if (lacOmDetails.length > 1) {
           alert('This overlapping unit cannot be removed because it contains different types of empty readings.');
           CL.data = originalData;
+          CL.dataSettings = originalSettings;
           SV.showSetVariantsData();
           return;
         }
@@ -5159,6 +5164,8 @@ var SV = (function() {
           SV.unprepareForOperation();
           SV.checkBugStatus('loaded', 'saved version');
           options.container = CL.container;
+          // restore the original data settings so we don't end up with a short witness list
+          CL.dataSettings = originalSettings;
           SV.showSetVariants(options);
         });
       });

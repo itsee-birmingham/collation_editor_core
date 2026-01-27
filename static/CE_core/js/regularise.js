@@ -874,7 +874,7 @@ var RG = (function () {
         options.configs.collatexHost = CL.services.collatexHost;
       }
 
-      if (output === 'add_witnesses') {
+      if (output === 'add_witnesses' || output === 'remove_overlap') {
         options.configs.split_single_reading_units = true;
         resultCallback = function (data) {
           callback(data);

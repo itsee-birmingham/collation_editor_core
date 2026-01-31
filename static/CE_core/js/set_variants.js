@@ -3517,7 +3517,7 @@ var SV = (function() {
           if (olUnit.readings.length > 1 && Object.prototype.hasOwnProperty.call(olUnit.readings[1], 'type')) {
             olRdgDetails.type = olUnit.readings[1].type;
           } else if (Object.prototype.hasOwnProperty.call(olUnit.readings[0], 'type')) {
-            // if it is an om that is overlapped and basetext is also om then there will only be on reading in
+            // if it is an om that is overlapped and basetext is also om then there will only be one reading in
             // the data structure even though display shows two
             olRdgDetails.type = olUnit.readings[0].type;
           }
@@ -3538,6 +3538,37 @@ var SV = (function() {
         }
       }
       return newAdds;
+    },
+
+    _uniquifySeparatedOverlapWitnesses: function(splitAdditions) {
+      /* Take the separated overlapped reading created in _separateIndividualOverlapWitnesses and combine them so each
+      witness appears only once. This is a separate function because we call _separateIndividualOverlapWitnesses and 
+      I'm not confident that this needs to happen in both places yet. */
+      let uniqueSplitAdditions = [];
+      let addedWitnesses = [];
+      // first of all find any data which has something other than an empty object in second position because this will
+      // need to overwrite the empty ones if witnesses are duplicated. I haven't found an example where this is true
+      // but it is theoretically possible so we should account for it
+      for (let entry of splitAdditions) {
+        if (!$.isEmptyObject(entry[1])) {
+          uniqueSplitAdditions.push(entry); // we could try to combine these but for now lets just add them all
+          addedWitnesses.push.apply(addedWitnesses, entry[0]);
+        }
+      }
+      // now get the others in order but only add the witnesses that have not alredy been handled
+      for (let entry of splitAdditions) {
+        if ($.isEmptyObject(entry[1])) {
+          // remove any witnesses already in the addedWitnesses list
+          entry[0] = entry[0].filter(x => addedWitnesses.indexOf(x) < 0);
+          // add the remaining witnesses to the addedWitnesses list
+          addedWitnesses.push.apply(addedWitnesses, entry[0]);
+          // if witnesses remain then add it to uniqueSplitAdditions
+          if (entry[0].length > 0) {
+            uniqueSplitAdditions.push(entry);
+          }
+        }
+      }
+      return uniqueSplitAdditions;
     },
 
     /** split unit stuff*/
@@ -3670,6 +3701,7 @@ var SV = (function() {
                 if (add.length > 0) {
                   if (Object.prototype.hasOwnProperty.call(unit, 'overlap_units')) {
                     splitAdds = SV._separateIndividualOverlapWitnesses(add, unit.overlap_units);
+                    splitAdds = SV._uniquifySeparatedOverlapWitnesses(splitAdds);
                     for (let k = 0; k < splitAdds.length; k += 1) {
                       if (key === 'duplicate') {
                         newReading = {

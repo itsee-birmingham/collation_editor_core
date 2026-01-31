@@ -5053,13 +5053,57 @@ var SV = (function() {
         appId = 'apparatus' + apparatusNum;
       } else {
         // removeOverlap function makes no sense for a top line unit.
+        spinner.removeLoadingOverlay();
         return;
       }
-      // remove the relevant witnesses from the section of the collation representing the overlap
+      // find the unit and get its range and witnesses
       const overlapUnit = CL.data[appId][index];
       const overlapId = overlapUnit._id;
       const range = SV._findOverlappedRange(overlapId);
       const witnesses = SV._getAllUnitWitnesses(overlapUnit).filter(x => x !== CL.data.overtext_name);
+      // find any other overlapping units which share any witnesses with the target unit
+      const candidateOverlaps = []; 
+      for (let key in CL.data) {
+        if (key != 'apparatus' && key.startsWith('apparatus') && key != appId) {
+          for (let unit of CL.data[key]) {
+            let cWitnesses = SV._getAllUnitWitnesses(unit).filter(x => x !== CL.data.overtext_name);
+            if (cWitnesses.filter(x => witnesses.indexOf(x) > 0).length > 0) {
+              let cRange = SV._findOverlappedRange(unit._id);
+              // if the overlap overlaps are current range add it to the candidates list
+              if ((Math.max(range[0], cRange[0]) - Math.min(range[1], cRange[1])) <= 0) {
+                candidateOverlaps.push([cRange[0], cRange[1]]);
+              }
+            }
+          }
+        }
+      }
+      // extend the range covered to include the extents of any overlapping units with shared witnesses
+      for (let entry of candidateOverlaps) {
+        if (entry[0] < range[0]) {
+          range[0] = entry[0];
+        }
+        if (entry[1] > range[1]) {
+          range[1] = entry[1];
+        }
+      }
+      // check the user wants to go ahead
+      if (candidateOverlaps.length > 0) {
+        let ok;
+        let startWord = CL.data.apparatus[range[0]].start;
+        let endWord = CL.data.apparatus[range[1]].end;
+        ok = confirm('Some of the witnesses in the overlap you have asked to remove are present in other ' +
+                     'overlapping units which also overlap the one being removed. Continuing with this ' +
+                     'overlap removal will affect all words between indexes ' + startWord + ' to ' + endWord +
+                     '. Are you sure you want to continue?');
+        if (!ok) {
+          spinner.removeLoadingOverlay();
+          return;
+        }
+      }
+      // TODO: removal isn't following the newly crated ranges.
+
+
+      // remove the relevant witnesses from the section of the collation representing the overlap
       const wordRanges = {};
       const lacOmDetails = [];
       wordRanges['basetext'] = SV._getWitnessIndexesForHand(overlapUnit, 'basetext');

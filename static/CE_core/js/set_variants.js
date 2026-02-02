@@ -3542,7 +3542,7 @@ var SV = (function() {
 
     _uniquifySeparatedOverlapWitnesses: function(splitAdditions) {
       /* Take the separated overlapped reading created in _separateIndividualOverlapWitnesses and combine them so each
-      witness appears only once. This is a separate function because we call _separateIndividualOverlapWitnesses and 
+      witness appears only once. This is a separate function because we call _separateIndividualOverlapWitnesses twice and 
       I'm not confident that this needs to happen in both places yet. */
       let uniqueSplitAdditions = [];
       let addedWitnesses = [];

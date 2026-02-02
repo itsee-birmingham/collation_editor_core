@@ -5058,6 +5058,7 @@ var SV = (function() {
       }
       // find the unit and get its range and witnesses
       const overlapUnit = CL.data[appId][index];
+      const allOverlappingUnits = [overlapUnit];
       const overlapId = overlapUnit._id;
       const range = SV._findOverlappedRange(overlapId);
       const witnesses = SV._getAllUnitWitnesses(overlapUnit).filter(x => x !== CL.data.overtext_name);
@@ -5071,6 +5072,7 @@ var SV = (function() {
               let cRange = SV._findOverlappedRange(unit._id);
               // if the overlap overlaps are current range add it to the candidates list
               if ((Math.max(range[0], cRange[0]) - Math.min(range[1], cRange[1])) <= 0) {
+                allOverlappingUnits.push(unit);
                 candidateOverlaps.push([cRange[0], cRange[1]]);
               }
             }
@@ -5106,12 +5108,18 @@ var SV = (function() {
       // remove the relevant witnesses from the section of the collation representing the overlap
       const wordRanges = {};
       const lacOmDetails = [];
-      wordRanges['basetext'] = SV._getWitnessIndexesForHand(overlapUnit, 'basetext');
+      wordRanges['basetext'] = SV._getWitnessIndexesForHand(allOverlappingUnits, 'basetext');
       for (const hand of witnesses) {
-        wordRanges[hand] = SV._getWitnessIndexesForHand(overlapUnit, hand);
-        // deal with the overlap unit - needs to be returned because it isn't passing as reference through the full function chain
-        CL.data[appId][index] = SV._removeWitnessFromUnitAndSortRemainder(overlapUnit, hand, appId);
-        CL.removeNullItems(CL.data[appId]);  
+        wordRanges[hand] = SV._getWitnessIndexesForHand(allOverlappingUnits, hand);
+        // here we need to remove the witness and return the unit for all overlapping units - we need to find appId and index for each one first!
+        for (const currentOverlappingUnit of allOverlappingUnits) {
+          let [currentAppId, currentIndex] = SV._getAppIdAndIndexByOverlapId(currentOverlappingUnit._id);
+          // remove from the current overlap unit - needs to be returned because it isn't passing as reference through the full function chain
+          CL.data[currentAppId][currentIndex] = SV._removeWitnessFromUnitAndSortRemainder(currentOverlappingUnit, hand, currentAppId);
+          //CL.data[appId][index] = SV._removeWitnessFromUnitAndSortRemainder(overlapUnit, hand, appId);
+          CL.removeNullItems(CL.data[currentAppId]);
+        }
+        // now remove from the top line
         for (let i = range[0]; i <= range[1]; i += 1) {       
           CL.data.apparatus[i] = SV._removeWitnessFromUnitAndSortRemainder(CL.data.apparatus[i], hand, 'apparatus');
           CL.removeNullItems(CL.data.apparatus);
@@ -5247,23 +5255,44 @@ var SV = (function() {
       });
     },
 
-    _getWitnessIndexesForHand: function(unit, hand) {
+    _getAppIdAndIndexByOverlapId: function(unitId) {
+      /* Given the id of an overlapping unit return its overlap line and position in that line. */
+      for (const key in CL.data) {
+        if (key !== 'apparatus' && key.startsWith('apparatus')) {
+          for (let i = 0; i < CL.data[key].length; i += 1) {
+            if (CL.data[key][i]._id === unitId) {
+              return([key, i]);
+            }
+          }       
+        }      
+      }
+    },
+
+    _getWitnessIndexesForHand: function(units, hand) {
+      /* Get the word index range in the requested hand that covers the full extent of the overlapping units provided */
       const indexes = [null, null, null];
-      for (const reading of unit.readings) {
-        if (reading.witnesses.indexOf(hand) !== -1) { // this is the right reading
-          for (const word of reading.text) {
-            if (Object.prototype.hasOwnProperty.call(word, hand)) {             
-              if (indexes[0] === null) {
-                indexes[0] = word[hand].index;
-                indexes[1] = word[hand].index;
-              } else {
-                indexes[1] = word[hand].index;
+      for (const unit of units) {
+        for (const reading of unit.readings) {
+          if (reading.witnesses.indexOf(hand) !== -1) { // this is the right reading
+            for (const word of reading.text) {
+              if (Object.prototype.hasOwnProperty.call(word, hand)) {             
+                if (indexes[0] === null) {
+                  indexes[0] = word[hand].index;
+                  indexes[1] = word[hand].index;
+                } else {
+                  if (word[hand].index < indexes[0]) {
+                    indexes[0] = word[hand].index;
+                  }
+                  if (word[hand].index > indexes[1]) {
+                    indexes[1] = word[hand].index;
+                  }
+                }
               }
             }
-          }
-          if (indexes[0] === null) {
-            // then this is lac or om and we need details
-            indexes[2] = [reading.type, reading.details];
+            if (indexes[0] === null) {
+              // then this is lac or om and we need details
+              indexes[2] = [reading.type, reading.details];
+            }
           }
         }
       }

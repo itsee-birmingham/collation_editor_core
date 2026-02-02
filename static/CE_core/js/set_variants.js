@@ -5102,7 +5102,6 @@ var SV = (function() {
           return;
         }
       }
-      // TODO: removal isn't following the newly crated ranges.
 
 
       // remove the relevant witnesses from the section of the collation representing the overlap

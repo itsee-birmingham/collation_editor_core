@@ -3517,7 +3517,7 @@ var SV = (function() {
           if (olUnit.readings.length > 1 && Object.prototype.hasOwnProperty.call(olUnit.readings[1], 'type')) {
             olRdgDetails.type = olUnit.readings[1].type;
           } else if (Object.prototype.hasOwnProperty.call(olUnit.readings[0], 'type')) {
-            // if it is an om that is overlapped and basetext is also om then there will only be on reading in
+            // if it is an om that is overlapped and basetext is also om then there will only be one reading in
             // the data structure even though display shows two
             olRdgDetails.type = olUnit.readings[0].type;
           }
@@ -3538,6 +3538,37 @@ var SV = (function() {
         }
       }
       return newAdds;
+    },
+
+    _uniquifySeparatedOverlapWitnesses: function(splitAdditions) {
+      /* Take the separated overlapped reading created in _separateIndividualOverlapWitnesses and combine them so each
+      witness appears only once. This is a separate function because we call _separateIndividualOverlapWitnesses twice and 
+      I'm not confident that this needs to happen in both places yet. */
+      let uniqueSplitAdditions = [];
+      let addedWitnesses = [];
+      // first of all find any data which has something other than an empty object in second position because this will
+      // need to overwrite the empty ones if witnesses are duplicated. I haven't found an example where this is true
+      // but it is theoretically possible so we should account for it
+      for (let entry of splitAdditions) {
+        if (!$.isEmptyObject(entry[1])) {
+          uniqueSplitAdditions.push(entry); // we could try to combine these but for now lets just add them all
+          addedWitnesses.push.apply(addedWitnesses, entry[0]);
+        }
+      }
+      // now get the others in order but only add the witnesses that have not alredy been handled
+      for (let entry of splitAdditions) {
+        if ($.isEmptyObject(entry[1])) {
+          // remove any witnesses already in the addedWitnesses list
+          entry[0] = entry[0].filter(x => addedWitnesses.indexOf(x) < 0);
+          // add the remaining witnesses to the addedWitnesses list
+          addedWitnesses.push.apply(addedWitnesses, entry[0]);
+          // if witnesses remain then add it to uniqueSplitAdditions
+          if (entry[0].length > 0) {
+            uniqueSplitAdditions.push(entry);
+          }
+        }
+      }
+      return uniqueSplitAdditions;
     },
 
     /** split unit stuff*/
@@ -3670,6 +3701,7 @@ var SV = (function() {
                 if (add.length > 0) {
                   if (Object.prototype.hasOwnProperty.call(unit, 'overlap_units')) {
                     splitAdds = SV._separateIndividualOverlapWitnesses(add, unit.overlap_units);
+                    splitAdds = SV._uniquifySeparatedOverlapWitnesses(splitAdds);
                     for (let k = 0; k < splitAdds.length; k += 1) {
                       if (key === 'duplicate') {
                         newReading = {
@@ -5023,21 +5055,72 @@ var SV = (function() {
         appId = 'apparatus' + apparatusNum;
       } else {
         // removeOverlap function makes no sense for a top line unit.
+        spinner.removeLoadingOverlay();
         return;
       }
-      // remove the relevant witnesses from the section of the collation representing the overlap
+      // find the unit and get its range and witnesses
       const overlapUnit = CL.data[appId][index];
+      const allOverlappingUnits = [overlapUnit];
       const overlapId = overlapUnit._id;
       const range = SV._findOverlappedRange(overlapId);
       const witnesses = SV._getAllUnitWitnesses(overlapUnit).filter(x => x !== CL.data.overtext_name);
+      // find any other overlapping units which share any witnesses with the target unit
+      const candidateOverlaps = []; 
+      for (let key in CL.data) {
+        if (key != 'apparatus' && key.startsWith('apparatus') && key != appId) {
+          for (let unit of CL.data[key]) {
+            let cWitnesses = SV._getAllUnitWitnesses(unit).filter(x => x !== CL.data.overtext_name);
+            if (cWitnesses.filter(x => witnesses.indexOf(x) > 0).length > 0) {
+              let cRange = SV._findOverlappedRange(unit._id);
+              // if the overlap overlaps are current range add it to the candidates list
+              if ((Math.max(range[0], cRange[0]) - Math.min(range[1], cRange[1])) <= 0) {
+                allOverlappingUnits.push(unit);
+                candidateOverlaps.push([cRange[0], cRange[1]]);
+              }
+            }
+          }
+        }
+      }
+      // extend the range covered to include the extents of any overlapping units with shared witnesses
+      for (let entry of candidateOverlaps) {
+        if (entry[0] < range[0]) {
+          range[0] = entry[0];
+        }
+        if (entry[1] > range[1]) {
+          range[1] = entry[1];
+        }
+      }
+      // check the user wants to go ahead
+      if (candidateOverlaps.length > 0) {
+        let ok;
+        let startWord = CL.data.apparatus[range[0]].start;
+        let endWord = CL.data.apparatus[range[1]].end;
+        ok = confirm('Some of the witnesses in the overlap you have asked to remove are present in other ' +
+                     'overlapping units which also overlap the one being removed. Continuing with this ' +
+                     'overlap removal will affect all words between indexes ' + startWord + ' to ' + endWord +
+                     '. Are you sure you want to continue?');
+        if (!ok) {
+          spinner.removeLoadingOverlay();
+          return;
+        }
+      }
+
+
+      // remove the relevant witnesses from the section of the collation representing the overlap
       const wordRanges = {};
       const lacOmDetails = [];
-      wordRanges['basetext'] = SV._getWitnessIndexesForHand(overlapUnit, 'basetext');
+      wordRanges['basetext'] = SV._getWitnessIndexesForHand(allOverlappingUnits, 'basetext');
       for (const hand of witnesses) {
-        wordRanges[hand] = SV._getWitnessIndexesForHand(overlapUnit, hand);
-        // deal with the overlap unit - needs to be returned because it isn't passing as reference through the full function chain
-        CL.data[appId][index] = SV._removeWitnessFromUnitAndSortRemainder(overlapUnit, hand, appId);
-        CL.removeNullItems(CL.data[appId]);  
+        wordRanges[hand] = SV._getWitnessIndexesForHand(allOverlappingUnits, hand);
+        // here we need to remove the witness and return the unit for all overlapping units - we need to find appId and index for each one first!
+        for (const currentOverlappingUnit of allOverlappingUnits) {
+          let [currentAppId, currentIndex] = SV._getAppIdAndIndexByOverlapId(currentOverlappingUnit._id);
+          // remove from the current overlap unit - needs to be returned because it isn't passing as reference through the full function chain
+          CL.data[currentAppId][currentIndex] = SV._removeWitnessFromUnitAndSortRemainder(currentOverlappingUnit, hand, currentAppId);
+          //CL.data[appId][index] = SV._removeWitnessFromUnitAndSortRemainder(overlapUnit, hand, appId);
+          CL.removeNullItems(CL.data[currentAppId]);
+        }
+        // now remove from the top line
         for (let i = range[0]; i <= range[1]; i += 1) {       
           CL.data.apparatus[i] = SV._removeWitnessFromUnitAndSortRemainder(CL.data.apparatus[i], hand, 'apparatus');
           CL.removeNullItems(CL.data.apparatus);
@@ -5177,23 +5260,44 @@ var SV = (function() {
       });
     },
 
-    _getWitnessIndexesForHand: function(unit, hand) {
+    _getAppIdAndIndexByOverlapId: function(unitId) {
+      /* Given the id of an overlapping unit return its overlap line and position in that line. */
+      for (const key in CL.data) {
+        if (key !== 'apparatus' && key.startsWith('apparatus')) {
+          for (let i = 0; i < CL.data[key].length; i += 1) {
+            if (CL.data[key][i]._id === unitId) {
+              return([key, i]);
+            }
+          }       
+        }      
+      }
+    },
+
+    _getWitnessIndexesForHand: function(units, hand) {
+      /* Get the word index range in the requested hand that covers the full extent of the overlapping units provided */
       const indexes = [null, null, null];
-      for (const reading of unit.readings) {
-        if (reading.witnesses.indexOf(hand) !== -1) { // this is the right reading
-          for (const word of reading.text) {
-            if (Object.prototype.hasOwnProperty.call(word, hand)) {             
-              if (indexes[0] === null) {
-                indexes[0] = word[hand].index;
-                indexes[1] = word[hand].index;
-              } else {
-                indexes[1] = word[hand].index;
+      for (const unit of units) {
+        for (const reading of unit.readings) {
+          if (reading.witnesses.indexOf(hand) !== -1) { // this is the right reading
+            for (const word of reading.text) {
+              if (Object.prototype.hasOwnProperty.call(word, hand)) {             
+                if (indexes[0] === null) {
+                  indexes[0] = word[hand].index;
+                  indexes[1] = word[hand].index;
+                } else {
+                  if (word[hand].index < indexes[0]) {
+                    indexes[0] = word[hand].index;
+                  }
+                  if (word[hand].index > indexes[1]) {
+                    indexes[1] = word[hand].index;
+                  }
+                }
               }
             }
-          }
-          if (indexes[0] === null) {
-            // then this is lac or om and we need details
-            indexes[2] = [reading.type, reading.details];
+            if (indexes[0] === null) {
+              // then this is lac or om and we need details
+              indexes[2] = [reading.type, reading.details];
+            }
           }
         }
       }

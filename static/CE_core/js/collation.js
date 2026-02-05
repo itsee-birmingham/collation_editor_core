@@ -3918,7 +3918,12 @@ var CL = (function() {
       }
     },
 
-    _mergeCollationObjects: function(mainCollation, newData, addedWits) {
+    _mergeCollationObjects: function(mainCollation, newData, addedWits, startIndex, endIndex) {
+      /** This merges a new collation into an existing collation. This might be a full verse if we are in add witness
+      /* mode or a small chunk of a verse if we are removing an overlapping unit.
+      /* AddedWits should be an empty list if removing an overlapping unit.
+      /* start and end index must be supplied if we are merging a partial section (used when removing
+      /* overlappingreadings) for full verse merges we can calculate from the data. */
       let index, newUnit, existingUnit, newUnits, existingUnits, newReadingText,
         matchingReadingFound, unitQueue, nextUnits, unit1, unit2, tempUnit, omReading,
         existingWitnesses, before, after, beforeIds, afterIds,
@@ -3942,10 +3947,12 @@ var CL = (function() {
         }
       }
       // update hand_id_map
-      for (const key in newData.hand_id_map) {
-        if (Object.prototype.hasOwnProperty.call(newData.hand_id_map, key)) {
-          if (!Object.prototype.hasOwnProperty.call(mainCollation.structure.hand_id_map, key)) {
-            mainCollation.structure.hand_id_map[key] = newData.hand_id_map[key];
+      if (addedWits.length > 0) { // we don't need to do this for removing overlaps because we never change it
+        for (const key in newData.hand_id_map) {
+          if (Object.prototype.hasOwnProperty.call(newData.hand_id_map, key)) {
+            if (!Object.prototype.hasOwnProperty.call(mainCollation.structure.hand_id_map, key)) {
+              mainCollation.structure.hand_id_map[key] = newData.hand_id_map[key];
+            }
           }
         }
       }
@@ -3953,10 +3960,13 @@ var CL = (function() {
       // if in existing and not new add new as om/lac verse/om_verse
       // if in new and not existing all existing needs to be om lac verse/om verse
       // make reading for any combined or shared units and check against existing readings
-      index = 1;  // this refers to the position indicated by numbers under the basetext
-      while (index <= (newData.overtext[0].tokens.length * 2) + 1) {
-        // if new data has one then
-  
+      if (startIndex === undefined) {
+        index = 1; // this refers to the position indicated by numbers under the basetext
+        endIndex = (newData.overtext[0].tokens.length * 2) + 1
+      } else {
+        index = startIndex;
+      } 
+      while (index <= endIndex) {
         newUnits = CL._getUnitsByStartIndex(index, newData.apparatus);
         existingUnits = CL._getUnitsByStartIndex(index, mainCollation.structure.apparatus);
         if (newUnits.length === 0 && existingUnits.length === 0) {
@@ -3981,9 +3991,9 @@ var CL = (function() {
                       !Object.prototype.hasOwnProperty.call(existingUnit.readings[i], 'overlap_status') &&
                       existingUnit.readings[i].text.length === 0) {
                   omReading = existingUnit.readings[i];
+                  break;  // if we don't break here then we might end up with regularised oms as the hit if the basetext is om
                 }
               }
-  
               if (omReading) {
                 // addedWits is identifiers rather than sigla for readings so use hand_id_map here instead
                 // we can assume that basetext is om in both cases as it is the same text so the check of exisitng
@@ -4100,7 +4110,7 @@ var CL = (function() {
                 }
               }
               index = newUnit.end + 1;
-            } else {
+            } else { // we have a existing unit to add the new unit to
               if (newUnit.end == existingUnit.end) {
                 for (let j = 0; j < newUnit.readings.length; j += 1) {
                   matchingReadingFound = false;
@@ -4184,24 +4194,56 @@ var CL = (function() {
     },
 
     _mergeNewLacOmVerseReadings: function(unit, newData) {
-      for (let i = 0; i < unit.readings.length; i += 1) {
-        if (Object.prototype.hasOwnProperty.call(unit.readings[i], 'type')) {
-          if (unit.readings[i].type === 'lac_verse' && newData.lac_readings.length > 0) {
-            for (let j = 0; j < newData.lac_readings.length; j += 1) {
-              if (unit.readings[i].witnesses.indexOf(newData.lac_readings[j]) === -1) {
-                unit.readings[i].witnesses.push(newData.lac_readings[j]);
-              }
+      /** Merge any lac/om verse readings from the new data into the provided unit or add a new reading if no
+       * appropriate reading exists. */
+      let lacsAdded, omsAdded;
+      if (newData.lac_readings.length > 0) {
+        lacsAdded = false;
+        for (let i = 0; i < unit.readings.length; i += 1) {
+          if (Object.prototype.hasOwnProperty.call(unit.readings[i], 'type')) {
+            if (unit.readings[i].type === 'lac_verse') {
+              lacsAdded = true;
+              for (let j = 0; j < newData.lac_readings.length; j += 1) {
+                if (unit.readings[i].witnesses.indexOf(newData.lac_readings[j]) === -1) {
+                  unit.readings[i].witnesses.push(newData.lac_readings[j]);
+                }
+              }   
             }
+          }
+        }
+        if (!lacsAdded) {
+          // add a new reading
+          unit.readings.push({
+            'text': [],
+            'type': 'lac_verse',
+            'details': CL.project.lacUnitLabel,
+            'witnesses': JSON.parse(JSON.stringify(newData.lac_readings))
+          });
+        }
+      }
+      if (newData.om_readings.length > 0) {
+        omsAdded = false;
+        for (let i = 0; i < unit.readings.length; i += 1) {
+          if (unit.readings[i].type === 'om_verse') {
+            omsAdded = true;
             // untested but same code as above
             // om verse might want to look for an overlapped unit and add to that with duplicates in the top line for
             // user to deal with
-          } else if (unit.readings[i].type === 'om_verse' && newData.om_readings.length > 0) {
             for (let j = 0; j < newData.om_readings.length; j += 1) {
               if (unit.readings[i].witnesses.indexOf(newData.om_readings[j]) === -1) {
-                unit.readings[i].witnesses.push(newData.om_readings[j]);
+                unit.readings[i].witnesses.push(newData.om_readings[j]);      
               }
             }
           }
+        }
+        if (!omsAdded) {
+          // add a new reading
+          unit.readings.push({
+            'text': [],
+            'type': 'om_verse',
+            'details': CL.project.omUnitLabel,
+            'witnesses': JSON.parse(JSON.stringify(newData.om_readings))
+          });
         }
       }
     },

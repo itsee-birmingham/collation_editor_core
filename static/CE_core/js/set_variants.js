@@ -5014,6 +5014,8 @@ var SV = (function() {
       let apparatusNum, appId, witId, tokens;
       spinner.showLoadingOverlay();
       SV.prepareForOperation();
+      const scrollOffset = [document.getElementById('scroller').scrollLeft,
+                            document.getElementById('scroller').scrollTop];
       // find the correct apparatus
       if (index.match(/-app-/g)) {
         apparatusNum = parseInt(index.match(/\d+/g)[1], 10);
@@ -5087,6 +5089,8 @@ var SV = (function() {
           CL.data = originalData;
           CL.dataSettings = originalSettings;
           SV.showSetVariantsData();
+          document.getElementById('scroller').scrollLeft = scrollOffset[0];
+          document.getElementById('scroller').scrollTop = scrollOffset[1];
           return;
         }
         const filteredCollationData = {'results': []};
@@ -5167,6 +5171,8 @@ var SV = (function() {
           // restore the original data settings so we don't end up with a short witness list
           CL.dataSettings = originalSettings;
           SV.showSetVariants(options);
+          document.getElementById('scroller').scrollLeft = scrollOffset[0];
+          document.getElementById('scroller').scrollTop = scrollOffset[1];
         });
       });
     },

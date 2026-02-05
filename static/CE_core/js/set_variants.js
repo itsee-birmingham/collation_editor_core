@@ -5104,8 +5104,6 @@ var SV = (function() {
           return;
         }
       }
-
-
       // remove the relevant witnesses from the section of the collation representing the overlap
       const wordRanges = {};
       const lacOmDetails = [];
@@ -5276,20 +5274,22 @@ var SV = (function() {
     _getWitnessIndexesForHand: function(units, hand) {
       /* Get the word index range in the requested hand that covers the full extent of the overlapping units provided */
       const indexes = [null, null, null];
+      let currentIndex;
       for (const unit of units) {
         for (const reading of unit.readings) {
           if (reading.witnesses.indexOf(hand) !== -1) { // this is the right reading
             for (const word of reading.text) {
-              if (Object.prototype.hasOwnProperty.call(word, hand)) {             
+              if (Object.prototype.hasOwnProperty.call(word, hand)) {
+                currentIndex = parseInt(word[hand].index)         
                 if (indexes[0] === null) {
-                  indexes[0] = word[hand].index;
-                  indexes[1] = word[hand].index;
+                  indexes[0] = currentIndex;
+                  indexes[1] = currentIndex;
                 } else {
                   if (word[hand].index < indexes[0]) {
-                    indexes[0] = word[hand].index;
+                    indexes[0] = currentIndex;
                   }
                   if (word[hand].index > indexes[1]) {
-                    indexes[1] = word[hand].index;
+                    indexes[1] = currentIndex;
                   }
                 }
               }

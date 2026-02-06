@@ -3928,7 +3928,7 @@ var CL = (function() {
         matchingReadingFound, unitQueue, nextUnits, unit1, unit2, tempUnit, omReading,
         existingWitnesses, before, after, beforeIds, afterIds,
         sharedIds, overlappedWitnesses;
-  
+
       for (let i = 0; i < addedWits.length; i += 1) {
         if (mainCollation.data_settings.witness_list.indexOf(addedWits[i]) === -1) {
           mainCollation.data_settings.witness_list.push(addedWits[i]);
@@ -3975,13 +3975,15 @@ var CL = (function() {
         for (let z = 0; z < Math.max(newUnits.length, existingUnits.length); z += 1) {
           newUnit = z < newUnits.length ? newUnits[z] : null;
           existingUnit = z < existingUnits.length ? existingUnits[z] : null;
+          // first handle the om and lac verse stuff
           if (existingUnit !== null && (newData.lac_readings.length > 0 || newData.om_readings.length > 0)) {
             CL._mergeNewLacOmVerseReadings(existingUnit, newData);
           }
+          // now move onto the readings
           if (newUnit === null && existingUnit === null) {
             index += 1;
           } else {
-            if (newUnit === null) {
+            if (newUnit === null) { // then these witnesses are added as oms (lacOmfix might change that later)
               omReading = null;
               for (let i = 0; i < existingUnit.readings.length; i += 1) {
                 // NB: this last condition should not be needed but before 26/09/21 the code was incorrectly

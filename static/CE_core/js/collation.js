@@ -4115,12 +4115,12 @@ var CL = (function() {
                 for (let j = 0; j < newUnit.readings.length; j += 1) {
                   matchingReadingFound = false;
                   newReadingText = CL.extractWitnessText(newUnit.readings[j]);
-  
                   for (let k = 0; k < existingUnit.readings.length; k += 1) {
                     if (!Object.prototype.hasOwnProperty.call(existingUnit.readings[k], 'overlap_status') &&
                       CL.extractWitnessText(existingUnit.readings[k]) === newReadingText) {
                       matchingReadingFound = true;
                       CL._mergeNewReading(existingUnit.readings[k], newUnit.readings[j]);
+                      break;  // if we don't break here then we might end up with regularised oms as the hit if the basetext is om
                     }
                   }
                   if (matchingReadingFound === false) {

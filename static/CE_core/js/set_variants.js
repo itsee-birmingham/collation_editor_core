@@ -5137,25 +5137,29 @@ var SV = (function() {
       CL.services.getUnitData(CL.context, CL.dataSettings.witness_list, function (collationData) {
         const witnessesInData = [];
         for (let entry of collationData.results) {
-          for (let j = 0; j < entry.witnesses.length; j += 1) {
-            // collate just the hands we need
-            witId = entry.witnesses[j].id;
-            if (witId !== CL.data.overtext_name && witnesses.indexOf(witId) === -1) {
-              entry.witnesses[j] = null;
-            } else if (witId !== CL.data.overtext_name && wordRanges[witId][2] !== null) { // this is lac or om for the chunk so don't collate
-              entry.witnesses[j].tokens = [];
-              entry.witnesses[j].gap_reading = 'for_fixing';
-              if (lacOmDetails.indexOf(wordRanges[witId][2].join('|')) === -1) {
-                lacOmDetails.push(wordRanges[witId][2].join('|'));
+          if (entry.witnesses === null) {  // this will be an om verse
+            witnessesInData.push(entry.siglum);
+          } else {
+            for (let j = 0; j < entry.witnesses.length; j += 1) {
+              // collate just the hands we need
+              witId = entry.witnesses[j].id;
+              if (witId !== CL.data.overtext_name && witnesses.indexOf(witId) === -1) {
+                entry.witnesses[j] = null;
+              } else if (witId !== CL.data.overtext_name && wordRanges[witId][2] !== null) { // this is lac or om for the chunk so don't collate
+                entry.witnesses[j].tokens = [];
+                entry.witnesses[j].gap_reading = 'for_fixing';
+                if (lacOmDetails.indexOf(wordRanges[witId][2].join('|')) === -1) {
+                  lacOmDetails.push(wordRanges[witId][2].join('|'));
+                }
+                witnessesInData.push(witId);
+              } else {
+                // collate just the text chunk we need
+                tokens = entry.witnesses[j].tokens.filter(
+                  x => parseInt(x.index) >= wordRanges[entry.witnesses[j].id][0] && parseInt(x.index) <= wordRanges[entry.witnesses[j].id][1]
+                );
+                entry.witnesses[j].tokens = tokens;
+                witnessesInData.push(witId);
               }
-              witnessesInData.push(witId);
-            } else {
-              // collate just the text chunk we need
-              tokens = entry.witnesses[j].tokens.filter(
-                x => parseInt(x.index) >= wordRanges[entry.witnesses[j].id][0] && parseInt(x.index) <= wordRanges[entry.witnesses[j].id][1]
-              );
-              entry.witnesses[j].tokens = tokens;
-              witnessesInData.push(witId);
             }
           } 
         }
@@ -5176,10 +5180,14 @@ var SV = (function() {
         }
         const filteredCollationData = {'results': []};
         for (let entry of collationData.results) {
-          entry.witnesses = entry.witnesses.filter(x => x !== null)
-          if (entry.witnesses.length > 0) {         
+          if (entry.witnesses !== null) {
+            entry.witnesses = entry.witnesses.filter(x => x !== null)
+            if (entry.witnesses.length > 0) {         
+              filteredCollationData.results.push(entry);
+            }
+          }  else {
             filteredCollationData.results.push(entry);
-          }
+          } 
         }
         CL.existingCollation = JSON.parse(JSON.stringify(CL.data));
         CL.collateData = {

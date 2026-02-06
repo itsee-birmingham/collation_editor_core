@@ -5228,15 +5228,28 @@ var SV = (function() {
           // add the data back in
           // just get the chunk we need to change
           const chunk = CL.existingCollation.apparatus.slice(range[0], range[1] + 1);
+          // renumber units that start with 1 to the gap before the first non-gap unit
           if (data.apparatus[0].start === 1 && preChunk.length > 0) {
-            if (preChunk[preChunk.length -1].end % 2 === 0) {
-              data.apparatus[0].start = preChunk[preChunk.length -1].end + 1;
-              data.apparatus[0].end = preChunk[preChunk.length -1].end + 1;
-              data.apparatus[0].first_word_index = data.apparatus[0].end + '.1';
-            } else {
-              data.apparatus[0].start = preChunk[preChunk.length -1].end;
-              data.apparatus[0].end = preChunk[preChunk.length -1].end;
-              data.apparatus[0].first_word_index = SV._incrementSubIndex(preChunk[preChunk.length -1].first_word_index, 1);
+            let i = 0;
+            while(data.apparatus[i].start === 1) {
+              if (preChunk[preChunk.length -1].end % 2 === 0) { // this is an even numbered unit 
+                data.apparatus[i].start = preChunk[preChunk.length -1].end + 1;
+                data.apparatus[i].end = preChunk[preChunk.length -1].end + 1;
+                if (i === 0) {
+                  data.apparatus[i].first_word_index = data.apparatus[i].end + '.1';
+                } else {
+                  data.apparatus[i].first_word_index = SV._incrementSubIndex(data.apparatus[i - 1].first_word_index, 1);
+                }
+              } else { // this is an addition unit
+                data.apparatus[i].start = preChunk[preChunk.length -1].end;
+                data.apparatus[i].end = preChunk[preChunk.length -1].end;
+                if (i === 0) {
+                  data.apparatus[i].first_word_index = SV._incrementSubIndex(preChunk[preChunk.length -1].first_word_index, 1);
+                } else {
+                  data.apparatus[i].first_word_index = SV._incrementSubIndex(data.apparatus[i - 1].first_word_index, 1);
+                }
+              }
+              i += 1;
             }
           }
           const mergedCollationChunk = CL._mergeCollationObjects(

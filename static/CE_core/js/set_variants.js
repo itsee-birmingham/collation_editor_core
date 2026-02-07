@@ -5115,7 +5115,6 @@ var SV = (function() {
           let [currentAppId, currentIndex] = SV._getAppIdAndIndexByOverlapId(currentOverlappingUnit._id);
           // remove from the current overlap unit - needs to be returned because it isn't passing as reference through the full function chain
           CL.data[currentAppId][currentIndex] = SV._removeWitnessFromUnitAndSortRemainder(currentOverlappingUnit, hand, currentAppId);
-          //CL.data[appId][index] = SV._removeWitnessFromUnitAndSortRemainder(overlapUnit, hand, appId);
           CL.removeNullItems(CL.data[currentAppId]);
         }
         // now remove from the top line
@@ -5137,14 +5136,20 @@ var SV = (function() {
       CL.services.getUnitData(CL.context, CL.dataSettings.witness_list, function (collationData) {
         const witnessesInData = [];
         for (let entry of collationData.results) {
-          if (entry.witnesses === null) {  // this will be an om verse
+          if (entry.witnesses === null) {  // this will be an om verse (single hand in the MS)
             witnessesInData.push(entry.siglum);
           } else {
             for (let j = 0; j < entry.witnesses.length; j += 1) {
               // collate just the hands we need
               witId = entry.witnesses[j].id;
               if (witId !== CL.data.overtext_name && witnesses.indexOf(witId) === -1) {
-                entry.witnesses[j] = null;
+                entry.witnesses[j] = null; // remove the witness if it isn't a witness in the overlap being removed
+              } else if (entry.witnesses[j].tokens.length === 0) { // then this hand is om_verse
+                entry.witnesses[j].tokens = null;              
+                if (lacOmDetails.indexOf(wordRanges[witId][2].join('|')) === -1) {
+                  lacOmDetails.push(wordRanges[witId][2].join('|'));
+                }
+                witnessesInData.push(witId);
               } else if (witId !== CL.data.overtext_name && wordRanges[witId][2] !== null) { // this is lac or om for the chunk so don't collate
                 entry.witnesses[j].tokens = [];
                 entry.witnesses[j].gap_reading = 'for_fixing';

@@ -5046,6 +5046,8 @@ var SV = (function() {
       let apparatusNum, appId, witId, tokens;
       spinner.showLoadingOverlay();
       SV.prepareForOperation();
+      const scrollOffset = [document.getElementById('scroller').scrollLeft,
+                            document.getElementById('scroller').scrollTop];
       // find the correct apparatus
       if (index.match(/-app-/g)) {
         apparatusNum = parseInt(index.match(/\d+/g)[1], 10);
@@ -5102,8 +5104,6 @@ var SV = (function() {
           return;
         }
       }
-
-
       // remove the relevant witnesses from the section of the collation representing the overlap
       const wordRanges = {};
       const lacOmDetails = [];
@@ -5115,7 +5115,6 @@ var SV = (function() {
           let [currentAppId, currentIndex] = SV._getAppIdAndIndexByOverlapId(currentOverlappingUnit._id);
           // remove from the current overlap unit - needs to be returned because it isn't passing as reference through the full function chain
           CL.data[currentAppId][currentIndex] = SV._removeWitnessFromUnitAndSortRemainder(currentOverlappingUnit, hand, currentAppId);
-          //CL.data[appId][index] = SV._removeWitnessFromUnitAndSortRemainder(overlapUnit, hand, appId);
           CL.removeNullItems(CL.data[currentAppId]);
         }
         // now remove from the top line
@@ -5137,25 +5136,35 @@ var SV = (function() {
       CL.services.getUnitData(CL.context, CL.dataSettings.witness_list, function (collationData) {
         const witnessesInData = [];
         for (let entry of collationData.results) {
-          for (let j = 0; j < entry.witnesses.length; j += 1) {
-            // collate just the hands we need
-            witId = entry.witnesses[j].id;
-            if (witId !== CL.data.overtext_name && witnesses.indexOf(witId) === -1) {
-              entry.witnesses[j] = null;
-            } else if (witId !== CL.data.overtext_name && wordRanges[witId][2] !== null) { // this is lac or om for the chunk so don't collate
-              entry.witnesses[j].tokens = [];
-              entry.witnesses[j].gap_reading = 'for_fixing';
-              if (lacOmDetails.indexOf(wordRanges[witId][2].join('|')) === -1) {
-                lacOmDetails.push(wordRanges[witId][2].join('|'));
+          if (entry.witnesses === null) {  // this will be an om verse (single hand in the MS)
+            witnessesInData.push(entry.siglum);
+          } else {
+            for (let j = 0; j < entry.witnesses.length; j += 1) {
+              // collate just the hands we need
+              witId = entry.witnesses[j].id;
+              if (witId !== CL.data.overtext_name && witnesses.indexOf(witId) === -1) {
+                entry.witnesses[j] = null; // remove the witness if it isn't a witness in the overlap being removed
+              } else if (entry.witnesses[j].tokens.length === 0) { // then this hand is om_verse
+                entry.witnesses[j].tokens = null;              
+                if (lacOmDetails.indexOf(wordRanges[witId][2].join('|')) === -1) {
+                  lacOmDetails.push(wordRanges[witId][2].join('|'));
+                }
+                witnessesInData.push(witId);
+              } else if (witId !== CL.data.overtext_name && wordRanges[witId][2] !== null) { // this is lac or om for the chunk so don't collate
+                entry.witnesses[j].tokens = [];
+                entry.witnesses[j].gap_reading = 'for_fixing';
+                if (lacOmDetails.indexOf(wordRanges[witId][2].join('|')) === -1) {
+                  lacOmDetails.push(wordRanges[witId][2].join('|'));
+                }
+                witnessesInData.push(witId);
+              } else {
+                // collate just the text chunk we need
+                tokens = entry.witnesses[j].tokens.filter(
+                  x => parseInt(x.index) >= wordRanges[entry.witnesses[j].id][0] && parseInt(x.index) <= wordRanges[entry.witnesses[j].id][1]
+                );
+                entry.witnesses[j].tokens = tokens;
+                witnessesInData.push(witId);
               }
-              witnessesInData.push(witId);
-            } else {
-              // collate just the text chunk we need
-              tokens = entry.witnesses[j].tokens.filter(
-                x => parseInt(x.index) >= wordRanges[entry.witnesses[j].id][0] && parseInt(x.index) <= wordRanges[entry.witnesses[j].id][1]
-              );
-              entry.witnesses[j].tokens = tokens;
-              witnessesInData.push(witId);
             }
           } 
         }
@@ -5170,14 +5179,20 @@ var SV = (function() {
           CL.data = originalData;
           CL.dataSettings = originalSettings;
           SV.showSetVariantsData();
+          document.getElementById('scroller').scrollLeft = scrollOffset[0];
+          document.getElementById('scroller').scrollTop = scrollOffset[1];
           return;
         }
         const filteredCollationData = {'results': []};
         for (let entry of collationData.results) {
-          entry.witnesses = entry.witnesses.filter(x => x !== null)
-          if (entry.witnesses.length > 0) {         
+          if (entry.witnesses !== null) {
+            entry.witnesses = entry.witnesses.filter(x => x !== null)
+            if (entry.witnesses.length > 0) {         
+              filteredCollationData.results.push(entry);
+            }
+          }  else {
             filteredCollationData.results.push(entry);
-          }
+          } 
         }
         CL.existingCollation = JSON.parse(JSON.stringify(CL.data));
         CL.collateData = {
@@ -5218,15 +5233,28 @@ var SV = (function() {
           // add the data back in
           // just get the chunk we need to change
           const chunk = CL.existingCollation.apparatus.slice(range[0], range[1] + 1);
+          // renumber units that start with 1 to the gap before the first non-gap unit
           if (data.apparatus[0].start === 1 && preChunk.length > 0) {
-            if (preChunk[preChunk.length -1].end % 2 === 0) {
-              data.apparatus[0].start = preChunk[preChunk.length -1].end + 1;
-              data.apparatus[0].end = preChunk[preChunk.length -1].end + 1;
-              data.apparatus[0].first_word_index = data.apparatus[0].end + '.1';
-            } else {
-              data.apparatus[0].start = preChunk[preChunk.length -1].end;
-              data.apparatus[0].end = preChunk[preChunk.length -1].end;
-              data.apparatus[0].first_word_index = SV._incrementSubIndex(preChunk[preChunk.length -1].first_word_index, 1);
+            let i = 0;
+            while(data.apparatus[i].start === 1) {
+              if (preChunk[preChunk.length -1].end % 2 === 0) { // this is an even numbered unit 
+                data.apparatus[i].start = preChunk[preChunk.length -1].end + 1;
+                data.apparatus[i].end = preChunk[preChunk.length -1].end + 1;
+                if (i === 0) {
+                  data.apparatus[i].first_word_index = data.apparatus[i].end + '.1';
+                } else {
+                  data.apparatus[i].first_word_index = SV._incrementSubIndex(data.apparatus[i - 1].first_word_index, 1);
+                }
+              } else { // this is an addition unit
+                data.apparatus[i].start = preChunk[preChunk.length -1].end;
+                data.apparatus[i].end = preChunk[preChunk.length -1].end;
+                if (i === 0) {
+                  data.apparatus[i].first_word_index = SV._incrementSubIndex(preChunk[preChunk.length -1].first_word_index, 1);
+                } else {
+                  data.apparatus[i].first_word_index = SV._incrementSubIndex(data.apparatus[i - 1].first_word_index, 1);
+                }
+              }
+              i += 1;
             }
           }
           const mergedCollationChunk = CL._mergeCollationObjects(
@@ -5250,6 +5278,8 @@ var SV = (function() {
           // restore the original data settings so we don't end up with a short witness list
           CL.dataSettings = originalSettings;
           SV.showSetVariants(options);
+          document.getElementById('scroller').scrollLeft = scrollOffset[0];
+          document.getElementById('scroller').scrollTop = scrollOffset[1];
         });
       });
     },
@@ -5270,20 +5300,22 @@ var SV = (function() {
     _getWitnessIndexesForHand: function(units, hand) {
       /* Get the word index range in the requested hand that covers the full extent of the overlapping units provided */
       const indexes = [null, null, null];
+      let currentIndex;
       for (const unit of units) {
         for (const reading of unit.readings) {
           if (reading.witnesses.indexOf(hand) !== -1) { // this is the right reading
             for (const word of reading.text) {
-              if (Object.prototype.hasOwnProperty.call(word, hand)) {             
+              if (Object.prototype.hasOwnProperty.call(word, hand)) {
+                currentIndex = parseInt(word[hand].index)         
                 if (indexes[0] === null) {
-                  indexes[0] = word[hand].index;
-                  indexes[1] = word[hand].index;
+                  indexes[0] = currentIndex;
+                  indexes[1] = currentIndex;
                 } else {
                   if (word[hand].index < indexes[0]) {
-                    indexes[0] = word[hand].index;
+                    indexes[0] = currentIndex;
                   }
                   if (word[hand].index > indexes[1]) {
-                    indexes[1] = word[hand].index;
+                    indexes[1] = currentIndex;
                   }
                 }
               }

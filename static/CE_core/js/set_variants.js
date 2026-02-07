@@ -4963,6 +4963,23 @@ var SV = (function() {
       }
     },
 
+    _findOverlappedRange: function(overlappingId) {
+      let startIndex, endIndex;
+      startIndex = null;
+      endIndex = null;
+      for (let i = 0; i < CL.data.apparatus.length; i += 1) {
+        if (Object.prototype.hasOwnProperty.call(CL.data.apparatus[i], 'overlap_units') && Object.prototype.hasOwnProperty.call(CL.data.apparatus[i].overlap_units, overlappingId)) {
+          if (startIndex === null) {
+            startIndex = i;
+            endIndex = i;
+          } else {
+            endIndex = i;
+          }
+        }
+      }
+      return [startIndex, endIndex];
+    },
+
     _addOverlappedEvent: function(id, flag) {
       $('#' + id).off('click.' + id + '_c');
       $('#' + id).off('mouseover.' + id + '_mo');

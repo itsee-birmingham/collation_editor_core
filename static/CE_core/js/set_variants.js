@@ -5030,6 +5030,25 @@ var SV = (function() {
       }
     },
 
+    _deleteStandoffRegularisation: function(unit, witness) {
+      for (const key in CL.data.marked_readings) {
+        if (Object.prototype.hasOwnProperty.call(CL.data.marked_readings, key)) {
+          for (let i = 0; i < CL.data.marked_readings[key].length; i += 1) {
+            if (CL.data.marked_readings[key][i].start === unit.start && 
+                    CL.data.marked_readings[key][i].end === unit.end) { //if this is the right unit
+              if (CL.data.marked_readings[key][i].witness === witness) { //and we have the right witness
+                CL.data.marked_readings[key][i] = null;
+              }
+            }
+          }
+          CL.data.marked_readings[key] = CL.removeNullItems(CL.data.marked_readings[key]);
+          if (CL.data.marked_readings[key].length === 0) {
+            delete CL.data.marked_readings[key];
+          }
+        }
+      }
+    },
+
     _removeOverlap: function(index, originalData, originalSettings) {
       /** Remove a current overlapping unit (activated from the right click context menu). Index is the id of the unit
        * being removed. The witnesses in this reading are removed from the section of text included in the overlap and
@@ -5104,7 +5123,10 @@ var SV = (function() {
           return;
         }
       }
-      // remove the relevant witnesses from the section of the collation representing the overlap
+      /* remove the relevant witnesses from the section of the collation representing the overlap while also removing
+      /* any standoff regularisations for these witnesses in the units being removed in the top line (we only need to do
+      /* this for the top line because overlaps will be removed entirely and the standoff removed as part of the clean
+      /* up process for no longer applied regularisations) */
       const wordRanges = {};
       const lacOmDetails = [];
       wordRanges['basetext'] = SV._getWitnessIndexesForHand(allOverlappingUnits, 'basetext');
@@ -5121,6 +5143,7 @@ var SV = (function() {
         for (let i = range[0]; i <= range[1]; i += 1) {       
           CL.data.apparatus[i] = SV._removeWitnessFromUnitAndSortRemainder(CL.data.apparatus[i], hand, 'apparatus');
           CL.removeNullItems(CL.data.apparatus);
+          SV._deleteStandoffRegularisation(CL.data.apparatus[i], hand);
         }
       }
       // now add them back in

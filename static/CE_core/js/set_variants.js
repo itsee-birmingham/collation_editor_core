@@ -5123,10 +5123,11 @@ var SV = (function() {
           return;
         }
       }
-      /* remove the relevant witnesses from the section of the collation representing the overlap while also removing
-      /* any standoff regularisations for these witnesses in the units being removed in the top line (we only need to do
-      /* this for the top line because overlaps will be removed entirely and the standoff removed as part of the clean
-      /* up process for no longer applied regularisations) */
+      /** remove the relevant witnesses from the section of the collation representing the overlap while also removing
+       * any standoff regularisations for these witnesses in the units being removed in the top line (we only need to do
+       * this for the top line because overlaps will be removed entirely and the standoff removed as part of the clean
+       * up process for no longer applied regularisations)
+       */
       const wordRanges = {};
       const lacOmDetails = [];
       wordRanges['basetext'] = SV._getWitnessIndexesForHand(allOverlappingUnits, 'basetext');

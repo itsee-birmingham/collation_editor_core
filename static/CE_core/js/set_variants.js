@@ -708,10 +708,12 @@ var SV = (function() {
      * at the end of this operation standoff marked readings should still be main readings even if they share a parent with another reading
      * we only need to combined readings that are not marked as standoff
      * */
-    unsplitUnitWitnesses: function(unitNum, appId) {
-      var text, unit, reading, readingList, index, witness, standoffRecord, isStandoff;
+    unsplitUnitWitnesses: function(unitNum, appId, unit) {
+      var text, reading, readingList, index, witness, standoffRecord, isStandoff;
       readingList = [];
-      unit = CL.data[appId][unitNum];
+      if (unit === undefined) {
+        unit = CL.data[appId][unitNum];
+      }
       SV._removeSeparatedWitnessData(appId, unit._id);
 
       for (let i = 0; i < unit.readings.length; i += 1) {

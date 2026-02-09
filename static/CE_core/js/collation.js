@@ -4131,6 +4131,7 @@ var CL = (function() {
                     existingUnit.readings.push(newUnit.readings[j]);
                   }
                 }
+                SV.unsplitUnitWitnesses(undefined, 'apparatus', existingUnit);
                 index = newUnit.end + 1;
               } else {
                 // no end agreement

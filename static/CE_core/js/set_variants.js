@@ -5303,6 +5303,7 @@ var SV = (function() {
           options.container = CL.container;
           // restore the original data settings so we don't end up with a short witness list
           CL.dataSettings = originalSettings;
+          CL._separateOverlapsInAddedUnits();
           SV.showSetVariants(options);
           document.getElementById('scroller').scrollLeft = scrollOffset[0];
           document.getElementById('scroller').scrollTop = scrollOffset[1];

@@ -5226,6 +5226,7 @@ var SV = (function() {
           'lac_witnesses': lacWitnesses
         };
         RG.runCollation(CL.collateData, 'remove_overlap', 0, function(data) {
+          let before, after;
           // set up
           CL.data = data; // temporary assignment to allow all the cleaning functions to work.
           /** Now sort out the gaps if we have an all gap chunk - they will always come back as lac but
@@ -5283,12 +5284,21 @@ var SV = (function() {
               i += 1;
             }
           }
+          before = null;
+          after = null;
+          if (preChunk.length > 0) {
+            before = preChunk[preChunk.length - 1];
+          }
+          if (postChunk.length > 0) {
+            after = postChunk[0];
+          }
           const mergedCollationChunk = CL._mergeCollationObjects(
             {'structure': {'apparatus': chunk, 'lac_readings': [], 'om_readings': []}},
             data,
             [],
             data.apparatus[0].start - 1,
-            data.apparatus[data.apparatus.length - 1].end + 1
+            data.apparatus[data.apparatus.length - 1].end + 1,
+            [before, after]
           );
           CL.existingCollation.apparatus = preChunk.concat(mergedCollationChunk.structure.apparatus, postChunk);
           CL.data = JSON.parse(JSON.stringify(CL.existingCollation));

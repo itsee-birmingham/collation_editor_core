@@ -3918,7 +3918,7 @@ var CL = (function() {
       }
     },
 
-    _mergeCollationObjects: function(mainCollation, newData, addedWits, startIndex, endIndex) {
+    _mergeCollationObjects: function(mainCollation, newData, addedWits, startIndex, endIndex, adjoiningUnits) {
       /** This merges a new collation into an existing collation. This might be a full verse if we are in add witness
       /* mode or a small chunk of a verse if we are removing an overlapping unit.
       /* AddedWits should be an empty list if removing an overlapping unit.
@@ -4084,6 +4084,7 @@ var CL = (function() {
               newUnit.added = true;
               mainCollation.structure.apparatus.push(newUnit);
               mainCollation.structure.apparatus.sort(SV.compareFirstWordIndexes);
+
               before = null;
               after = null;
               for (let i = 0; i < mainCollation.structure.apparatus.length; i += 1) {
@@ -4093,6 +4094,12 @@ var CL = (function() {
                 if (mainCollation.structure.apparatus[i].start === newUnit.start + 1) {
                   after = mainCollation.structure.apparatus[i];
                 }
+              }
+              if (before === null && adjoiningUnits !== undefined) {
+                before = adjoiningUnits[0];
+              }
+              if (after === null && adjoiningUnits !== undefined) {
+                after = adjoiningUnits[1];
               }
               if (before && after && Object.prototype.hasOwnProperty.call(before, 'overlap_units') &&
                       Object.prototype.hasOwnProperty.call(after, 'overlap_units')) {

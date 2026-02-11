@@ -4129,7 +4129,7 @@ var CL = (function() {
                       CL.extractWitnessText(existingUnit.readings[k]) === newReadingText) {
                       matchingReadingFound = true;
                       CL._mergeNewReading(existingUnit.readings[k], newUnit.readings[j]);
-                      break;  // if we don't break here then we might end up with regularised oms as the hit if the basetext is om
+                      break;  // if we don't break here then we might end up with a regularised reading as a hit
                     }
                   }
                   if (matchingReadingFound === false) {
@@ -4171,6 +4171,7 @@ var CL = (function() {
                       CL.extractWitnessText(existingUnit.readings[k]) === newReadingText) {
                       matchingReadingFound = true;
                       CL._mergeNewReading(existingUnit.readings[k], unit1.readings[j]);
+                      break;  // if we don't break here then we might end up with a regularised reading as the hit
                     }
                   }
                   if (matchingReadingFound === false) {

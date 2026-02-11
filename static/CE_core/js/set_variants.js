@@ -5292,8 +5292,13 @@ var SV = (function() {
           if (postChunk.length > 0) {
             after = postChunk[0];
           }
+          const baseCollationChunk = {
+            'structure': {
+              'apparatus': chunk, 'lac_readings': originalData.lac_readings, 'om_readings': originalData.om_readings
+            }
+          };
           const mergedCollationChunk = CL._mergeCollationObjects(
-            {'structure': {'apparatus': chunk, 'lac_readings': [], 'om_readings': []}},
+            baseCollationChunk,
             data,
             [],
             data.apparatus[0].start - 1,

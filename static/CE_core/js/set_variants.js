@@ -5143,7 +5143,7 @@ var SV = (function() {
           CL.removeNullItems(CL.data[currentAppId]);
         }
         // now remove from the top line
-        for (let i = range[0]; i <= range[1]; i += 1) {       
+        for (let i = range[1]; i >= range[0]; i -= 1) {
           CL.data.apparatus[i] = SV._removeWitnessFromUnitAndSortRemainder(CL.data.apparatus[i], hand, 'apparatus');
           CL.removeNullItems(CL.data.apparatus);
           SV._deleteStandoffRegularisation(CL.data.apparatus[i], hand);

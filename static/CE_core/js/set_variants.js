@@ -5133,6 +5133,7 @@ var SV = (function() {
       const wordRanges = {};
       const lacOmDetails = [];
       wordRanges['basetext'] = SV._getWitnessIndexesForHand(allOverlappingUnits, 'basetext');
+      let nullCount = 0;
       for (const hand of witnesses) {
         wordRanges[hand] = SV._getWitnessIndexesForHand(allOverlappingUnits, hand);
         // here we need to remove the witness and return the unit for all overlapping units - we need to find appId and index for each one first!
@@ -5142,13 +5143,18 @@ var SV = (function() {
           CL.data[currentAppId][currentIndex] = SV._removeWitnessFromUnitAndSortRemainder(currentOverlappingUnit, hand, currentAppId);
           CL.removeNullItems(CL.data[currentAppId]);
         }
-        // now remove from the top line
+        // now remove from the top line while keeping a count of any top line untis that are removed.
         for (let i = range[1]; i >= range[0]; i -= 1) {
           CL.data.apparatus[i] = SV._removeWitnessFromUnitAndSortRemainder(CL.data.apparatus[i], hand, 'apparatus');
+          if (CL.data.apparatus[i] === null) {
+            nullCount += 1;
+          }
           CL.removeNullItems(CL.data.apparatus);
           SV._deleteStandoffRegularisation(CL.data.apparatus[i], hand);
         }
       }
+      // recalculate the final unit in the range based on any that have been removed.
+      range[1] = range[1] - nullCount;
       // now add them back in
       // get the data and split out just the sections we need (details in wordRanges)
       CL.dataSettings.witness_list = [];

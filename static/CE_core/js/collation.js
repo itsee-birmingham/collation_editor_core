@@ -237,7 +237,8 @@ var CL = (function() {
         options = {};
       }
       text = [];
-      witnessText = [];
+      // eslint disabled because I think it is safer to assign a default here given the complex branching in this function
+      witnessText = [];  /* eslint-disable-line no-useless-assignment */
       // first fix the display of overlapped statuses
       if (Object.prototype.hasOwnProperty.call(reading, 'overlap_status') && reading.overlap_status !== 'duplicate') {
         if (test === true) {

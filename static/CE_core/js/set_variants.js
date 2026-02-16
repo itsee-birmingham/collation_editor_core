@@ -789,7 +789,7 @@ var SV = (function() {
             readingList.push(null);  // needed so our list indexes stay alligned with the readings in the unit
             if (unit.readings[index].type === 'om') {
               unit.readings[index].witnesses.push.apply(unit.readings[index].witnesses, reading.witnesses);
-              reading = null;
+              reading = null; /* eslint-disable-line no-useless-assignment */
             }
           } else {
             readingList.push(text);
@@ -1428,7 +1428,6 @@ var SV = (function() {
       let subrowId, suffix, textString, highlightedClasses;
       const html = [];
       const rowList = [];
-      textString = '';
       if (Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
         html.push('<ul class="subreading-unit" id="subreading-unit-' + id + '-row-' + i + '">');
         for (const type in reading.subreadings) {
@@ -1725,7 +1724,6 @@ var SV = (function() {
         if (previousIndex === -1) {
           previousIndex = mainIndexes.indexOf(missingIndexes[i] - 2);
         }
-        nextIndex = -1
         nextIndex = mainIndexes.indexOf(missingIndexes[i] + 1);
         if (nextIndex === -1) {
           nextIndex = mainIndexes.indexOf(missingIndexes[i] + 2);

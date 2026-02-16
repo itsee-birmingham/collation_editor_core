@@ -2817,7 +2817,7 @@ var CL = (function() {
           CL.dataSettings.base_text = document.getElementById('base-text').value;
         } else {
           alert('You can only add witnesses if the project base text is currently the same as the one used for the ' +
-            'saved collation. This is not the case with yur data.\n\nTo add witnesses change the project base ' +
+            'saved collation. This is not the case with your data.\n\nTo add witnesses change the project base ' +
             'text to match the saved collations.');
           CL.returnToSummaryTable();
           return;
@@ -4009,12 +4009,18 @@ var CL = (function() {
                 }
                 index = existingUnit.end + 1;
               } else {
-                alert('The new witnesses could not be added this time due to a base text conflict.\n' +
+                if (addedWits.length > 0) { // then we are trying to add witnesses
+                  alert('The new witnesses could not be added this time due to a base text conflict.\n' +
                   'Please check that your current project base text is the same as that used for the saved ' +
                   'collations and then try again.');
-                spinner.removeLoadingOverlay();
-                CL.returnToSummaryTable();
-                return;
+                  spinner.removeLoadingOverlay();
+                  CL.returnToSummaryTable();
+                  return;
+                } else {
+                  alert('Something went wrong while trying to remove the overlap. You must reload this page and not continue editing.')
+                  spinner.removeLoadingOverlay();
+                  return;
+                }
               }
             } else if (existingUnit === null) {
               // then add a new unit and make sure any overlapped witnesses are separated appropriately

@@ -33,7 +33,8 @@ jobs:
           node-version: '22'
       - name: Install dependencies and lint
         run: |
-          npm i eslint 
+          npm i eslint
+          npm i @eslint/js
           npm i @stylistic/eslint-plugin
           node_modules/eslint/bin/eslint.js static/CE_core/js/*.js --ignore-pattern "**/*.min.js"
 

@@ -3246,6 +3246,15 @@ var CL = (function() {
         // default is false
         CL.project.showSelectAllVariantsOption = false;
       }
+      // setting for allowing overlap removal. On a setting because the call to collateX might not always be appropriate
+      if (Object.prototype.hasOwnProperty.call(project, 'allowOverlapRemoval')) {
+        CL.project.allowOverlapRemoval = project.allowOverlapRemoval;
+      } else if (Object.prototype.hasOwnProperty.call(CL.services, 'allowOverlapRemoval')) {
+        CL.project.allowOverlapRemoval = CL.services.allowOverlapRemoval;
+      } else {
+        // default is false (maintains existing behaviour)
+        CL.project.allowOverlapRemoval = false;
+      }
       // settings for get apparatus button in approved view
       if (Object.prototype.hasOwnProperty.call(project, 'showGetApparatusButton')) {
         CL.project.showGetApparatusButton = project.showGetApparatusButton;

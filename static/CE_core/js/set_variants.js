@@ -4734,7 +4734,7 @@ var SV = (function() {
       if (menuName === 'unit') {
         document.getElementById('context-menu').innerHTML = '<li id="split-words"><span>Split words</span></li><li id="split-readings"><span>Split readings</span></li>';
       } else if (menuName === 'overlap-unit') {
-        if (CL.witnessEditingMode === false) {
+        if (CL.witnessEditingMode === false && CL.project.allowOverlapRemoval === true) {
           document.getElementById('context-menu').innerHTML = '<li id="split-readings"><span>Split readings</span></li><li id="remove-overlap"><span>Remove overlap</span></li>';
         } else {
           document.getElementById('context-menu').innerHTML = '<li id="split-readings"><span>Split readings</span></li>';

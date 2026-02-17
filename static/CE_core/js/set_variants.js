@@ -5091,7 +5091,7 @@ var SV = (function() {
         if (key != 'apparatus' && key.startsWith('apparatus') && key != appId) {
           for (let unit of CL.data[key]) {
             let cWitnesses = SV._getAllUnitWitnesses(unit).filter(x => x !== CL.data.overtext_name);
-            if (cWitnesses.filter(x => witnesses.indexOf(x) > 0).length > 0) {
+            if (cWitnesses.filter(x => witnesses.indexOf(x) !== -1).length > 0) {
               let cRange = SV._findOverlappedRange(unit._id);
               // if the overlap overlaps are current range add it to the candidates list
               if ((Math.max(range[0], cRange[0]) - Math.min(range[1], cRange[1])) <= 0) {

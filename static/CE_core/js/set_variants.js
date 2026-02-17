@@ -5132,18 +5132,28 @@ var SV = (function() {
        */
       const wordRanges = {};
       const lacOmDetails = [];
-      wordRanges['basetext'] = SV._getWitnessIndexesForHand(allOverlappingUnits, 'basetext');
+      wordRanges['basetext'] = SV._getWitnessIndexesForHand(allOverlappingUnits, 'basetext', range);
       let nullCount = 0;
       for (const hand of witnesses) {
-        wordRanges[hand] = SV._getWitnessIndexesForHand(allOverlappingUnits, hand);
-        // here we need to remove the witness and return the unit for all overlapping units - we need to find appId and index for each one first!
-        for (const currentOverlappingUnit of allOverlappingUnits) {
+        wordRanges[hand] = SV._getWitnessIndexesForHand(allOverlappingUnits, hand, range);
+        let relevantOverlappingUnits = [];
+        // get only the overlapping units from allOverlappingUnits which contain this hand
+        for (let overlappingUnit of allOverlappingUnits) {
+          for (let reading of overlappingUnit.readings) {
+            if (reading.witnesses.indexOf(hand) !== -1) {
+              relevantOverlappingUnits.push(overlappingUnit);
+              break;
+            }
+          }
+        }
+        // here we need to remove the witness and return the unit for all overlapping units - we need to find appId and index for each one first! 
+        for (const currentOverlappingUnit of relevantOverlappingUnits) {
           let [currentAppId, currentIndex] = SV._getAppIdAndIndexByOverlapId(currentOverlappingUnit._id);
           // remove from the current overlap unit - needs to be returned because it isn't passing as reference through the full function chain
           CL.data[currentAppId][currentIndex] = SV._removeWitnessFromUnitAndSortRemainder(currentOverlappingUnit, hand, currentAppId);
           CL.removeNullItems(CL.data[currentAppId]);
         }
-        // now remove from the top line while keeping a count of any top line untis that are removed.
+        // now remove from the top line while keeping a count of any top line units that are removed.
         for (let i = range[1]; i >= range[0]; i -= 1) {
           CL.data.apparatus[i] = SV._removeWitnessFromUnitAndSortRemainder(CL.data.apparatus[i], hand, 'apparatus');
           if (CL.data.apparatus[i] === null) {
@@ -5345,7 +5355,18 @@ var SV = (function() {
       }
     },
 
-    _getWitnessIndexesForHand: function(units, hand) {
+    _isHandInOverlaps: function(hand, overlaps) {
+      /** Return whether or not the provided hand is in the list of witnesses in the overlap_details key of a top line
+       * unit. */
+      for (const key in overlaps) {
+        if (overlaps[key].indexOf(hand) !== -1) {
+          return true;
+        }
+      }
+      return false;
+    },
+
+    _getWitnessIndexesForHand: function(units, hand, range) {
       /* Get the word index range in the requested hand that covers the full extent of the overlapping units provided */
       const indexes = [null, null, null];
       let currentIndex;
@@ -5354,7 +5375,7 @@ var SV = (function() {
           if (reading.witnesses.indexOf(hand) !== -1) { // this is the right reading
             for (const word of reading.text) {
               if (Object.prototype.hasOwnProperty.call(word, hand)) {
-                currentIndex = parseInt(word[hand].index)         
+                currentIndex = parseInt(word[hand].index)
                 if (indexes[0] === null) {
                   indexes[0] = currentIndex;
                   indexes[1] = currentIndex;
@@ -5374,6 +5395,32 @@ var SV = (function() {
             }
           }
         }
+      }
+      for (let i = range[0]; i <= range[1]; i += 1) {
+        if (!SV._isHandInOverlaps(hand, CL.data.apparatus[i].overap_units)) {
+          for (const reading of CL.data.apparatus[i].readings) {
+            for (const word of reading.text) {
+              if (Object.prototype.hasOwnProperty.call(word, hand)) {
+                currentIndex = parseInt(word[hand].index)
+                if (indexes[0] === null) {
+                  indexes[0] = currentIndex;
+                  indexes[1] = currentIndex;
+                } else {
+                  if (word[hand].index < indexes[0]) {
+                    indexes[0] = currentIndex;
+                  }
+                  if (word[hand].index > indexes[1]) {
+                    indexes[1] = currentIndex;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      // check whether we have filled in the indexes[0] position on another pass and if so remove the lac/om details
+      if (indexes[0] !== null) {
+        indexes[2] = null;
       }
       return indexes;
     },

@@ -706,7 +706,7 @@ var SV = (function() {
      * so subreadings are always hidden and standoff readings are always main readings
      * after this unprepare_for_operation will run find subreadings
      * at the end of this operation standoff marked readings should still be main readings even if they share a parent with another reading
-     * we only need to combined readings that are not marked as standoff
+     * we only need to combine readings that are not marked as standoff
      * */
     unsplitUnitWitnesses: function(unitNum, appId, unit) {
       var text, reading, readingList, index, witness, standoffRecord, isStandoff;

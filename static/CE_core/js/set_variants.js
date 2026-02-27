@@ -706,12 +706,14 @@ var SV = (function() {
      * so subreadings are always hidden and standoff readings are always main readings
      * after this unprepare_for_operation will run find subreadings
      * at the end of this operation standoff marked readings should still be main readings even if they share a parent with another reading
-     * we only need to combined readings that are not marked as standoff
+     * we only need to combine readings that are not marked as standoff
      * */
-    unsplitUnitWitnesses: function(unitNum, appId) {
-      var text, unit, reading, readingList, index, witness, standoffRecord, isStandoff;
+    unsplitUnitWitnesses: function(unitNum, appId, unit) {
+      var text, reading, readingList, index, witness, standoffRecord, isStandoff;
       readingList = [];
-      unit = CL.data[appId][unitNum];
+      if (unit === undefined) {
+        unit = CL.data[appId][unitNum];
+      }
       SV._removeSeparatedWitnessData(appId, unit._id);
 
       for (let i = 0; i < unit.readings.length; i += 1) {
@@ -787,7 +789,7 @@ var SV = (function() {
             readingList.push(null);  // needed so our list indexes stay alligned with the readings in the unit
             if (unit.readings[index].type === 'om') {
               unit.readings[index].witnesses.push.apply(unit.readings[index].witnesses, reading.witnesses);
-              reading = null;
+              reading = null; /* eslint-disable-line no-useless-assignment */
             }
           } else {
             readingList.push(text);
@@ -1426,7 +1428,6 @@ var SV = (function() {
       let subrowId, suffix, textString, highlightedClasses;
       const html = [];
       const rowList = [];
-      textString = '';
       if (Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
         html.push('<ul class="subreading-unit" id="subreading-unit-' + id + '-row-' + i + '">');
         for (const type in reading.subreadings) {
@@ -1723,7 +1724,6 @@ var SV = (function() {
         if (previousIndex === -1) {
           previousIndex = mainIndexes.indexOf(missingIndexes[i] - 2);
         }
-        nextIndex = -1
         nextIndex = mainIndexes.indexOf(missingIndexes[i] + 1);
         if (nextIndex === -1) {
           nextIndex = mainIndexes.indexOf(missingIndexes[i] + 2);
@@ -4732,7 +4732,7 @@ var SV = (function() {
       if (menuName === 'unit') {
         document.getElementById('context-menu').innerHTML = '<li id="split-words"><span>Split words</span></li><li id="split-readings"><span>Split readings</span></li>';
       } else if (menuName === 'overlap-unit') {
-        if (CL.witnessEditingMode === false) {
+        if (CL.witnessEditingMode === false && CL.project.allowOverlapRemoval === true) {
           document.getElementById('context-menu').innerHTML = '<li id="split-readings"><span>Split readings</span></li><li id="remove-overlap"><span>Remove overlap</span></li>';
         } else {
           document.getElementById('context-menu').innerHTML = '<li id="split-readings"><span>Split readings</span></li>';
@@ -5030,6 +5030,25 @@ var SV = (function() {
       }
     },
 
+    _deleteStandoffRegularisation: function(unit, witness) {
+      for (const key in CL.data.marked_readings) {
+        if (Object.prototype.hasOwnProperty.call(CL.data.marked_readings, key)) {
+          for (let i = 0; i < CL.data.marked_readings[key].length; i += 1) {
+            if (CL.data.marked_readings[key][i].start === unit.start && 
+                    CL.data.marked_readings[key][i].end === unit.end) { //if this is the right unit
+              if (CL.data.marked_readings[key][i].witness === witness) { //and we have the right witness
+                CL.data.marked_readings[key][i] = null;
+              }
+            }
+          }
+          CL.data.marked_readings[key] = CL.removeNullItems(CL.data.marked_readings[key]);
+          if (CL.data.marked_readings[key].length === 0) {
+            delete CL.data.marked_readings[key];
+          }
+        }
+      }
+    },
+
     _removeOverlap: function(index, originalData, originalSettings) {
       /** Remove a current overlapping unit (activated from the right click context menu). Index is the id of the unit
        * being removed. The witnesses in this reading are removed from the section of text included in the overlap and
@@ -5046,6 +5065,8 @@ var SV = (function() {
       let apparatusNum, appId, witId, tokens;
       spinner.showLoadingOverlay();
       SV.prepareForOperation();
+      const scrollOffset = [document.getElementById('scroller').scrollLeft,
+                            document.getElementById('scroller').scrollTop];
       // find the correct apparatus
       if (index.match(/-app-/g)) {
         apparatusNum = parseInt(index.match(/\d+/g)[1], 10);
@@ -5068,7 +5089,7 @@ var SV = (function() {
         if (key != 'apparatus' && key.startsWith('apparatus') && key != appId) {
           for (let unit of CL.data[key]) {
             let cWitnesses = SV._getAllUnitWitnesses(unit).filter(x => x !== CL.data.overtext_name);
-            if (cWitnesses.filter(x => witnesses.indexOf(x) > 0).length > 0) {
+            if (cWitnesses.filter(x => witnesses.indexOf(x) !== -1).length > 0) {
               let cRange = SV._findOverlappedRange(unit._id);
               // if the overlap overlaps are current range add it to the candidates list
               if ((Math.max(range[0], cRange[0]) - Math.min(range[1], cRange[1])) <= 0) {
@@ -5102,28 +5123,46 @@ var SV = (function() {
           return;
         }
       }
-
-
-      // remove the relevant witnesses from the section of the collation representing the overlap
+      /** remove the relevant witnesses from the section of the collation representing the overlap while also removing
+       * any standoff regularisations for these witnesses in the units being removed in the top line (we only need to do
+       * this for the top line because overlaps will be removed entirely and the standoff removed as part of the clean
+       * up process for no longer applied regularisations)
+       */
       const wordRanges = {};
       const lacOmDetails = [];
-      wordRanges['basetext'] = SV._getWitnessIndexesForHand(allOverlappingUnits, 'basetext');
+      wordRanges['basetext'] = SV._getWitnessIndexesForHand(allOverlappingUnits, 'basetext', range);
+      let nullCount = 0;
       for (const hand of witnesses) {
-        wordRanges[hand] = SV._getWitnessIndexesForHand(allOverlappingUnits, hand);
-        // here we need to remove the witness and return the unit for all overlapping units - we need to find appId and index for each one first!
-        for (const currentOverlappingUnit of allOverlappingUnits) {
+        wordRanges[hand] = SV._getWitnessIndexesForHand(allOverlappingUnits, hand, range);
+        let relevantOverlappingUnits = [];
+        // get only the overlapping units from allOverlappingUnits which contain this hand
+        for (let overlappingUnit of allOverlappingUnits) {
+          for (let reading of overlappingUnit.readings) {
+            if (reading.witnesses.indexOf(hand) !== -1) {
+              relevantOverlappingUnits.push(overlappingUnit);
+              break;
+            }
+          }
+        }
+        // here we need to remove the witness and return the unit for all overlapping units - we need to find appId and index for each one first! 
+        for (const currentOverlappingUnit of relevantOverlappingUnits) {
           let [currentAppId, currentIndex] = SV._getAppIdAndIndexByOverlapId(currentOverlappingUnit._id);
           // remove from the current overlap unit - needs to be returned because it isn't passing as reference through the full function chain
           CL.data[currentAppId][currentIndex] = SV._removeWitnessFromUnitAndSortRemainder(currentOverlappingUnit, hand, currentAppId);
-          //CL.data[appId][index] = SV._removeWitnessFromUnitAndSortRemainder(overlapUnit, hand, appId);
           CL.removeNullItems(CL.data[currentAppId]);
         }
-        // now remove from the top line
-        for (let i = range[0]; i <= range[1]; i += 1) {       
+        // now remove from the top line while keeping a count of any top line units that are removed.
+        for (let i = range[1]; i >= range[0]; i -= 1) {
           CL.data.apparatus[i] = SV._removeWitnessFromUnitAndSortRemainder(CL.data.apparatus[i], hand, 'apparatus');
+          if (CL.data.apparatus[i] === null) {
+            nullCount += 1;
+          }
           CL.removeNullItems(CL.data.apparatus);
+          SV._deleteStandoffRegularisation(CL.data.apparatus[i], hand);
         }
       }
+      // recalculate the final unit in the range based on any that have been removed.
+      range[1] = range[1] - nullCount;
       // now add them back in
       // get the data and split out just the sections we need (details in wordRanges)
       CL.dataSettings.witness_list = [];
@@ -5137,25 +5176,35 @@ var SV = (function() {
       CL.services.getUnitData(CL.context, CL.dataSettings.witness_list, function (collationData) {
         const witnessesInData = [];
         for (let entry of collationData.results) {
-          for (let j = 0; j < entry.witnesses.length; j += 1) {
-            // collate just the hands we need
-            witId = entry.witnesses[j].id;
-            if (witId !== CL.data.overtext_name && witnesses.indexOf(witId) === -1) {
-              entry.witnesses[j] = null;
-            } else if (witId !== CL.data.overtext_name && wordRanges[witId][2] !== null) { // this is lac or om for the chunk so don't collate
-              entry.witnesses[j].tokens = [];
-              entry.witnesses[j].gap_reading = 'for_fixing';
-              if (lacOmDetails.indexOf(wordRanges[witId][2].join('|')) === -1) {
-                lacOmDetails.push(wordRanges[witId][2].join('|'));
+          if (entry.witnesses === null) {  // this will be an om verse (single hand in the MS)
+            witnessesInData.push(entry.siglum);
+          } else {
+            for (let j = 0; j < entry.witnesses.length; j += 1) {
+              // collate just the hands we need
+              witId = entry.witnesses[j].id;
+              if (witId !== CL.data.overtext_name && witnesses.indexOf(witId) === -1) {
+                entry.witnesses[j] = null; // remove the witness if it isn't a witness in the overlap being removed
+              } else if (entry.witnesses[j].tokens.length === 0) { // then this hand is om_verse
+                entry.witnesses[j].tokens = null;              
+                if (lacOmDetails.indexOf(wordRanges[witId][2].join('|')) === -1) {
+                  lacOmDetails.push(wordRanges[witId][2].join('|'));
+                }
+                witnessesInData.push(witId);
+              } else if (witId !== CL.data.overtext_name && wordRanges[witId][2] !== null) { // this is lac or om for the chunk so don't collate
+                entry.witnesses[j].tokens = [];
+                entry.witnesses[j].gap_reading = 'for_fixing';
+                if (lacOmDetails.indexOf(wordRanges[witId][2].join('|')) === -1) {
+                  lacOmDetails.push(wordRanges[witId][2].join('|'));
+                }
+                witnessesInData.push(witId);
+              } else {
+                // collate just the text chunk we need
+                tokens = entry.witnesses[j].tokens.filter(
+                  x => parseInt(x.index) >= wordRanges[entry.witnesses[j].id][0] && parseInt(x.index) <= wordRanges[entry.witnesses[j].id][1]
+                );
+                entry.witnesses[j].tokens = tokens;
+                witnessesInData.push(witId);
               }
-              witnessesInData.push(witId);
-            } else {
-              // collate just the text chunk we need
-              tokens = entry.witnesses[j].tokens.filter(
-                x => parseInt(x.index) >= wordRanges[entry.witnesses[j].id][0] && parseInt(x.index) <= wordRanges[entry.witnesses[j].id][1]
-              );
-              entry.witnesses[j].tokens = tokens;
-              witnessesInData.push(witId);
             }
           } 
         }
@@ -5170,14 +5219,20 @@ var SV = (function() {
           CL.data = originalData;
           CL.dataSettings = originalSettings;
           SV.showSetVariantsData();
+          document.getElementById('scroller').scrollLeft = scrollOffset[0];
+          document.getElementById('scroller').scrollTop = scrollOffset[1];
           return;
         }
         const filteredCollationData = {'results': []};
         for (let entry of collationData.results) {
-          entry.witnesses = entry.witnesses.filter(x => x !== null)
-          if (entry.witnesses.length > 0) {         
+          if (entry.witnesses !== null) {
+            entry.witnesses = entry.witnesses.filter(x => x !== null)
+            if (entry.witnesses.length > 0) {         
+              filteredCollationData.results.push(entry);
+            }
+          }  else {
             filteredCollationData.results.push(entry);
-          }
+          } 
         }
         CL.existingCollation = JSON.parse(JSON.stringify(CL.data));
         CL.collateData = {
@@ -5185,6 +5240,7 @@ var SV = (function() {
           'lac_witnesses': lacWitnesses
         };
         RG.runCollation(CL.collateData, 'remove_overlap', 0, function(data) {
+          let before, after;
           // set up
           CL.data = data; // temporary assignment to allow all the cleaning functions to work.
           /** Now sort out the gaps if we have an all gap chunk - they will always come back as lac but
@@ -5218,23 +5274,50 @@ var SV = (function() {
           // add the data back in
           // just get the chunk we need to change
           const chunk = CL.existingCollation.apparatus.slice(range[0], range[1] + 1);
+          // renumber units that start with 1 to the gap before the first non-gap unit
           if (data.apparatus[0].start === 1 && preChunk.length > 0) {
-            if (preChunk[preChunk.length -1].end % 2 === 0) {
-              data.apparatus[0].start = preChunk[preChunk.length -1].end + 1;
-              data.apparatus[0].end = preChunk[preChunk.length -1].end + 1;
-              data.apparatus[0].first_word_index = data.apparatus[0].end + '.1';
-            } else {
-              data.apparatus[0].start = preChunk[preChunk.length -1].end;
-              data.apparatus[0].end = preChunk[preChunk.length -1].end;
-              data.apparatus[0].first_word_index = SV._incrementSubIndex(preChunk[preChunk.length -1].first_word_index, 1);
+            let i = 0;
+            while(data.apparatus[i].start === 1) {
+              if (preChunk[preChunk.length -1].end % 2 === 0) { // this is an even numbered unit 
+                data.apparatus[i].start = preChunk[preChunk.length -1].end + 1;
+                data.apparatus[i].end = preChunk[preChunk.length -1].end + 1;
+                if (i === 0) {
+                  data.apparatus[i].first_word_index = data.apparatus[i].end + '.1';
+                } else {
+                  data.apparatus[i].first_word_index = SV._incrementSubIndex(data.apparatus[i - 1].first_word_index, 1);
+                }
+              } else { // this is an addition unit
+                data.apparatus[i].start = preChunk[preChunk.length -1].end;
+                data.apparatus[i].end = preChunk[preChunk.length -1].end;
+                if (i === 0) {
+                  data.apparatus[i].first_word_index = SV._incrementSubIndex(preChunk[preChunk.length -1].first_word_index, 1);
+                } else {
+                  data.apparatus[i].first_word_index = SV._incrementSubIndex(data.apparatus[i - 1].first_word_index, 1);
+                }
+              }
+              i += 1;
             }
           }
+          before = null;
+          after = null;
+          if (preChunk.length > 0) {
+            before = preChunk[preChunk.length - 1];
+          }
+          if (postChunk.length > 0) {
+            after = postChunk[0];
+          }
+          const baseCollationChunk = {
+            'structure': {
+              'apparatus': chunk, 'lac_readings': originalData.lac_readings, 'om_readings': originalData.om_readings
+            }
+          };
           const mergedCollationChunk = CL._mergeCollationObjects(
-            {'structure': {'apparatus': chunk, 'lac_readings': [], 'om_readings': []}},
+            baseCollationChunk,
             data,
             [],
             data.apparatus[0].start - 1,
-            data.apparatus[data.apparatus.length - 1].end + 1
+            data.apparatus[data.apparatus.length - 1].end + 1,
+            [before, after]
           );
           CL.existingCollation.apparatus = preChunk.concat(mergedCollationChunk.structure.apparatus, postChunk);
           CL.data = JSON.parse(JSON.stringify(CL.existingCollation));
@@ -5249,7 +5332,10 @@ var SV = (function() {
           options.container = CL.container;
           // restore the original data settings so we don't end up with a short witness list
           CL.dataSettings = originalSettings;
+          CL._separateOverlapsInAddedUnits();
           SV.showSetVariants(options);
+          document.getElementById('scroller').scrollLeft = scrollOffset[0];
+          document.getElementById('scroller').scrollTop = scrollOffset[1];
         });
       });
     },
@@ -5267,23 +5353,36 @@ var SV = (function() {
       }
     },
 
-    _getWitnessIndexesForHand: function(units, hand) {
+    _isHandInOverlaps: function(hand, overlaps) {
+      /** Return whether or not the provided hand is in the list of witnesses in the overlap_details key of a top line
+       * unit. */
+      for (const key in overlaps) {
+        if (overlaps[key].indexOf(hand) !== -1) {
+          return true;
+        }
+      }
+      return false;
+    },
+
+    _getWitnessIndexesForHand: function(units, hand, range) {
       /* Get the word index range in the requested hand that covers the full extent of the overlapping units provided */
       const indexes = [null, null, null];
+      let currentIndex;
       for (const unit of units) {
         for (const reading of unit.readings) {
           if (reading.witnesses.indexOf(hand) !== -1) { // this is the right reading
             for (const word of reading.text) {
-              if (Object.prototype.hasOwnProperty.call(word, hand)) {             
+              if (Object.prototype.hasOwnProperty.call(word, hand)) {
+                currentIndex = parseInt(word[hand].index)
                 if (indexes[0] === null) {
-                  indexes[0] = word[hand].index;
-                  indexes[1] = word[hand].index;
+                  indexes[0] = currentIndex;
+                  indexes[1] = currentIndex;
                 } else {
-                  if (word[hand].index < indexes[0]) {
-                    indexes[0] = word[hand].index;
+                  if (currentIndex < indexes[0]) {
+                    indexes[0] = currentIndex;
                   }
-                  if (word[hand].index > indexes[1]) {
-                    indexes[1] = word[hand].index;
+                  if (currentIndex > indexes[1]) {
+                    indexes[1] = currentIndex;
                   }
                 }
               }
@@ -5294,6 +5393,32 @@ var SV = (function() {
             }
           }
         }
+      }
+      for (let i = range[0]; i <= range[1]; i += 1) {
+        if (!SV._isHandInOverlaps(hand, CL.data.apparatus[i].overap_units)) {
+          for (const reading of CL.data.apparatus[i].readings) {
+            for (const word of reading.text) {
+              if (Object.prototype.hasOwnProperty.call(word, hand)) {
+                currentIndex = parseInt(word[hand].index)
+                if (indexes[0] === null) {
+                  indexes[0] = currentIndex;
+                  indexes[1] = currentIndex;
+                } else {
+                  if (word[hand].index < indexes[0]) {
+                    indexes[0] = currentIndex;
+                  }
+                  if (word[hand].index > indexes[1]) {
+                    indexes[1] = currentIndex;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      // check whether we have filled in the indexes[0] position on another pass and if so remove the lac/om details
+      if (indexes[0] !== null) {
+        indexes[2] = null;
       }
       return indexes;
     },

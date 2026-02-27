@@ -237,7 +237,8 @@ var CL = (function() {
         options = {};
       }
       text = [];
-      witnessText = [];
+      // eslint disabled because I think it is safer to assign a default here given the complex branching in this function
+      witnessText = [];  /* eslint-disable-line no-useless-assignment */
       // first fix the display of overlapped statuses
       if (Object.prototype.hasOwnProperty.call(reading, 'overlap_status') && reading.overlap_status !== 'duplicate') {
         if (test === true) {
@@ -2817,7 +2818,7 @@ var CL = (function() {
           CL.dataSettings.base_text = document.getElementById('base-text').value;
         } else {
           alert('You can only add witnesses if the project base text is currently the same as the one used for the ' +
-            'saved collation. This is not the case with yur data.\n\nTo add witnesses change the project base ' +
+            'saved collation. This is not the case with your data.\n\nTo add witnesses change the project base ' +
             'text to match the saved collations.');
           CL.returnToSummaryTable();
           return;
@@ -3245,6 +3246,15 @@ var CL = (function() {
       } else {
         // default is false
         CL.project.showSelectAllVariantsOption = false;
+      }
+      // setting for allowing overlap removal. On a setting because the call to collateX might not always be appropriate
+      if (Object.prototype.hasOwnProperty.call(project, 'allowOverlapRemoval')) {
+        CL.project.allowOverlapRemoval = project.allowOverlapRemoval;
+      } else if (Object.prototype.hasOwnProperty.call(CL.services, 'allowOverlapRemoval')) {
+        CL.project.allowOverlapRemoval = CL.services.allowOverlapRemoval;
+      } else {
+        // default is false (maintains existing behaviour)
+        CL.project.allowOverlapRemoval = false;
       }
       // settings for get apparatus button in approved view
       if (Object.prototype.hasOwnProperty.call(project, 'showGetApparatusButton')) {
@@ -3918,7 +3928,7 @@ var CL = (function() {
       }
     },
 
-    _mergeCollationObjects: function(mainCollation, newData, addedWits, startIndex, endIndex) {
+    _mergeCollationObjects: function(mainCollation, newData, addedWits, startIndex, endIndex, adjoiningUnits) {
       /** This merges a new collation into an existing collation. This might be a full verse if we are in add witness
       /* mode or a small chunk of a verse if we are removing an overlapping unit.
       /* AddedWits should be an empty list if removing an overlapping unit.
@@ -3928,7 +3938,7 @@ var CL = (function() {
         matchingReadingFound, unitQueue, nextUnits, unit1, unit2, tempUnit, omReading,
         existingWitnesses, before, after, beforeIds, afterIds,
         sharedIds, overlappedWitnesses;
-  
+
       for (let i = 0; i < addedWits.length; i += 1) {
         if (mainCollation.data_settings.witness_list.indexOf(addedWits[i]) === -1) {
           mainCollation.data_settings.witness_list.push(addedWits[i]);
@@ -3975,13 +3985,15 @@ var CL = (function() {
         for (let z = 0; z < Math.max(newUnits.length, existingUnits.length); z += 1) {
           newUnit = z < newUnits.length ? newUnits[z] : null;
           existingUnit = z < existingUnits.length ? existingUnits[z] : null;
+          // first handle the om and lac verse stuff
           if (existingUnit !== null && (newData.lac_readings.length > 0 || newData.om_readings.length > 0)) {
             CL._mergeNewLacOmVerseReadings(existingUnit, newData);
           }
+          // now move onto the readings
           if (newUnit === null && existingUnit === null) {
             index += 1;
           } else {
-            if (newUnit === null) {
+            if (newUnit === null) { // then these witnesses are added as oms (lacOmfix might change that later)
               omReading = null;
               for (let i = 0; i < existingUnit.readings.length; i += 1) {
                 // NB: this last condition should not be needed but before 26/09/21 the code was incorrectly
@@ -4007,12 +4019,18 @@ var CL = (function() {
                 }
                 index = existingUnit.end + 1;
               } else {
-                alert('The new witnesses could not be added this time due to a base text conflict.\n' +
+                if (addedWits.length > 0) { // then we are trying to add witnesses
+                  alert('The new witnesses could not be added this time due to a base text conflict.\n' +
                   'Please check that your current project base text is the same as that used for the saved ' +
                   'collations and then try again.');
-                spinner.removeLoadingOverlay();
-                CL.returnToSummaryTable();
-                return;
+                  spinner.removeLoadingOverlay();
+                  CL.returnToSummaryTable();
+                  return;
+                } else {
+                  alert('Something went wrong while trying to remove the overlap. You must reload this page and not continue editing.')
+                  spinner.removeLoadingOverlay();
+                  return;
+                }
               }
             } else if (existingUnit === null) {
               // then add a new unit and make sure any overlapped witnesses are separated appropriately
@@ -4082,6 +4100,7 @@ var CL = (function() {
               newUnit.added = true;
               mainCollation.structure.apparatus.push(newUnit);
               mainCollation.structure.apparatus.sort(SV.compareFirstWordIndexes);
+
               before = null;
               after = null;
               for (let i = 0; i < mainCollation.structure.apparatus.length; i += 1) {
@@ -4091,6 +4110,12 @@ var CL = (function() {
                 if (mainCollation.structure.apparatus[i].start === newUnit.start + 1) {
                   after = mainCollation.structure.apparatus[i];
                 }
+              }
+              if (before === null && adjoiningUnits !== undefined) {
+                before = adjoiningUnits[0];
+              }
+              if (after === null && adjoiningUnits !== undefined) {
+                after = adjoiningUnits[1];
               }
               if (before && after && Object.prototype.hasOwnProperty.call(before, 'overlap_units') &&
                       Object.prototype.hasOwnProperty.call(after, 'overlap_units')) {
@@ -4115,12 +4140,12 @@ var CL = (function() {
                 for (let j = 0; j < newUnit.readings.length; j += 1) {
                   matchingReadingFound = false;
                   newReadingText = CL.extractWitnessText(newUnit.readings[j]);
-  
                   for (let k = 0; k < existingUnit.readings.length; k += 1) {
                     if (!Object.prototype.hasOwnProperty.call(existingUnit.readings[k], 'overlap_status') &&
                       CL.extractWitnessText(existingUnit.readings[k]) === newReadingText) {
                       matchingReadingFound = true;
                       CL._mergeNewReading(existingUnit.readings[k], newUnit.readings[j]);
+                      break;  // if we don't break here then we might end up with a regularised reading as a hit
                     }
                   }
                   if (matchingReadingFound === false) {
@@ -4129,6 +4154,7 @@ var CL = (function() {
                     existingUnit.readings.push(newUnit.readings[j]);
                   }
                 }
+                SV.unsplitUnitWitnesses(undefined, 'apparatus', existingUnit);
                 index = newUnit.end + 1;
               } else {
                 // no end agreement
@@ -4161,6 +4187,7 @@ var CL = (function() {
                       CL.extractWitnessText(existingUnit.readings[k]) === newReadingText) {
                       matchingReadingFound = true;
                       CL._mergeNewReading(existingUnit.readings[k], unit1.readings[j]);
+                      break;  // if we don't break here then we might end up with a regularised reading as the hit
                     }
                   }
                   if (matchingReadingFound === false) {

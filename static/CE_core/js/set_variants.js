@@ -5378,10 +5378,10 @@ var SV = (function() {
                   indexes[0] = currentIndex;
                   indexes[1] = currentIndex;
                 } else {
-                  if (word[hand].index < indexes[0]) {
+                  if (currentIndex < indexes[0]) {
                     indexes[0] = currentIndex;
                   }
-                  if (word[hand].index > indexes[1]) {
+                  if (currentIndex > indexes[1]) {
                     indexes[1] = currentIndex;
                   }
                 }

@@ -34,7 +34,7 @@ var SV = (function() {
      *              	error_unit - the unit which needs to be highlighted as an error*/
     showSetVariants: function(options) {
       var footerHtml, preselectedAddedHighlight;
-      console.log(CL.data);
+      console.log(JSON.parse(JSON.stringify(CL.data)));
       CL.stage = 'set';
       if (typeof options === 'undefined') {
         options = {};
@@ -5067,6 +5067,7 @@ var SV = (function() {
       SV.prepareForOperation();
       const scrollOffset = [document.getElementById('scroller').scrollLeft,
                             document.getElementById('scroller').scrollTop];
+
       // find the correct apparatus
       if (index.match(/-app-/g)) {
         apparatusNum = parseInt(index.match(/\d+/g)[1], 10);
@@ -5306,6 +5307,7 @@ var SV = (function() {
           if (postChunk.length > 0) {
             after = postChunk[0];
           }
+          
           const baseCollationChunk = {
             'structure': {
               'apparatus': chunk, 'lac_readings': originalData.lac_readings, 'om_readings': originalData.om_readings
@@ -5319,6 +5321,8 @@ var SV = (function() {
             data.apparatus[data.apparatus.length - 1].end + 1,
             [before, after]
           );
+          // mergedCollationChunk.structure.apparatus[1].first_word_index = '3.1';
+          // mergedCollationChunk.structure.apparatus[2].first_word_index = '3.2';
           CL.existingCollation.apparatus = preChunk.concat(mergedCollationChunk.structure.apparatus, postChunk);
           CL.data = JSON.parse(JSON.stringify(CL.existingCollation));
           CL.lacOmFix(); // call this again on the full collation

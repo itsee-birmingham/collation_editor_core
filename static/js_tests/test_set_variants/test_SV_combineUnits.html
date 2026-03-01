@@ -10,6 +10,10 @@
   	<script src="../../../../../common-static/js/jquery-3.7.1.min.js"></script>
 	<script src="../../../../../node_modules/sinon/pkg/sinon.js"></script>
 	<script src="../../../../../node_modules/qunit/qunit/qunit.js"></script>
+    <script src="../../CE_core/js/md5.js"></script>
+    <script src="../../CE_core/js/draggable.js"></script>
+    <script src="../../CE_core/js/redips-drag-5.3.min.js"></script>
+    <script src="../../CE_core/js/spinner.js"></script>
 	<script src="../../CE_core/js/collation.js"></script>
   	<script src="../../CE_core/js/subreadings.js"></script>
     <script src="../../CE_core/js/set_variants.js"></script>
@@ -17,7 +21,18 @@
 
   	<div id="qunit"></div>
  	<div id="qunit-fixture">
-        <div id="scroller"></div>
+        <div id="redips-drag">
+            <div id="header"></div>
+            <div id="scroller">
+                <div id="error-panel">
+                    <div id="error-message-panel"></div>
+                </div>
+            </div>
+            <div id="single-witness-reading"></div>
+            <button id="undo-button"/>
+            
+            
+        </div>
 	</div>
 </body>
 </html>

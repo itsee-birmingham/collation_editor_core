@@ -202,7 +202,7 @@ var CL = (function() {
       const text = [];
       text.push(start);
       text.push(end);
-      for (let i = 0; i < unit.readings.length; i += 1) {
+      for (let i = 0; i < unit.readings.length; i += 1) {        
         text.push(CL.extractWitnessText(unit.readings[i]) + unit.readings[i].witnesses.join(' '));
       }
       if (typeof appId !== 'undefined') {
@@ -1327,15 +1327,10 @@ var CL = (function() {
       // first strip all the empty units displaying gaps and then recreate the ones we still need
       CL._cleanExtraGaps();
       CL._createExtraGaps();
-      console.log('@@@@@@@@@@')
-      console.log(JSON.parse(JSON.stringify(CL.data)))
       const apparatus = CL.data.apparatus;
       for (let i = 0; i < apparatus.length; i += 1) { // loop through units
         extraReadings = [];
         for (let j = 0; j < apparatus[i].readings.length; j += 1) { // loop through readings
-          if (i === 2) {
-            console.log(JSON.parse(JSON.stringify(apparatus[i].readings[j])))
-          }
           // if this is reading contains an empty reading and if this isn't a whole verse lac or whole verse om
           if (CL._containsEmptyReading(apparatus[i].readings[j]) &&  // includes subreadings and SR_text
                     apparatus[i].readings[j].type !== 'lac_verse' &&
@@ -1346,16 +1341,8 @@ var CL = (function() {
             }
             // gets all witnesses that have an empty reading including those in subreadings
             emptyWitnesses = CL._getAllEmptyReadingWitnesses(apparatus[i].readings[j]);
-            if (i === 2) {
-              console.log('empty witnesses')
-              console.log(JSON.parse(JSON.stringify(emptyWitnesses)))
-            }
             // get all the witnesses for the reading
             witnesses = CL.getAllReadingWitnesses(apparatus[i].readings[j]);
-            if (i === 2) {
-              console.log('witnesses')
-              console.log(JSON.parse(JSON.stringify(witnesses)))
-            }
             // now work out from context if it should be lac or om
             for (let k = 0; k < witnesses.length; k += 1) {
               // if this witness is overlapped do not try to fix - it should be displayed as om regardless
@@ -1386,35 +1373,22 @@ var CL = (function() {
                                   apparatus[i].readings[j].SR_text[witnesses[k]].text.length === 0) {
                   // squelch if this is an om reading which is a subreading of another reading
                 } else {
-                  witnesses[k] = null;
+                  /**This used to be in place. I took it out because it was removing witnesses when combining units
+                   * which contained a reading with text regularised to lac when combining with an om. I am laving the
+                   * line here for now, commented out, because it might break something else and this will remind me
+                   * what I did (2/3/26).
+                   */
+                  // witnesses[k] = null;
                 }
               }
             }
-            if (i === 2) {
-              console.log('}}}}}}}}}')
-              console.log(witnesses)
-              console.log(JSON.parse(JSON.stringify(apparatus[i])))
-            }
             apparatus[i].readings[j].witnesses = CL.removeNullItems(witnesses); //strip null from witnesses
-            if (i === 2) {
-              console.log('}}}}}}}}}')
-              console.log(JSON.parse(JSON.stringify(apparatus[i])))
-            }
             //if no witnesses remain delete the reading
             if (apparatus[i].readings[j].witnesses.length === 0) {
               apparatus[i].readings[j] = null;
             }
-            if (i === 2) {
-              console.log('}}}}}}}}}')
-              console.log(JSON.parse(JSON.stringify(apparatus[i])))
-            }
           }
         }
-        if (i === 2) {
-          console.log('££££££££££££')
-          console.log(JSON.parse(JSON.stringify(apparatus[i])))
-        }
-        
         apparatus[i].readings = CL.removeNullItems(apparatus[i].readings);
         for (let j = 0; j < extraReadings.length; j += 1) {
           CL.addReadingId(extraReadings[j], apparatus[i].start, apparatus[i].end);

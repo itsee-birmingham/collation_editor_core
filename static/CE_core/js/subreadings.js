@@ -805,7 +805,6 @@ var SR = (function () {
       reading.witnesses = CL.setList(reading.witnesses);
       delete reading.subreadings;
     }
-
   };
 
 }());

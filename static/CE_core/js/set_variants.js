@@ -254,17 +254,9 @@ var SV = (function() {
           }
         }
       }
-      console.log('&&&&&&&')
-      console.log(JSON.parse(JSON.stringify(CL.data)))
       SV.prepareForOperation();
-      console.log('{{{{{{{{{{{{{{{')
-      console.log(JSON.parse(JSON.stringify(CL.data)))
       CL.lacOmFix();  // also does extra gaps
-      console.log('%%%%%%%%%%%%')
-      console.log(JSON.parse(JSON.stringify(CL.data)))
       SV.unprepareForOperation();
-      console.log('************')
-      console.log(JSON.parse(JSON.stringify(CL.data)))
       temp = CL.getUnitLayout(CL.data.apparatus, 1, 'set_variants', options);
       header = CL.getCollationHeader(CL.data, temp[1], true);
       html = header[0];
@@ -1189,6 +1181,11 @@ var SV = (function() {
                                                         [read1, read2], witness,
                                                         newReadings[text].text).sort(SV._compareIndexes);
           } else {
+            console.log('-----------')
+            console.log(JSON.parse(JSON.stringify(readings1)))
+            console.log(JSON.parse(JSON.stringify(read1)))
+            console.log(witness)
+            console.log('-----------')
             newRdg = {
               'witnesses': [witness],
               'text': SV._combineReadingText(readings1, readings2, [read1, read2], witness, [])
@@ -1223,14 +1220,13 @@ var SV = (function() {
           
         }
       }
-      console.log(JSON.parse(JSON.stringify(newReadings)));
+      console.log(JSON.parse(JSON.stringify(newReadings)))
       newunit.readings = [];
       for (const key in newReadings) {
         if (Object.prototype.hasOwnProperty.call(newReadings, key)) {
           newunit.readings.push(SV._fixIndexNumbers(newReadings[key]));
         }
       }
-      console.log(JSON.parse(JSON.stringify(newunit)));
       return newunit;
     },
 
@@ -2628,9 +2624,6 @@ var SV = (function() {
           }
         }
         newunit = SV.combineReadings(unit1.readings, unit2.readings, newunit, false);
-        console.log('###########')
-        console.log(JSON.parse(JSON.stringify(newunit)))
-        console.log('###########')
         if (keepId === true) {
           newunit._id = unit1._id;
         } else {
@@ -2685,8 +2678,6 @@ var SV = (function() {
         } else {
           SV._checkAndFixIndexOrder(newunit.start);
         }
-        console.log('----------------')
-        console.log(JSON.parse(JSON.stringify(newunit)))
         // in here split out 'a' reading if we are dealing with overlapping units
         // and always separate is as a different reading even when other readings agree
         if (appId !== 'apparatus') {
@@ -2700,14 +2691,8 @@ var SV = (function() {
             }
           }
         }
-        console.log('============')
-        console.log(JSON.parse(JSON.stringify(newunit)))
         SV.unsplitUnitWitnesses(index, 'apparatus'); //just in case
-        console.log('+++++++++++')
-        console.log(JSON.parse(JSON.stringify(newunit)))
         SV.unprepareForOperation();
-        console.log('^^^^^^^^^^^^^')
-        console.log(JSON.parse(JSON.stringify(newunit)))
         if (appId !== 'apparatus') {
           // then check that all witness words in the unit are only 2 apart
           problems = SV._checkUnitIntegrity(appId, index);
@@ -2726,8 +2711,6 @@ var SV = (function() {
             'error_unit': warningUnit
           });
         } else {
-          console.log('$$$$$$$$$$$$$$$$$$')
-          console.log(JSON.parse(JSON.stringify(CL.data)))
           SV.showSetVariantsData({});
         }
       } else {
@@ -3435,11 +3418,7 @@ var SV = (function() {
         if (Object.prototype.hasOwnProperty.call(currentText[i], 'combined_gap_after')) {
           delete currentText[i].combined_gap_after;
         }
-      }
-      if (witness === '256C') {
-        console.log(currentText)
-      }
-      
+      }      
       return currentText;
     },
 
@@ -4528,8 +4507,6 @@ var SV = (function() {
       // because the rest of the function works on the basis they are there
       SR.loseSubreadings();
       SR.findSubreadings();
-      console.log('~~~~~~~~~~~~~~~~')
-      console.log(JSON.parse(JSON.stringify(CL.data)))
       const data = CL.data;
       for (const key in data) {
         if (Object.prototype.hasOwnProperty.call(data, key)) {

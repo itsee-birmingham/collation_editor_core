@@ -92,10 +92,7 @@ class PostProcessor(Regulariser, SettingsApplier):
 
                 if reading in readings.keys():
                     readings[reading]['witnesses'].append(self.alignment_table['witnesses'][i])
-                    try:
-                        readings[reading]['text'] = self._combine_readings(readings[reading]['text'], witness)
-                    except IndexError:
-                        raise IndexError(f'Problem with {readings[reading]} witness {witness}')
+                    readings[reading]['text'] = self._combine_readings(readings[reading]['text'], witness)
                 else:
                     readings[reading] = {
                         'witnesses': [self.alignment_table['witnesses'][i]],

@@ -1182,6 +1182,7 @@ var SV = (function() {
                                                         newReadings[text].text).sort(SV._compareIndexes);
           } else {
             console.log('-----------')
+            console.log(text)
             console.log(JSON.parse(JSON.stringify(readings1)))
             console.log(JSON.parse(JSON.stringify(read1)))
             console.log(witness)
@@ -3000,7 +3001,11 @@ var SV = (function() {
       let unit1, unit2, errorMess;
       const scrollOffset = [document.getElementById('scroller').scrollLeft,
                             document.getElementById('scroller').scrollTop];
+      console.log('############ - pre-prepared')
+      console.log(JSON.parse(JSON.stringify(CL.data)))
       SV.prepareForOperation();
+      console.log(JSON.parse(JSON.stringify(CL.data)))
+      console.log('############ - prepared')
       // at this point both units are from same apparatus
       const appId = units[0][1];
       if (appId === 'apparatus') {

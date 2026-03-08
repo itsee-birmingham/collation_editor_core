@@ -338,7 +338,6 @@ var OR = (function() {
       let temp, rowId, overlapped, hasContextMenu, readingClass, colspan, hand, readingLabel, readingSuffix, text, overlap;
       const html = [];
       const rowList = [];
-      hasContextMenu = true;
       overlap = false;
       if (id.indexOf('-app-') !== -1) {
         overlap = true;

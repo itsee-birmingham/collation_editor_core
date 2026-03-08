@@ -160,7 +160,7 @@ class PreProcessor(Regulariser):
                         hand_to_transcript_map[reading['id']] = transcription_verse['transcription_identifier']
                     else:
                         hand_to_transcript_map[reading['id']] = transcription_verse['transcription']
-                    if len(reading['tokens']) == 0:
+                    if reading['tokens'] is None or len(reading['tokens']) == 0:
                         if 'gap_reading' in reading:
                             lac_hands.append(reading['id'])
                             self._add_to_special_categories(special_categories, reading)

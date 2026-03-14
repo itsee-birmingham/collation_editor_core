@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
+import sys
 import importlib
 import json
-import sys
 import warnings
 from .exceptions import DataInputException
 from collation.core.postprocessor import PostProcessor
@@ -312,11 +312,9 @@ class PreProcessor(Regulariser):
         try:
             output = pp.produce_variant_units()
         except DataInputException as e:
-#            pp.alignment_table = []
-            output = pp.produce_variant_units()
             print('FAILURE: ' + str(e), file=sys.stderr)
-            pass
-#            raise DataInputException
+#            pass
+            raise DataInputException
         return output
 
     def get_overtext(self, verse):

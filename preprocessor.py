@@ -419,14 +419,17 @@ class PreProcessor(Regulariser):
                 output['ai_alignment_table'] = build_html_alignment_table(
                     output['table'], output['witnesses'])
 
-            # write debug log
+            # write debug log if a log directory is configured
             response_json = {'output': output}
-            try:
-                with open('/home/ntvmr/src/community/webapp/tmp/post_collation.json',
-                          'w', encoding='utf-8') as file:
-                    file.write(json.dumps(response_json, ensure_ascii=False, indent=4))
-            except Exception as e:
-                print('======= error writing log: ' + str(e), file=sys.stderr)
+            log_dir = settings.get('debug_log_dir')
+            if log_dir:
+                try:
+                    import os
+                    log_path = os.path.join(log_dir, 'post_collation.json')
+                    with open(log_path, 'w', encoding='utf-8') as file:
+                        file.write(json.dumps(response_json, ensure_ascii=False, indent=4))
+                except Exception as e:
+                    print('======= error writing log: ' + str(e), file=sys.stderr)
 
             return json.dumps(output, ensure_ascii=False, indent=4)
 

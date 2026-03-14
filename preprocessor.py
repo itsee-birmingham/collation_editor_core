@@ -384,42 +384,4 @@ class PreProcessor(Regulariser):
             result = engine.collate(data, options, self.basetext_siglum)
             return engine.process_result(result, data)
 
-        # 3. Fallback: CollateX via HTTP (if no engine registered for this algorithm)
-        #    This handles traditional algorithms like dekker, needleman-wunsch
-        return self._collate_collatex(data, options)
-
-    def _collate_collatex(self, data, options):
-        """Fallback collation via CollateX Java microservice."""
-        import urllib.request
-
-        if 'algorithm' in options:
-            data['algorithm'] = options['algorithm']
-        if 'tokenComparator' in options:
-            data['tokenComparator'] = options['tokenComparator']
-
-        target = self.host
-        json_witnesses = json.dumps(data)
-        if 'outputFormat' in options:
-            accept_header = self.convert_header_argument(options['outputFormat'])
-        else:
-            accept_header = 'application/json'
-
-        req = urllib.request.Request(target)
-        req.add_header('content-type', 'application/json')
-        req.add_header('Accept', accept_header)
-
-        response = urllib.request.urlopen(req, json_witnesses.encode('utf-8'))
-        return response.read()
-
-    def convert_header_argument(self, accept):
-        """Convert shortname to MIME type."""
-        if accept == 'json' or accept == 'lcs':
-            return "application/json"
-        elif accept == 'tei':
-            return "application/tei+xml"
-        elif accept == 'graphml':
-            return 'application/graphml+xml'
-        elif accept == 'dot':
-            return 'text/plain'
-        elif accept == 'svg':
-            return 'image/svg+xml'
+        raise DataInputException('No collation engine registered for algorithm: {}'.format(algorithm))

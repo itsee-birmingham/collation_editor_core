@@ -127,17 +127,27 @@ class CollationEngine(ABC):
 # Engine registry
 # ---------------------------------------------------------------------------
 
+from collation.core.engines.collatex import CollatexEngine
+
 _engine_registry = {}
+_default_engine = CollatexEngine
 
 
-def register_engine(name, engine_class):
-    """Register a collation engine class by algorithm name."""
+def register_engine(name, engine_class, default=False):
+    """Register a collation engine class by algorithm name.
+
+    If default=True, this engine handles any algorithm name not
+    explicitly registered (e.g. CollateX handles dekker, needleman-wunsch, etc.).
+    """
     _engine_registry[name] = engine_class
+    if default:
+        global _default_engine
+        _default_engine = engine_class
 
 
 def get_engine(name, algorithm_settings):
-    """Look up and instantiate a registered engine, or return None."""
-    cls = _engine_registry.get(name)
+    """Look up and instantiate a registered engine, or fall back to the default."""
+    cls = _engine_registry.get(name, _default_engine)
     if cls is not None:
         return cls(algorithm_settings)
     return None

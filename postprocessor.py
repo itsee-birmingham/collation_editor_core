@@ -57,7 +57,12 @@ class PostProcessor(Regulariser, SettingsApplier):
     def produce_variant_units(self):
         """Produce variant units for display and editing."""
         variant_readings = self.create_readings_sets()
-        return self.format_output(self.anchor_readings(variant_readings))
+        variant_units = self.format_output(self.anchor_readings(variant_readings))
+        # pass through AI engine metadata if present
+        for key in ('ai_comments', 'ai_alignment_table', 'ai_processing_duration', 'ai_usage'):
+            if key in self.alignment_table:
+                variant_units[key] = self.alignment_table[key]
+        return variant_units
 
     def create_extra_reading(self, text_list, witness):
         new = {'witnesses': [witness], 'text': []}

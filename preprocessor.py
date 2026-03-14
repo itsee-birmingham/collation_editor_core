@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
-import sys
 import importlib
 import json
+import sys
 import warnings
 from .exceptions import DataInputException
 from collation.core.postprocessor import PostProcessor
-import urllib.request
 from collation.core.regulariser import Regulariser
+from collation.core.collation_engine import (
+    get_engine, build_token_lookup, validate_token_integrity,
+    check_ai_verify_block, build_html_alignment_table,
+)
 
 
 class PreProcessor(Regulariser):
@@ -30,7 +33,9 @@ class PreProcessor(Regulariser):
             self.rule_conds_config = None
 
         if 'algorithm_settings' in configs:
-            algorithm_settings = {}
+            algorithm_settings = configs['algorithm_settings']
+            if not algorithm_settings:
+                algorithm_settings = {}
             algorithm_settings['algorithm'] = configs['algorithm_settings']['algorithm']
             algorithm_settings['tokenComparator'] = {}
             if 'fuzzy_match' in configs['algorithm_settings']:
@@ -187,6 +192,9 @@ class PreProcessor(Regulariser):
                      'missing_reason': missing_reason,
                      'index': 1
                      }
+
+        self.basetext_siglum = basetext_siglum
+
         return self.regularise(rules, witnesses, verse, accept)
 
     def add_to_special_categories(self, special_categories, reading):
@@ -230,7 +238,7 @@ class PreProcessor(Regulariser):
             algorithm = self.algorithm_settings['algorithm']
         if self.algorithm_settings['tokenComparator'] and self.algorithm_settings['tokenComparator']['type']:
             tokenComparator['type'] = 'levenshtein'
-            if self.algorithm_settings['tokenComparator'] and self.algorithm_settings['tokenComparator']['distance']:
+            if 'tokenComparator' in self.algorithm_settings and 'distance' in self.algorithm_settings['tokenComparator']:
                 tokenComparator['distance'] = self.algorithm_settings['tokenComparator']['distance']
             else:
                 # default to 2
@@ -306,8 +314,12 @@ class PreProcessor(Regulariser):
             )
         try:
             output = pp.produce_variant_units()
-        except DataInputException:
-            raise DataInputException
+        except DataInputException as e:
+#            pp.alignment_table = []
+            output = pp.produce_variant_units()
+            print('FAILURE: ' + str(e), file=sys.stderr)
+            pass
+#            raise DataInputException
         return output
 
     def get_overtext(self, verse):
@@ -334,8 +346,8 @@ class PreProcessor(Regulariser):
             else:
                 return [verse['witnesses'][0]['id'], [verse['witnesses'][0]]]
 
-    def do_collate(self, data, options):  # accept, algorithm, tokenComparator, host='localhost'):
-        """Do the collation"""
+    def do_collate(self, data, options):
+        """Do the collation using a registered engine or the legacy local_python_functions hook."""
         print('COLLATING', file=sys.stderr)
         try:
             print('algorithm - {}'.format(options['algorithm']), file=sys.stderr)
@@ -352,6 +364,7 @@ class PreProcessor(Regulariser):
                 raise DataInputException('There is a problem with an empty token in the following '
                                          'witness(es): {}'.format(', '.join(problem_wits)))
 
+        # 1. Try local_python_functions hook (legacy plugin mechanism)
         if (self.local_python_functions
                 and 'local_collation_function' in self.local_python_functions):
             module_name = self.local_python_functions['local_collation_function']['python_file']
@@ -361,29 +374,88 @@ class PreProcessor(Regulariser):
             return getattr(collation_class,
                            self.local_python_functions['local_collation_function']['function']
                            )(data, options)
+
+        algorithm = options.get('algorithm', 'dekker')
+
+        # 2. Try registered engine
+        # Pass collatexHost through algorithm_settings for the CollateX engine
+        settings = dict(self.algorithm_settings) if self.algorithm_settings else {}
+        settings['collatexHost'] = self.host
+        engine = get_engine(algorithm, settings)
+
+        if engine is not None:
+            result = engine.collate(data, options, self.basetext_siglum)
+
+            # check for raw response (CollateX backward compatibility)
+            if hasattr(result, '_raw_response') and result._raw_response:
+                return result._raw_response
+
+            output = result.to_output_dict()
+
+            # build token indices for validation
+            _, input_token_indices = build_token_lookup(data['witnesses'])
+
+            # check AI verify block if present
+            check_ai_verify_block(output, input_token_indices)
+
+            # validate token integrity
+            if output.get('table') and output.get('witnesses'):
+                validation_errors = validate_token_integrity(
+                    output['table'], output['witnesses'], input_token_indices)
+                if validation_errors:
+                    print('======= AI alignment validation errors: {}'.format(
+                        '; '.join(validation_errors)), file=sys.stderr)
+                    output['table'] = []
+                    output['witnesses'] = []
+                    output['ai_comments'] = (
+                        'Error: The AI produced an alignment with token integrity errors '
+                        'and the result has been rejected to protect data quality. '
+                        'Please try again. Details: ' +
+                        '; '.join(validation_errors))
+
+            # build HTML alignment table if not already present
+            if (not output.get('ai_alignment_table')
+                    and output.get('table') and output.get('witnesses')):
+                output['ai_alignment_table'] = build_html_alignment_table(
+                    output['table'], output['witnesses'])
+
+            # write debug log
+            response_json = {'output': output}
+            try:
+                with open('/home/ntvmr/src/community/webapp/tmp/post_collation.json',
+                          'w', encoding='utf-8') as file:
+                    file.write(json.dumps(response_json, ensure_ascii=False, indent=4))
+            except Exception as e:
+                print('======= error writing log: ' + str(e), file=sys.stderr)
+
+            return json.dumps(output, ensure_ascii=False, indent=4)
+
+        # 3. Fallback: CollateX via HTTP (if no engine registered for this algorithm)
+        #    This handles traditional algorithms like dekker, needleman-wunsch
+        return self._collate_collatex(data, options)
+
+    def _collate_collatex(self, data, options):
+        """Fallback collation via CollateX Java microservice."""
+        import urllib.request
+
+        if 'algorithm' in options:
+            data['algorithm'] = options['algorithm']
+        if 'tokenComparator' in options:
+            data['tokenComparator'] = options['tokenComparator']
+
+        target = self.host
+        json_witnesses = json.dumps(data)
+        if 'outputFormat' in options:
+            accept_header = self.convert_header_argument(options['outputFormat'])
         else:
-            # use collateX Java microservices
-            if 'algorithm' in options:
-                # examples include 'needleman-wunsch'#'dekker'#'dekker-experimental'
-                data['algorithm'] = options['algorithm']
-            if 'tokenComparator' in options:
-                # examples include {"type": "levenshtein", "distance": 2}#{'type': 'equality'}
-                data['tokenComparator'] = options['tokenComparator']
+            accept_header = 'application/json'
 
-            target = self.host
+        req = urllib.request.Request(target)
+        req.add_header('content-type', 'application/json')
+        req.add_header('Accept', accept_header)
 
-            json_witnesses = json.dumps(data)
-            if 'outputFormat' in options:
-                accept_header = self.convert_header_argument(options['outputFormat'])
-            else:
-                accept_header = "application/json"
-
-            req = urllib.request.Request(target)
-            req.add_header('content-type', 'application/json')
-            req.add_header('Accept', accept_header)
-
-            response = urllib.request.urlopen(req, json_witnesses.encode('utf-8'))
-            return response.read()
+        response = urllib.request.urlopen(req, json_witnesses.encode('utf-8'))
+        return response.read()
 
     def convert_header_argument(self, accept):
         """Convert shortname to MIME type."""

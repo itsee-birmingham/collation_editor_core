@@ -1,0 +1,292 @@
+# -*- coding: utf-8 -*-
+"""Abstract collation engine and plugin registry.
+
+Provides the base class for collation engines and a registry mechanism
+so that engines can be added without modifying core code.
+"""
+import json
+import re
+import sys
+from abc import ABC, abstractmethod
+
+
+class CollationResult:
+    """Container for collation engine output."""
+
+    def __init__(self):
+        self.table = []
+        self.witnesses = []
+        self.ai_comments = ''
+        self.ai_alignment_table = ''
+        self.ai_processing_duration = None
+        self.ai_usage = None
+
+    def to_output_dict(self):
+        """Return a dict suitable for use as the 'output' block."""
+        d = {
+            'witnesses': self.witnesses,
+            'table': self.table,
+        }
+        if self.ai_comments:
+            d['ai_comments'] = self.ai_comments
+        if self.ai_alignment_table:
+            d['ai_alignment_table'] = self.ai_alignment_table
+        if self.ai_processing_duration is not None:
+            d['ai_processing_duration'] = self.ai_processing_duration
+        if self.ai_usage is not None:
+            d['ai_usage'] = self.ai_usage
+        return d
+
+
+class CollationEngine(ABC):
+    """Abstract base class for collation engines.
+
+    Subclasses implement collate() to perform the actual collation.
+    The preprocessor handles all pre/post processing around the engine call.
+    """
+
+    def __init__(self, algorithm_settings):
+        self.algorithm_settings = algorithm_settings
+
+    @abstractmethod
+    def name(self):
+        """Return the engine identifier string (e.g. 'collatex', 'claude')."""
+        pass
+
+    @abstractmethod
+    def collate(self, data, options, basetext_siglum):
+        """Perform collation and return a CollationResult.
+
+        Args:
+            data: dict with 'witnesses' list and 'algorithm' key
+            options: dict with 'outputFormat', 'algorithm', 'tokenComparator'
+            basetext_siglum: the siglum of the base text witness
+
+        Returns:
+            CollationResult with table and witnesses populated
+        """
+        pass
+
+
+# ---------------------------------------------------------------------------
+# Engine registry
+# ---------------------------------------------------------------------------
+
+_engine_registry = {}
+
+
+def register_engine(name, engine_class):
+    """Register a collation engine class by algorithm name."""
+    _engine_registry[name] = engine_class
+
+
+def get_engine(name, algorithm_settings):
+    """Look up and instantiate a registered engine, or return None."""
+    cls = _engine_registry.get(name)
+    if cls is not None:
+        return cls(algorithm_settings)
+    return None
+
+
+def list_engines():
+    """Return list of registered engine names."""
+    return list(_engine_registry.keys())
+
+
+# ---------------------------------------------------------------------------
+# Shared utilities used by engines and the preprocessor
+# ---------------------------------------------------------------------------
+
+def build_token_lookup(witnesses):
+    """Build lookup dicts from a list of witness objects.
+
+    Returns:
+        token_lookup: {witness_id: {index: token_dict}}
+        input_token_indices: {witness_id: set(indices)}
+    """
+    token_lookup = {}
+    input_token_indices = {}
+    for witness in witnesses:
+        wit_id = witness['id']
+        token_lookup[wit_id] = {}
+        input_token_indices[wit_id] = set()
+        for token in witness['tokens']:
+            token_lookup[wit_id][token['index']] = token
+            input_token_indices[wit_id].add(token['index'])
+    return token_lookup, input_token_indices
+
+
+def validate_token_integrity(table, witnesses, input_token_indices):
+    """Check for duplicate or missing tokens in an alignment table.
+
+    Returns:
+        list of error strings (empty if valid)
+    """
+    errors = []
+    for i, wit_id in enumerate(witnesses):
+        seen_indices = []
+        for cg in table:
+            if i < len(cg):
+                for token in cg[i]:
+                    idx = token.get('index')
+                    if idx in seen_indices:
+                        errors.append(
+                            'Duplicate token index {} in witness {}'.format(idx, wit_id))
+                    else:
+                        seen_indices.append(idx)
+        if wit_id in input_token_indices:
+            missing = input_token_indices[wit_id] - set(seen_indices)
+            if missing:
+                errors.append(
+                    'Missing token indices {} in witness {}'.format(
+                        sorted(missing, key=lambda x: int(x)), wit_id))
+    return errors
+
+
+def check_ai_verify_block(output, input_token_indices):
+    """Validate an AI engine's self-check verify block if present.
+
+    Removes the verify block from output after checking.
+
+    Returns:
+        list of error strings (empty if valid or no verify block)
+    """
+    verify = output.get('verify', {})
+    if not verify:
+        return []
+    errors = []
+    for wit_id, verify_indices in verify.items():
+        if wit_id in input_token_indices:
+            expected = input_token_indices[wit_id]
+            got = set(verify_indices)
+            if len(verify_indices) != len(got):
+                dupes = [idx for idx in verify_indices if verify_indices.count(idx) > 1]
+                errors.append(
+                    'AI self-check: duplicates {} in witness {}'.format(
+                        list(set(dupes)), wit_id))
+            missing_v = expected - got
+            extra = got - expected
+            if missing_v:
+                errors.append(
+                    'AI self-check: missing {} in witness {}'.format(
+                        sorted(missing_v, key=lambda x: int(x)), wit_id))
+            if extra:
+                errors.append(
+                    'AI self-check: unexpected {} in witness {}'.format(
+                        sorted(extra, key=lambda x: int(x)), wit_id))
+    if errors:
+        print('======= AI verify block errors: {}'.format(
+            '; '.join(errors)), file=sys.stderr)
+    del output['verify']
+    return errors
+
+
+def build_html_alignment_table(table, witnesses):
+    """Build an HTML alignment table from collation output.
+
+    Returns:
+        HTML string
+    """
+    html = '<table><thead><tr><th>Witness</th>'
+    col_headers = []
+    pbt_col_num = 0
+    for cg in table:
+        if len(cg) > 0:
+            max_in_cg = max(len(w) for w in cg) if any(cg) else 1
+            pbt_count = len(cg[0]) if len(cg) > 0 else 0
+            for c in range(max_in_cg):
+                if c < pbt_count:
+                    pbt_col_num += 2
+                    col_headers.append(str(pbt_col_num))
+                else:
+                    col_headers.append('')
+    for hdr in col_headers:
+        html += '<th>{}</th>'.format(hdr)
+    html += '</tr></thead><tbody>'
+    for wit_i, wit_id in enumerate(witnesses):
+        html += '<tr><td>{}</td>'.format(wit_id)
+        for cg in table:
+            if wit_i < len(cg):
+                for token in cg[wit_i]:
+                    html += '<td>{}</td>'.format(token.get('original', ''))
+                max_in_cg = max(len(w) for w in cg) if any(cg) else 0
+                for _ in range(max_in_cg - len(cg[wit_i])):
+                    html += '<td></td>'
+            else:
+                html += '<td></td>'
+        html += '</tr>'
+    html += '</tbody></table>'
+    return html
+
+
+def parse_ai_json_response(text):
+    """Parse JSON from an AI response that may include markdown fences or preamble.
+
+    Returns:
+        parsed dict, or raises an exception
+    """
+    text = text.strip()
+    # strip markdown code fences if present
+    if text.startswith('```'):
+        first_newline = text.find('\n')
+        if first_newline != -1:
+            text = text[first_newline + 1:]
+        if text.endswith('```'):
+            text = text[:-3].strip()
+    # fix trailing commas which are invalid JSON but sometimes produced by LLMs
+    text = re.sub(r',\s*([}\]])', r'\1', text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        # model may have included preamble text before the JSON;
+        # try to find valid JSON by scanning for { and parsing from there
+        for idx in range(len(text)):
+            if text[idx] == '{':
+                try:
+                    candidate = re.sub(r',\s*([}\]])', r'\1', text[idx:])
+                    return json.loads(candidate)
+                except json.JSONDecodeError:
+                    decoder = json.JSONDecoder()
+                    try:
+                        result, _ = decoder.raw_decode(candidate)
+                        return result
+                    except json.JSONDecodeError:
+                        continue
+        raise
+
+
+def expand_compact_table(table, witnesses, token_lookup):
+    """Expand a compact index-format table into full WordToken objects.
+
+    In compact format, table cells contain string indices instead of
+    full token objects. This reconstructs the full objects from the lookup.
+
+    Returns:
+        expanded table (list of column groups)
+    """
+    print('reconstructing WordTokens from compact index format', file=sys.stderr)
+    expanded_table = []
+    for cg in table:
+        expanded_cg = []
+        for i, indices in enumerate(cg):
+            wit_id = witnesses[i] if i < len(witnesses) else None
+            tokens = []
+            for idx in indices:
+                if wit_id and wit_id in token_lookup and idx in token_lookup[wit_id]:
+                    tokens.append(token_lookup[wit_id][idx])
+                else:
+                    print('WARNING: token index {} not found for witness {}'.format(
+                        idx, wit_id), file=sys.stderr)
+            expanded_cg.append(tokens)
+        expanded_table.append(expanded_cg)
+    return expanded_table
+
+
+def is_compact_format(table):
+    """Check if a table uses compact index format (arrays of strings)
+    vs full WordToken format (arrays of objects)."""
+    return (len(table) > 0 and len(table[0]) > 0
+            and any(len(cg_wit) > 0 for cg_wit in table[0])
+            and isinstance(next(
+                (item for cg_wit in table[0] for item in cg_wit), None
+            ), str))

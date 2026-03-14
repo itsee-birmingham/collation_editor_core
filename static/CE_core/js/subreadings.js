@@ -50,69 +50,72 @@ var SR = (function () {
                     if (markedReading.apparatus === key) { //if in right apparatus row
                       if (markedReading.start === apparatus[i].start &&
                         markedReading.end === apparatus[i].end) { //if unit extent is correct
-                        // find the child reading
-                        [child, childPos] = SR._findChildReading(apparatus[i], markedReading, _test);
-                        if (_test) {
-                          console.log('child is...');
-                          console.log(child);
-                        }
-                        // get the parent
-                        parent = SR._findParentReading(apparatus[i], key, markedReading, true, childPos);
-                        if (_test) {
-                          console.log('parent is...');
-                          console.log(parent);
-                        }
-                        if (parent !== null) {
-                          if (Object.prototype.hasOwnProperty.call(parent, 'subreadings')) {
-                            subreadings = parent.subreadings;
-                          } else {
-                            subreadings = {};
+                          if (!Object.prototype.hasOwnProperty.call(markedReading, 'first_word_index') ||
+                               markedReading.first_word_index === apparatus[i].first_word_index) { // check position
+                          // find the child reading
+                          [child, childPos] = SR._findChildReading(apparatus[i], markedReading, _test);
+                          if (_test) {
+                            console.log('child is...');
+                            console.log(child);
                           }
-                          if (child !== null) {
-                            markedReading.applied = true;
-                            SR._addCombinedGapDataToParent(parent, markedReading);
-                            // sort out the options
-                            options = {
-                              'standoff': true
-                            };
-                            if (typeof ruleClasses !== 'undefined') {
-                              options.rules = ruleClasses;
+                          // get the parent
+                          parent = SR._findParentReading(apparatus[i], key, markedReading, true, childPos);
+                          if (_test) {
+                            console.log('parent is...');
+                            console.log(parent);
+                          }
+                          if (parent !== null) {
+                            if (Object.prototype.hasOwnProperty.call(parent, 'subreadings')) {
+                              subreadings = parent.subreadings;
+                            } else {
+                              subreadings = {};
                             }
-                            if (typeof markedReading.reading_text !== 'undefined') {
-                              options.text = markedReading.reading_text;
-                              options.text = SR._getCorrectStandoffReadingText(markedReading, ruleClasses);
-                            }
-                            if (typeof markedReading.combined_gap_before !== 'undefined') {
-                              options.combined_gap_before = markedReading.combined_gap_before;
-                            }
-                            if (typeof markedReading.combined_gap_after !== 'undefined') {
-                              options.combined_gap_after = markedReading.combined_gap_after;
-                            }
-                            if (typeof markedReading.combined_gap_before_details !== 'undefined') {
-                              options.combined_gap_before_details = markedReading.combined_gap_before_details;
-                            }
-                            if (Object.prototype.hasOwnProperty.call(child, 'parents')) {
-                              parent.parents = child.parents;
-                            }
-                            if (_test) {
-                              console.log(options);
-                              console.log(JSON.parse(JSON.stringify(subreadings)));
-                            }
-                            // then make the subreading for that witness (you might have to split a reading)
-                            subreadings = SR._addToSubreadings(subreadings, child, markedReading.witness,
-                                                               markedReading.value.split('|'), options);
-                            if (SR._witnessIn(subreadings, markedReading.witness)) {
-                              parent.subreadings = subreadings;
-                              forDeletion.push([markedReading.witness, child]);
-                            }
-                            // for each reading we need to record the witnesses that were made subreading by standoff
-                            // readings rather than regularised readings. This is so we can put all standoff
-                            // subreadings in SR_text when we lose them (makes extracting text easier)
-                            if (!Object.prototype.hasOwnProperty.call(parent, 'standoff_subreadings')) {
-                              parent.standoff_subreadings = [];
-                            }
-                            if (parent.standoff_subreadings.indexOf(markedReading.witness) === -1) {
-                              parent.standoff_subreadings.push(markedReading.witness);
+                            if (child !== null) {
+                              markedReading.applied = true;
+                              SR._addCombinedGapDataToParent(parent, markedReading);
+                              // sort out the options
+                              options = {
+                                'standoff': true
+                              };
+                              if (typeof ruleClasses !== 'undefined') {
+                                options.rules = ruleClasses;
+                              }
+                              if (typeof markedReading.reading_text !== 'undefined') {
+                                options.text = markedReading.reading_text;
+                                options.text = SR._getCorrectStandoffReadingText(markedReading, ruleClasses);
+                              }
+                              if (typeof markedReading.combined_gap_before !== 'undefined') {
+                                options.combined_gap_before = markedReading.combined_gap_before;
+                              }
+                              if (typeof markedReading.combined_gap_after !== 'undefined') {
+                                options.combined_gap_after = markedReading.combined_gap_after;
+                              }
+                              if (typeof markedReading.combined_gap_before_details !== 'undefined') {
+                                options.combined_gap_before_details = markedReading.combined_gap_before_details;
+                              }
+                              if (Object.prototype.hasOwnProperty.call(child, 'parents')) {
+                                parent.parents = child.parents;
+                              }
+                              if (_test) {
+                                console.log(options);
+                                console.log(JSON.parse(JSON.stringify(subreadings)));
+                              }
+                              // then make the subreading for that witness (you might have to split a reading)
+                              subreadings = SR._addToSubreadings(subreadings, child, markedReading.witness,
+                                                                markedReading.value.split('|'), options);
+                              if (SR._witnessIn(subreadings, markedReading.witness)) {
+                                parent.subreadings = subreadings;
+                                forDeletion.push([markedReading.witness, child]);
+                              }
+                              // for each reading we need to record the witnesses that were made subreading by standoff
+                              // readings rather than regularised readings. This is so we can put all standoff
+                              // subreadings in SR_text when we lose them (makes extracting text easier)
+                              if (!Object.prototype.hasOwnProperty.call(parent, 'standoff_subreadings')) {
+                                parent.standoff_subreadings = [];
+                              }
+                              if (parent.standoff_subreadings.indexOf(markedReading.witness) === -1) {
+                                parent.standoff_subreadings.push(markedReading.witness);
+                              }
                             }
                           }
                         }

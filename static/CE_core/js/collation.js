@@ -1594,7 +1594,7 @@ var CL = (function() {
         i = 0;
       } else {
         i = 1;
-      }     
+      }
       for (i; i < unit.readings.length; i += 1) {
         witnesses.push.apply(witnesses, unit.readings[i].witnesses);
         if (Object.prototype.hasOwnProperty.call(unit.readings[i], 'subreadings')) {

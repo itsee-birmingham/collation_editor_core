@@ -1181,12 +1181,6 @@ var SV = (function() {
                                                         [read1, read2], witness,
                                                         newReadings[text].text).sort(SV._compareIndexes);
           } else {
-            console.log('-----------')
-            console.log(text)
-            console.log(JSON.parse(JSON.stringify(readings1)))
-            console.log(JSON.parse(JSON.stringify(read1)))
-            console.log(witness)
-            console.log('-----------')
             newRdg = {
               'witnesses': [witness],
               'text': SV._combineReadingText(readings1, readings2, [read1, read2], witness, [])
@@ -1221,7 +1215,6 @@ var SV = (function() {
           
         }
       }
-      console.log(JSON.parse(JSON.stringify(newReadings)))
       newunit.readings = [];
       for (const key in newReadings) {
         if (Object.prototype.hasOwnProperty.call(newReadings, key)) {
@@ -2555,7 +2548,7 @@ var SV = (function() {
       return a;
     },
 
-    _doCombineUnits: function(units, appId, keepId) {
+    _doCombineUnits: function(units, appId, keepId, redraw) {
       let newunit, index, warningMess, errorMess, problems, warningUnit, combinedGapBeforeSubreadings,
           combinedGapAfterSubreadings, combinedGapBeforeSubreadingsDetails;
   
@@ -2567,7 +2560,9 @@ var SV = (function() {
       const witnessEquality = SV._checkWitnessEquality(unit1, unit2, appId);
       const overlapBoundaries = SV._checkOverlapBoundaries(unit1, unit2, appId);
       const overlapStatusAgreement = SV._checkOverlapStatusAgreement(unit1, unit2, appId);
-      SV._addToUndoStack(CL.data);
+      if (redraw !== false) {
+        SV._addToUndoStack(CL.data);
+      }
       if (witnessEquality && overlapBoundaries && overlapStatusAgreement) {
         if (keepId === true) {
           // combine the reference ids in the top apparatus
@@ -2702,6 +2697,9 @@ var SV = (function() {
             warningUnit = [appId, index];
           }
         }
+        if (redraw === false) {
+          return;
+        }
         SV.checkBugStatus('combine', appId + ' unit ' + Math.min(units[0][0], units[1][0]) + ' with unit ' + Math.max(units[0][0], units[1][0]) + '.');
         if (warningMess !== undefined) {
           SV.showSetVariantsData({
@@ -2723,8 +2721,10 @@ var SV = (function() {
         } else if (overlapStatusAgreement === false) {
           errorMess = 'ERROR: These units cannot be combined as some of the witnesses have different statuses (deleted, overlapped etc.)';
         }
-        console.log(errorMess)
         SV.unprepareForOperation();
+        if (redraw === false) {
+          return;
+        }
         SV.showSetVariantsData({
           'message': {
             'type': 'error',
@@ -3001,11 +3001,7 @@ var SV = (function() {
       let unit1, unit2, errorMess;
       const scrollOffset = [document.getElementById('scroller').scrollLeft,
                             document.getElementById('scroller').scrollTop];
-      console.log('############ - pre-prepared')
-      console.log(JSON.parse(JSON.stringify(CL.data)))
       SV.prepareForOperation();
-      console.log(JSON.parse(JSON.stringify(CL.data)))
-      console.log('############ - prepared')
       // at this point both units are from same apparatus
       const appId = units[0][1];
       if (appId === 'apparatus') {
@@ -5137,6 +5133,29 @@ var SV = (function() {
           return;
         }
       }
+      /** Now, if the overlaps contain text, check the odd numbered units either side of the extent we are going to be
+       * removing. If there is more than one unit already at that index point then the user must reduce that to one
+       * before removing another overlap containing text. This is to ensure that any units added can be numbered uniquely
+       * and in order (using .0 where for the odd unit after the overlap). Overlaps without text are fine because we
+       * know they will never add any more units into the odd numbered index points.
+       */
+      if (SV._containsText([overlapUnit]) || SV._containsText(candidateOverlaps)) {
+        let startWord = CL.data.apparatus[range[0]].start;
+        let endWord = CL.data.apparatus[range[1]].end;
+        if (startWord % 2 == 0) {
+          startWord = startWord - 1;
+        }
+        if (endWord % 2 == 0) {
+          endWord = endWord + 1;
+        }
+        if (SV._adjacentIndexPointsHaveMultipleUnits(range)) {
+          alert('This overlap cannot be removed while there are mutliple units at word index ' +
+                startWord + ' and/or ' + endWord + '.\n' +
+                'Please reduce the units at these word index to one and then try again.');
+          spinner.removeLoadingOverlay();
+          return;
+        }
+      }
       /** remove the relevant witnesses from the section of the collation representing the overlap while also removing
        * any standoff regularisations for these witnesses in the units being removed in the top line (we only need to do
        * this for the top line because overlaps will be removed entirely and the standoff removed as part of the clean
@@ -5281,6 +5300,33 @@ var SV = (function() {
           }
           CL.lacOmFix();
           // copy so we can change CL.data without screwing this up
+          // merge any units that would end up as additions before and after the chunk being combined
+          // NB: CL.data and data are the same thing at this point
+          while (data.apparatus[0].start === 1 && data.apparatus[1].start === 1) {
+            SV._doCombineUnits([[0, 'apparatus'], [1, 'apparatus']], 'apparatus', undefined, false);
+          }
+          // one final combine to get it all in an even unit if possible
+          if (data.apparatus[0].start === 1 && data.apparatus.length > 1) {
+            SV._doCombineUnits([[0, 'apparatus'], [1, 'apparatus']], 'apparatus', undefined, false);
+          } 
+          while (data.apparatus[data.apparatus.length - 1].start % 2 === 1 &&
+                  data.apparatus[data.apparatus.length - 2].start % 2 === 1) {
+            SV._doCombineUnits(
+              [[data.apparatus.length - 2, 'apparatus'], [data.apparatus.length - 1, 'apparatus']],
+              'apparatus',
+              undefined,
+              false
+            );
+          }
+          // one final combine to get it all in an even unit if possible
+          if (data.apparatus.length > 1 && data.apparatus[data.apparatus.length - 1].start % 2 === 1) {
+            SV._doCombineUnits(
+              [[data.apparatus.length - 2, 'apparatus'], [data.apparatus.length - 1, 'apparatus']],
+              'apparatus',
+              undefined,
+              false
+            );
+          }
           data = JSON.parse(JSON.stringify(CL.data));
           const originalApparatus = JSON.parse(JSON.stringify(CL.existingCollation.apparatus));
           const preChunk = originalApparatus.slice(0, range[0]);
@@ -5288,30 +5334,31 @@ var SV = (function() {
           // add the data back in
           // just get the chunk we need to change
           const chunk = CL.existingCollation.apparatus.slice(range[0], range[1] + 1);
-          // renumber units that start with 1 to the gap before the first non-gap unit
-          if (data.apparatus[0].start === 1 && preChunk.length > 0) {
-            let i = 0;
-            while(data.apparatus[i].start === 1) {
-              if (preChunk[preChunk.length -1].end % 2 === 0) { // this is an even numbered unit 
-                data.apparatus[i].start = preChunk[preChunk.length -1].end + 1;
-                data.apparatus[i].end = preChunk[preChunk.length -1].end + 1;
-                if (i === 0) {
-                  data.apparatus[i].first_word_index = data.apparatus[i].end + '.1';
-                } else {
-                  data.apparatus[i].first_word_index = SV._incrementSubIndex(data.apparatus[i - 1].first_word_index, 1);
-                }
-              } else { // this is an addition unit
-                data.apparatus[i].start = preChunk[preChunk.length -1].end;
-                data.apparatus[i].end = preChunk[preChunk.length -1].end;
-                if (i === 0) {
-                  data.apparatus[i].first_word_index = SV._incrementSubIndex(preChunk[preChunk.length -1].first_word_index, 1);
-                } else {
-                  data.apparatus[i].first_word_index = SV._incrementSubIndex(data.apparatus[i - 1].first_word_index, 1);
-                }
-              }
-              i += 1;
-            }
-          }
+          // check and renumber and units in the odd spaces either side of the chunk we recollated
+          // if (preChunk.length > 0 && data.apparatus[0].start === 1) {
+          //   if (preChunk[preChunk.length - 1].end > 1) {
+          //     if (preChunk[preChunk.length - 1].end % 2 === 0) {
+          //       data.apparatus[0].start = preChunk[preChunk.length - 1].end + 1;
+          //       data.apparatus[0].end = preChunk[preChunk.length - 1].end + 1;
+          //       data.apparatus[0].first_word_index = data.apparatus[0].end + '.1';
+          //     } else {
+          //       data.apparatus[0].start = preChunk[preChunk.length - 1].end;
+          //       data.apparatus[0].end = preChunk[preChunk.length - 1].end;
+          //       data.apparatus[0].first_word_index = SV._incrementSubIndex(preChunk[preChunk.length - 1].first_word_index, 1);
+          //     } 
+          //   }
+          //   const mainIndexPoint = data.apparatus[0].end;
+          //   for (let reading of data.apparatus[0].readings) {
+          //     if (reading.text.length > 0) {
+          //       for (let word of reading.text) {
+          //         word.index = mainIndexPoint + '.0';
+          //       }
+          //     }
+          //   }
+          // }
+          // if (postChunk.length > 0 && postChunk[0].start % 2 === 1 && postChunk[0].start === data.apparatus[data.apparatus.length - 1].start) {
+          //   data.apparatus[data.apparatus.length - 1].first_word_index = data.apparatus[data.apparatus.length - 1].start + '.0';
+          // }
           before = null;
           after = null;
           if (preChunk.length > 0) {
@@ -5334,8 +5381,7 @@ var SV = (function() {
             data.apparatus[data.apparatus.length - 1].end + 1,
             [before, after]
           );
-          // mergedCollationChunk.structure.apparatus[1].first_word_index = '3.1';
-          // mergedCollationChunk.structure.apparatus[2].first_word_index = '3.2';
+
           CL.existingCollation.apparatus = preChunk.concat(mergedCollationChunk.structure.apparatus, postChunk);
           CL.data = JSON.parse(JSON.stringify(CL.existingCollation));
           CL.lacOmFix(); // call this again on the full collation
@@ -5355,6 +5401,52 @@ var SV = (function() {
           document.getElementById('scroller').scrollTop = scrollOffset[1];
         });
       });
+    },
+
+    _containsText: function(unitList) {
+      /* Check if any of the provided units contain any text (either in main or subreadings) */
+      for (let unit of unitList) {
+        for (let i = 1; i < unit.readings.length; i += 1) {
+          if (unit.readings[i].text.length > 0) {
+            return true;
+          }
+          if (unit.readings[i].SR_text) {
+            for (let key in unit.readings[i].SR_text) {
+              if (unit.readings[i].SR_text[key].text.length > 0) {
+                return true;
+              }
+            }
+          }
+        }
+      }
+      return false;
+    },
+
+    _adjacentIndexPointsHaveMultipleUnits: function(range) {
+      let start, end;
+      if (CL.data.apparatus[range[0]].start % 2 == 0) {
+        start = CL.data.apparatus[range[0]].start - 1;
+      } else {
+        start = CL.data.apparatus[range[0]].start;
+      }
+      if (CL.data.apparatus[range[1]].end % 2 == 0) {
+        end = CL.data.apparatus[range[1]].end + 1;
+      } else {
+        end = CL.data.apparatus[range[1]].end;
+      }
+      let startUnits = 0, endUnits = 0;
+      for (let unit of CL.data.apparatus) {
+        if (unit.start == start) {
+          startUnits += 1;
+        }
+        if (unit.end == end) {
+          endUnits += 1;
+        }
+      }
+      if (startUnits > 1 || endUnits > 1) {
+        return true;
+      }
+      return false;
     },
 
     _getAppIdAndIndexByOverlapId: function(unitId) {

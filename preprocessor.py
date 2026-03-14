@@ -403,21 +403,25 @@ class PreProcessor(Regulariser):
                 validation_errors = validate_token_integrity(
                     output['table'], output['witnesses'], input_token_indices)
                 if validation_errors:
-                    print('======= AI alignment validation errors: {}'.format(
+                    print('======= alignment validation errors: {}'.format(
                         '; '.join(validation_errors)), file=sys.stderr)
                     output['table'] = []
                     output['witnesses'] = []
-                    output['ai_comments'] = (
-                        'Error: The AI produced an alignment with token integrity errors '
+                    feedback = output.get('collation_feedback', {})
+                    feedback['comments'] = (
+                        'Error: The collation engine produced an alignment with token integrity errors '
                         'and the result has been rejected to protect data quality. '
                         'Please try again. Details: ' +
                         '; '.join(validation_errors))
+                    output['collation_feedback'] = feedback
 
             # build HTML alignment table if not already present
-            if (not output.get('ai_alignment_table')
+            feedback = output.get('collation_feedback', {})
+            if (not feedback.get('alignment_table')
                     and output.get('table') and output.get('witnesses')):
-                output['ai_alignment_table'] = build_html_alignment_table(
+                feedback['alignment_table'] = build_html_alignment_table(
                     output['table'], output['witnesses'])
+                output['collation_feedback'] = feedback
 
             # write debug log if a log directory is configured
             response_json = {'output': output}

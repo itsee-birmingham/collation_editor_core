@@ -16,10 +16,12 @@ class CollationResult:
     def __init__(self):
         self.table = []
         self.witnesses = []
-        self.ai_comments = ''
-        self.ai_alignment_table = ''
-        self.ai_processing_duration = None
-        self.ai_usage = None
+        self.feedback = {
+            'comments': '',
+            'alignment_table': '',
+            'processing_duration': None,
+            'engine_usage': None,
+        }
 
     def to_output_dict(self):
         """Return a dict suitable for use as the 'output' block."""
@@ -27,14 +29,11 @@ class CollationResult:
             'witnesses': self.witnesses,
             'table': self.table,
         }
-        if self.ai_comments:
-            d['ai_comments'] = self.ai_comments
-        if self.ai_alignment_table:
-            d['ai_alignment_table'] = self.ai_alignment_table
-        if self.ai_processing_duration is not None:
-            d['ai_processing_duration'] = self.ai_processing_duration
-        if self.ai_usage is not None:
-            d['ai_usage'] = self.ai_usage
+        # include only non-empty feedback entries
+        feedback = {k: v for k, v in self.feedback.items()
+                    if v is not None and v != ''}
+        if feedback:
+            d['collation_feedback'] = feedback
         return d
 
 

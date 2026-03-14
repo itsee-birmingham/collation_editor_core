@@ -58,10 +58,9 @@ class PostProcessor(Regulariser, SettingsApplier):
         """Produce variant units for display and editing."""
         variant_readings = self.create_readings_sets()
         variant_units = self.format_output(self.anchor_readings(variant_readings))
-        # pass through AI engine metadata if present
-        for key in ('ai_comments', 'ai_alignment_table', 'ai_processing_duration', 'ai_usage'):
-            if key in self.alignment_table:
-                variant_units[key] = self.alignment_table[key]
+        # pass through collation feedback if present
+        if 'collation_feedback' in self.alignment_table:
+            variant_units['collation_feedback'] = self.alignment_table['collation_feedback']
         return variant_units
 
     def create_extra_reading(self, text_list, witness):

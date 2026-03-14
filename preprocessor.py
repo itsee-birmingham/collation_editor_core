@@ -6,10 +6,7 @@ import warnings
 from .exceptions import DataInputException
 from collation.core.postprocessor import PostProcessor
 from collation.core.regulariser import Regulariser
-from collation.core.collation_engine import (
-    get_engine, build_token_lookup, validate_token_integrity,
-    check_ai_verify_block, build_html_alignment_table,
-)
+from collation.core.collation_engine import get_engine
 
 
 class PreProcessor(Regulariser):
@@ -346,7 +343,7 @@ class PreProcessor(Regulariser):
             else:
                 return [verse['witnesses'][0]['id'], [verse['witnesses'][0]]]
 
-    def do_collate(self, data, options):
+    def do_collate(self, data, options):  # accept, algorithm, tokenComparator, host='localhost'):
         """Do the collation using a registered engine or the legacy local_python_functions hook."""
         print('COLLATING', file=sys.stderr)
         try:
@@ -385,57 +382,7 @@ class PreProcessor(Regulariser):
 
         if engine is not None:
             result = engine.collate(data, options, self.basetext_siglum)
-
-            # check for raw response (CollateX backward compatibility)
-            if hasattr(result, '_raw_response') and result._raw_response:
-                return result._raw_response
-
-            output = result.to_output_dict()
-
-            # build token indices for validation
-            _, input_token_indices = build_token_lookup(data['witnesses'])
-
-            # check AI verify block if present
-            check_ai_verify_block(output, input_token_indices)
-
-            # validate token integrity
-            if output.get('table') and output.get('witnesses'):
-                validation_errors = validate_token_integrity(
-                    output['table'], output['witnesses'], input_token_indices)
-                if validation_errors:
-                    print('======= alignment validation errors: {}'.format(
-                        '; '.join(validation_errors)), file=sys.stderr)
-                    output['table'] = []
-                    output['witnesses'] = []
-                    feedback = output.get('collation_feedback', {})
-                    feedback['comments'] = (
-                        'Error: The collation engine produced an alignment with token integrity errors '
-                        'and the result has been rejected to protect data quality. '
-                        'Please try again. Details: ' +
-                        '; '.join(validation_errors))
-                    output['collation_feedback'] = feedback
-
-            # build HTML alignment table if not already present
-            feedback = output.get('collation_feedback', {})
-            if (not feedback.get('alignment_table')
-                    and output.get('table') and output.get('witnesses')):
-                feedback['alignment_table'] = build_html_alignment_table(
-                    output['table'], output['witnesses'])
-                output['collation_feedback'] = feedback
-
-            # write debug log if a log directory is configured
-            response_json = {'output': output}
-            log_dir = settings.get('debug_log_dir')
-            if log_dir:
-                try:
-                    import os
-                    log_path = os.path.join(log_dir, 'post_collation.json')
-                    with open(log_path, 'w', encoding='utf-8') as file:
-                        file.write(json.dumps(response_json, ensure_ascii=False, indent=4))
-                except Exception as e:
-                    print('======= error writing log: ' + str(e), file=sys.stderr)
-
-            return json.dumps(output, ensure_ascii=False, indent=4)
+            return engine.process_result(result, data)
 
         # 3. Fallback: CollateX via HTTP (if no engine registered for this algorithm)
         #    This handles traditional algorithms like dekker, needleman-wunsch

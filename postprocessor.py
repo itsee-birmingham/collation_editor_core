@@ -58,9 +58,9 @@ class PostProcessor(Regulariser, SettingsApplier):
         """Produce variant units for display and editing."""
         variant_readings = self.create_readings_sets()
         variant_units = self.format_output(self.anchor_readings(variant_readings))
-        # pass through collation feedback if present
+        # move collation feedback out of alignment table — it's not part of the alignment data
         if 'collation_feedback' in self.alignment_table:
-            variant_units['collation_feedback'] = self.alignment_table['collation_feedback']
+            variant_units['collation_feedback'] = self.alignment_table.pop('collation_feedback')
         return variant_units
 
     def create_extra_reading(self, text_list, witness):

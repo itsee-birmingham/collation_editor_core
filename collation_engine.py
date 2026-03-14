@@ -41,7 +41,8 @@ class CollationEngine(ABC):
     """Abstract base class for collation engines.
 
     Subclasses implement collate() to perform the actual collation.
-    The preprocessor handles all pre/post processing around the engine call.
+    process_result() handles post-collation validation, HTML table
+    building, and debug logging — inherited by all engines.
     """
 
     def __init__(self, algorithm_settings):
@@ -65,6 +66,61 @@ class CollationEngine(ABC):
             CollationResult with table and witnesses populated
         """
         pass
+
+    def process_result(self, result, data):
+        """Post-process a CollationResult: validate tokens, build HTML table, write debug log.
+
+        Args:
+            result: CollationResult from collate()
+            data: the original witness data (for building token indices)
+
+        Returns:
+            JSON string of the output dict
+        """
+        # raw response bypass (e.g. CollateX returning bytes directly)
+        if hasattr(result, '_raw_response') and result._raw_response:
+            return result._raw_response
+
+        output = result.to_output_dict()
+
+        _, input_token_indices = build_token_lookup(data['witnesses'])
+
+        check_ai_verify_block(output, input_token_indices)
+
+        if output.get('table') and output.get('witnesses'):
+            validation_errors = validate_token_integrity(
+                output['table'], output['witnesses'], input_token_indices)
+            if validation_errors:
+                print('======= alignment validation errors: {}'.format(
+                    '; '.join(validation_errors)), file=sys.stderr)
+                output['table'] = []
+                output['witnesses'] = []
+                feedback = output.get('collation_feedback', {})
+                feedback['comments'] = (
+                    'Error: The collation engine produced an alignment with token integrity errors '
+                    'and the result has been rejected to protect data quality. '
+                    'Please try again. Details: ' +
+                    '; '.join(validation_errors))
+                output['collation_feedback'] = feedback
+
+        feedback = output.get('collation_feedback', {})
+        if (not feedback.get('alignment_table')
+                and output.get('table') and output.get('witnesses')):
+            feedback['alignment_table'] = build_html_alignment_table(
+                output['table'], output['witnesses'])
+            output['collation_feedback'] = feedback
+
+        log_dir = self.algorithm_settings.get('debug_log_dir')
+        if log_dir:
+            try:
+                import os
+                log_path = os.path.join(log_dir, 'post_collation.json')
+                with open(log_path, 'w', encoding='utf-8') as f:
+                    f.write(json.dumps({'output': output}, ensure_ascii=False, indent=4))
+            except Exception as e:
+                print('======= error writing log: ' + str(e), file=sys.stderr)
+
+        return json.dumps(output, ensure_ascii=False, indent=4)
 
 
 # ---------------------------------------------------------------------------

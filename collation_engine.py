@@ -77,7 +77,7 @@ class CollationEngine(ABC):
         start_time = time.time()
         result = self.collate(data, options, basetext_siglum)
 
-        elapsed = int(time.time() - start_time)
+        elapsed = round(time.time() - start_time, 1)
 
         # fill in processing_duration if the engine didn't set it
         if result.feedback.get('processing_duration') is None:

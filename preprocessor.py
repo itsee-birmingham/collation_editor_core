@@ -379,7 +379,6 @@ class PreProcessor(Regulariser):
         engine = get_engine(algorithm, settings)
 
         if engine is not None:
-            result = engine.collate(data, options, self.basetext_siglum)
-            return engine.process_result(result, data)
+            return engine.run(data, options, self.basetext_siglum)
 
         raise DataInputException('No collation engine registered for algorithm: {}'.format(algorithm))

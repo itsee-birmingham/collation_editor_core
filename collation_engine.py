@@ -7,6 +7,7 @@ so that engines can be added without modifying core code.
 import json
 import re
 import sys
+import time
 from abc import ABC, abstractmethod
 
 
@@ -66,6 +67,36 @@ class CollationEngine(ABC):
             CollationResult with table and witnesses populated
         """
         pass
+
+    def run(self, data, options, basetext_siglum):
+        """Run collation with automatic timing, then post-process the result.
+
+        Calls collate(), fills in processing_duration if the engine didn't set it,
+        and populates engine_usage with the engine name and algorithm.
+        """
+        start_time = time.time()
+        result = self.collate(data, options, basetext_siglum)
+
+        elapsed = int(time.time() - start_time)
+
+        # fill in processing_duration if the engine didn't set it
+        if result.feedback.get('processing_duration') is None:
+            result.feedback['processing_duration'] = elapsed
+
+        # ensure engine_usage has at least engine name and algorithm
+        if result.feedback.get('engine_usage') is None:
+            result.feedback['engine_usage'] = {}
+        usage = result.feedback['engine_usage']
+        if 'engine' not in usage:
+            usage['engine'] = self.name()
+        if 'algorithm' not in usage:
+            usage['algorithm'] = options.get('algorithm', '')
+        if 'duration_seconds' not in usage:
+            usage['duration_seconds'] = elapsed
+        if 'summary' not in usage:
+            usage['summary'] = '{} | {}s'.format(self.name(), elapsed)
+
+        return self.process_result(result, data)
 
     def process_result(self, result, data):
         """Post-process a CollationResult: validate tokens, build HTML table, write debug log.

@@ -33,7 +33,8 @@ tr.ui-selecting  {
 }
 
 td.nav {
-	font-size: 20pt;
+  font-size: 20pt;
+  cursor: pointer;
 }
 
 div#drag {
@@ -222,6 +223,7 @@ tr.top , li.top{
 
 div.reg_word {
     display: inline-block;
+    padding: 0 0.1em 0 0.1em;
 }
 
 div.drag_div {

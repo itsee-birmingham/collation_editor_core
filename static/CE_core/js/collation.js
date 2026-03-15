@@ -201,7 +201,7 @@ var CL = (function() {
       const text = [];
       text.push(start);
       text.push(end);
-      for (let i = 0; i < unit.readings.length; i += 1) {
+      for (let i = 0; i < unit.readings.length; i += 1) {      
         text.push(CL.extractWitnessText(unit.readings[i]) + unit.readings[i].witnesses.join(' '));
       }
       if (typeof appId !== 'undefined') {
@@ -1372,7 +1372,12 @@ var CL = (function() {
                                   apparatus[i].readings[j].SR_text[witnesses[k]].text.length === 0) {
                   // squelch if this is an om reading which is a subreading of another reading
                 } else {
-                  witnesses[k] = null;
+                  /** This used to be in place. I took it out because it was removing witnesses when combining units
+                   * which contained a reading with text regularised to lac when combining with an om. I am leaving the
+                   * line here for now, commented out, because it might break something else and this will remind me
+                   * what I did (2/3/26).
+                   */
+                  // witnesses[k] = null;
                 }
               }
             }

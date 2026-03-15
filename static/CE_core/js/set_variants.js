@@ -2553,7 +2553,7 @@ var SV = (function() {
       return a;
     },
 
-    _doCombineUnits: function(units, appId, keepId) {
+    _doCombineUnits: function(units, appId, keepId, redraw) {
       let newunit, index, warningMess, errorMess, problems, warningUnit, combinedGapBeforeSubreadings,
           combinedGapAfterSubreadings, combinedGapBeforeSubreadingsDetails;
   
@@ -2565,7 +2565,9 @@ var SV = (function() {
       const witnessEquality = SV._checkWitnessEquality(unit1, unit2, appId);
       const overlapBoundaries = SV._checkOverlapBoundaries(unit1, unit2, appId);
       const overlapStatusAgreement = SV._checkOverlapStatusAgreement(unit1, unit2, appId);
-      SV._addToUndoStack(CL.data);
+      if (redraw !== false) {
+        SV._addToUndoStack(CL.data);
+      }
       if (witnessEquality && overlapBoundaries && overlapStatusAgreement) {
         if (keepId === true) {
           // combine the reference ids in the top apparatus
@@ -2700,6 +2702,9 @@ var SV = (function() {
             warningUnit = [appId, index];
           }
         }
+        if (redraw === false) {
+          return;
+        }
         SV.checkBugStatus('combine', appId + ' unit ' + Math.min(units[0][0], units[1][0]) + ' with unit ' + Math.max(units[0][0], units[1][0]) + '.');
         if (warningMess !== undefined) {
           SV.showSetVariantsData({
@@ -2722,6 +2727,9 @@ var SV = (function() {
           errorMess = 'ERROR: These units cannot be combined as some of the witnesses have different statuses (deleted, overlapped etc.)';
         }
         SV.unprepareForOperation();
+        if (redraw === false) {
+          return;
+        }
         SV.showSetVariantsData({
           'message': {
             'type': 'error',
@@ -5272,38 +5280,59 @@ var SV = (function() {
             }
           }
           CL.lacOmFix();
-          // copy so we can change CL.data without screwing this up
-          data = JSON.parse(JSON.stringify(CL.data));
+
           const originalApparatus = JSON.parse(JSON.stringify(CL.existingCollation.apparatus));
           const preChunk = originalApparatus.slice(0, range[0]);
           const postChunk = originalApparatus.slice(range[1]+ 1);
-          // add the data back in
           // just get the chunk we need to change
           const chunk = CL.existingCollation.apparatus.slice(range[0], range[1] + 1);
-          // renumber units that start with 1 to the gap before the first non-gap unit
-          if (data.apparatus[0].start === 1 && preChunk.length > 0) {
-            let i = 0;
+          // Check and renumber units in the odd space before the chunk if required (if they have been assigned 1 and
+          // the overlap being removed didn't start at 1 or 2)
+          let i = 0; 
+          if (preChunk.length > 0) {
             while(data.apparatus[i].start === 1) {
-              if (preChunk[preChunk.length -1].end % 2 === 0) { // this is an even numbered unit 
-                data.apparatus[i].start = preChunk[preChunk.length -1].end + 1;
-                data.apparatus[i].end = preChunk[preChunk.length -1].end + 1;
-                if (i === 0) {
-                  data.apparatus[i].first_word_index = data.apparatus[i].end + '.1';
+              if (preChunk[preChunk.length - 1].end > 1) {
+                if (preChunk[preChunk.length - 1].end % 2 === 0) {
+                  data.apparatus[i].start = preChunk[preChunk.length - 1].end + 1;
+                  data.apparatus[i].end = preChunk[preChunk.length - 1].end + 1;
+                  data.apparatus[i].first_word_index = data.apparatus[0].end + '.1';
                 } else {
-                  data.apparatus[i].first_word_index = SV._incrementSubIndex(data.apparatus[i - 1].first_word_index, 1);
-                }
-              } else { // this is an addition unit
-                data.apparatus[i].start = preChunk[preChunk.length -1].end;
-                data.apparatus[i].end = preChunk[preChunk.length -1].end;
-                if (i === 0) {
-                  data.apparatus[i].first_word_index = SV._incrementSubIndex(preChunk[preChunk.length -1].first_word_index, 1);
-                } else {
-                  data.apparatus[i].first_word_index = SV._incrementSubIndex(data.apparatus[i - 1].first_word_index, 1);
-                }
+                  data.apparatus[i].start = preChunk[preChunk.length - 1].end;
+                  data.apparatus[i].end = preChunk[preChunk.length - 1].end;
+                  data.apparatus[i].first_word_index = SV._incrementSubIndex(preChunk[preChunk.length - 1].first_word_index, 1);
+                } 
               }
               i += 1;
             }
           }
+          // merge any units that would end up as additions before and after the chunk being combined
+          while (data.apparatus[0].start % 2 === 1 && data.apparatus[1].start % 2 === 1) {
+            SV._doCombineUnits([[0, 'apparatus'], [1, 'apparatus']], 'apparatus', undefined, false);
+          }
+          // one final combine to get it all in an even unit if possible and necessary
+          if (data.apparatus[0].start % 2 === 1 && data.apparatus.length > 1 && chunk[0].end % 2 !== 1) {
+            SV._doCombineUnits([[0, 'apparatus'], [1, 'apparatus']], 'apparatus', undefined, false);
+          }
+          while (data.apparatus[data.apparatus.length - 1].start % 2 === 1 &&
+                  data.apparatus[data.apparatus.length - 2].start % 2 === 1) {
+            SV._doCombineUnits(
+              [[data.apparatus.length - 2, 'apparatus'], [data.apparatus.length - 1, 'apparatus']],
+              'apparatus',
+              undefined,
+              false
+            );
+          }
+          // one final combine to get it all in an even unit if possible and necessary
+          if (data.apparatus.length > 1 && data.apparatus[data.apparatus.length - 1].start % 2 === 1 && chunk[chunk.length - 1].end % 2 !== 1) {
+            SV._doCombineUnits(
+              [[data.apparatus.length - 2, 'apparatus'], [data.apparatus.length - 1, 'apparatus']],
+              'apparatus',
+              undefined,
+              false
+            );
+          }
+          data = JSON.parse(JSON.stringify(CL.data));   
+          // add the data back in         
           before = null;
           after = null;
           if (preChunk.length > 0) {

@@ -202,7 +202,7 @@ var CL = (function() {
       const text = [];
       text.push(start);
       text.push(end);
-      for (let i = 0; i < unit.readings.length; i += 1) {      
+      for (let i = 0; i < unit.readings.length; i += 1) {
         text.push(CL.extractWitnessText(unit.readings[i]) + unit.readings[i].witnesses.join(' '));
       }
       if (typeof appId !== 'undefined') {

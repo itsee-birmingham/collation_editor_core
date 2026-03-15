@@ -34,7 +34,7 @@ var SV = (function() {
      *              	error_unit - the unit which needs to be highlighted as an error*/
     showSetVariants: function(options) {
       var footerHtml, preselectedAddedHighlight;
-      console.log(JSON.parse(JSON.stringify(CL.data)));
+      console.log(CL.data);
       CL.stage = 'set';
       if (typeof options === 'undefined') {
         options = {};
@@ -1212,7 +1212,6 @@ var SV = (function() {
             newReadings[text] = newRdg;
             SV._addTypeAndDetails(newReadings[text], readings1[read1], readings2[read2]);
           }
-          
         }
       }
       newunit.readings = [];

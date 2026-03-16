@@ -386,3 +386,76 @@ def is_compact_format(table):
             and isinstance(next(
                 (item for cg_wit in table[0] for item in cg_wit), None
             ), str))
+
+
+def compress_ai_request(data, basetext_siglum):
+    """Build a compressed AI request from witness data.
+
+    Compression rules (no data is lost):
+    - 'verse' is hoisted to top level (same for all tokens)
+    - 'reading' is omitted when it equals the witness id
+    - 'siglum' is omitted when it equals the witness id
+    - 't' is omitted when it equals 'original'
+    - 'n' is omitted when absent or equals 't'
+    - 'rule_match' is omitted when it equals [original]
+    - 'decision_details' and 'decision_class' are omitted when absent
+    - Uses compact JSON separators
+
+    Returns:
+        dict ready for json.dumps()
+    """
+    # extract verse from first token (same for all)
+    verse = None
+    for w in data['witnesses']:
+        if w['tokens']:
+            verse = w['tokens'][0].get('verse')
+            break
+
+    compressed_witnesses = []
+    for w in data['witnesses']:
+        wit_id = w['id']
+        compressed_tokens = []
+        for token in w['tokens']:
+            ct = {
+                'index': token['index'],
+                'original': token['original'],
+            }
+            # only include fields that differ from defaults
+            if token.get('t') and token['t'] != token['original']:
+                ct['t'] = token['t']
+            n_val = token.get('n')
+            t_val = token.get('t', token['original'])
+            if n_val and n_val != t_val:
+                ct['n'] = n_val
+            if token.get('siglum') and token['siglum'] != wit_id:
+                ct['siglum'] = token['siglum']
+            if token.get('reading') and token['reading'] != wit_id:
+                ct['reading'] = token['reading']
+            rule_match = token.get('rule_match')
+            if rule_match and rule_match != [token['original']]:
+                ct['rule_match'] = rule_match
+            if 'decision_details' in token:
+                ct['decision_details'] = token['decision_details']
+            if 'decision_class' in token:
+                ct['decision_class'] = token['decision_class']
+            # preserve any other keys we don't know about
+            for k in token:
+                if k not in ('index', 'original', 't', 'n', 'siglum',
+                             'reading', 'verse', 'rule_match',
+                             'decision_details', 'decision_class'):
+                    ct[k] = token[k]
+            compressed_tokens.append(ct)
+        compressed_witnesses.append({'id': wit_id, 'tokens': compressed_tokens})
+
+    result = {
+        'input': {'witnesses': compressed_witnesses},
+        'basetext_siglum': basetext_siglum,
+        'verse': verse,
+        'output': {
+            'ai_comments': '',
+            'ai_alignment_table': '',
+            'witnesses': [basetext_siglum],
+            'table': []
+        }
+    }
+    return result

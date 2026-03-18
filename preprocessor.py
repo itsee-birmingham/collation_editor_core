@@ -5,8 +5,8 @@ import json
 import warnings
 from .exceptions import DataInputException
 from collation.core.postprocessor import PostProcessor
-import urllib.request
 from collation.core.regulariser import Regulariser
+from collation.core.collation_engine import get_engine
 
 
 class PreProcessor(Regulariser):
@@ -30,7 +30,9 @@ class PreProcessor(Regulariser):
             self.rule_conds_config = None
 
         if 'algorithm_settings' in configs:
-            algorithm_settings = {}
+            algorithm_settings = configs['algorithm_settings']
+            if not algorithm_settings:
+                algorithm_settings = {}
             algorithm_settings['algorithm'] = configs['algorithm_settings']['algorithm']
             algorithm_settings['tokenComparator'] = {}
             if 'fuzzy_match' in configs['algorithm_settings']:
@@ -187,6 +189,9 @@ class PreProcessor(Regulariser):
                      'missing_reason': missing_reason,
                      'index': 1
                      }
+
+        self.basetext_siglum = basetext_siglum
+
         return self.regularise(rules, witnesses, verse, accept)
 
     def add_to_special_categories(self, special_categories, reading):
@@ -230,7 +235,7 @@ class PreProcessor(Regulariser):
             algorithm = self.algorithm_settings['algorithm']
         if self.algorithm_settings['tokenComparator'] and self.algorithm_settings['tokenComparator']['type']:
             tokenComparator['type'] = 'levenshtein'
-            if self.algorithm_settings['tokenComparator'] and self.algorithm_settings['tokenComparator']['distance']:
+            if 'tokenComparator' in self.algorithm_settings and 'distance' in self.algorithm_settings['tokenComparator']:
                 tokenComparator['distance'] = self.algorithm_settings['tokenComparator']['distance']
             else:
                 # default to 2
@@ -306,7 +311,9 @@ class PreProcessor(Regulariser):
             )
         try:
             output = pp.produce_variant_units()
-        except DataInputException:
+        except DataInputException as e:
+            print('FAILURE: ' + str(e), file=sys.stderr)
+#            pass
             raise DataInputException
         return output
 
@@ -335,7 +342,7 @@ class PreProcessor(Regulariser):
                 return [verse['witnesses'][0]['id'], [verse['witnesses'][0]]]
 
     def do_collate(self, data, options):  # accept, algorithm, tokenComparator, host='localhost'):
-        """Do the collation"""
+        """Do the collation using a registered engine or the legacy local_python_functions hook."""
         print('COLLATING', file=sys.stderr)
         try:
             print('algorithm - {}'.format(options['algorithm']), file=sys.stderr)
@@ -352,6 +359,7 @@ class PreProcessor(Regulariser):
                 raise DataInputException('There is a problem with an empty token in the following '
                                          'witness(es): {}'.format(', '.join(problem_wits)))
 
+        # 1. Try local_python_functions hook (legacy plugin mechanism)
         if (self.local_python_functions
                 and 'local_collation_function' in self.local_python_functions):
             module_name = self.local_python_functions['local_collation_function']['python_file']
@@ -361,39 +369,16 @@ class PreProcessor(Regulariser):
             return getattr(collation_class,
                            self.local_python_functions['local_collation_function']['function']
                            )(data, options)
-        else:
-            # use collateX Java microservices
-            if 'algorithm' in options:
-                # examples include 'needleman-wunsch'#'dekker'#'dekker-experimental'
-                data['algorithm'] = options['algorithm']
-            if 'tokenComparator' in options:
-                # examples include {"type": "levenshtein", "distance": 2}#{'type': 'equality'}
-                data['tokenComparator'] = options['tokenComparator']
 
-            target = self.host
+        algorithm = options.get('algorithm', 'dekker')
 
-            json_witnesses = json.dumps(data)
-            if 'outputFormat' in options:
-                accept_header = self.convert_header_argument(options['outputFormat'])
-            else:
-                accept_header = "application/json"
+        # 2. Try registered engine
+        # Pass collatexHost through algorithm_settings for the CollateX engine
+        settings = dict(self.algorithm_settings) if self.algorithm_settings else {}
+        settings['collatexHost'] = self.host
+        engine = get_engine(algorithm, settings)
 
-            req = urllib.request.Request(target)
-            req.add_header('content-type', 'application/json')
-            req.add_header('Accept', accept_header)
+        if engine is not None:
+            return engine.run(data, options, self.basetext_siglum)
 
-            response = urllib.request.urlopen(req, json_witnesses.encode('utf-8'))
-            return response.read()
-
-    def convert_header_argument(self, accept):
-        """Convert shortname to MIME type."""
-        if accept == 'json' or accept == 'lcs':
-            return "application/json"
-        elif accept == 'tei':
-            return "application/tei+xml"
-        elif accept == 'graphml':
-            return 'application/graphml+xml'
-        elif accept == 'dot':
-            return 'text/plain'
-        elif accept == 'svg':
-            return 'image/svg+xml'
+        raise DataInputException('No collation engine registered for algorithm: {}'.format(algorithm))

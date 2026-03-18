@@ -46,6 +46,9 @@ class CollationEngine(ABC):
     building, and debug logging — inherited by all engines.
     """
 
+    MAX_TOTAL_ATTEMPTS = 4
+    MAX_PHASE_RETRIES = 2
+
     def __init__(self, algorithm_settings):
         self.algorithm_settings = algorithm_settings
 
@@ -67,6 +70,18 @@ class CollationEngine(ABC):
             CollationResult with table and witnesses populated
         """
         pass
+
+    def _write_conversation_log(self, conversation_log):
+        """Write the AI conversation log to a debug file."""
+        log_dir = self.algorithm_settings.get('debug_log_dir')
+        if log_dir:
+            try:
+                import os
+                log_path = os.path.join(log_dir, '{}_conversation.txt'.format(self.name()))
+                with open(log_path, 'w', encoding='utf-8') as f:
+                    f.write('\n\n'.join(conversation_log))
+            except Exception:
+                pass
 
     def run(self, data, options, basetext_siglum):
         """Run collation with automatic timing, then post-process the result.
@@ -118,22 +133,6 @@ class CollationEngine(ABC):
 
         check_ai_verify_block(output, input_token_indices)
 
-        if output.get('table') and output.get('witnesses'):
-            validation_errors = validate_token_integrity(
-                output['table'], output['witnesses'], input_token_indices)
-            if validation_errors:
-                print('======= alignment validation errors: {}'.format(
-                    '; '.join(validation_errors)), file=sys.stderr)
-                output['table'] = []
-                output['witnesses'] = []
-                feedback = output.get('collation_feedback', {})
-                feedback['comments'] = (
-                    'Error: The collation engine produced an alignment with token integrity errors '
-                    'and the result has been rejected to protect data quality. '
-                    'Please try again. Details: ' +
-                    '; '.join(validation_errors))
-                output['collation_feedback'] = feedback
-
         feedback = output.get('collation_feedback', {})
         if (not feedback.get('alignment_table')
                 and output.get('table') and output.get('witnesses')):
@@ -141,13 +140,16 @@ class CollationEngine(ABC):
                 output['table'], output['witnesses'])
             output['collation_feedback'] = feedback
 
+        print('process_result: table_cgs={} witnesses={}'.format(
+            len(output.get('table', [])), len(output.get('witnesses', []))), file=sys.stderr)
+
         log_dir = self.algorithm_settings.get('debug_log_dir')
         if log_dir:
             try:
                 import os
                 log_path = os.path.join(log_dir, 'post_collation.json')
                 with open(log_path, 'w', encoding='utf-8') as f:
-                    f.write(json.dumps({'output': output}, ensure_ascii=False, indent=4))
+                    f.write(json.dumps({'input': data, 'output': output}, ensure_ascii=False, indent=4))
             except Exception as e:
                 print('======= error writing log: ' + str(e), file=sys.stderr)
 
@@ -213,7 +215,7 @@ def build_token_lookup(witnesses):
 
 
 def validate_token_integrity(table, witnesses, input_token_indices):
-    """Check for duplicate or missing tokens in an alignment table.
+    """Check for duplicate, missing, or out-of-order tokens in an alignment table.
 
     Returns:
         list of error strings (empty if valid)
@@ -224,7 +226,14 @@ def validate_token_integrity(table, witnesses, input_token_indices):
         for cg in table:
             if i < len(cg):
                 for token in cg[i]:
-                    idx = token.get('index')
+                    if isinstance(token, str):
+                        idx = token
+                    elif isinstance(token, dict):
+                        idx = token.get('index')
+                    else:
+                        print('WARNING: unexpected token type {} in witness {}: {}'.format(
+                            type(token), wit_id, token), file=sys.stderr)
+                        continue
                     if idx in seen_indices:
                         errors.append(
                             'Duplicate token index {} in witness {}'.format(idx, wit_id))
@@ -236,7 +245,100 @@ def validate_token_integrity(table, witnesses, input_token_indices):
                 errors.append(
                     'Missing token indices {} in witness {}'.format(
                         sorted(missing, key=lambda x: int(x)), wit_id))
+            phantom = set(seen_indices) - input_token_indices[wit_id]
+            if phantom:
+                errors.append(
+                    'Phantom token indices {} in witness {} (these indices do not exist in the input)'.format(
+                        sorted(phantom, key=lambda x: int(x)), wit_id))
+        # check sequential order
+        for j in range(1, len(seen_indices)):
+            if int(seen_indices[j]) < int(seen_indices[j-1]):
+                correct_order = sorted(seen_indices, key=lambda x: int(x))
+                errors.append(
+                    'Out-of-order token indices in witness {}: index {} appears after {}. '
+                    'Witness tokens MUST be in ascending order across all ColumnGroups. '
+                    'The correct order for this witness is: {}. '
+                    'You need to rearrange which ColumnGroups these indices belong to '
+                    'so that reading left to right they are in this ascending sequence. '
+                    'Transposed tokens that cannot be placed in the PBT\'s column position '
+                    'without breaking order should go in their own insertion ColumnGroup '
+                    'at the position where they actually occur in the witness.'.format(
+                        wit_id, seen_indices[j], seen_indices[j-1],
+                        ','.join(correct_order)))
+                break
     return errors
+
+
+def find_mergeable_column_groups(table, witnesses):
+    """Find adjacent column groups that could be merged because most witnesses agree.
+
+    Compares the 'original' text of tokens in adjacent CGs. If the majority
+    of witnesses that have tokens agree (same strings), suggest a merge.
+    Cross-language witnesses may have different strings but shouldn't block
+    merging when same-language witnesses all agree.
+
+    Returns:
+        list of merge suggestions
+        Empty list if no merges are possible.
+    """
+    suggestions = []
+    i = 0
+    while i < len(table) - 1:
+        run_start = i
+        can_merge = True
+        while can_merge and i < len(table) - 1:
+            cg_a = table[i]
+            cg_b = table[i + 1]
+            texts = []
+            for wi in range(len(witnesses)):
+                tokens_a = cg_a[wi] if wi < len(cg_a) else []
+                tokens_b = cg_b[wi] if wi < len(cg_b) else []
+                if tokens_a or tokens_b:
+                    combined = ' '.join(
+                        t.get('original', '') for t in (tokens_a + tokens_b))
+                    texts.append(combined)
+            if len(texts) == 0:
+                can_merge = False
+            else:
+                # don't merge if either CG is mostly empty (insertion-like)
+                non_empty_a = sum(1 for wi in range(len(witnesses))
+                    if wi < len(cg_a) and cg_a[wi])
+                non_empty_b = sum(1 for wi in range(len(witnesses))
+                    if wi < len(cg_b) and cg_b[wi])
+                total = len(witnesses)
+                if non_empty_a <= total / 2 or non_empty_b <= total / 2:
+                    # one of the CGs is mostly empty — don't merge
+                    can_merge = False
+                else:
+                    from collections import Counter
+                    counts = Counter(texts)
+                    most_common_text, most_common_count = counts.most_common(1)[0]
+                    if most_common_count > len(texts) / 2:
+                        i += 1
+                    else:
+                        can_merge = False
+
+        if i > run_start:
+            cg_nums = list(range(run_start, i + 1))
+            if len(cg_nums) >= 2:
+                sample = []
+                for wi in range(len(witnesses)):
+                    words = []
+                    for cg_idx in cg_nums:
+                        cg = table[cg_idx]
+                        if wi < len(cg):
+                            for t in cg[wi]:
+                                words.append(t.get('original', ''))
+                    if words:
+                        sample.append(' '.join(words))
+                        break
+                suggestions.append(
+                    'CGs {} should be merged into one — most witnesses agree (e.g. "{}"). '
+                    'Merge them into a single ColumnGroup.'.format(
+                        ','.join(str(n) for n in cg_nums),
+                        sample[0] if sample else ''))
+        i += 1
+    return suggestions
 
 
 def check_ai_verify_block(output, input_token_indices):
@@ -329,6 +431,8 @@ def parse_ai_json_response(text):
             text = text[first_newline + 1:]
         if text.endswith('```'):
             text = text[:-3].strip()
+    # fix JavaScript-style array indexing e.g. [["18","20"]][0] → ["18","20"]
+    text = re.sub(r'\]\[(\d+)\]', r']', text)
     # fix trailing commas which are invalid JSON but sometimes produced by LLMs
     text = re.sub(r',\s*([}\]])', r'\1', text)
     try:
@@ -386,6 +490,41 @@ def is_compact_format(table):
             and isinstance(next(
                 (item for cg_wit in table[0] for item in cg_wit), None
             ), str))
+
+
+def reconstruct_table(table, witnesses, token_lookup):
+    """Reconstruct a table using original tokens from the lookup.
+
+    Works with both compact format (arrays of index strings) and
+    full WordToken format (arrays of objects). In either case, the
+    returned table uses only the original token data from token_lookup,
+    ensuring the AI cannot alter word content.
+
+    Returns:
+        reconstructed table (list of column groups)
+    """
+    rebuilt = []
+    for cg in table:
+        rebuilt_cg = []
+        for i, wit_tokens in enumerate(cg):
+            wit_id = witnesses[i] if i < len(witnesses) else None
+            tokens = []
+            for item in wit_tokens:
+                # extract index from either a string or a dict
+                if isinstance(item, str):
+                    idx = item
+                elif isinstance(item, dict):
+                    idx = item.get('index')
+                else:
+                    continue
+                if wit_id and wit_id in token_lookup and idx in token_lookup[wit_id]:
+                    tokens.append(token_lookup[wit_id][idx])
+                else:
+                    print('WARNING: token index {} not found for witness {}'.format(
+                        idx, wit_id), file=sys.stderr)
+            rebuilt_cg.append(tokens)
+        rebuilt.append(rebuilt_cg)
+    return rebuilt
 
 
 def compress_ai_request(data, basetext_siglum):

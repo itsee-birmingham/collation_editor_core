@@ -310,13 +310,24 @@ def find_mergeable_column_groups(table, witnesses):
                     # one of the CGs is mostly empty — don't merge
                     can_merge = False
                 else:
-                    from collections import Counter
-                    counts = Counter(texts)
-                    most_common_text, most_common_count = counts.most_common(1)[0]
-                    if most_common_count > len(texts) / 2:
-                        i += 1
-                    else:
+                    # don't merge if witnesses have different token counts
+                    # across these CGs — that reveals one-to-many alignment
+                    token_counts = set()
+                    for wi in range(len(witnesses)):
+                        tokens_a = cg_a[wi] if wi < len(cg_a) else []
+                        tokens_b = cg_b[wi] if wi < len(cg_b) else []
+                        if tokens_a or tokens_b:
+                            token_counts.add((len(tokens_a), len(tokens_b)))
+                    if len(token_counts) > 1:
                         can_merge = False
+                    else:
+                        from collections import Counter
+                        counts = Counter(texts)
+                        most_common_text, most_common_count = counts.most_common(1)[0]
+                        if most_common_count > len(texts) / 2:
+                            i += 1
+                        else:
+                            can_merge = False
 
         if i > run_start:
             cg_nums = list(range(run_start, i + 1))
@@ -385,6 +396,7 @@ def build_html_alignment_table(table, witnesses):
     Returns:
         HTML string
     """
+    cg_border = 'border-left:2px solid #888'
     html = '<table><thead><tr><th>Witness</th>'
     col_headers = []
     pbt_col_num = 0
@@ -398,20 +410,28 @@ def build_html_alignment_table(table, witnesses):
                     col_headers.append(str(pbt_col_num))
                 else:
                     col_headers.append('')
-    for hdr in col_headers:
-        html += '<th>{}</th>'.format(hdr)
+    col_idx = 0
+    for cg_i, cg in enumerate(table):
+        max_in_cg = max(len(w) for w in cg) if (len(cg) > 0 and any(cg)) else 1
+        for c in range(max_in_cg):
+            style = ' style="{}"'.format(cg_border) if c == 0 else ''
+            html += '<th{}>{}</th>'.format(style, col_headers[col_idx] if col_idx < len(col_headers) else '')
+            col_idx += 1
     html += '</tr></thead><tbody>'
     for wit_i, wit_id in enumerate(witnesses):
         html += '<tr><td>{}</td>'.format(wit_id)
         for cg in table:
             if wit_i < len(cg):
-                for token in cg[wit_i]:
-                    html += '<td>{}</td>'.format(token.get('original', ''))
+                tokens = cg[wit_i]
                 max_in_cg = max(len(w) for w in cg) if any(cg) else 0
-                for _ in range(max_in_cg - len(cg[wit_i])):
-                    html += '<td></td>'
+                for c in range(max_in_cg):
+                    style = ' style="{}"'.format(cg_border) if c == 0 else ''
+                    if c < len(tokens):
+                        html += '<td{}>{}</td>'.format(style, tokens[c].get('original', ''))
+                    else:
+                        html += '<td{}></td>'.format(style)
             else:
-                html += '<td></td>'
+                html += '<td style="{}"></td>'.format(cg_border)
         html += '</tr>'
     html += '</tbody></table>'
     return html
@@ -438,21 +458,64 @@ def parse_ai_json_response(text):
     try:
         return json.loads(text)
     except json.JSONDecodeError:
-        # model may have included preamble text before the JSON;
-        # try to find valid JSON by scanning for { and parsing from there
-        for idx in range(len(text)):
-            if text[idx] == '{':
-                try:
-                    candidate = re.sub(r',\s*([}\]])', r'\1', text[idx:])
-                    return json.loads(candidate)
-                except json.JSONDecodeError:
-                    decoder = json.JSONDecoder()
+        pass
+
+    # Fix: AI sometimes writes "table": CG0, CG1, ... instead of "table": [CG0, CG1, ...]
+    # (CGs leak out as top-level values instead of being wrapped in an outer array)
+    table_match = re.search(r'"table"\s*:', text)
+    if table_match:
+        next_key = re.search(r',\s*"(?:verify|ai_comments)"', text[table_match.end():])
+        if next_key:
+            table_start = table_match.end()
+            table_end = table_match.end() + next_key.start()
+            table_raw = text[table_start:table_end]
+            # Try to parse the table value as-is first
+            try:
+                json.loads(table_raw.strip())
+            except json.JSONDecodeError:
+                # Parse CGs one by one using raw_decode
+                decoder = json.JSONDecoder()
+                cgs = []
+                pos = 0
+                scan = table_raw
+                while pos < len(scan):
+                    rest = scan[pos:].lstrip(' ,\n\r\t]')
+                    if not rest or not rest.startswith('['):
+                        break
+                    offset = len(scan) - len(scan[pos:]) + (len(scan[pos:]) - len(rest))
                     try:
-                        result, _ = decoder.raw_decode(candidate)
+                        arr, end = decoder.raw_decode(scan[offset:])
+                        cgs.append(arr)
+                        pos = offset + end
+                    except json.JSONDecodeError:
+                        break
+                if cgs:
+                    # Rebuild with proper table array
+                    rebuilt = text[:table_start] + json.dumps(cgs) + text[table_end:]
+                    rebuilt = re.sub(r',\s*([}\]])', r'\1', rebuilt)
+                    try:
+                        result = json.loads(rebuilt)
+                        print('fixed broken table structure (reconstructed {} CGs)'.format(
+                            len(cgs)), file=sys.stderr)
                         return result
                     except json.JSONDecodeError:
-                        continue
-        raise
+                        pass
+
+    # model may have included preamble text before the JSON;
+    # try to find valid JSON by scanning for { and parsing from there
+    for idx in range(len(text)):
+        if text[idx] == '{':
+            try:
+                candidate = re.sub(r',\s*([}\]])', r'\1', text[idx:])
+                return json.loads(candidate)
+            except json.JSONDecodeError:
+                decoder = json.JSONDecoder()
+                try:
+                    result, _ = decoder.raw_decode(candidate)
+                    return result
+                except json.JSONDecodeError:
+                    continue
+    raise json.JSONDecodeError('No valid JSON found', text, 0)
 
 
 def expand_compact_table(table, witnesses, token_lookup):
@@ -530,15 +593,9 @@ def reconstruct_table(table, witnesses, token_lookup):
 def compress_ai_request(data, basetext_siglum):
     """Build a compressed AI request from witness data.
 
-    Compression rules (no data is lost):
-    - 'verse' is hoisted to top level (same for all tokens)
-    - 'reading' is omitted when it equals the witness id
-    - 'siglum' is omitted when it equals the witness id
-    - 't' is omitted when it equals 'original'
-    - 'n' is omitted when absent or equals 't'
-    - 'rule_match' is omitted when it equals [original]
-    - 'decision_details' and 'decision_class' are omitted when absent
-    - Uses compact JSON separators
+    Each token is reduced to just index and t (the effective regularized form).
+    The engine only needs these two fields for alignment. Full token objects
+    are reconstructed from the original data after alignment using the index.
 
     Returns:
         dict ready for json.dumps()
@@ -555,34 +612,12 @@ def compress_ai_request(data, basetext_siglum):
         wit_id = w['id']
         compressed_tokens = []
         for token in w['tokens']:
+            # use the most regularized form available: n > t > original
+            t_val = token.get('n') or token.get('t') or token['original']
             ct = {
                 'index': token['index'],
-                'original': token['original'],
+                't': t_val,
             }
-            # only include fields that differ from defaults
-            if token.get('t') and token['t'] != token['original']:
-                ct['t'] = token['t']
-            n_val = token.get('n')
-            t_val = token.get('t', token['original'])
-            if n_val and n_val != t_val:
-                ct['n'] = n_val
-            if token.get('siglum') and token['siglum'] != wit_id:
-                ct['siglum'] = token['siglum']
-            if token.get('reading') and token['reading'] != wit_id:
-                ct['reading'] = token['reading']
-            rule_match = token.get('rule_match')
-            if rule_match and rule_match != [token['original']]:
-                ct['rule_match'] = rule_match
-            if 'decision_details' in token:
-                ct['decision_details'] = token['decision_details']
-            if 'decision_class' in token:
-                ct['decision_class'] = token['decision_class']
-            # preserve any other keys we don't know about
-            for k in token:
-                if k not in ('index', 'original', 't', 'n', 'siglum',
-                             'reading', 'verse', 'rule_match',
-                             'decision_details', 'decision_class'):
-                    ct[k] = token[k]
             compressed_tokens.append(ct)
         compressed_witnesses.append({'id': wit_id, 'tokens': compressed_tokens})
 

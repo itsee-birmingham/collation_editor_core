@@ -63,6 +63,11 @@ class PreProcessor(Regulariser):
         else:
             self.split_single_reading_units = False
 
+        if 'algorithm_settings' in configs and configs['algorithm_settings']:
+            self.preserve_column_groups = configs['algorithm_settings'].get('preserve_column_groups', False)
+        else:
+            self.preserve_column_groups = False
+
         Regulariser.__init__(self, self.rule_conds_config, self.local_python_functions)
 
     def process_witness_list(self, collation_input_data, accept='lcs'):
@@ -307,7 +312,8 @@ class PreProcessor(Regulariser):
             display_settings_config=self.display_settings_config,
             local_python_functions=self.local_python_functions,
             rule_conditions_config=self.rule_conds_config,
-            split_single_reading_units=self.split_single_reading_units
+            split_single_reading_units=self.split_single_reading_units,
+            preserve_column_groups=self.preserve_column_groups
             )
         try:
             output = pp.produce_variant_units()

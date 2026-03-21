@@ -29,7 +29,8 @@ class PostProcessor(Regulariser, SettingsApplier):
                  display_settings_config,
                  local_python_functions,
                  rule_conditions_config,
-                 split_single_reading_units
+                 split_single_reading_units,
+                 preserve_column_groups=False
                  ):
 
         self.alignment_table = alignment_table
@@ -48,6 +49,7 @@ class PostProcessor(Regulariser, SettingsApplier):
         else:
             self.local_python_functions = None
         self.split_single_reading_units = split_single_reading_units
+        self.preserve_column_groups = preserve_column_groups
         Regulariser.__init__(self, rule_conditions_config, local_python_functions)
         SettingsApplier.__init__(self, {'display_settings': self.display_settings,
                                         'display_settings_config': self.display_settings_config})
@@ -266,6 +268,8 @@ class PostProcessor(Regulariser, SettingsApplier):
 
     def check_unit_splits(self, readings):
         """Works out whether any units need further splitting and sends them off to restructure_unit"""
+        if self.preserve_column_groups:
+            return [readings]
         token_matches = []
         base_text = None
         # if we have at least two actual readings (not including empty readings)

@@ -49,8 +49,63 @@ class CollationEngine(ABC):
     MAX_TOTAL_ATTEMPTS = 4
     MAX_PHASE_RETRIES = 2
 
+    # Subclasses should define these to register their models and metadata.
+    _engine_meta = {
+         'display_name': 'My Collation Engine',
+         'model_override_key': 'my_engine_algorithm',
+    }
+    _models = [
+    # e.g.,
+    #    {'id': 'dekker',
+    #     'name': 'Dekker',
+    #     'default': True
+    #     'max_tokens': 0,  # any additional model propeties the engine wants to keep per model for its own use
+    #    },
+    #    {'id': 'needleman-wunsch', 'name': 'Needleman-Wunsch', 'max_tokens': 0},
+    ]
+
+
+    @classmethod
+    def get_model_names(cls):
+        """Return {model_id: display_name} dict."""
+        return {m['id']: m['name'] for m in cls._models}
+
+    @classmethod
+    def get_model_max_tokens(cls):
+        """Return {model_id: max_tokens} dict."""
+        return {m['id']: m['max_tokens'] for m in cls._models}
+
+    @classmethod
+    def get_default_model(cls):
+        """Return the default model ID, or the first model if none marked."""
+        for m in cls._models:
+            if m.get('default'):
+                return m['id']
+        return cls._models[0]['id'] if cls._models else None
+
+    @classmethod
+    def get_engine_registry(cls):
+        """Return this engine's metadata and models in registry format."""
+        meta = dict(cls._engine_meta)
+        meta['models'] = cls._models
+        return meta
+
     def __init__(self, algorithm_settings):
         self.algorithm_settings = algorithm_settings
+        self._init_conversation_log()
+
+    def _init_conversation_log(self):
+        """Clear the conversation log file for this engine at the start of a run."""
+        import os
+        log_dir = self.algorithm_settings.get('debug_log_dir')
+        if log_dir:
+            try:
+                log_path = os.path.join(log_dir, '{}_conversation.txt'.format(self.name()))
+                with open(log_path, 'w', encoding='utf-8') as f:
+                    f.write('=== {} engine started ===\n'.format(self.name()))
+
+            except Exception:
+                pass
 
     @abstractmethod
     def name(self):
@@ -71,15 +126,23 @@ class CollationEngine(ABC):
         """
         pass
 
-    def _write_conversation_log(self, conversation_log):
-        """Write the AI conversation log to a debug file."""
+    def _write_conversation_log(self, entry):
+        """Append a log entry to the conversation log file.
+
+        Args:
+            entry: a string or a list of strings to append
+        """
+        import os
         log_dir = self.algorithm_settings.get('debug_log_dir')
         if log_dir:
             try:
-                import os
                 log_path = os.path.join(log_dir, '{}_conversation.txt'.format(self.name()))
-                with open(log_path, 'w', encoding='utf-8') as f:
-                    f.write('\n\n'.join(conversation_log))
+                with open(log_path, 'a', encoding='utf-8') as f:
+                    if isinstance(entry, list):
+                        f.write('\n\n'.join(entry))
+                    else:
+                        f.write(entry)
+                    f.write('\n\n')
             except Exception:
                 pass
 
@@ -189,6 +252,15 @@ def get_engine(name, algorithm_settings):
 def list_engines():
     """Return list of registered engine names."""
     return list(_engine_registry.keys())
+
+
+def get_engine_registry():
+    """Return model metadata from all registered engines."""
+    engines = {}
+    for name, cls in _engine_registry.items():
+        if hasattr(cls, '_engine_meta') and cls._engine_meta:
+            engines[name] = cls.get_engine_registry()
+    return {'engines': engines}
 
 
 # ---------------------------------------------------------------------------

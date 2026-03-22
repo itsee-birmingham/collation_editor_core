@@ -17,6 +17,7 @@ class CollationResult:
     def __init__(self):
         self.table = []
         self.witnesses = []
+        self.regularization_suggestions = []
         self.feedback = {
             'comments': '',
             'alignment_table': '',
@@ -30,6 +31,8 @@ class CollationResult:
             'witnesses': self.witnesses,
             'table': self.table,
         }
+        if self.regularization_suggestions:
+            d['regularization_suggestions'] = self.regularization_suggestions
         # include only non-empty feedback entries
         feedback = {k: v for k, v in self.feedback.items()
                     if v is not None and v != ''}
@@ -574,7 +577,26 @@ def parse_ai_json_response(text):
                         pass
 
     # model may have included preamble text before the JSON;
-    # try to find valid JSON by scanning for { and parsing from there
+    # try to find valid JSON by scanning for { and parsing from there.
+    # Skip over small non-collation objects (e.g. regularization suggestion
+    # fragments the model may emit in its reasoning before the real output).
+    _collation_keys = {'table', 'witnesses'}
+    for idx in range(len(text)):
+        if text[idx] == '{':
+            try:
+                candidate = re.sub(r',\s*([}\]])', r'\1', text[idx:])
+                obj = json.loads(candidate)
+                if isinstance(obj, dict) and _collation_keys & obj.keys():
+                    return obj
+            except json.JSONDecodeError:
+                decoder = json.JSONDecoder()
+                try:
+                    result, _ = decoder.raw_decode(candidate)
+                    if isinstance(result, dict) and _collation_keys & result.keys():
+                        return result
+                except json.JSONDecodeError:
+                    continue
+    # no object with collation keys found; fall back to first valid JSON
     for idx in range(len(text)):
         if text[idx] == '{':
             try:

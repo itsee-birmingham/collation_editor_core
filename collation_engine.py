@@ -97,6 +97,39 @@ class CollationEngine(ABC):
         self.algorithm_settings = algorithm_settings
         self._init_conversation_log()
 
+    def process_prompt_template(self, prompt_text):
+        """Process template conditionals in a system prompt.
+
+        Supports {{#if_X}}...{{/if_X}} and {{#unless_X}}...{{/unless_X}} blocks.
+        The condition is checked against algorithm_settings['include_X'].
+        When the setting is absent, the if-block is included by default.
+        """
+        import re
+        def _replace_block(match):
+            block_type = match.group(1)   # 'if' or 'unless'
+            key = match.group(2)           # e.g. 'regularization'
+            content = match.group(3)
+            setting = self.algorithm_settings.get('include_' + key)
+            enabled = setting is not False  # default to True if absent
+            if block_type == 'if':
+                return content if enabled else ''
+            else:  # unless
+                return content if not enabled else ''
+        return re.sub(
+            r'\{\{#(if|unless)_(\w+)\}\}(.*?)\{\{/(if|unless)_\2\}\}',
+            _replace_block, prompt_text, flags=re.DOTALL)
+
+    def _expected_keys_description(self):
+        """Return a description of the expected JSON keys for error messages."""
+        include_reg = self.algorithm_settings.get('include_regularization_suggestions') is not False
+        if include_reg:
+            return ('5 keys: "witnesses" (array), "table" (array of ColumnGroups), '
+                    '"verify" (object), "regularization_suggestions" (array), '
+                    'and "ai_comments" (string)')
+        else:
+            return ('4 keys: "witnesses" (array), "table" (array of ColumnGroups), '
+                    '"verify" (object), and "ai_comments" (string)')
+
     def _init_conversation_log(self):
         """Clear the conversation log file for this engine at the start of a run."""
         import os

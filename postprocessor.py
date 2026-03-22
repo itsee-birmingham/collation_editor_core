@@ -63,6 +63,8 @@ class PostProcessor(Regulariser, SettingsApplier):
         # move collation feedback out of alignment table — it's not part of the alignment data
         if 'collation_feedback' in self.alignment_table:
             variant_units['collation_feedback'] = self.alignment_table.pop('collation_feedback')
+        if 'regularization_suggestions' in self.alignment_table:
+            variant_units['regularization_suggestions'] = self.alignment_table.pop('regularization_suggestions')
         return variant_units
 
     def create_extra_reading(self, text_list, witness):

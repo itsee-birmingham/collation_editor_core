@@ -239,6 +239,12 @@ class CollationEngine(ABC):
                 output['table'], output['witnesses'])
             output['collation_feedback'] = feedback
 
+        # enrich regularization suggestions with token references
+        if output.get('regularization_suggestions'):
+            token_lookup, _ = build_token_lookup(data['witnesses'])
+            output['regularization_suggestions'] = _resolve_suggestion_refs(
+                output['regularization_suggestions'], token_lookup)
+
         print('process_result: table_cgs={} witnesses={}'.format(
             len(output.get('table', [])), len(output.get('witnesses', []))), file=sys.stderr)
 
@@ -302,6 +308,60 @@ def get_engine_registry():
 # ---------------------------------------------------------------------------
 # Shared utilities used by engines and the preprocessor
 # ---------------------------------------------------------------------------
+
+
+def _resolve_suggestion_refs(suggestions, token_lookup):
+    """Enrich regularization suggestions with witness/index references.
+
+    For each suggestion, finds the first witness token whose 't' value
+    matches the source and target words, and adds source_witness,
+    source_index, target_witness, target_index fields.
+
+    Suggestions whose source doesn't match any token are dropped.
+    """
+    import unicodedata
+
+    def _norm(s):
+        return unicodedata.normalize('NFC', s) if s else ''
+
+    enriched = []
+    for s in suggestions:
+        if not s:
+            continue
+        source = _norm(s.get('source', ''))
+        target = _norm(s.get('target', ''))
+        if not source:
+            continue
+
+        source_wit = None
+        source_idx = None
+        target_wit = None
+        target_idx = None
+
+        for wit_id, tokens in token_lookup.items():
+            for idx, tok in tokens.items():
+                t_val = _norm(tok.get('t', tok.get('original', '')))
+                if t_val == source and source_wit is None:
+                    source_wit = wit_id
+                    source_idx = idx
+                if t_val == target and target_wit is None:
+                    target_wit = wit_id
+                    target_idx = idx
+            if source_wit and target_wit:
+                break
+
+        if source_wit is None:
+            # source word not found in any token — skip this suggestion
+            continue
+
+        s['source_witness'] = source_wit
+        s['source_index'] = source_idx
+        if target_wit:
+            s['target_witness'] = target_wit
+            s['target_index'] = target_idx
+        enriched.append(s)
+
+    return enriched
 
 def build_token_lookup(witnesses):
     """Build lookup dicts from a list of witness objects.

@@ -253,11 +253,20 @@ class CollationEngine(ABC):
                 output['table'], output['witnesses'])
             output['collation_feedback'] = feedback
 
-        # enrich regularization suggestions with token references
+        # add unclear/supplied regularization suggestions deterministically
+        unclear_suggestions = _add_unclear_suggestions(data['witnesses'])
+        if unclear_suggestions:
+            existing = output.get('regularization_suggestions', [])
+            existing.extend(unclear_suggestions)
+            output['regularization_suggestions'] = existing
+
+        # enrich regularization suggestions with token references, then deduplicate
         if output.get('regularization_suggestions'):
             token_lookup, _ = build_token_lookup(data['witnesses'])
             output['regularization_suggestions'] = _resolve_suggestion_refs(
                 output['regularization_suggestions'], token_lookup)
+            output['regularization_suggestions'] = _dedup_suggestions(
+                output['regularization_suggestions'])
 
         print('process_result: table_cgs={} witnesses={}'.format(
             len(output.get('table', [])), len(output.get('witnesses', []))), file=sys.stderr)
@@ -324,6 +333,68 @@ def get_engine_registry():
 # ---------------------------------------------------------------------------
 
 
+def _add_unclear_suggestions(witnesses):
+    """Generate regularization suggestions for unclear/supplied tokens.
+
+    Checks each witness token where 'original' differs from 't'
+    only by brackets [ ] (supplied text) and/or U+0323 combining dot below
+    (unclear text). These are candidates for 'unclear_resolved' regularization.
+
+    Returns:
+        list of suggestion dicts with source, target, class, reason
+    """
+    suggestions = []
+
+    for witness in witnesses:
+        for token in witness['tokens']:
+            original = token.get('original', '')
+            t = token.get('t', original)
+            if original == t:
+                continue
+
+            # strip brackets and underdots from original, see if it matches t
+            stripped = original.replace('[', '').replace(']', '').replace('\u0323', '')
+            if stripped == t:
+                # determine what was removed for the reason text
+                has_brackets = '[' in original or ']' in original
+                has_underdots = '\u0323' in original
+                if has_brackets and has_underdots:
+                    reason = 'supplied and unclear text markers confirmed'
+                elif has_brackets:
+                    reason = 'supplied text markers confirmed'
+                else:
+                    reason = 'unclear text markers confirmed'
+
+                suggestions.append({
+                    'source': original,
+                    'target': t,
+                    'class': 'unclear_resolved',
+                    'reason': reason,
+                    'source_witness': witness['id'],
+                    'source_index': token['index'],
+                })
+
+    return suggestions
+
+
+def _dedup_suggestions(suggestions):
+    """Remove duplicate suggestions based on source→target pair.
+
+    Keeps the first occurrence of each (source, target) pair.
+    """
+    seen = set()
+    deduped = []
+    for s in suggestions:
+        if not s:
+            continue
+        key = (s.get('source', ''), s.get('target', ''))
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(s)
+    return deduped
+
+
 def _resolve_suggestion_refs(suggestions, token_lookup):
     """Enrich regularization suggestions with witness/index references.
 
@@ -347,10 +418,11 @@ def _resolve_suggestion_refs(suggestions, token_lookup):
         if not source:
             continue
 
-        source_wit = None
-        source_idx = None
-        target_wit = None
-        target_idx = None
+        # use pre-existing references if already set (e.g. from _add_unclear_suggestions)
+        source_wit = s.get('source_witness')
+        source_idx = s.get('source_index')
+        target_wit = s.get('target_witness')
+        target_idx = s.get('target_index')
 
         for wit_id, tokens in token_lookup.items():
             for idx, tok in tokens.items():

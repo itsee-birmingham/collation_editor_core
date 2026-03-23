@@ -340,7 +340,7 @@ def _resolve_suggestion_refs(suggestions, token_lookup):
 
         for wit_id, tokens in token_lookup.items():
             for idx, tok in tokens.items():
-                t_val = _norm(tok.get('t', tok.get('original', '')))
+                t_val = _norm(tok.get('n') or tok.get('t') or tok.get('original', ''))
                 if t_val == source and source_wit is None:
                     source_wit = wit_id
                     source_idx = idx

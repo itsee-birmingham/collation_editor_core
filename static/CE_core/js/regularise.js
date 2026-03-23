@@ -1626,6 +1626,7 @@ RG = (function() {
       _scheduleSelectedRulesDeletion: _scheduleSelectedRulesDeletion,
       _addFooterFunctions: _addFooterFunctions,
       _highlightAddedWitness: _highlightAddedWitness,
+      stageRule: function(wordId, rules) { _rules[wordId] = rules; },
 
     };
   } else {
@@ -1639,6 +1640,7 @@ RG = (function() {
       recollate: recollate,
       showVerseCollation: showVerseCollation,
       allRuleStacksEmpty: allRuleStacksEmpty,
+      stageRule: function(wordId, rules) { _rules[wordId] = rules; },
 
     };
   }

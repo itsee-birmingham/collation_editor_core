@@ -115,9 +115,23 @@ class CollationEngine(ABC):
                 return content if enabled else ''
             else:  # unless
                 return content if not enabled else ''
-        return re.sub(
+        result = re.sub(
             r'\{\{#(if|unless)_(\w+)\}\}(.*?)\{\{/(if|unless)_\2\}\}',
             _replace_block, prompt_text, flags=re.DOTALL)
+
+        # replace {{regularization_classes}} with the configured rule class descriptions
+        rule_classes = self.algorithm_settings.get('regularization_rule_classes', [])
+        if rule_classes:
+            lines = []
+            for rc in rule_classes:
+                lines.append('- "{}" \u2014 {}'.format(rc['value'], rc['suggest_instructions']))
+            result = result.replace('{{regularization_classes}}', '\n'.join(lines))
+            values = ', '.join('"' + rc['value'] + '"' for rc in rule_classes)
+            result = result.replace('{{regularization_class_values}}', values)
+        else:
+            result = result.replace('{{regularization_classes}}', '')
+            result = result.replace('{{regularization_class_values}}', '')
+        return result
 
     def _expected_keys_description(self):
         """Return a description of the expected JSON keys for error messages."""

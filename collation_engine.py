@@ -347,6 +347,10 @@ def _add_unclear_suggestions(witnesses):
 
     for witness in witnesses:
         for token in witness['tokens']:
+            # skip tokens that already have an unclear_resolved rule applied
+            if token.get('decision_details') and any(
+                    d.get('class') == 'unclear_resolved' for d in token['decision_details']):
+                continue
             original = token.get('original', '')
             t = token.get('t', original)
             if original == t:

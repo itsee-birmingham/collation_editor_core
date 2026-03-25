@@ -79,6 +79,14 @@ class CollationEngine(ABC):
         return {m['id']: m['max_tokens'] for m in cls._models}
 
     @classmethod
+    def get_model_reasoning_tokens(cls):
+        """Return {model_id: reasoning_tokens} dict.
+
+        If a model does not define reasoning_tokens, it defaults to max_tokens.
+        """
+        return {m['id']: m.get('reasoning_tokens', m['max_tokens']) for m in cls._models}
+
+    @classmethod
     def get_default_model(cls):
         """Return the default model ID, or the first model if none marked."""
         for m in cls._models:
@@ -93,8 +101,9 @@ class CollationEngine(ABC):
         meta['models'] = cls._models
         return meta
 
-    def __init__(self, algorithm_settings):
+    def __init__(self, algorithm_settings, display_settings=None):
         self.algorithm_settings = algorithm_settings
+        self.display_settings = display_settings or {}
         self._init_conversation_log()
 
     def process_prompt_template(self, prompt_text):
@@ -254,11 +263,16 @@ class CollationEngine(ABC):
             output['collation_feedback'] = feedback
 
         # add unclear/supplied regularization suggestions deterministically
-        unclear_suggestions = _add_unclear_suggestions(data['witnesses'])
-        if unclear_suggestions:
-            existing = output.get('regularization_suggestions', [])
-            existing.extend(unclear_suggestions)
-            output['regularization_suggestions'] = existing
+        # skip if the project auto-hides these markers (setting absent from display_settings)
+        skip_supplied = 'view_supplied' not in self.display_settings
+        skip_unclear = 'view_unclear' not in self.display_settings
+        if not (skip_supplied and skip_unclear):
+            unclear_suggestions = _add_unclear_suggestions(
+                data['witnesses'], skip_supplied=skip_supplied, skip_unclear=skip_unclear)
+            if unclear_suggestions:
+                existing = output.get('regularization_suggestions', [])
+                existing.extend(unclear_suggestions)
+                output['regularization_suggestions'] = existing
 
         # enrich regularization suggestions with token references, then deduplicate
         if output.get('regularization_suggestions'):
@@ -306,11 +320,11 @@ def register_engine(name, engine_class, default=False):
         _default_engine = engine_class
 
 
-def get_engine(name, algorithm_settings):
+def get_engine(name, algorithm_settings, display_settings=None):
     """Look up and instantiate a registered engine, or fall back to the default."""
     cls = _engine_registry.get(name, _default_engine)
     if cls is not None:
-        return cls(algorithm_settings)
+        return cls(algorithm_settings, display_settings=display_settings)
     return None
 
 
@@ -333,12 +347,17 @@ def get_engine_registry():
 # ---------------------------------------------------------------------------
 
 
-def _add_unclear_suggestions(witnesses):
+def _add_unclear_suggestions(witnesses, skip_supplied=False, skip_unclear=False):
     """Generate regularization suggestions for unclear/supplied tokens.
 
     Checks each witness token where 'original' differs from 't'
     only by brackets [ ] (supplied text) and/or U+0323 combining dot below
     (unclear text). These are candidates for 'unclear_resolved' regularization.
+
+    Args:
+        witnesses: list of witness dicts
+        skip_supplied: if True, ignore bracket markers (project auto-hides supplied text)
+        skip_unclear: if True, ignore underdot markers (project auto-hides unclear text)
 
     Returns:
         list of suggestion dicts with source, target, class, reason
@@ -362,6 +381,13 @@ def _add_unclear_suggestions(witnesses):
                 # determine what was removed for the reason text
                 has_brackets = '[' in original or ']' in original
                 has_underdots = '\u0323' in original
+                # skip if project auto-handles these markers
+                if has_brackets and not has_underdots and skip_supplied:
+                    continue
+                if has_underdots and not has_brackets and skip_unclear:
+                    continue
+                if has_brackets and has_underdots and skip_supplied and skip_unclear:
+                    continue
                 if has_brackets and has_underdots:
                     reason = 'supplied and unclear text markers confirmed'
                 elif has_brackets:
@@ -512,17 +538,23 @@ def validate_token_integrity(table, witnesses, input_token_indices):
         for j in range(1, len(seen_indices)):
             if int(seen_indices[j]) < int(seen_indices[j-1]):
                 correct_order = sorted(seen_indices, key=lambda x: int(x))
+                bad_idx = seen_indices[j]
+                prev_idx = seen_indices[j-1]
                 errors.append(
                     'Out-of-order token indices in witness {}: index {} appears after {}. '
                     'Witness tokens MUST be in ascending order across all ColumnGroups. '
                     'The correct order for this witness is: {}. '
-                    'You need to rearrange which ColumnGroups these indices belong to '
-                    'so that reading left to right they are in this ascending sequence. '
-                    'Transposed tokens that cannot be placed in the PBT\'s column position '
-                    'without breaking order should go in their own insertion ColumnGroup '
-                    'at the position where they actually occur in the witness.'.format(
-                        wit_id, seen_indices[j], seen_indices[j-1],
-                        ','.join(correct_order)))
+                    'HOW TO FIX: (1) Remove index {} from the ColumnGroup where it currently sits '
+                    '(leave that witness cell empty in that CG). '
+                    '(2) Insert a NEW ColumnGroup immediately BEFORE the ColumnGroup that '
+                    'contains index {} for this witness. '
+                    '(3) Place index {} alone in the new ColumnGroup (with empty arrays for '
+                    'all other witnesses). '
+                    'Repeat this procedure for every out-of-order index until this witness\'s '
+                    'indices read left-to-right in ascending order.'.format(
+                        wit_id, bad_idx, prev_idx,
+                        ','.join(correct_order),
+                        bad_idx, prev_idx, bad_idx))
                 break
     return errors
 

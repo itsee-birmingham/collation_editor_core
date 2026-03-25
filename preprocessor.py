@@ -382,7 +382,7 @@ class PreProcessor(Regulariser):
         # Pass collatexHost through algorithm_settings for the CollateX engine
         settings = dict(self.algorithm_settings) if self.algorithm_settings else {}
         settings['collatexHost'] = self.host
-        engine = get_engine(algorithm, settings)
+        engine = get_engine(algorithm, settings, display_settings=self.display_settings)
 
         if engine is not None:
             return engine.run(data, options, self.basetext_siglum)

@@ -498,13 +498,74 @@ def build_token_lookup(witnesses):
     return token_lookup, input_token_indices
 
 
+def fix_token_order(table, witnesses):
+    """Fix out-of-order tokens by moving them into their own insertion CGs.
+
+    For each witness, scans left-to-right. When an index appears after a higher
+    index, it is removed from its current CG and placed alone in a new CG
+    inserted immediately before the CG containing the next sequential index.
+
+    Modifies table in place and returns a list of descriptions of fixes applied.
+    """
+    num_witnesses = len(witnesses)
+    fix_descriptions = []
+    for wi in range(num_witnesses):
+        changed = True
+        while changed:
+            changed = False
+            # collect (cg_index, token_index_within_cg, index_value) for this witness
+            entries = []
+            for cgi, cg in enumerate(table):
+                if wi < len(cg):
+                    for ti, token in enumerate(cg[wi]):
+                        if isinstance(token, str):
+                            idx = token
+                        elif isinstance(token, dict):
+                            idx = token.get('index')
+                        else:
+                            continue
+                        entries.append((cgi, ti, idx))
+            # find first out-of-order entry
+            for j in range(1, len(entries)):
+                if int(entries[j][2]) < int(entries[j-1][2]):
+                    bad_cgi, bad_ti, bad_idx = entries[j]
+                    # find where this index should go: before the first entry
+                    # with a higher index than bad_idx
+                    insert_before = None
+                    for k in range(len(entries)):
+                        if int(entries[k][2]) > int(bad_idx) and entries[k] != entries[j]:
+                            insert_before = entries[k][0]
+                            break
+                    if insert_before is None:
+                        insert_before = len(table)
+                    # remove the token from its current CG
+                    bad_token = table[bad_cgi][wi].pop(bad_ti)
+                    # create a new CG with empty arrays for all witnesses
+                    new_cg = [[] for _ in range(num_witnesses)]
+                    new_cg[wi] = [bad_token]
+                    table.insert(insert_before, new_cg)
+                    desc = 'We fixed out-of-order index {} in witness {} by moving it to its own new ColumnGroup'.format(
+                        bad_idx, witnesses[wi])
+                    fix_descriptions.append(desc)
+                    changed = True
+                    print('fix_token_order: moved index {} for witness {} to new CG at position {}'.format(
+                        bad_idx, witnesses[wi], insert_before), file=sys.stderr)
+                    break
+    return fix_descriptions
+
+
 def validate_token_integrity(table, witnesses, input_token_indices):
     """Check for duplicate, missing, or out-of-order tokens in an alignment table.
+
+    Automatically fixes out-of-order tokens before checking for remaining errors.
 
     Returns:
         list of error strings (empty if valid)
     """
-    errors = []
+    # fix out-of-order tokens mechanically before validating
+    fix_descriptions = fix_token_order(table, witnesses)
+
+    errors = list(fix_descriptions)
     for i, wit_id in enumerate(witnesses):
         seen_indices = []
         for cg in table:

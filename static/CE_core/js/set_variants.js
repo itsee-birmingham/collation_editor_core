@@ -2550,7 +2550,9 @@ var SV = (function() {
     _doCombineUnits: function(units, appId, keepId, redraw) {
       let newunit, index, warningMess, errorMess, problems, warningUnit, combinedGapBeforeSubreadings,
           combinedGapAfterSubreadings, combinedGapBeforeSubreadingsDetails;
-  
+      if (redraw === undefined) {
+        redraw = true;
+      }
       const scrollOffset = [document.getElementById('scroller').scrollLeft,
                             document.getElementById('scroller').scrollTop];
       // make sure unit 1 is leftmost and unit 2 is rightmost
@@ -2559,7 +2561,7 @@ var SV = (function() {
       const witnessEquality = SV._checkWitnessEquality(unit1, unit2, appId);
       const overlapBoundaries = SV._checkOverlapBoundaries(unit1, unit2, appId);
       const overlapStatusAgreement = SV._checkOverlapStatusAgreement(unit1, unit2, appId);
-      if (redraw !== false) {
+      if (redraw === true) {
         SV._addToUndoStack(CL.data);
       }
       if (witnessEquality && overlapBoundaries && overlapStatusAgreement) {

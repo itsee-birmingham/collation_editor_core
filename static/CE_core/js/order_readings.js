@@ -953,8 +953,6 @@ var OR = (function() {
             OR._numberEditionSubreadings();
           }
           OR._getSiglaSuffixes();
-          // TODO: fosilise the reading suffixes and main reading label suffixes here
-          // then make output dependent on these not being present
           OR._getMainReadingSpecialClasses();
           // The following comment is no longer true as we do have that button in the approved screen!
           // at this point the saved approved version always and only ever has the correct subreadings shown we
@@ -988,34 +986,36 @@ var OR = (function() {
     },
 
     _getMainReadingSpecialClasses: function () {
-      let unit, reading;
-      const ruleClasses = CL.getRuleClasses('keep_as_main_reading', true, 'value', ['identifier', 'suffixed_label',
-                                                                                    'suffixed_reading']);
+      const ruleClasses = CL.getRuleClasses(
+        'keep_as_main_reading', true, 'value', ['identifier', 'suffixed_label', 'suffixed_reading']
+      );
       if ($.isEmptyObject(ruleClasses)) {
           return;
       }
       for (const key in CL.data) {
         if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
           if (key.indexOf('apparatus') != -1) {
-            for (let i = 0; i < CL.data[key].length; i += 1) {
-              unit = CL.data[key][i];
-              for (let j = 0; j < unit.readings.length; j += 1) {
-                reading = unit.readings[j];
+            for (let unit of CL.data[key]) {
+              for (let reading of unit.readings) {
                 if (Object.prototype.hasOwnProperty.call(reading, 'reading_classes') && reading.reading_classes.length > 0) {
-                  for (let k = 0; k < reading.reading_classes.length; k += 1) {
-                    if (Object.prototype.hasOwnProperty.call(ruleClasses, reading.reading_classes[k])) {
-                      if (ruleClasses[reading.reading_classes[k]][1] === true) {
+                  for (let readingClass of reading.reading_classes) {
+                    if (Object.prototype.hasOwnProperty.call(ruleClasses, readingClass)) {
+                      if (ruleClasses[readingClass][1] === true) {
                         if (Object.prototype.hasOwnProperty.call(reading, 'label_suffix')) {
-                          reading.label_suffix = reading.label_suffix + ruleClasses[reading.reading_classes[k]][0];
+                          if (reading.label_suffix.indexOf(ruleClasses[readingClass][0]) === -1) {
+                            reading.label_suffix = reading.label_suffix + ruleClasses[readingClass][0];
+                          }
                         } else {
-                          reading.label_suffix = ruleClasses[reading.reading_classes[k]][0];
+                          reading.label_suffix = ruleClasses[readingClass][0];
                         }
                       }
-                      if (ruleClasses[reading.reading_classes[k]][2] === true) {
+                      if (ruleClasses[readingClass][2] === true) {
                         if (Object.prototype.hasOwnProperty.call(reading, 'reading_suffix')) {
-                          reading.reading_suffix = reading.reading_suffix + ruleClasses[reading.reading_classes[k]][0];
+                          if (reading.reading_suffix.indexOf(ruleClasses[readingClass][0])) {
+                            reading.reading_suffix = reading.reading_suffix + ruleClasses[readingClass][0];
+                          }
                         } else {
-                          reading.reading_suffix = ruleClasses[reading.reading_classes[k]][0];
+                          reading.reading_suffix = ruleClasses[readingClass][0];
                         }
                       }
                     }

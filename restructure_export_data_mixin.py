@@ -106,15 +106,16 @@ class RestructureExportDataMixin(object):
                 if len(label_suffixes) > 0:
                     label_suffixes.sort()
                 reading['label_suffix'] = ''.join(label_suffixes)
-            if 'reading_suffix' not in reading:
-                reading_suffixes = []
-                for clss in reading['reading_classes']:
-                    for rule in self.rule_classes:
-                        if rule['value'] == clss:
-                            if rule['suffixed_reading'] is True:
-                                reading_suffixes.append(rule['identifier'])
-                if len(reading_suffixes) > 0:
-                    reading['reading_suffix'] = ''.join(reading_suffixes)
+            # the reading_suffix needs fixing regardless because there was a bug in the collation editor which was
+            # duplicating the labels at the approve stage.
+            reading_suffixes = []
+            for clss in reading['reading_classes']:
+                for rule in self.rule_classes:
+                    if rule['value'] == clss:
+                        if rule['suffixed_reading'] is True:
+                            reading_suffixes.append(rule['identifier'])
+            if len(reading_suffixes) > 0:
+                reading['reading_suffix'] = ''.join(reading_suffixes)
 
     def _simplify_text_list(self, reading):
         """Simplify the list of tokens provided in the text key so it only includes the interface string.

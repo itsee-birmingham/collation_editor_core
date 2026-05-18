@@ -783,8 +783,11 @@ var OR = (function() {
       CL.data[app][unit].readings = readings;
     },
 
-    editLabel: function(rdgDetails, menuPos, saveFunction) {
+    editLabel: function(rdgDetails, menuPos, saveFunction, overruleZvSetting) {
       let left, top;
+      if (overruleZvSetting === undefined) {
+        overruleZvSetting = false;
+      }
       if (document.getElementById('label-form')) {
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('label-form'));
       }
@@ -856,7 +859,7 @@ var OR = (function() {
       }
       if (document.getElementById('parent-select')) {
         $('#parent-select').on('change', function () {
-          OR._updateLabel(rdgDetails);
+          OR._updateLabel(rdgDetails, overruleZvSetting);
         });
       }
       // the +25 here is to move it out of the way of the other labels and readings so you can still see them
@@ -1157,7 +1160,7 @@ var OR = (function() {
       return [html, rowList];
     },
 
-    _updateLabel: function (rdgDetails) {
+    _updateLabel: function (rdgDetails, overruleZvSetting) {
       let supportsAll;
       const readings = [];
       const labels = [];
@@ -1174,7 +1177,7 @@ var OR = (function() {
           labels.push(CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].label);
         }
       }
-      if (supportsAll === true && CL.project.useZvForAllReadingsSupport == true) {
+      if (supportsAll === true && (CL.project.useZvForAllReadingsSupport === true && overruleZvSetting === false)) {
         document.getElementById('new-label').value = 'zv';
       } else {
         document.getElementById('new-label').value = labels.join('/');

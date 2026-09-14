@@ -21,7 +21,7 @@ The default is false.
 | ------ | ------------------- | ------------ |
 | callback | <code>function</code> |[optional] A function to be called when this function completes. |
 
-This function can be used to display the currently logged in user. It is called when pages are displayed. It should get the current user and display the required details in the preferred way for the platform. There is a <div> element on each page that calls this function which has the id 'login_status' which should be used to display the user details. When this is done the function should run the callback if one was provided.
+This function can be used to display the currently logged in user. It is called when pages are displayed. It should get the current user and display the required details in the preferred way for the platform. There is a <div> element on each page that calls this function which has the id 'login-status' which should be used to display the user details. When this is done the function should run the callback if one was provided.
 
 ## `getSavedStageIds()`
 
@@ -72,7 +72,7 @@ This function is used to sort the witness sigla into the desired order. It is us
 
 **There is a default in the core code which is explained below**
 
-This function tells the collation editor how to extract the list of witnesses from the index page. If there is an element on the page with the id *preselected_witnesses* the default code will take that value and split on commas. If there is no such element the default will assume that there is a form with the id *collation_form* which has a series of checkboxes for the witnesses and it will use any values that are selected.
+This function tells the collation editor how to extract the list of witnesses from the index page. If there is an element on the page with the id *preselected_witnesses* the default code will take that value and split on commas. If there is no such element the default will assume that there is a form with the id *collation-form* which has a series of checkboxes for the witnesses and it will use any values that are selected.
 
 This default behaviour can be overridden by providing this function in the services. It cannot be overridden in the project settings so the function must work for all projects you host. The function must return an array containing the ids of the documents selected for collation.
 

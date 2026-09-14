@@ -131,17 +131,17 @@ var cforms = (function () {
       return value;
     },
 
-    /**TODO: make sure you catch errors with parseInt and leave
+    /** TODO: make sure you catch errors with parseInt and leave
     the string as it is - forms should be validating entry
     anyway before this point! */
-    serialiseForm: function(formId, elemList, prefix) {
-      let j, elem, subelems, key, subjson, value;
+    serialiseForm: function (formId, elemList, prefix) {
+      let j, elem, subelems, key, subjson, value, elemId;
       const elems = cforms._getFormElements(formId, elemList);
       const json = {};
       for (let i = 0; i < elems.length; i += 1) {
         elem = elems[i];
         if ($(elem).hasClass('data_group') || $(elem).hasClass('data-group')) {
-          //construct a list of all elements descending from elem
+          // construct a list of all elements descending from elem
           subelems = [];
           // j records where we are in the list of elements so we can set i
           // to this to continue our loop where we left of with sub elements
@@ -150,15 +150,20 @@ var cforms = (function () {
             subelems.push(elems[j]);
             j += 1;
           }
-          key = typeof prefix === 'undefined' ? elem.id : elem.id.replace(prefix, '');
-          subjson = cforms.serialiseForm(formId, subelems, elem.id + '_');
+          elemId = elem.id;
+          if ($(elem).hasClass('data-group')) {
+            elemId = elemId.replaceAll('-', '_')
+          }
+          
+          key = typeof prefix === 'undefined' ? elemId : elemId.replace(prefix, '');     
+          subjson = cforms.serialiseForm(formId, subelems, elemId + '_');
           if (!$.isEmptyObject(subjson)) {
             if ($(elem).hasClass('objectlist')) {
               if (cforms._hasData(subjson)) {
                 try {
                   json[key.substring(0, key.lastIndexOf('_'))].push(subjson);
                 } catch {
-                  json[key.substring(0, key.lastIndexOf('_'))] = [ subjson ];
+                  json[key.substring(0, key.lastIndexOf('_'))] = [subjson];
                 }
               } else {
                 if (!Object.prototype.hasOwnProperty.call(json, key.substring(0, key.lastIndexOf('_')))) {
@@ -166,7 +171,7 @@ var cforms = (function () {
                 }
               }
             } else if ($(elem).hasClass('stringlist')) {
-              //make an array of strings
+              // make an array of strings
               json[key] = [];
               for (const k in subjson) {
                 if (Object.prototype.hasOwnProperty.call(subjson, k)) {
@@ -200,14 +205,16 @@ var cforms = (function () {
               json[elem.name.replace(prefix, '')] = value;
             }
           } else {
-            if (!Object.prototype.hasOwnProperty.call(json, elem.name) || value !== 'radio_null') {
-              if (typeof prefix === 'undefined') {
+            if (typeof prefix === 'undefined') {
+              if (!Object.prototype.hasOwnProperty.call(json, elem.name) || value !== 'radio_null') {
                 if (value === 'radio_null') {
                   json[elem.name] = null;
                 } else {
                   json[elem.name] = value;
                 }
-              } else {
+              }
+            } else {
+              if (!Object.prototype.hasOwnProperty.call(json, elem.name.replace(prefix, '')) || value !== 'radio_null') {
                 if (value === 'radio_null') {
                   json[elem.name.replace(prefix, '')] = null;
                 } else {
@@ -220,7 +227,7 @@ var cforms = (function () {
       }
       return json;
     },
-    
+
     /** Populate a select
     * data = list of json objects containing all data or a list of strings which will be used as value and display
     *        disabled key set to true can be used to disable the option

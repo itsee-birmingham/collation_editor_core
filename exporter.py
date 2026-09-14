@@ -1,5 +1,6 @@
 import re
 import xml.etree.ElementTree as etree
+
 from .restructure_export_data_mixin import RestructureExportDataMixin
 
 
@@ -13,42 +14,44 @@ class Exporter(RestructureExportDataMixin, object):
     restructures the data from collation data into a simpler stripped down format to use for exporting and also
     backfills some data which may be missing in collations produced in the early versions of the collation editor.
 
-    Args:
-        format (str, optional): The output format requires. options are [negative_xml|positive_xml].
-            Defaults to positive_xml.
-        include_punctuation (bool, optional): Indicates whether or not to include punctuation in the lemma.
-            Defaults to False.
-        ignore_basetext (bool, optional): Indicates whether or not to report the base text as a witness.
+    Attributes:
+        format (str, optional): The output format required. options are [negative_xml|positive_xml]. Defaults to
+            positive_xml.
+        include_punctuation (bool, optional): Indicates whether or not to include punctuation in the lemma. Defaults
+            to False.
+        ignore_basetext (bool, optional): Indicates whether or not to report the base text as a witness. Defaults
+            to False.
         overlap_status_to_ignore (list, optional): A list of strings representing the overlap status categories
-            that should be ignored in the export. Defaults to ['overlapped','deleted'].
+            that should be ignored in the export. Defaults to ['overlapped', 'deleted'].
         consolidate_om_verse (bool, optional): Indicates whether or not witnesses omitted in the entire collation
             unit are listed once at the start of the apparatus or indicated in each variant unit. Defaults to True.
         consolidate_lac_verse (bool, optional): Indicates whether or not witnesses which are lac for the entire
-            collation unit are listed once at the start of the apparatus or indicated in each variant unit.
-            Defaults to True.
+            collation unit are listed once at the start of the apparatus or indicated in each variant unit. Defaults
+            to True.
         include_lemma_when_no_variants (bool, optional): Indicates whether or not to include the lemma in the export
             if it has no variant readings. Defaults to False.
         exclude_lemma_entry (bool, optional): Indicates if the lemma entry in the apparatus should be excluded. If the
             setting is True the apparatus will not have a <lem> tag for each entry. Defaults to False.
-        rule_classes (dict, optional): This is the dictionary representing the rule classes used in the current
-            editing project. Defaults to {}. Only needed for older data.
-        witness_decorators (list, optional): This is a list of JSON objects which define any decorators and the list of
-            witnesses to be decorated, this will always be set at project level. Defaults to [].
+        rule_classes (dict, optional): The dictionary representing the rule classes used in the current editing project.
+            Only needed for older data. Defaults to {}.
+        witness_decorators (list, optional): A list of JSON objects which define any decorators and the list of
+            witnesses to be decorated, this will always be set at the project level. Defaults to [].
+
     """
 
-    def __init__(self,
-                 format='positive_xml',
-                 include_punctuation=False,
-                 ignore_basetext=False,
-                 overlap_status_to_ignore=['overlapped', 'deleted'],
-                 consolidate_om_verse=True,
-                 consolidate_lac_verse=True,
-                 include_lemma_when_no_variants=False,
-                 exclude_lemma_entry=False,
-                 rule_classes={},
-                 witness_decorators=[],
-                 ):
-
+    def __init__(
+        self,
+        format='positive_xml',
+        include_punctuation=False,
+        ignore_basetext=False,
+        overlap_status_to_ignore=['overlapped', 'deleted'],
+        consolidate_om_verse=True,
+        consolidate_lac_verse=True,
+        include_lemma_when_no_variants=False,
+        exclude_lemma_entry=False,
+        rule_classes={},
+        witness_decorators=[],
+    ):
         self.format = format
         self.include_punctuation = include_punctuation
         if 'negative' in self.format:
@@ -84,8 +87,9 @@ class Exporter(RestructureExportDataMixin, object):
             if self.witness_decorators is not None:
                 restructured_collation_unit = self.add_witness_decorators(restructured_collation_unit)
             output.append(etree.tostring(self.get_unit_xml(restructured_collation_unit), 'utf-8').decode())
-        return '<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0">{}' \
-               '</TEI>'.format('\n'.join(output).replace('<?xml version=\'1.0\' encoding=\'utf-8\'?>', ''))
+        return '<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0">{}</TEI>'.format(
+            '\n'.join(output).replace('<?xml version=\'1.0\' encoding=\'utf-8\'?>', '')
+        )
 
     def add_witness_decorators(self, unit):
         """Add any prescribed witness decorators to the specified witnesses.
@@ -105,19 +109,20 @@ class Exporter(RestructureExportDataMixin, object):
                     decorated_hands.append(hand)
             all_decorators[label] = decorated_hands
         if 'lac_readings' in unit['structure']:
-            unit['structure']['lac_readings'] = self._decorate_witnesses(unit['structure']['lac_readings'],
-                                                                         all_decorators)
+            unit['structure']['lac_readings'] = self._decorate_witnesses(
+                unit['structure']['lac_readings'], all_decorators
+            )
         if 'om_readings' in unit['structure']:
-            unit['structure']['om_readings'] = self._decorate_witnesses(unit['structure']['om_readings'],
-                                                                        all_decorators)
+            unit['structure']['om_readings'] = self._decorate_witnesses(
+                unit['structure']['om_readings'], all_decorators
+            )
         for collation_unit in unit['structure']['apparatus']:
             for reading in collation_unit['readings']:
                 reading['witnesses'] = self._decorate_witnesses(reading['witnesses'], all_decorators)
                 if 'subreadings' in reading:
                     for type in reading['subreadings']:
                         for subreading in reading['subreadings'][type]:
-                            subreading['witnesses'] = self._decorate_witnesses(subreading['witnesses'],
-                                                                               all_decorators)
+                            subreading['witnesses'] = self._decorate_witnesses(subreading['witnesses'], all_decorators)
         return unit
 
     def _decorate_witnesses(self, witnesses, all_decorators):
@@ -168,7 +173,7 @@ class Exporter(RestructureExportDataMixin, object):
                 return ['lac.', 'lac']
 
     def get_lemma_text(self, overtext, start, end):
-        """Function to get the text of the lemma within the specified range in the overtext.
+        """Get the text of the lemma within the specified range in the overtext.
 
         Args:
             overtext (dict): The JSON segment representing the overtext tokens for this unit. The data should be
@@ -187,11 +192,11 @@ class Exporter(RestructureExportDataMixin, object):
             return ['', 'om']
         if start % 2 == 1:
             start += 1
-        real_start = int(start/2)-1
-        real_end = int(end/2)-1
+        real_start = int(start / 2) - 1
+        real_end = int(end / 2) - 1
         if real_start < 0:
             real_start = 0
-        required_text = overtext['current'][real_start:real_end+1]
+        required_text = overtext['current'][real_start : real_end + 1]
         words = []
         for token in required_text:
             word = []
@@ -204,7 +209,7 @@ class Exporter(RestructureExportDataMixin, object):
         return [' '.join(words)]
 
     def get_witnesses(self, reading, to_remove):
-        """Function to return the witnesses that should be reported for the given reading.
+        """Return the witnesses that should be reported for the given reading.
 
         Args:
             reading (dict): The JSON segment representing the reading.
@@ -222,7 +227,7 @@ class Exporter(RestructureExportDataMixin, object):
         return witnesses
 
     def get_label(self, label, is_subreading, reading):
-        """Function to get the correct label to display for the reading.
+        """Get the correct label to display for the reading.
 
         Args:
             label (str): The current label of the reading (the basic form for a main reading or the full label
@@ -240,7 +245,7 @@ class Exporter(RestructureExportDataMixin, object):
         return label
 
     def check_for_suffixed_reading_marker(self, text, reading):
-        """Function to add any required reading suffixes to the text of the reading.
+        """Add any required reading suffixes to the text of the reading.
 
         Args:
             text (str): The extracted text of the current reading.
@@ -254,12 +259,12 @@ class Exporter(RestructureExportDataMixin, object):
             return text
         return text
 
-    def make_reading(self, reading, index_position, label, witnesses, is_subreading=False, subtype=None):
-        """Function to make the TEI XML version of a reading.
+    def make_reading(self, reading, reading_position, label, witnesses, is_subreading=False, subtype=None):
+        """Make the TEI XML version of a reading.
 
         Args:
             reading (dict): The JSON segment representing the reading.
-            index_position (int): The position of this reading in the apparatus unit.
+            reading_position (int): The position of this reading in the apparatus unit.
             label (str): The current label of the reading (the basic form).
             witnesses (list): A list of witnesses for this reading.
             is_subreading (bool, optional): A boolean indicating if this reading is a subreading. Defaults to False.
@@ -279,7 +284,7 @@ class Exporter(RestructureExportDataMixin, object):
         if subtype:
             rdg.set('cause', subtype)
         rdg.text = text[0]
-        pos = index_position + 1  # add one because of 0-indexing
+        pos = reading_position + 1  # add one because of 0-indexing
         rdg.set('varSeq', '{}'.format(pos))
         if len(witnesses) > 0:
             rdg.set('wit', ' '.join(witnesses))
@@ -313,13 +318,16 @@ class Exporter(RestructureExportDataMixin, object):
         return ''.join(new_label)
 
     def get_required_end(self, unit, context):
-        """This is a function which is not important when working on a single unit where the end value is taken
-        directly from the unit. It is a separate function so inheriting classes, which may be joining readings
-        over multiple units, can overwrite it to provide the end value required.
+        """Get the location where this unit ends.
+
+        This is a function which is not important when working on a single unit as the end value is taken directly
+        from the single unit. It is a separate function so inheriting classes, which may be joining readings
+        over multiple units, can overwrite it to provide the end value required for those joined cases where it will not
+        be in the same unit.
 
         Args:
             unit (dict): The current apparatus unit being processed.
-            context (str): The context of this collation unit (used in inheriting classes to recognise joined readings)
+            context (str): The context of this collation unit (used in inheriting classes to recognise joined readings).
 
         Returns:
             str: The string to use for the end value in the apparatus <app> tag.
@@ -327,7 +335,15 @@ class Exporter(RestructureExportDataMixin, object):
         return unit['end']
 
     def get_subreading_label(self, parent_label, subreading):
-        """Work out the subreading label and return it as a string."""
+        """Work out the subreading label and return it as a string.
+
+        Args:
+            parent_label (str): The label of the parent reading for this subreading.
+            subreading (dict): The dictionary representing the subreading.
+
+        Returns:
+            str: The label for the subreading.
+        """
         label = [parent_label]
         if 'suffix' in subreading:
             label.append(self.fix_subreading_suffix(subreading['suffix']))
@@ -335,17 +351,17 @@ class Exporter(RestructureExportDataMixin, object):
             label.append(subreading['position_suffix'])
         return ''.join(label)
 
-    def get_app_units(self, apparatus, overtext, context, missing):
-        """Function to take the JSON apparatus and turn it into a list of ElementTree.Elements with each entry
-        representing one variant unit in TEI XML.
+    def get_app_units(self, apparatus, overtext, context, excluded_wits):
+        """Turn the JSON apparatus into a list of ElementTree.Elements.
+
+        Each entry in the list represents one variant unit in TEI XML.
 
         Args:
             apparatus (dict): The JSON segment representing the apparatus for this unit.
             overtext (dict): The JSON segment representing the overtext for this unit. The data should be wrapped in a
-                             dictionary as the value to the key 'current'
-                             eg. {'current': [{'id': 'basetext', 'tokens': []}]}
+                dictionary as the value to the key 'current' eg. {'current': [{'id': 'basetext', 'tokens': []}]}
             context (str): The reference for this apparatus unit context.
-            missing (list): The list of witnesses to exclude from this apparatus.
+            excluded_wits (list): The list of witnesses to exclude from this apparatus.
 
         Returns:
             list: A list of XML elements which make up the apparatus for this unit.
@@ -363,65 +379,98 @@ class Exporter(RestructureExportDataMixin, object):
                 if len(text) > 1:
                     lem.set('type', text[1])
                 app.append(lem)
-            readings = False
+            has_readings = False
             if self.include_lemma_when_no_variants:
-                readings = True
+                has_readings = True
             for i, reading in enumerate(unit['readings']):
-                wits = self.get_witnesses(reading, missing)
+                wits = self.get_witnesses(reading, excluded_wits)
                 if self.negative_apparatus is True:
-                    if ((len(wits) > 0 or reading['label'] == 'a' or 'subreadings' in reading)
-                            and ('overlap_status' not in reading
-                                 or reading['overlap_status'] not in self.overlap_status_to_ignore)):
+                    if (len(wits) > 0 or reading['label'] == 'a' or 'subreadings' in reading) and (
+                        'overlap_status' not in reading
+                        or reading['overlap_status'] not in self.overlap_status_to_ignore
+                    ):
                         if reading['label'] == 'a':
                             wits = []
                         if len(wits) > 0:
-                            readings = True
+                            has_readings = True
                         subtype = None
                         if 'reading_classes' in reading:
                             subtype = '|'.join(reading['reading_classes'])
                         app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
 
                     if 'subreadings' in reading:
-                        for key in reading['subreadings']:
-                            for subreading in reading['subreadings'][key]:
-                                wits = self.get_witnesses(subreading, missing)
-                                if len(wits) > 0:
-                                    readings = True
-                                    subreading_label = self.get_subreading_label(reading['label'], subreading)
-                                    app.append(self.make_reading(subreading, i, subreading_label, wits, True, key))
-
+                        has_readings = self.get_subreadings(reading, i, app, excluded_wits, has_readings)
                 else:
-                    if ((len(wits) > 0 or reading['label'] == 'a' or 'subreadings' in reading)
-                            and ('overlap_status' not in reading
-                                 or reading['overlap_status'] not in self.overlap_status_to_ignore)):
+                    if (len(wits) > 0 or reading['label'] == 'a' or 'subreadings' in reading) and (
+                        'overlap_status' not in reading
+                        or reading['overlap_status'] not in self.overlap_status_to_ignore
+                    ):
                         if len(wits) > 0:
-                            readings = True
+                            has_readings = True
                         subtype = None
                         if 'reading_classes' in reading:
                             subtype = ' '.join(reading['reading_classes'])
                         app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
 
                     if 'subreadings' in reading:
-                        for key in reading['subreadings']:
-                            for subreading in reading['subreadings'][key]:
-                                wits = self.get_witnesses(subreading, missing)
-                                if len(wits) > 0:
-                                    readings = True
-                                    subreading_label = self.get_subreading_label(reading['label'], subreading)
-                                    app.append(self.make_reading(subreading, i, subreading_label, wits, True, key))
-
-            if readings:
+                        has_readings = self.get_subreadings(reading, i, app, excluded_wits, has_readings)
+            if has_readings:
                 app_list.append(app)
         return app_list
 
+    def get_subreadings(self, reading, reading_position, app, excluded_wits, has_readings):
+        """Create the subreading XML for this reading and add it to the provided apparatus unit.
+
+        Args:
+            reading (dict): The JSON dictionary representing a reading.
+            reading_position (int): The position of this reading in the readings of this unit.
+            app (xml.etree.ElementTree.Element): The XML tree being created for this apparatus unit.
+            excluded_wits (list): A list of witnesses to remove from the apparatus (because they are being reported
+                separately or of no interest for another reason.)
+            has_readings (bool): A boolean to determine if this unit should be included in the apparatus output.
+
+        Returns:
+            bool: The reading boolean updated if required.
+        """
+        for key in reading['subreadings']:
+            for subreading in reading['subreadings'][key]:
+                wits = self.get_witnesses(subreading, excluded_wits)
+                if len(wits) > 0:
+                    has_readings = True
+                    subreading_label = self.get_subreading_label(reading['label'], subreading)
+                    app.append(self.make_reading(subreading, reading_position, subreading_label, wits, True, key))
+        return has_readings
+
     def get_overtext_data(self, entry):
+        """Get the overtext data in a specfic format.
+
+        The format required for the overtext is in expectation of exporters which inherit this exporter and which
+        implement joins across collation unit boundaries. In these cases the overtext needs to be concatenated from all
+        of the joined units.
+
+        Args:
+            entry (dict): The entry for this collation unit.
+
+        Returns:
+            dict: The overtext in a specific form required by the exporter.
+        """
         return {'current': entry['structure']['overtext']}
 
     def sort_units(self, unit):
+        """Extract a sort tuple from the unit which is used as a sort key when sorting the apparatus.
+
+         Units are sorted by start value and in reverse order of end value.
+
+        Args:
+            unit (dict): The dictionary representing a collation unit
+
+        Returns:
+            tuple: Integers describing the sort position for this unit.
+        """
         return (unit['start'], -unit['end'])
 
     def get_unit_xml(self, entry):
-        """Function to turn the JSON apparatus of the collation unit into TEI XML.
+        """Turn the JSON apparatus of the collation unit into TEI XML.
 
         Args:
             entry (dict): The JSON fragment representing the apparatus of a collation unit.
@@ -441,11 +490,11 @@ class Exporter(RestructureExportDataMixin, object):
 
         vtree = etree.fromstring('<ab n="{}-APP"></ab>'.format(context))
         # here deal with the whole verse lac and om and only use witnesses elsewhere not in these lists
-        missing = []
+        excluded_wits = []
         if self.consolidate_om_verse or self.consolidate_lac_verse:
-            app = etree.fromstring('<app type="lac" n="{}">'
-                                   '<lem wit="editorial">Whole verse</lem>'
-                                   '</app>'.format(context))
+            app = etree.fromstring(
+                '<app type="lac" n="{}"><lem wit="editorial">Whole verse</lem></app>'.format(context)
+            )
             add_whole_verse_app = False
 
             if self.consolidate_lac_verse:
@@ -464,7 +513,7 @@ class Exporter(RestructureExportDataMixin, object):
                         wit.append(idno)
                     rdg.append(wit)
                     app.append(rdg)
-                missing.extend(entry['structure']['lac_readings'])
+                excluded_wits.extend(entry['structure']['lac_readings'])
 
             if self.consolidate_om_verse:
                 if len(entry['structure']['om_readings']) > 0:
@@ -481,17 +530,17 @@ class Exporter(RestructureExportDataMixin, object):
                         wit.append(idno)
                     rdg.append(wit)
                     app.append(rdg)
-                missing.extend(entry['structure']['om_readings'])
+                excluded_wits.extend(entry['structure']['om_readings'])
             if add_whole_verse_app:
                 vtree.append(app)
 
-        # if we are ignoring the basetext add it to our missing list so it isn't listed (except in lemma)
+        # if we are ignoring the basetext add it to our excluded_wits list so it isn't listed (except in lemma)
         if self.ignore_basetext:
-            missing.append(basetext_siglum)
+            excluded_wits.append(basetext_siglum)
         apparatus = sorted(apparatus, key=self.sort_units)
         overtext = self.get_overtext_data(entry)
 
-        app_units = self.get_app_units(apparatus, overtext, context, missing)
+        app_units = self.get_app_units(apparatus, overtext, context, excluded_wits)
         for app in app_units:
             vtree.append(app)
 

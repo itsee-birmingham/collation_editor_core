@@ -1,97 +1,70 @@
 body {
-    margin: 0px 0px 0px 0px;
-    padding: 0px 0px 0px 0px;
+    margin: 0;
+    padding: 0;
 }
 
-body.waiting,  body.waiting div input {
+body.waiting,
+body.waiting div input {
     cursor: wait;
 }
 
 #header {
-    font-family: arial;
+    font-family: arial, sans-serif;
+    padding: 7px;
+    height: 40px;
 }
 
-#header h1 {
+#header span.title {
+    font-weight: bold;
     font-size: 12pt;
+    margin-top: 10px;
 }
 
-#header h1#stage_id {
+#header span#stage-id {
     float: left;
 }
 
-#header h1#project_name {
+#header span#project-name {
     float: left;
     padding-left: 20px;
 }
 
-#header h1#verse_ref {
-    float:left;
+#header span#unit-ref {
+    float: left;
     padding-left: 20px;
 }
 
-#header.collation_header {
-    background: #9999EE;
+#header.collation-header {
+    background: #99E;
 }
 
-#header.regularisation_header {
+#header.regularisation-header {
     background: orangered;
 }
 
-#header.set_variants_header {
-    background: #FFBB55;
+#header.set-variants-header {
+    background: #FB5;
 }
 
-#header.reorder_header {
-    background: #99FF99;
+#header.reorder-header {
+    background: #9F9;
 }
 
-#header.approved_header {
+#header.approved-header {
     background: silver;
 }
 
-
-
-.project_header {
-    background: #CC99FF;
-}
-
-.versional_editor_header {
-    background: lightblue;
-}
-
-
-.admin_header {
-    background: #CCCCFF;
-}
-
-
-
-#header {
-    /*position: fixed;*/
-    padding: 7px;
-    height: 40px;
-    /*width: 100%*/
-}
-
-#stage_links {
+#stage-links {
     margin-top: 14px;
     float: left;
 }
 
-#stage_links span {
+#stage-links span {
     margin-left: 10px;
     margin-right: 10px;
 }
 
-
-#header h1#version_language, #header h1#other_versions_displayed, #header h1#read_status {
-    float: left;
-    padding-left: 20px;
-}
-
-
-
-div#login_status {
+div#login-status {
     float: right;
     font-size: 11pt;
 }
@@ -101,8 +74,8 @@ div#login_status {
     padding-bottom: 50px;
 }
 
-
-#container, #scroller {
+#container,
+#scroller {
     overflow: auto;
     position: relative;
 }
@@ -111,34 +84,6 @@ div#scroller {
     padding-left: 10px;
     padding-right: 10px;
 }
-/*
-#footer {
-    position: fixed;
-    clear: both;
-    width: 100%;
-    height: 50px;
-    bottom: 0;
-    border-top: 1px solid black;
-    padding: 0 0 0 10px;
-    /*margin-left: -8px;*/
-/*    text-align: right;
-    background-color: white;
-    overflow-y: auto;
-}
-
-
-#footer .left_foot {
-    float: left;
-
-}
-
-#footer input, #footer select, #footer a {
-    margin-top: 10px;
-    margin-right: 15px;
-}*/
-
-
-
 
 div#footer {
     position: fixed;
@@ -147,7 +92,7 @@ div#footer {
     height: 50px;
     bottom: 0;
     border-top: 1px solid black;
-    padding: 0 0 0 0;
+    padding: 0;
     background-color: white;
     overflow-y: auto;
 }
@@ -159,18 +104,19 @@ div#footer select {
     padding: 0;
 }
 
-div#footer .pure-button, div#footer .btn {
-	margin-top: 8px;
+div#footer .pure-button,
+div#footer .btn {
+    margin-top: 8px;
 }
 
-div#footer .left_foot {
-	float:left;
-	margin-left: 10px;
-	margin-right: 5px;
+div#footer .left-foot {
+    float: left;
+    margin-left: 10px;
+    margin-right: 5px;
 }
 
-div#footer .right_foot {
-  float: right;
-  margin-right: 10px;
-	margin-left: 5px;
+div#footer .right-foot {
+    float: right;
+    margin-right: 10px;
+    margin-left: 5px;
 }

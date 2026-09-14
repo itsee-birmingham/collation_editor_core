@@ -253,7 +253,7 @@ django_services = (function() {
 
   showLoginStatus = function(callback) {
     var elem, loginStatusMessage;
-    elem = document.getElementById('login_status');
+    elem = document.getElementById('login-status');
     if (elem !== null) {
       CL.services.getUserInfo(function(response) {
         if (response) {
@@ -341,11 +341,11 @@ django_services = (function() {
 
   getWitnessesFromInputForm = function() {
     var witnessList, data, key;
-    if (document.getElementById('preselected_witnesses')) {
-      witnessList = document.getElementById('preselected_witnesses').value.split(',');
+    if (document.getElementById('preselected-witnesses')) {
+      witnessList = document.getElementById('preselected-witnesses').value.split(',');
     } else {
       witnessList = [];
-      data = cforms.serialiseForm('collation_form');
+      data = cforms.serialiseForm('collation-form');
       if (!$.isEmptyObject(data)) {
         witnessList = [];
         for (key in data) {
@@ -836,9 +836,9 @@ django_services = (function() {
         // then split out the new unit and overlap the witnesses in the corresponding
       });
     }
-    if (document.getElementById('overlap_om_verse')) {
-      $('#overlap_om_verse').off('click.overlap_om');
-      $('#overlap_om_verse').on('click.overlap_om', function() {
+    if (document.getElementById('overlap-om-verse')) {
+      $('#overlap-om-verse').off('click.overlap_om');
+      $('#overlap-om-verse').on('click.overlap_om', function() {
         var data, foundOmVerse, appIds, newunit, textList, newTextObject, unitId;
         //make the new unit for the overlapping reading
         newunit = {};

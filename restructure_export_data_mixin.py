@@ -2,20 +2,21 @@ from .exceptions import MissingSuffixesException
 
 
 class RestructureExportDataMixin(object):
+    """Mixin for restructuring export data."""
 
     def clean_collation_unit(self, collation_unit):
         """Clean the data and back fill anything missing from older data structures.
 
         Args:
             collation_unit (dict): The collation unit structure which has two keys (context, structure) where structure
-            is the JSON that comes out of the collation editor.
+                is the JSON that comes out of the collation editor.
 
         Returns:
             dict: The transformed collation_unit dictionary.
 
         Raises:
             MissingSuffixesException: raised if any of the readings in this collation unit are missing the list of
-            witness suffixes.
+                witness suffixes.
         """
         structure = collation_unit['structure']
         # remove the data we don't need (without raising an error if it isn't there)
@@ -25,7 +26,6 @@ class RestructureExportDataMixin(object):
         # unrequired keys
         to_remove = ['reading', 'siglum', 'rule_match', 'verse', 't']
         structure['overtext'] = [self._strip_keys(x, to_remove) for x in structure['overtext'][0]['tokens']]
-
         # now do the variant units
         for key in structure:
             if 'apparatus' in key:
@@ -33,9 +33,11 @@ class RestructureExportDataMixin(object):
                     try:
                         self._clean_variant_unit(variant_unit)
                     except MissingSuffixesException:
-                        raise MissingSuffixesException(f'At least one of the readings in {collation_unit["context"]} '
-                                                       f'is missing the suffixes data. Reapproving this unit will '
-                                                       f'probably fix the problem.')
+                        raise MissingSuffixesException(
+                            f'At least one of the readings in {collation_unit["context"]} '
+                            f'is missing the suffixes data. Reapproving this unit will '
+                            f'probably fix the problem.'
+                        )
         return collation_unit
 
     def _clean_variant_unit(self, variant_unit):
@@ -104,15 +106,16 @@ class RestructureExportDataMixin(object):
                 if len(label_suffixes) > 0:
                     label_suffixes.sort()
                 reading['label_suffix'] = ''.join(label_suffixes)
-            if 'reading_suffix' not in reading:
-                reading_suffixes = []
-                for clss in reading['reading_classes']:
-                    for rule in self.rule_classes:
-                        if rule['value'] == clss:
-                            if rule['suffixed_reading'] is True:
-                                reading_suffixes.append(rule['identifier'])
-                if len(reading_suffixes) > 0:
-                    reading['reading_suffix'] = ''.join(reading_suffixes)
+            # the reading_suffix needs fixing regardless because there was a bug in the collation editor which was
+            # duplicating the labels at the approve stage.
+            reading_suffixes = []
+            for clss in reading['reading_classes']:
+                for rule in self.rule_classes:
+                    if rule['value'] == clss:
+                        if rule['suffixed_reading'] is True:
+                            reading_suffixes.append(rule['identifier'])
+            if len(reading_suffixes) > 0:
+                reading['reading_suffix'] = ''.join(reading_suffixes)
 
     def _simplify_text_list(self, reading):
         """Simplify the list of tokens provided in the text key so it only includes the interface string.

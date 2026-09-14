@@ -1,5 +1,5 @@
 /* exported SV */
-/* global CL, OR, SR, REDIPS SimpleContextMenu cforms, staticUrl, spinner, drag */
+/* global CL, RG, OR, SR, REDIPS SimpleContextMenu cforms, staticUrl, spinner, drag */
 var SV = (function() {
 
   /** Major operations in this file (by which I mean ones directly called by the user interface) are:
@@ -59,41 +59,41 @@ var SV = (function() {
         SimpleContextMenu.attach('unit', function() {
           return SV._makeMenu('unit');
         });
-        SimpleContextMenu.attach('overlap_unit', function() {
-          return SV._makeMenu('overlap_unit');
+        SimpleContextMenu.attach('overlap-unit', function() {
+          return SV._makeMenu('overlap-unit');
         });
-        SimpleContextMenu.attach('split_unit_a', function() {
-          return SV._makeMenu('split_unit_a');
+        SimpleContextMenu.attach('split-unit-a', function() {
+          return SV._makeMenu('split-unit-a');
         });
-        SimpleContextMenu.attach('split_unit', function() {
-          return SV._makeMenu('split_unit');
+        SimpleContextMenu.attach('split-unit', function() {
+          return SV._makeMenu('split-unit');
         });
-        SimpleContextMenu.attach('overlap_split_unit_a', function() {
-          return SV._makeMenu('overlap_split_unit_a');
+        SimpleContextMenu.attach('overlap-split-unit-a', function() {
+          return SV._makeMenu('overlap-split-unit-a');
         });
-        SimpleContextMenu.attach('overlap_split_unit', function() {
-          return SV._makeMenu('overlap_split_unit');
+        SimpleContextMenu.attach('overlap-split-unit', function() {
+          return SV._makeMenu('overlap-split-unit');
         });
         SimpleContextMenu.attach('subreading', function() {
           return SV._makeMenu('subreading');
         });
-        SimpleContextMenu.attach('split_omlac_unit', function() {
-          return SV._makeMenu('split_omlac_unit');
+        SimpleContextMenu.attach('split-omlac-unit', function() {
+          return SV._makeMenu('split-omlac-unit');
         });
-        SimpleContextMenu.attach('split_duplicate_unit', function() {
-          return SV._makeMenu('split_duplicate_unit');
+        SimpleContextMenu.attach('split-duplicate-unit', function() {
+          return SV._makeMenu('split-duplicate-unit');
         });
-        SimpleContextMenu.attach('split_deleted_unit', function() {
-          return SV._makeMenu('split_overlapped_change_unit');
+        SimpleContextMenu.attach('split-deleted-unit', function() {
+          return SV._makeMenu('split-overlapped-change-unit');
         });
-        SimpleContextMenu.attach('split_overlapped_unit', function() {
-          return SV._makeMenu('split_overlapped_change_unit');
+        SimpleContextMenu.attach('split-overlapped-unit', function() {
+          return SV._makeMenu('split-overlapped-change-unit');
         });
       }
 
       // sort out header and main page
       document.getElementById('header').innerHTML = CL.getHeaderHtml('Set Variants', CL.context);
-      document.getElementById('header').className = 'set_variants_header';
+      document.getElementById('header').className = 'set-variants-header';
       if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
         CL.services.showLoginStatus();
       }
@@ -104,24 +104,24 @@ var SV = (function() {
       footerHtml = [];
       if (Object.prototype.hasOwnProperty.call(CL.project, 'showCollapseAllUnitsButton') &&
               CL.project.showCollapseAllUnitsButton === true) {
-        footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+        footerHtml.push('<button class="pure-button left-foot" id="expand-collapse-button">collapse all</button>');
       }
-      footerHtml.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">show subreadings</button>');
+      footerHtml.push('<button class="pure-button left-foot" id="show-hide-subreadings-button">show subreadings</button>');
       if (CL.witnessEditingMode === false) {
-        footerHtml.push('<span id="extra_buttons"></span>');
-        footerHtml.push('<span id="stage_links"></span>');
+        footerHtml.push('<span id="extra-buttons"></span>');
+        footerHtml.push('<span id="stage-links"></span>');
       }
       if (CL.witnessEditingMode === true) {
-        footerHtml.push('<button class="pure-button right_foot" id="return_to_saved_table_button">Return to summary table</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="return-to-saved-table-button">Return to summary table</button>');
       } else {
-        footerHtml.push('<button class="pure-button right_foot" id="move_to_reorder_button">Move to Reorder Variants</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="move-to-reorder-button">Move to Reorder Variants</button>');
       }
-      footerHtml.push('<button class="pure-button right_foot" id="save">Save</button>');
-      footerHtml.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
+      footerHtml.push('<button class="pure-button right-foot" id="save">Save</button>');
+      footerHtml.push('<select class="right-foot" id="highlighted" name="highlighted"></select>');
       if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
-        footerHtml.push('<select class="right_foot" id="added_highlight" name="added_highlight"></select>');
+        footerHtml.push('<select class="right-foot" id="added-highlight" name="added_highlight"></select>');
       }
-      footerHtml.push('<button class="pure-button right_foot" id="undo_button" style="display:none">undo</button>');
+      footerHtml.push('<button class="pure-button right-foot" id="undo-button" style="display:none">undo</button>');
       // this does the styling of the select elements in the footer using pure (they cannot be styled individually)
       $('#footer').addClass('pure-form');
       document.getElementById('footer').innerHTML = footerHtml.join('');
@@ -130,8 +130,8 @@ var SV = (function() {
 
       // get the data itself
       CL.container.innerHTML = '<div id="redips-drag"><div id="scroller" class="fillPage"></div>' +
-                               '<div id="single_witness_reading"></div></div>';
-      document.getElementById('single_witness_reading').style.bottom = document.getElementById('footer').offsetHeight +
+                               '<div id="single-witness-reading"></div></div>';
+      document.getElementById('single-witness-reading').style.bottom = document.getElementById('footer').offsetHeight +
                                                                       'px';
       if (CL.witnessAddingMode === true) {
         // this sets this a default so that when all is highlighted this will work - any data specified in
@@ -159,7 +159,7 @@ var SV = (function() {
         } else {
           preselectedAddedHighlight = 'all';
         }
-        cforms.populateSelect(CL.sortWitnesses(CL.witnessesAdded), document.getElementById('added_highlight'), {
+        cforms.populateSelect(CL.sortWitnesses(CL.witnessesAdded), document.getElementById('added-highlight'), {
           'selected': preselectedAddedHighlight,
           'add_select': true,
           'select_label_details': {
@@ -169,7 +169,7 @@ var SV = (function() {
         });
       }
 
-      $('#move_to_reorder_button').on('click', function() {
+      $('#move-to-reorder-button').on('click', function() {
         SV._moveToReorder();
       });
 
@@ -182,7 +182,7 @@ var SV = (function() {
         }
       });
 
-      $('#return_to_saved_table_button').on('click', function() {
+      $('#return-to-saved-table-button').on('click', function() {
         const callback = function() {
           SV.undoStack = [];
           CL.isDirty = false;
@@ -193,13 +193,13 @@ var SV = (function() {
       $('#highlighted').on('change', function(event) {
         SV._highlightWitness(event.target.value);
       });
-      if (document.getElementById('added_highlight')) {
-        $('#added_highlight').on('change', function(event) {
+      if (document.getElementById('added-highlight')) {
+        $('#added-highlight').on('change', function(event) {
           SV._highlightAddedWitness(event.target.value);
         });
       }
-      if (document.getElementById('undo_button')) {
-        $('#undo_button').on('click', function() {
+      if (document.getElementById('undo-button')) {
+        $('#undo-button').on('click', function() {
           spinner.showLoadingOverlay();
           SV._undo();
         });
@@ -222,21 +222,21 @@ var SV = (function() {
       }
       options.sort = true;
       // remove the witness removal window if shown
-      if (document.getElementById('remove_witnesses_div')) {
-        document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
+      if (document.getElementById('remove-witnesses-div')) {
+        document.getElementById('remove-witnesses-div').parentNode.removeChild(document.getElementById('remove-witnesses-div'));
       }
       if (CL.witnessEditingMode === true) {
         wits = CL.checkWitnessesAgainstProject(CL.dataSettings.witness_list, CL.project.witnesses);
         if (wits[0] === false) {
           if ((wits[1] === 'removed' || wits[1] === 'both') && CL.witnessRemovingMode === true) {
             $.get(staticUrl + 'CE_core/html_fragments/remove_witnesses_form.html', function(html) {
-              if (!document.getElementById('remove_witnesses_div')) {
+              if (!document.getElementById('remove-witnesses-div')) {
                 removeWitsForm = document.createElement('div');
               } else {
-                removeWitsForm = document.getElementById('remove_witnesses_div');
+                removeWitsForm = document.getElementById('remove-witnesses-div');
               }
-              removeWitsForm.setAttribute('id', 'remove_witnesses_div');
-              removeWitsForm.setAttribute('class', 'remove_witnesses_div dialogue_form');
+              removeWitsForm.setAttribute('id', 'remove-witnesses-div');
+              removeWitsForm.setAttribute('class', 'remove-witnesses-div dialogue-form');
               removeWitsForm.innerHTML = html;
               document.getElementsByTagName('body')[0].appendChild(removeWitsForm);
               removeFunction = function() {
@@ -282,12 +282,12 @@ var SV = (function() {
         html.push.apply(html, overlaps[0]);
         temp[2].push.apply(temp[2], overlaps[1]);
       }
-      html.push('<ul id="context_menu" class="SimpleContextMenu"></ul>');
-      errorPanelHtml = '<div id="error_panel" class="warning dialogue_form" style="display:none">' +
-        '<div class="dialogue_form_header drag-zone"><span id="message_summary">Messages</span>' +
-        '<span id="error_coll_ex">&#9660;</span></div><div id="error_message_panel">' +
-        '<span id="error_message">message</span></div></div>';
-      document.getElementById('scroller').innerHTML = '<table class="collation_overview">' + html.join('') +
+      html.push('<ul id="context-menu" class="simple-context-menu"></ul>');
+      errorPanelHtml = '<div id="error-panel" class="warning dialogue-form" style="display:none">' +
+        '<div class="dialogue-form-header drag-zone"><span id="message-summary">Messages</span>' +
+        '<span id="error-coll-ex">&#9660;</span></div><div id="error-message-panel">' +
+        '<span id="error-message">message</span></div></div>';
+      document.getElementById('scroller').innerHTML = '<table class="collation-overview">' + html.join('') +
         '</table>' + errorPanelHtml;
       eventRows = temp[2];
       for (let i = 0; i < eventRows.length; i += 1) {
@@ -302,9 +302,9 @@ var SV = (function() {
   
       if (SV.undoStack.length > 0) {
         CL.isDirty = true;
-        document.getElementById("undo_button").style.display = 'inline';
+        document.getElementById("undo-button").style.display = 'inline';
       } else {
-        document.getElementById("undo_button").style.display = 'none';
+        document.getElementById("undo-button").style.display = 'none';
       }
       CL.addTriangleFunctions('list');
       // decide if we need to display any messages and display them if we do
@@ -476,14 +476,14 @@ var SV = (function() {
         }
       }
       if (Object.prototype.hasOwnProperty.call(options, 'td_id')) {
-        html.push('<td id="' + options.td_id + '" class="start_' + start + '" headers="NA_' + start + '" colspan="' + colspan + '">');
+        html.push('<td id="' + options.td_id + '" class="start-' + start + '" headers="overtext-' + start + '" colspan="' + colspan + '">');
       } else {
-        html.push('<td class="start_' + start + '" headers="NA_' + start + '" colspan="' + colspan + '">');
+        html.push('<td class="start-' + start + '" headers="overtext-' + start + '" colspan="' + colspan + '">');
       }
 
       // is the unit highlighted? used for showing errors
       if (Object.prototype.hasOwnProperty.call(options, 'error_unit') && parseInt(id) === options.error_unit[1]) {
-        errorUnit = ' error_unit';
+        errorUnit = ' error-unit';
       } else {
         errorUnit = '';
       }
@@ -506,7 +506,7 @@ var SV = (function() {
         readingLabel = CL.getReadingLabel(i, data[i], svRules);
         readingSuffix = CL.getReadingSuffix(data[i], svRules);
         // what is the row id? (and add it to the list for adding events)
-        rowId = 'variant_unit_' + id + '_row_' + i;
+        rowId = 'variant-unit-' + id + '-row-' + i;
         rowList.push(rowId);
 
         // Work out what reading highlighting classes we need
@@ -517,34 +517,34 @@ var SV = (function() {
         }
         if (Object.prototype.hasOwnProperty.call(options, 'highlighted_added_wits') &&
               data[i].witnesses.filter(x => options.highlighted_added_wits.includes(x)).length > 0) {
-          highlightedClasses.push('added_highlighted');
+          highlightedClasses.push('added-highlighted');
         }
         if (Object.prototype.hasOwnProperty.call(options, 'split') && options.split === true) {
           if (Object.prototype.hasOwnProperty.call(data[i], 'overlap_status')) {
-            html.push('<div id="' + 'drag_unit_' + id + '_reading_' + i + '" class="redips-drag split_' +
-                      data[i].overlap_status + '_unit">');
+            html.push('<div id="' + 'drag-unit-' + id + '-reading-' + i + '" class="redips-drag split-' +
+                      data[i].overlap_status + '-unit">');
           } else {
             if (Object.prototype.hasOwnProperty.call(options, 'overlap') && options.overlap === true) {
               if (i === 0) {
-                splitClass = 'overlap_split_unit_a';
+                splitClass = 'overlap-split-unit-a';
               } else {
-                splitClass = 'overlap_split_unit';
+                splitClass = 'overlap-split-unit';
               }
             } else {
               if (i === 0) {
-                splitClass = 'split_unit_a';
+                splitClass = 'split-unit-a';
               } else {
                 if (CL.witnessAddingMode === true &&
                       data[i].witnesses.filter(x => allOverlappedWitnesses.includes(x)).length === data[i].witnesses.length) {
-                  splitClass = 'redips-drag split_duplicate_unit';
+                  splitClass = 'redips-drag split-duplicate-unit';
                 } else {
-                  splitClass = 'redips-drag split_unit';
+                  splitClass = 'redips-drag split-unit';
                 }
               }
             }
-            html.push('<div id="' + 'drag_unit_' + id + '_reading_' + i + '" class="' + splitClass + '">');
+            html.push('<div id="' + 'drag-unit-' + id + '-reading-' + i + '" class="' + splitClass + '">');
           }
-          html.push('<ul class="variant_unit" id="variant_unit_' + id + '_reading_' + i + '">');
+          html.push('<ul class="variant-unit" id="variant-unit-' + id + '-reading-' + i + '">');
 
           html.push('<li id="' + rowId + '" class="' + highlightedClasses.join(' ') + '">');
           html.push('<div class="spanlike">' + readingLabel + ' ' + text + readingSuffix + '  </div>');
@@ -557,16 +557,16 @@ var SV = (function() {
         } else {
           if (i === 0) {
             if (Object.prototype.hasOwnProperty.call(options, 'overlap') && options.overlap === true) {
-              html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag overlap_unit' + errorUnit + '">');
+              html.push('<div id="' + 'drag-unit-' + id + '" class="redips-drag overlap-unit' + errorUnit + '">');
             } else if (Object.prototype.hasOwnProperty.call(options, 'gap_unit') && options.gap_unit === true) {
-              html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag gap_unit' + errorUnit + '">');
+              html.push('<div id="' + 'drag-unit-' + id + '" class="redips-drag gap-unit' + errorUnit + '">');
             } else {
-              html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag unit' + errorUnit + '">');
+              html.push('<div id="' + 'drag-unit-' + id + '" class="redips-drag unit' + errorUnit + '">');
             }
             if (data.length > 1) {
-              html.push('<ul class="variant_unit" id="variant_unit_' + id + '"><span id="toggle_variant_' + id + '" class="triangle">&#9660;</span><br/>');
+              html.push('<ul class="variant-unit" id="variant-unit-' + id + '"><span id="toggle-variant-' + id + '" class="triangle">&#9660;</span><br/>');
             } else {
-              html.push('<ul class="variant_unit" id="variant_unit_' + id + '"><br/>');
+              html.push('<ul class="variant-unit" id="variant-unit-' + id + '"><br/>');
             }
             html.push('<li id="' + rowId + '" class="top ' + highlightedClasses.join(' ') + '">');
           } else {
@@ -706,22 +706,23 @@ var SV = (function() {
      * so subreadings are always hidden and standoff readings are always main readings
      * after this unprepare_for_operation will run find subreadings
      * at the end of this operation standoff marked readings should still be main readings even if they share a parent with another reading
-     * we only need to combined readings that are not marked as standoff
+     * we only need to combine readings that are not marked as standoff
      * */
-    unsplitUnitWitnesses: function(unitNum, appId) {
-      var text, unit, reading, readingList, index, witness, standoffRecord, isStandoff;
+    unsplitUnitWitnesses: function(unitNum, appId, unit) {
+      var text, reading, readingList, index, witness, standoffRecord, isStandoff;
       readingList = [];
-      unit = CL.data[appId][unitNum];
+      if (unit === undefined) {
+        unit = CL.data[appId][unitNum];
+      }
       SV._removeSeparatedWitnessData(appId, unit._id);
 
       for (let i = 0; i < unit.readings.length; i += 1) {
         reading = unit.readings[i];
-        // get the text and add '_a' if it is the first reading of an overlapped unit (although I don't
-        // think we ever call this on overlapped units anymore)
         text = CL.extractWitnessText(reading, {
           'app_id': appId,
           'unit_id': unit._id
         });
+        // add '_a' if it is the first reading of an overlapped unit
         if (i === 0 && appId !== 'apparatus') {
           text = text + '_a';
         }
@@ -740,6 +741,13 @@ var SV = (function() {
         }
         if (Object.prototype.hasOwnProperty.call(reading, 'type') && reading.type === 'lac_verse') {
           text = text + '_lac_verse';
+        }
+        // When used in OR it is important to respect cross collation unit joins
+        if (Object.prototype.hasOwnProperty.call(reading, 'join_forwards') && reading.join_forwards === true) {
+          text = text + '_join_forwards';
+        }
+        if (Object.prototype.hasOwnProperty.call(reading, 'join_backwards') && reading.join_backwards === true) {
+          text = text + '_join_backwards';
         }
         // find out if this is a standoff reading
         // at this point all witnesses to the reading should be standoff if it is a standoff reading made into a main
@@ -787,7 +795,7 @@ var SV = (function() {
             readingList.push(null);  // needed so our list indexes stay alligned with the readings in the unit
             if (unit.readings[index].type === 'om') {
               unit.readings[index].witnesses.push.apply(unit.readings[index].witnesses, reading.witnesses);
-              reading = null;
+              reading = null; /* eslint-disable-line no-useless-assignment */
             }
           } else {
             readingList.push(text);
@@ -811,9 +819,9 @@ var SV = (function() {
           'form_size': 'small',
           'just_split': true
         });
-        $('#select_button').on('click', function() {
+        $('#select-button').on('click', function() {
           witnessList = [];
-          data = cforms.serialiseForm('select_wit_form');
+          data = cforms.serialiseForm('select-wit-form');
           if (!$.isEmptyObject(data)) {
             witnessList = [];
             for (const key in data) {
@@ -840,7 +848,7 @@ var SV = (function() {
             'witnesses': witnessList
           });
           SV.doSplitReadingWitnesses(rdgDetails[0], rdgDetails[2], witnessList, rdgDetails[1], true);
-          document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
+          document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit-form'));
           if (stage === 'set_variants') {
             SV.checkBugStatus('move', 'split witnesses ' + witnessList.join(', ') + ' out of reading ' + rdgDetails[2] +
                               ' in unit ' + rdgDetails[0] + ' in apparatus.');
@@ -1036,6 +1044,15 @@ var SV = (function() {
             }
           }
           console.log('witnesses missing in unit ' + i);
+          const missing = [];
+          for (const sigla of totalSigla) {
+            if (witnesses.indexOf(sigla) === -1) {
+              if (sigla !== null) {
+                missing.push(sigla);
+              }
+            }
+          }
+          console.log('missing witnesses are ' + missing.join(', '));
           return false;
         }
       }
@@ -1213,8 +1230,8 @@ var SV = (function() {
     },
 
     _setUpSVRemoveWitnessesForm: function(wits, data) {
-      document.getElementById('remove_witnesses_div').style.left = document.getElementById('scroller').offsetWidth -
-                                                document.getElementById('remove_witnesses_div').offsetWidth - 15 + 'px';
+      document.getElementById('remove-witnesses-div').style.left = document.getElementById('scroller').offsetWidth -
+                                                document.getElementById('remove-witnesses-div').offsetWidth - 15 + 'px';
       const html = [];
       for (let i = 0; i < wits.length; i += 1) {
         for (const key in data.hand_id_map) {
@@ -1224,12 +1241,12 @@ var SV = (function() {
           }
         }
       }
-      document.getElementById('witness_checkboxes').innerHTML = html.join('');
-      drag.initDraggable('remove_witnesses_div', true, true);
-      $('#remove_selected_button').on('click', function() {
+      document.getElementById('witness-checkboxes').innerHTML = html.join('');
+      drag.initDraggable('remove-witnesses-div', true, true);
+      $('#remove-selected-button').on('click', function() {
         var data, handsToRemove;
         handsToRemove = [];
-        data = cforms.serialiseForm('remove_witnesses_form');
+        data = cforms.serialiseForm('remove-witnesses-form');
         for (const key in data) {
           if (Object.prototype.hasOwnProperty.call(data, key) && data[key] === true) {
             handsToRemove.push(key);
@@ -1287,8 +1304,8 @@ var SV = (function() {
             'rule_classes': CL.getRuleClasses('subreading', true, 'value', ['identifier', 'subreading'])
           }); // only show the subreadings when there class is labelled as subreading in the project)))
           // remove the remove witnesses menu if it is still hanging about
-          if (document.getElementById('remove_witnesses_div')) {
-            document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
+          if (document.getElementById('remove-witnesses-div')) {
+            document.getElementById('remove-witnesses-div').parentNode.removeChild(document.getElementById('remove-witnesses-div'));
           }
           OR.showOrderReadings({
             'container': CL.container
@@ -1327,53 +1344,53 @@ var SV = (function() {
     /** displays warning and error messages on the screen in a draggable and collapsable box */
     _setupMessage: function(type, message) {
       let dropFunction;
-      document.getElementById('error_message_panel').innerHTML = message;
-      $('#error_panel').removeClass('warning');
-      $('#error_panel').removeClass('error');
-      $('#error_panel').removeClass('clear');
-      $('#error_panel').addClass(type);
-      if (document.getElementById('error_panel').style.display === 'none') {
-        document.getElementById('error_panel').style.display = 'block';
+      document.getElementById('error-message-panel').innerHTML = message;
+      $('#error-panel').removeClass('warning');
+      $('#error-panel').removeClass('error');
+      $('#error-panel').removeClass('clear');
+      $('#error-panel').addClass(type);
+      if (document.getElementById('error-panel').style.display === 'none') {
+        document.getElementById('error-panel').style.display = 'block';
         dropFunction = function(draggable) {
           SV.messagePosLeft = draggable.style.left;
           SV.messagePosTop = draggable.style.top;
         };
-        drag.initDraggable('error_panel', true, true, dropFunction);
-        document.getElementById('error_message_panel').style.height = document.getElementById('error_panel').offsetHeight - 40 + 'px';
+        drag.initDraggable('error-panel', true, true, dropFunction);
+        document.getElementById('error-message-panel').style.height = document.getElementById('error-panel').offsetHeight - 40 + 'px';
       }
       if (_messageExpanded === true) {
-        document.getElementById('error_message_panel').style.display = 'block';
-        document.getElementById('error_coll_ex').innerHTML = '&#9660;';
+        document.getElementById('error-message-panel').style.display = 'block';
+        document.getElementById('error-coll-ex').innerHTML = '&#9660;';
       } else {
-        document.getElementById('error_message_panel').style.display = 'none';
-        document.getElementById('error_coll_ex').innerHTML = '&#9650;';
+        document.getElementById('error-message-panel').style.display = 'none';
+        document.getElementById('error-coll-ex').innerHTML = '&#9650;';
       }
       if (SV.messagePosLeft !== null) {
-        document.getElementById('error_panel').style.left = SV.messagePosLeft;
-        document.getElementById('error_panel').style.top = SV.messagePosTop;
+        document.getElementById('error-panel').style.left = SV.messagePosLeft;
+        document.getElementById('error-panel').style.top = SV.messagePosTop;
 
       } else {
-        document.getElementById('error_panel').style.top = (document.getElementById('header').offsetHeight +
+        document.getElementById('error-panel').style.top = (document.getElementById('header').offsetHeight +
             document.getElementById('scroller').offsetHeight +
-            document.getElementById('single_witness_reading').offsetHeight) -
-          document.getElementById('error_panel').offsetHeight + 'px';
-        document.getElementById('error_panel').style.left = document.getElementById('scroller').offsetWidth -
-          document.getElementById('error_panel').offsetWidth - 15 + 'px';
+            document.getElementById('single-witness-reading').offsetHeight) -
+          document.getElementById('error-panel').offsetHeight + 'px';
+        document.getElementById('error-panel').style.left = document.getElementById('scroller').offsetWidth -
+          document.getElementById('error-panel').offsetWidth - 15 + 'px';
       }
-      $('#error_coll_ex').on('click', function() {
-        if (document.getElementById('error_message_panel').style.display === 'block') {
-          document.getElementById('error_panel').style.top = parseInt(document.getElementById('error_panel').style.top) +
-            parseInt(document.getElementById('error_message_panel').offsetHeight) + 'px';
-          document.getElementById('error_message_panel').style.display = 'none';
-          document.getElementById('error_coll_ex').innerHTML = '&#9650;';
-          SV.messagePosTop = document.getElementById('error_panel').style.top;
+      $('#error-coll-ex').on('click', function() {
+        if (document.getElementById('error-message-panel').style.display === 'block') {
+          document.getElementById('error-panel').style.top = parseInt(document.getElementById('error-panel').style.top) +
+            parseInt(document.getElementById('error-message-panel').offsetHeight) + 'px';
+          document.getElementById('error-message-panel').style.display = 'none';
+          document.getElementById('error-coll-ex').innerHTML = '&#9650;';
+          SV.messagePosTop = document.getElementById('error-panel').style.top;
           _messageExpanded = false;
         } else {
-          document.getElementById('error_message_panel').style.display = 'block';
-          document.getElementById('error_panel').style.top = parseInt(document.getElementById('error_panel').style.top) -
-            parseInt(document.getElementById('error_message_panel').offsetHeight) + 'px';
-          document.getElementById('error_coll_ex').innerHTML = '&#9660;';
-          SV.messagePosTop = document.getElementById('error_panel').style.top;
+          document.getElementById('error-message-panel').style.display = 'block';
+          document.getElementById('error-panel').style.top = parseInt(document.getElementById('error-panel').style.top) -
+            parseInt(document.getElementById('error-message-panel').offsetHeight) + 'px';
+          document.getElementById('error-coll-ex').innerHTML = '&#9660;';
+          SV.messagePosTop = document.getElementById('error-panel').style.top;
           _messageExpanded = true;
         }
       });
@@ -1417,22 +1434,21 @@ var SV = (function() {
       let subrowId, suffix, textString, highlightedClasses;
       const html = [];
       const rowList = [];
-      textString = '';
       if (Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
-        html.push('<ul class="subreading_unit" id="subreading_unit_' + id + '_row_' + i + '">');
+        html.push('<ul class="subreading-unit" id="subreading-unit-' + id + '-row-' + i + '">');
         for (const type in reading.subreadings) {
           if (Object.prototype.hasOwnProperty.call(reading.subreadings, type)) {
             suffix = reading.subreadings[type][0].suffix;
             for (let j = 0; j < reading.subreadings[type].length; j += 1) {
               highlightedClasses = [];
-              subrowId = 'subreading_unit_' + id + '_row_' + i + '_type_' + type + '_subrow_' + j;
+              subrowId = 'subreading-unit-' + id + '-row-' + i + '-type-' + type + '-subrow-' + j;
               rowList.push(subrowId);
               if (reading.subreadings[type][j].witnesses.indexOf(hand) !== -1) {
                 highlightedClasses.push('highlighted');
               }
               if (highlightedAdded !== undefined &&
                     reading.subreadings[type][j].witnesses.filter(x => highlightedAdded.includes(x)).length > 0) {
-                highlightedClasses.push('added_highlighted');
+                highlightedClasses.push('added-highlighted');
               }
               if (reading.subreadings[type][j].type === 'lac') {
                 textString = '&lt;' + reading.subreadings[type][j].text_string + '&gt;';
@@ -1459,14 +1475,14 @@ var SV = (function() {
       rd.init();
       rd.event.clicked = function() {
         width = document.getElementById(rd.obj.id).offsetWidth;
-        if (document.getElementById(rd.obj.id.replace('drag_unit', 'spacer'))) {
-          document.getElementById(rd.obj.id.replace('drag_unit', 'spacer')).style.width = width + 'px';
+        if (document.getElementById(rd.obj.id.replace('drag-unit', 'spacer'))) {
+          document.getElementById(rd.obj.id.replace('drag-unit', 'spacer')).style.width = width + 'px';
         }
       };
       rd.event.dropped = function() {
         scrollOffset = [document.getElementById('scroller').scrollLeft,
                         document.getElementById('scroller').scrollTop];
-        if (rd.td.target.parentElement.id === 'number_row') {  // if you drag onto a number
+        if (rd.td.target.parentElement.id === 'number-row') {  // if you drag onto a number
           SV._moveUnit(rd);
         } else {
           _selectedVariantUnits = [];
@@ -1481,7 +1497,7 @@ var SV = (function() {
               // would be reading pos if single reading)
               if (typeof _selectedVariantUnits[0][2] === 'undefined' &&
                       typeof _selectedVariantUnits[1][2] === 'undefined') {
-                SV._combineUnits(_selectedVariantUnits);
+                SV.combineUnits(_selectedVariantUnits);
               } else {
                 // at least one is a reading
                 SV._moveReading(_selectedVariantUnits);
@@ -1500,10 +1516,10 @@ var SV = (function() {
             }
           } else {
             if (_selectedVariantUnits[0][1] !== 'apparatus') {
-              sourceCol = parseInt(rd.td.source.id.substring(rd.td.source.id.indexOf('_') + 1));
-              targetCol = parseInt(rd.td.target.id.substring(rd.td.target.id.indexOf('_') + 1));
+              sourceCol = parseInt(rd.td.source.id.substring(rd.td.source.id.indexOf('-') + 1));
+              targetCol = parseInt(rd.td.target.id.substring(rd.td.target.id.indexOf('-') + 1));
               if (sourceCol === targetCol) {
-                targetRow = rd.td.target.id.substring(0, rd.td.target.id.indexOf('_'));
+                targetRow = rd.td.target.id.substring(0, rd.td.target.id.indexOf('-'));
                 isSpace = OR.canUnitMoveTo(CL.data[_selectedVariantUnits[0][1]][_selectedVariantUnits[0][0]]._id, targetRow);
                 if (isSpace) {
                   // move it to the target row or combine if there are two
@@ -1560,23 +1576,30 @@ var SV = (function() {
         if (CL.data.apparatus[i].start === location) {
           unit = CL.data.apparatus[i];
           unit.first_word_index = location + '.' + firstWordIndex;  // set the first word index for the unit
-          // for each witness in the list
+          // for each witness in the list find the reading that the witness supports
           for (let j = 0; j < witnesses.length; j += 1) {
             found = false;
             k = 0;
             while (!found && k < unit.readings.length) {
               if (unit.readings[k].witnesses.indexOf(witnesses[j]) !== -1) {
                 found = true;
-                for (let m = 0; m < unit.readings[k].text.length; m += 1) {
-                  if (!Object.prototype.hasOwnProperty.call(unit.readings[k].text[m], 'index') ||
-                            typeof unit.readings[k].text[m].index === 'undefined' ||
-                            (m > 0 && SV._indexLessThanOrEqualTo(unit.readings[k].text[m].index,
-                                                                unit.readings[k].text[m - 1].index))) {
-                    if (m === 0) {
-                      unit.readings[k].text[m].index = location + '.' + firstWordIndex;
-                    } else {
-                      unit.readings[k].text[m].index = SV._incrementSubIndex(unit.readings[k].text[m - 1].index,
-                                                                             firstWordIndex);
+                // check to see if at least half of the reading needs reindexing and if so use the matching function
+                const undefinedIndexes = unit.readings[k].text.map(x => x.index).filter(x => typeof x === 'undefined');
+                if (unit.readings[k].text.length > 0 && undefinedIndexes.length > unit.readings[k].text.length / 2) {
+                  SV._reindexMovedReadingByMatching(location, witnesses[j]);
+                } else {
+                  // if the whole reading doesn't need reindexing then use the other words in the reading to fix it
+                  for (let m = 0; m < unit.readings[k].text.length; m += 1) {
+                    if (!Object.prototype.hasOwnProperty.call(unit.readings[k].text[m], 'index') ||
+                              typeof unit.readings[k].text[m].index === 'undefined' ||
+                              (m > 0 && SV._indexLessThanOrEqualTo(unit.readings[k].text[m].index,
+                                                                   unit.readings[k].text[m - 1].index))) {
+                      if (m === 0) {
+                        unit.readings[k].text[m].index = location + '.' + firstWordIndex;
+                      } else {
+                        unit.readings[k].text[m].index = SV._incrementSubIndex(unit.readings[k].text[m - 1].index,
+                                                                              firstWordIndex);
+                      }
                     }
                   }
                 }
@@ -1586,6 +1609,176 @@ var SV = (function() {
           }
         }
       }
+    },
+
+    _reindexMovedReadingByMatching: function (location, witness) {
+      /* A function to attempt to recollate a moved reading based on the closest reading in the new unit. It attempts
+      to match words with that reading and determine indexes based on those in that reading. it is only called if at
+      least half of the words in the resulting reading in the target unit has undefined indexes in  at least half of
+      its words. It is called for a single witness at a time. If no pre-indexed closest reading is found then it will
+      index from the start position. */
+      let movedReading, movedReadingText;
+      // find the unit 
+      const unit = CL.data.apparatus.filter(x => x.start === location )[0];
+      const readingTexts = [];  
+      for (let i = 0; i < unit.readings.length; i += 1) {
+        if (unit.readings[i].witnesses.indexOf(witness) !== -1) {
+          movedReading = unit.readings[i];
+          movedReadingText = unit.readings[i].text.map(x => x.interface).join(' ');
+          readingTexts.push('');
+        } else {
+          readingTexts.push(unit.readings[i].text.map(x => x.interface).join(' '));
+        }
+      }
+      const distances = readingTexts.map(x => SV._levenstein(x, movedReadingText));
+      let shortestDistance = distances.indexOf(Math.min(...distances));
+      let closestReading = unit.readings[shortestDistance];
+      // if the reading we found does not yet have index numbers for all of its words and other reading options are still available then keep looking
+      while (
+        distances.filter(x => x === Infinity).length < distances.length - 1 && 
+        closestReading.text.map(x => x.index).filter(x => x === undefined).length === 0
+      ) {
+        distances[shortestDistance] = Infinity;
+        shortestDistance = distances.indexOf(Math.min(...distances));
+        closestReading = unit.readings[shortestDistance];
+      }
+      // if no suitable closest reading was found just reindex from the start point
+      if (closestReading.text.map(x => x.index).filter(x => x === undefined).length > 0) {
+        movedReading.text[0].index = location + '.1';
+        for (let i = 1; i < movedReading.text.length; i += 1) {
+          movedReading.text[i].index = SV._incrementSubIndex(movedReading.text[i - 1].index, 1);
+        }
+        SV._checkAndFixRecalculatedIndexes(movedReading, location, unit.end);
+        return;
+      }
+      // find the shared words
+      const closestReadingText = closestReading.text.map(x => x.interface);
+      const shared = SV._getSharedWordsList(JSON.parse(JSON.stringify(closestReadingText)), movedReadingText.split(' '));
+      const sharedClosestIndexes = shared.map((x, pos) => closestReadingText.indexOf(x, pos)).filter(x => x > -1);
+      const sharedMovedIndexes = shared.map((x, pos) => movedReadingText.split(' ').indexOf(x, pos)).filter(x => x > -1);
+      if (sharedMovedIndexes.length === 0) {
+        const firstWordIndex = 1;
+        movedReading.text[0].index = location + '.' + firstWordIndex;
+        for (let i = 1; i < movedReading.text.length; i += 1) {
+          movedReading.text[i].index = SV._incrementSubIndex(movedReading.text[i - 1].index, firstWordIndex);
+        }
+      } else {
+        for (let i = 0; i < movedReading.text.length; i += 1) {
+          if (sharedMovedIndexes.indexOf(i) !== -1 && sharedClosestIndexes[sharedMovedIndexes.indexOf(i)] !== undefined) {
+            movedReading.text[i].index = closestReading.text[sharedClosestIndexes[sharedMovedIndexes.indexOf(i)]].index;
+            // check we are always increasing the index numbers
+            if (i > 0) {
+              if (movedReading.text[i].index === movedReading.text[i-1].index) {
+                movedReading.text[i].index = SV._incrementSubIndex(movedReading.text[i].index, 1);
+              }
+            }
+          } else {
+            // if we don't have a match then make something up based on the other positions in the moved reading
+            if (i === 0) {
+              // 1000 here just makes sure it is always the last thing in the previous unit.
+              movedReading.text[i].index = (parseInt(closestReading.text[0].index) - 1) + '.' + '1000';
+            } else {
+              movedReading.text[i].index = SV._incrementSubIndex(movedReading.text[i-1].index, 1);
+            }     
+          }
+        }
+      }
+      SV._checkAndFixRecalculatedIndexes(movedReading, location, unit.end);
+    },
+
+    _getSharedWordsList: function (closestReadingWords, movedReadingWords) {
+      // work out which readings are shared in the correct order
+      const shared = [];
+      for (const word of movedReadingWords) {
+        if (closestReadingWords.indexOf(word) !== -1) {
+          shared.push(word);
+          closestReadingWords = closestReadingWords.slice(closestReadingWords.indexOf(word) + 1);
+        }
+      }
+      return shared;
+    },
+
+    _checkAndFixRecalculatedIndexes: function (movedReading, unitStart, unitEnd) {
+      // check that there are no gaps between words that should be filled by adapting indexes to words rather than gaps
+      const mainIndexes = movedReading.text.map(x => parseInt(x.index.split('.')[0]));
+      const subIndexes = movedReading.text.map(x => parseInt(x.index.split('.')[1]));
+      // set up the first one
+      if (mainIndexes[0] < unitStart && mainIndexes[1] > unitStart) {
+        mainIndexes[0] = unitStart;
+        subIndexes[0] = 1;
+        movedReading.text[0].index = mainIndexes[0] + '.' + subIndexes[0];
+      }
+      // if we have a clear run of even numbers from unitStart to unitEnd (ignoring any odd ones) then we are fine
+      const expectedIndexes = [];
+      for (let i = unitStart; i <= unitEnd; i += 2) {
+        expectedIndexes.push(i);
+      }
+      const missingIndexes = [];
+      for (let index of expectedIndexes) {
+        if (mainIndexes.indexOf(index) === -1) {
+          missingIndexes.push(index);
+        }
+      }
+      if (missingIndexes.length === 0) {
+        // then there is nothing to fix
+        return;
+      }
+      let changes = false;
+      let previousIndex, nextIndex;
+      for (let i = 0; i < missingIndexes.length; i += 1) {
+        previousIndex = mainIndexes.indexOf(missingIndexes[i] - 1);
+        if (previousIndex === -1) {
+          previousIndex = mainIndexes.indexOf(missingIndexes[i] - 2);
+        }
+        nextIndex = mainIndexes.indexOf(missingIndexes[i] + 1);
+        if (nextIndex === -1) {
+          nextIndex = mainIndexes.indexOf(missingIndexes[i] + 2);
+        } else {
+          continue;
+        }
+        if (previousIndex !== -1 && nextIndex % 2 !== 1 && nextIndex - previousIndex !== 1) {
+          if (mainIndexes.filter(x => x === mainIndexes[previousIndex + 1]).length > 1) {
+            mainIndexes[previousIndex + 1] = missingIndexes[i];
+            for (let j = previousIndex + 2; j < mainIndexes.length; j += 1) {
+              if (mainIndexes[j] < mainIndexes[previousIndex + 1]) {
+                mainIndexes[j] = mainIndexes[previousIndex + 1];
+              }
+            }
+            changes = true;
+          }  
+        }
+      }
+      if (changes) {
+        // then we need to update the subindexes (first one already done above)
+        let currentMain = mainIndexes[0];
+        for (let i = 1; i < mainIndexes.length; i += 1) {
+          if (mainIndexes[i] !== currentMain) {
+            subIndexes[i] = 1;
+          } else {
+            subIndexes[i] = subIndexes[i - 1] + 1;
+          }
+          currentMain = mainIndexes[i];
+        }
+      }
+      for (let i = 0; i < movedReading.text.length; i += 1) {
+        movedReading.text[i].index = mainIndexes[i] + '.' + subIndexes[i];
+      }
+    },
+
+    _levenstein: function (s1, s2) {
+      /* A JavaScript implementation of the levenstein distance algorithm - originally adapted from a tutorial online */
+      if (s1 === '' || s2 === '') {
+        // returning infinity here because otherwise short readings will have lowest distance to empty string
+        return Infinity;
+      }
+      const matrix = [];
+      for (let i = 0; i <= s2.length; i += 1) {
+        matrix[i] = [i];
+        for (let j = 1; j <= s1.length; j += 1) {
+          matrix[i][j] = i === 0 ? j : Math.min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j - 1] + (s1[j - 1] === s2[i - 1] ? 0 : 1));
+        }
+      }
+      return matrix[s2.length][s1.length];
     },
 
     // TODO: this could do with a better name
@@ -2263,7 +2456,7 @@ var SV = (function() {
       const unitDetails = CL.getUnitAppReading(rd.obj.firstChild.id);
       const unitNum = unitDetails[0];
       const unit = CL.data[unitDetails[1]][unitNum];
-      const targetLocation = parseInt(rd.td.target.id.replace('num_', ''), 10);
+      const targetLocation = parseInt(rd.td.target.id.replace('num-', ''), 10);
       const originalLocation = CL.data.apparatus[unitNum].start;
       if (targetLocation % 2 === 1) {
         if ((unit.start === unit.end && unit.start % 2 === 1) || typeof unitDetails[2] !== 'undefined') {
@@ -2360,10 +2553,12 @@ var SV = (function() {
       return a;
     },
 
-    _doCombineUnits: function(units, appId, keepId) {
+    _doCombineUnits: function(units, appId, keepId, redraw) {
       let newunit, index, warningMess, errorMess, problems, warningUnit, combinedGapBeforeSubreadings,
           combinedGapAfterSubreadings, combinedGapBeforeSubreadingsDetails;
-  
+      if (redraw === undefined) {
+        redraw = true;
+      }
       const scrollOffset = [document.getElementById('scroller').scrollLeft,
                             document.getElementById('scroller').scrollTop];
       // make sure unit 1 is leftmost and unit 2 is rightmost
@@ -2372,7 +2567,9 @@ var SV = (function() {
       const witnessEquality = SV._checkWitnessEquality(unit1, unit2, appId);
       const overlapBoundaries = SV._checkOverlapBoundaries(unit1, unit2, appId);
       const overlapStatusAgreement = SV._checkOverlapStatusAgreement(unit1, unit2, appId);
-      SV._addToUndoStack(CL.data);
+      if (redraw === true) {
+        SV._addToUndoStack(CL.data);
+      }
       if (witnessEquality && overlapBoundaries && overlapStatusAgreement) {
         if (keepId === true) {
           // combine the reference ids in the top apparatus
@@ -2507,6 +2704,9 @@ var SV = (function() {
             warningUnit = [appId, index];
           }
         }
+        if (redraw === false) {
+          return;
+        }
         SV.checkBugStatus('combine', appId + ' unit ' + Math.min(units[0][0], units[1][0]) + ' with unit ' + Math.max(units[0][0], units[1][0]) + '.');
         if (warningMess !== undefined) {
           SV.showSetVariantsData({
@@ -2529,6 +2729,9 @@ var SV = (function() {
           errorMess = 'ERROR: These units cannot be combined as some of the witnesses have different statuses (deleted, overlapped etc.)';
         }
         SV.unprepareForOperation();
+        if (redraw === false) {
+          return;
+        }
         SV.showSetVariantsData({
           'message': {
             'type': 'error',
@@ -2801,7 +3004,7 @@ var SV = (function() {
   
     /** combine two units */
     // TODO: come up with a way of testing adjacency with overlapping rows
-    _combineUnits: function(units) {
+    combineUnits: function(units) {
       let unit1, unit2, errorMess;
       const scrollOffset = [document.getElementById('scroller').scrollLeft,
                             document.getElementById('scroller').scrollTop];
@@ -3330,7 +3533,7 @@ var SV = (function() {
           if (olUnit.readings.length > 1 && Object.prototype.hasOwnProperty.call(olUnit.readings[1], 'type')) {
             olRdgDetails.type = olUnit.readings[1].type;
           } else if (Object.prototype.hasOwnProperty.call(olUnit.readings[0], 'type')) {
-            // if it is an om that is overlapped and basetext is also om then there will only be on reading in
+            // if it is an om that is overlapped and basetext is also om then there will only be one reading in
             // the data structure even though display shows two
             olRdgDetails.type = olUnit.readings[0].type;
           }
@@ -3351,6 +3554,37 @@ var SV = (function() {
         }
       }
       return newAdds;
+    },
+
+    _uniquifySeparatedOverlapWitnesses: function(splitAdditions) {
+      /* Take the separated overlapped reading created in _separateIndividualOverlapWitnesses and combine them so each
+      witness appears only once. This is a separate function because we call _separateIndividualOverlapWitnesses twice and 
+      I'm not confident that this needs to happen in both places yet. */
+      let uniqueSplitAdditions = [];
+      let addedWitnesses = [];
+      // first of all find any data which has something other than an empty object in second position because this will
+      // need to overwrite the empty ones if witnesses are duplicated. I haven't found an example where this is true
+      // but it is theoretically possible so we should account for it
+      for (let entry of splitAdditions) {
+        if (!$.isEmptyObject(entry[1])) {
+          uniqueSplitAdditions.push(entry); // we could try to combine these but for now lets just add them all
+          addedWitnesses.push.apply(addedWitnesses, entry[0]);
+        }
+      }
+      // now get the others in order but only add the witnesses that have not alredy been handled
+      for (let entry of splitAdditions) {
+        if ($.isEmptyObject(entry[1])) {
+          // remove any witnesses already in the addedWitnesses list
+          entry[0] = entry[0].filter(x => addedWitnesses.indexOf(x) < 0);
+          // add the remaining witnesses to the addedWitnesses list
+          addedWitnesses.push.apply(addedWitnesses, entry[0]);
+          // if witnesses remain then add it to uniqueSplitAdditions
+          if (entry[0].length > 0) {
+            uniqueSplitAdditions.push(entry);
+          }
+        }
+      }
+      return uniqueSplitAdditions;
     },
 
     /** split unit stuff*/
@@ -3399,7 +3633,7 @@ var SV = (function() {
           }
         }
       }
-      //make a sets of all of witnesses
+      //make a set of all of witnesses
       witnesses = CL.setList(witnesses);
       //remove any om and lac verse witnesses
       if (Object.prototype.hasOwnProperty.call(CL.data, 'om_readings')) {
@@ -3483,6 +3717,7 @@ var SV = (function() {
                 if (add.length > 0) {
                   if (Object.prototype.hasOwnProperty.call(unit, 'overlap_units')) {
                     splitAdds = SV._separateIndividualOverlapWitnesses(add, unit.overlap_units);
+                    splitAdds = SV._uniquifySeparatedOverlapWitnesses(splitAdds);
                     for (let k = 0; k < splitAdds.length; k += 1) {
                       if (key === 'duplicate') {
                         newReading = {
@@ -3656,7 +3891,7 @@ var SV = (function() {
       const scrollOffset = [document.getElementById('scroller').scrollLeft,
                             document.getElementById('scroller').scrollTop];
       // find the correct apparatus
-      if (index.match(/_app_/g)) {
+      if (index.match(/-app-/g)) {
         apparatusNum = parseInt(index.match(/\d+/g)[1], 10);
         index = parseInt(index.match(/\d+/g)[0], 10);
         appId = 'apparatus' + apparatusNum;
@@ -3784,9 +4019,9 @@ var SV = (function() {
               'button': 'Overlap witnesses',
               'form_size': 'small'
             });
-            $('#select_button').on('click', function() {
+            $('#select-button').on('click', function() {
               witnessList = [];
-              data = cforms.serialiseForm('select_wit_form');
+              data = cforms.serialiseForm('select-wit-form');
               if (!$.isEmptyObject(data)) {
                 witnessList = [];
                 for (const key in data) {
@@ -3801,7 +4036,7 @@ var SV = (function() {
               }
               newReadingId = SV.doSplitReadingWitnesses(unitNum, readingNum, witnessList, 'apparatus');
               SV._makeOverlappingReading(unitNum, newReadingId, duplicate);
-              document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
+              document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit-form'));
             });
           } else {
             SV._makeOverlappingReading(unitNum, reading._id, duplicate);
@@ -4334,14 +4569,14 @@ var SV = (function() {
                             if (key === 'apparatus') {
                               appString = '';
                             } else {
-                              appString = 'app_' + key.replace('apparatus', '') + '_';
+                              appString = 'app-' + key.replace('apparatus', '') + '-';
                             }
                             for (const sr in readings[rowNum].subreadings) {
                               if (Object.prototype.hasOwnProperty.call(readings[rowNum].subreadings, sr)) {
                                 if (sr === type) { //this may need to change if we allow chaining here
                                   for (let l = 0; l < readings[rowNum].subreadings[sr].length; l += 1) {
                                     if (readings[rowNum].subreadings[sr][l].witnesses.indexOf(data.marked_readings[type][k].witness) !== -1) {
-                                      subreadingId = 'unit_' + i + '_' + appString + 'row_' + rowNum + '_type_' + type + '_subrow_' + l;
+                                      subreadingId = 'unit-' + i + '-' + appString + 'row-' + rowNum + '-type-' + type + '-subrow-' + l;
                                       if (Object.prototype.hasOwnProperty.call(makeMainIds, subreadingId)) {
                                         makeMainIds[subreadingId].push(data.marked_readings[type][k].witness);
                                       } else {
@@ -4395,17 +4630,17 @@ var SV = (function() {
         // send each item on list in turn to CL.makeMainReading(idString, false);
         // false stops the standoff record from being deleted
         for (let i = 0; i < idString.length; i += 1) {
-          if (idString[i].indexOf('_app_') === -1) {
+          if (idString[i].indexOf('-app-') === -1) {
             appId = 'apparatus';
-            unitNumber = parseInt(idString[i].substring(idString[i].indexOf('unit_') + 5, idString[i].indexOf('_row_')));
+            unitNumber = parseInt(idString[i].substring(idString[i].indexOf('unit-') + 5, idString[i].indexOf('-row-')));
           } else {
-            unitNumber = parseInt(idString[i].substring(idString[i].indexOf('unit_') + 5, idString[i].indexOf('_app_')));
-            appId = 'apparatus' + idString[i].substring(idString[i].indexOf('_app_') + 5, idString[i].indexOf('_row_'));
+            unitNumber = parseInt(idString[i].substring(idString[i].indexOf('unit-') + 5, idString[i].indexOf('-app-')));
+            appId = 'apparatus' + idString[i].substring(idString[i].indexOf('-app-') + 5, idString[i].indexOf('-row-'));
           }
           unit = CL.data[appId][unitNumber];
-          subtype = idString[i].substring(idString[i].indexOf('_type_') + 6, idString[i].indexOf('_subrow_'));
-          parentPos = parseInt(idString[i].substring(idString[i].indexOf('_row_') + 5, idString[i].indexOf('_type_')));
-          subreadingPos = parseInt(idString[i].substring(idString[i].indexOf('_subrow_') + 8));
+          subtype = idString[i].substring(idString[i].indexOf('-type-') + 6, idString[i].indexOf('-subrow-'));
+          parentPos = parseInt(idString[i].substring(idString[i].indexOf('-row-') + 5, idString[i].indexOf('-type-')));
+          subreadingPos = parseInt(idString[i].substring(idString[i].indexOf('-subrow-') + 8));
           parentReading = unit.readings[parentPos];
           options = {
             'delete_offset': false,
@@ -4418,23 +4653,23 @@ var SV = (function() {
                         document.getElementById('scroller').scrollTop];
         SV._addToUndoStack(CL.data);
 
-        if (idString.indexOf('_app_') === -1) {
+        if (idString.indexOf('-app-') === -1) {
           appId = 'apparatus';
-          unitNumber = parseInt(idString.substring(idString.indexOf('unit_') + 5, idString.indexOf('_row_')));
+          unitNumber = parseInt(idString.substring(idString.indexOf('unit-') + 5, idString.indexOf('-row-')));
         } else {
-          unitNumber = parseInt(idString.substring(idString.indexOf('unit_') + 5, idString.indexOf('_app_')));
-          appId = 'apparatus' + idString.substring(idString.indexOf('_app_') + 5, idString.indexOf('_row_'));
+          unitNumber = parseInt(idString.substring(idString.indexOf('unit-') + 5, idString.indexOf('-app-')));
+          appId = 'apparatus' + idString.substring(idString.indexOf('-app-') + 5, idString.indexOf('-row-'));
         }
         unit = CL.data[appId][unitNumber];
-        subtype = idString.substring(idString.indexOf('_type_') + 6, idString.indexOf('_subrow_'));
-        parentPos = parseInt(idString.substring(idString.indexOf('_row_') + 5, idString.indexOf('_type_')));
-        subreadingPos = parseInt(idString.substring(idString.indexOf('_subrow_') + 8));
+        subtype = idString.substring(idString.indexOf('-type-') + 6, idString.indexOf('-subrow-'));
+        parentPos = parseInt(idString.substring(idString.indexOf('-row-') + 5, idString.indexOf('-type-')));
+        subreadingPos = parseInt(idString.substring(idString.indexOf('-subrow-') + 8));
         parentReading = unit.readings[parentPos];
         options = {
           'delete_offset': true
         };
         CL.makeMainReading(unit, parentReading, subtype, subreadingPos, options);
-        // Need to prepare for unsplitting but not for make_main_reading
+        // Need to prepare for unsplitting but not for makeMainReading()
         SV.prepareForOperation();
         SV.unsplitUnitWitnesses(unitNumber, appId);
         SV.unprepareForOperation();
@@ -4482,20 +4717,20 @@ var SV = (function() {
 
     _subreadingIdSort: function(a, b) {
       // row first
-      const rowA = parseInt(a.substring(a.indexOf('_row_') + 5, a.indexOf('_type_')));
-      const rowB = parseInt(b.substring(b.indexOf('_row_') + 5, b.indexOf('_type_')));
+      const rowA = parseInt(a.substring(a.indexOf('-row-') + 5, a.indexOf('-type-')));
+      const rowB = parseInt(b.substring(b.indexOf('-row-') + 5, b.indexOf('-type-')));
       if (rowA !== rowB) {
         return rowB - rowA;
       }
       // then type
-      const typeA = a.substring(a.indexOf('_type_') + 6, a.indexOf('_subrow_'));
-      const typeB = b.substring(b.indexOf('_type_') + 6, b.indexOf('_subrow_'));
+      const typeA = a.substring(a.indexOf('-type-') + 6, a.indexOf('-subrow-'));
+      const typeB = b.substring(b.indexOf('-type-') + 6, b.indexOf('-subrow-'));
       if (typeA !== typeB) {
         return a < b ? -1 : 1;
       }
       // then subrow
-      const subRowA = parseInt(a.substring(a.indexOf('_subrow_') + 8));
-      const subRowB = parseInt(b.substring(b.indexOf('_subrow_') + 8));
+      const subRowA = parseInt(a.substring(a.indexOf('-subrow-') + 8));
+      const subRowB = parseInt(b.substring(b.indexOf('-subrow-') + 8));
       if (subRowA !== subRowB) {
         return subRowB - subRowA;
       }
@@ -4504,48 +4739,52 @@ var SV = (function() {
     /** The next three functions are concerned with the context menu and associated event handling */
 
     /** creates context menu for right clicked on element
-     * unit, overlap_unit, subreading and split_duplicate_unit are straight hard coded menus
+     * unit, overlap-unit, subreading and split-duplicate-unit are straight hard coded menus
      * the others are determined from project configuration
      *  */
     _makeMenu: function(menuName) {
       let menu, subreadings, svRules;
       // menus for full units
       if (menuName === 'unit') {
-        document.getElementById('context_menu').innerHTML = '<li id="split_words"><span>Split words</span></li><li id="split_readings"><span>Split readings</span></li>';
-      } else if (menuName === 'overlap_unit') {
-        document.getElementById('context_menu').innerHTML = '<li id="split_readings"><span>Split readings</span></li>';
+        document.getElementById('context-menu').innerHTML = '<li id="split-words"><span>Split words</span></li><li id="split-readings"><span>Split readings</span></li>';
+      } else if (menuName === 'overlap-unit') {
+        if (CL.witnessEditingMode === false && CL.project.allowOverlapRemoval === true) {
+          document.getElementById('context-menu').innerHTML = '<li id="split-readings"><span>Split readings</span></li><li id="remove-overlap"><span>Remove overlap</span></li>';
+        } else {
+          document.getElementById('context-menu').innerHTML = '<li id="split-readings"><span>Split readings</span></li>';
+        }
       } else if (menuName === 'subreading') {
-        document.getElementById('context_menu').innerHTML = '<li id="make_main_reading"><span>Make main reading</span></li>';
-      } else if (menuName === 'split_duplicate_unit') {
+        document.getElementById('context-menu').innerHTML = '<li id="make-main-reading"><span>Make main reading</span></li>';
+      } else if (menuName === 'split-duplicate-unit') {
         // used for reading in top line labelled 'duplicate' when the unit is in split readings state
-        menu = ['<li id="treat_as_main"><span>Make main reading</span></li>'];
+        menu = ['<li id="treat-as-main"><span>Make main reading</span></li>'];
         for (let i = 0; i < CL.overlappedOptions.length; i += 1) {
           menu.push('<li id="' + CL.overlappedOptions[i].id + '"><span>' + CL.overlappedOptions[i].label + '</span></li>');
         }
-        document.getElementById('context_menu').innerHTML = menu.join('');
-      } else if (menuName === 'split_overlapped_change_unit') {
+        document.getElementById('context-menu').innerHTML = menu.join('');
+      } else if (menuName === 'split-overlapped-change-unit') {
         menu = [];
         for (let i = 0; i < CL.overlappedOptions.length; i += 1) {
           menu.push('<li id="' + CL.overlappedOptions[i].id + '"><span>' + CL.overlappedOptions[i].label + '</span></li>');
         }
-        document.getElementById('context_menu').innerHTML = menu.join('');
+        document.getElementById('context-menu').innerHTML = menu.join('');
       } else {
         menu = [];
-        menu.push('<li id="recombine_readings"><span>Recombine</span></li>');
-        if (menuName === 'split_unit' || menuName === 'split_unit_a') {
+        menu.push('<li id="recombine-readings"><span>Recombine</span></li>');
+        if (menuName === 'split-unit' || menuName === 'split-unit-a') {
           menu.push('<li id="overlap"><span>Overlap</span></li>');
         }
-        if (menuName === 'split_unit' || menuName === 'split_unit_a' || menuName === 'overlap_split_unit') {
-          menu.push('<li id="split_witnesses"><span>Split Witnesses</span></li>');
+        if (menuName === 'split-unit' || menuName === 'split-unit-a' || menuName === 'overlap-split-unit') {
+          menu.push('<li id="split-witnesses"><span>Split Witnesses</span></li>');
         }
 
-        if (menuName === 'split_unit' || menuName === 'split_omlac_unit' || menuName === 'overlap_split_unit') {
+        if (menuName === 'split-unit' || menuName === 'split-omlac-unit' || menuName === 'overlap-split-unit') {
           svRules = CL.getRuleClasses('create_in_SV', true, 'name', ['subreading', 'value', 'identifier', 'keep_as_main_reading']);
           subreadings = [];
           for (const key in svRules) {
             if (Object.prototype.hasOwnProperty.call(svRules, key)) {
               if (svRules[key][3]) {
-                menu.push('<li id="mark_as_' + svRules[key][1] + '"><span>Mark/Unmark as ' + key + '</span></li>');
+                menu.push('<li id="mark-as-' + svRules[key][1] + '"><span>Mark/Unmark as ' + key + '</span></li>');
               } else {
                 subreadings.push([key, svRules[key][1], svRules[key][2]]);
               }
@@ -4553,26 +4792,26 @@ var SV = (function() {
           }
           if (subreadings.length === 1) {
             if (typeof subreadings[0][2] !== 'undefined') {
-              menu.push('<li id="mark_as_' + subreadings[0][1] + '"><span>Mark as ' + subreadings[0][0] + ' (' + subreadings[0][2] + ')</span></li>');
+              menu.push('<li id="mark-as-' + subreadings[0][1] + '"><span>Mark as ' + subreadings[0][0] + ' (' + subreadings[0][2] + ')</span></li>');
             } else {
-              menu.push('<li id="mark_as_' + subreadings[0][1] + '"><span>Mark as ' + subreadings[0][0] + '</span></li>');
+              menu.push('<li id="mark-as-' + subreadings[0][1] + '"><span>Mark as ' + subreadings[0][0] + '</span></li>');
             }
           } else if (subreadings.length > 1) {
-            menu.push('<li id="mark_as_SVsubreading"><span>Mark as subreading</span></li>');
+            menu.push('<li id="mark-as-sv-subreading"><span>Mark as subreading</span></li>');
           }
         }
-        document.getElementById('context_menu').innerHTML = menu.join('');
+        document.getElementById('context-menu').innerHTML = menu.join('');
       }
       SV._addContextMenuHandlers();
-      return 'context_menu';
+      return 'context-menu';
     },
 
     /**adds events for context menu */
     _addContextMenuHandlers: function() {
-      if (document.getElementById('split_words')) {
-        $('#split_words').off('click.swd_c');
-        $('#split_words').off('mouseover.swd_mo');
-        $('#split_words').on('click.swd_c', function() {
+      if (document.getElementById('split-words')) {
+        $('#split-words').off('click.swd_c');
+        $('#split-words').off('mouseover.swd_mo');
+        $('#split-words').on('click.swd_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -4580,17 +4819,45 @@ var SV = (function() {
             }
             return true;
           });
-          const unitNumber = div.id.replace('drag_unit_', '');
+          const unitNumber = div.id.replace('drag-unit-', '');
           SV._splitUnit(unitNumber);
         });
-        $('#split_words').on('mouseover.swd_mo', function() {
+        $('#split-words').on('mouseover.swd_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('split_readings')) {
-        $('#split_readings').off('click.sr_c');
-        $('#split_readings').off('mouseover.sr_mo');
-        $('#split_readings').on('click.sr_c', function() {
+      if (document.getElementById('remove-overlap')) {
+        $('#remove-overlap').off('click.ro_c');
+        $('#remove-overlap').off('mouseover.ro_mo');
+        $('#remove-overlap').on('click.ro_c', function() {
+          const element = SimpleContextMenu._target_element;
+          const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
+            if ($(e).hasClass('spanlike')) {
+              return false;
+            }
+            return true;
+          });
+          const unitNumber = div.id.replace('drag-unit-', '');
+          SV._addToUndoStack(CL.data);
+          const dataCopy = JSON.parse(JSON.stringify(CL.data));
+          const settingsCopy = JSON.parse(JSON.stringify(CL.dataSettings));
+          try {
+            SV._removeOverlap(unitNumber, dataCopy, settingsCopy);
+          } catch (err) {
+            console.log(err);
+            alert('The overlapping unit could not be deleted.');
+            CL.data = dataCopy;
+            SV.showSetVariantsData();
+          } 
+        });
+        $('#remove-overlap').on('mouseover.ro_mo', function() {
+          CL.hideTooltip();
+        });
+      }
+      if (document.getElementById('split-readings')) {
+        $('#split-readings').off('click.sr_c');
+        $('#split-readings').off('mouseover.sr_mo');
+        $('#split-readings').on('click.sr_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -4601,27 +4868,27 @@ var SV = (function() {
           const rdgDetails = CL.getUnitAppReading(div.id);
           SV._splitReadings(rdgDetails);
         });
-        $('#split_readings').on('mouseover.sr_mo', function() {
+        $('#split-readings').on('mouseover.sr_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('make_main_reading')) {
-        $('#make_main_reading').off('click.mmr_c');
-        $('#make_main_reading').off('mouseover.mmr_mo');
-        $('#make_main_reading').on('click.mmr_c', function() {
+      if (document.getElementById('make-main-reading')) {
+        $('#make-main-reading').off('click.mmr_c');
+        $('#make-main-reading').off('mouseover.mmr_mo');
+        $('#make-main-reading').on('click.mmr_c', function() {
           const element = SimpleContextMenu._target_element;
           const li = CL.getSpecifiedAncestor(element, 'LI');
-          const idString = li.id.replace('subreading_', '');
+          const idString = li.id.replace('subreading-', '');
           SV._makeMainReading(idString);
         });
-        $('#make_main_reading').on('mouseover.mmr_mo', function() {
+        $('#make-main-reading').on('mouseover.mmr_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('recombine_readings')) {
-        $('#recombine_readings').off('click.rr_c');
-        $('#recombine_readings').off('mouseover.rr_mo');
-        $('#recombine_readings').on('click.rr_c', function() {
+      if (document.getElementById('recombine-readings')) {
+        $('#recombine-readings').off('click.rr_c');
+        $('#recombine-readings').off('mouseover.rr_mo');
+        $('#recombine-readings').on('click.rr_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -4632,7 +4899,7 @@ var SV = (function() {
           const rdgDetails = CL.getUnitAppReading(div.id);
           SV._unsplitReadings(rdgDetails);
         });
-        $('#recombine_readings').on('mouseover.rr_mo', function() {
+        $('#recombine-readings').on('mouseover.rr_mo', function() {
           CL.hideTooltip();
         });
       }
@@ -4657,10 +4924,10 @@ var SV = (function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('split_witnesses')) {
-        $('#split_witnesses').off('click.sw_c');
-        $('#split_witnesses').off('mouseover.sw_mo');
-        $('#split_witnesses').on('click.sw_c', function() {
+      if (document.getElementById('split-witnesses')) {
+        $('#split-witnesses').off('click.sw_c');
+        $('#split-witnesses').off('mouseover.sw_mo');
+        $('#split-witnesses').on('click.sw_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -4674,15 +4941,15 @@ var SV = (function() {
             'left': SimpleContextMenu._menuElement.style.left
           });
         });
-        $('#split_witnesses').on('mouseover.sw_mo', function() {
+        $('#split-witnesses').on('mouseover.sw_mo', function() {
           CL.hideTooltip();
         });
       }
       // next if and for deal with overlapped options
-      if (document.getElementById('treat_as_main')) {
-        $('#treat_as_main').off('click.tam_c');
-        $('#treat_as_main').off('mouseover.tam_mo');
-        $('#treat_as_main').on('click.tam_c', function() {
+      if (document.getElementById('treat-as-main')) {
+        $('#treat-as-main').off('click.tam_c');
+        $('#treat-as-main').off('mouseover.tam_mo');
+        $('#treat-as-main').on('click.tam_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -4698,7 +4965,7 @@ var SV = (function() {
           SV._removeReadingFlag(readingDetails, reading);
           SV.unprepareForOperation();
         });
-        $('#treat_as_main').on('mouseover.tam_mo', function() {
+        $('#treat-as-main').on('mouseover.tam_mo', function() {
           CL.hideTooltip();
         });
       }
@@ -4714,7 +4981,7 @@ var SV = (function() {
       for (const key in svRules) {
         if (Object.prototype.hasOwnProperty.call(svRules, key)) {
           if (!svRules[key][0]) {
-            if (document.getElementById('mark_as_' + svRules[key][1])) {
+            if (document.getElementById('mark-as-' + svRules[key][1])) {
               // add event decides if its a keep as main reading or not and adds correct handler
               SV._addEvent(svRules, key);
             }
@@ -4722,12 +4989,11 @@ var SV = (function() {
         }
       }
       // if there is a generic SVsubreading entry in the context menu then we deal with the distinction in a drop down
-      if (document.getElementById('mark_as_SVsubreading')) {
-        // make menu for mark_as_SVsubreading
-        const key = 'SVsubreading';
-        $('#mark_as_' + key).off('click.' + key + '_c');
-        $('#mark_as_' + key).off('mouseover.' + key + '_mo');
-        $('#mark_as_' + key).on('click.' + key + '_c', function() {
+      if (document.getElementById('mark-as-sv-subreading')) {
+        // make menu for mark-as-sv-subreading
+        $('#mark-as-sv-subreading').off('click.sv-subreading_c');
+        $('#mark-as-sv-subreading').off('mouseover.sv-subreading_mo');
+        $('#mark-as-sv-subreading').on('click.sv-subreading_c', function() {
           var element, div, unit, appId, unitPos, rdgDetails, readingPos, reading, readingDetails,
               readingText, tokenList;
           element = SimpleContextMenu._target_element;
@@ -4759,25 +5025,478 @@ var SV = (function() {
             'reading_id': reading._id,
             'reading_text': readingText
           };
-          CL.markStandoffReading(key, 'Subreading', readingDetails, 'set_variants', {
+          CL.markStandoffReading('SVsubreading', 'Subreading', readingDetails, 'set_variants', {
             'top': SimpleContextMenu._menuElement.style.top,
             'left': SimpleContextMenu._menuElement.style.left
           });
         });
-        $('#mark_as_' + key).on('mouseover.' + key + '_mo', function() {
+        $('#mark-as-sv-subreading').on('mouseover.sv-subreading_mo', function() {
           CL.hideTooltip();
         });
       } else {
         for (const key in svRules) {
           if (Object.prototype.hasOwnProperty.call(svRules, key)) {
             if (svRules[key][0]) {  // if this is a subreading (hence dealt with as subreading in menu)
-              if (document.getElementById('mark_as_' + svRules[key][1])) {
+              if (document.getElementById('mark-as-' + svRules[key][1])) {
                 SV._addEvent(svRules, key);
               }
             }
           }
         }
       }
+    },
+
+    _deleteStandoffRegularisation: function(unit, witness) {
+      for (const key in CL.data.marked_readings) {
+        if (Object.prototype.hasOwnProperty.call(CL.data.marked_readings, key)) {
+          for (let i = 0; i < CL.data.marked_readings[key].length; i += 1) {
+            if (CL.data.marked_readings[key][i].start === unit.start && 
+                    CL.data.marked_readings[key][i].end === unit.end) { //if this is the right unit
+              if (CL.data.marked_readings[key][i].witness === witness) { //and we have the right witness
+                CL.data.marked_readings[key][i] = null;
+              }
+            }
+          }
+          CL.data.marked_readings[key] = CL.removeNullItems(CL.data.marked_readings[key]);
+          if (CL.data.marked_readings[key].length === 0) {
+            delete CL.data.marked_readings[key];
+          }
+        }
+      }
+    },
+
+    _removeOverlap: function(index, originalData, originalSettings) {
+      /** Remove a current overlapping unit (activated from the right click context menu). Index is the id of the unit
+       * being removed. The witnesses in this reading are removed from the section of text included in the overlap and
+       * then that same chunk of text is recollated and merged back into the collation data. This reuses the code for
+       * removing and adding witnesses from a collation where ever possible. 
+       * 
+       * The originalData argument is a copy of the full CL.data structure from before we start the process so we
+       * can restore it if any errors happen along the way. Ideally the error could be thrown back to the place this
+       * function is called but the callback chain doesn't seem to allow that.
+       *
+       * The originalSettings argument is a copy of the settings for the full unit which will be restored once the
+       * overlap removal is complete because we have to modify the witness list as part of the recollation process.
+       */
+      let apparatusNum, appId, witId, tokens;
+      spinner.showLoadingOverlay();
+      SV.prepareForOperation();
+      const scrollOffset = [document.getElementById('scroller').scrollLeft,
+                            document.getElementById('scroller').scrollTop];
+      // find the correct apparatus
+      if (index.match(/-app-/g)) {
+        apparatusNum = parseInt(index.match(/\d+/g)[1], 10);
+        index = parseInt(index.match(/\d+/g)[0], 10);
+        appId = 'apparatus' + apparatusNum;
+      } else {
+        // removeOverlap function makes no sense for a top line unit.
+        spinner.removeLoadingOverlay();
+        return;
+      }
+      // find the unit and get its range and witnesses
+      const overlapUnit = CL.data[appId][index];
+      const allOverlappingUnits = [overlapUnit];
+      const overlapId = overlapUnit._id;
+      const range = SV._findOverlappedRange(overlapId);
+      const witnesses = SV._getAllUnitWitnesses(overlapUnit).filter(x => x !== CL.data.overtext_name);
+      // find any other overlapping units which share any witnesses with the target unit
+      const candidateOverlaps = []; 
+      for (let key in CL.data) {
+        if (key != 'apparatus' && key.startsWith('apparatus') && key != appId) {
+          for (let unit of CL.data[key]) {
+            let cWitnesses = SV._getAllUnitWitnesses(unit).filter(x => x !== CL.data.overtext_name);
+            if (cWitnesses.filter(x => witnesses.indexOf(x) !== -1).length > 0) {
+              let cRange = SV._findOverlappedRange(unit._id);
+              // if the overlap overlaps are current range add it to the candidates list
+              if ((Math.max(range[0], cRange[0]) - Math.min(range[1], cRange[1])) <= 0) {
+                allOverlappingUnits.push(unit);
+                candidateOverlaps.push([cRange[0], cRange[1]]);
+              }
+            }
+          }
+        }
+      }
+      // extend the range covered to include the extents of any overlapping units with shared witnesses
+      for (let entry of candidateOverlaps) {
+        if (entry[0] < range[0]) {
+          range[0] = entry[0];
+        }
+        if (entry[1] > range[1]) {
+          range[1] = entry[1];
+        }
+      }
+      // check the user wants to go ahead
+      if (candidateOverlaps.length > 0) {
+        let ok;
+        let startWord = CL.data.apparatus[range[0]].start;
+        let endWord = CL.data.apparatus[range[1]].end;
+        ok = confirm('Some of the witnesses in the overlap you have asked to remove are present in other ' +
+                     'overlapping units which also overlap the one being removed. Continuing with this ' +
+                     'overlap removal will affect all words between indexes ' + startWord + ' to ' + endWord +
+                     '. Are you sure you want to continue?');
+        if (!ok) {
+          spinner.removeLoadingOverlay();
+          return;
+        }
+      }
+      /** remove the relevant witnesses from the section of the collation representing the overlap while also removing
+       * any standoff regularisations for these witnesses in the units being removed in the top line (we only need to do
+       * this for the top line because overlaps will be removed entirely and the standoff removed as part of the clean
+       * up process for no longer applied regularisations)
+       */
+      const wordRanges = {};
+      const lacOmDetails = [];
+      wordRanges['basetext'] = SV._getWitnessIndexesForHand(allOverlappingUnits, 'basetext', range);
+      let nullCount = 0;
+      for (const hand of witnesses) {
+        wordRanges[hand] = SV._getWitnessIndexesForHand(allOverlappingUnits, hand, range);
+        let relevantOverlappingUnits = [];
+        // get only the overlapping units from allOverlappingUnits which contain this hand
+        for (let overlappingUnit of allOverlappingUnits) {
+          for (let reading of overlappingUnit.readings) {
+            if (reading.witnesses.indexOf(hand) !== -1) {
+              relevantOverlappingUnits.push(overlappingUnit);
+              break;
+            }
+          }
+        }
+        // here we need to remove the witness and return the unit for all overlapping units - we need to find appId and index for each one first! 
+        for (const currentOverlappingUnit of relevantOverlappingUnits) {
+          let [currentAppId, currentIndex] = SV._getAppIdAndIndexByOverlapId(currentOverlappingUnit._id);
+          // remove from the current overlap unit - needs to be returned because it isn't passing as reference through the full function chain
+          CL.data[currentAppId][currentIndex] = SV._removeWitnessFromUnitAndSortRemainder(currentOverlappingUnit, hand, currentAppId);
+          CL.removeNullItems(CL.data[currentAppId]);
+        }
+        // now remove from the top line while keeping a count of any top line units that are removed.
+        for (let i = range[1]; i >= range[0]; i -= 1) {
+          CL.data.apparatus[i] = SV._removeWitnessFromUnitAndSortRemainder(CL.data.apparatus[i], hand, 'apparatus');
+          if (CL.data.apparatus[i] === null) {
+            nullCount += 1;
+          }
+          CL.removeNullItems(CL.data.apparatus);
+          SV._deleteStandoffRegularisation(CL.data.apparatus[i], hand);
+        }
+      }
+      // recalculate the final unit in the range based on any that have been removed.
+      range[1] = range[1] - nullCount;
+      // now add them back in
+      // get the data and split out just the sections we need (details in wordRanges)
+      CL.dataSettings.witness_list = [];
+      for (const wit of witnesses) {
+        CL.dataSettings.witness_list.push(CL.data.hand_id_map[wit]);
+      }
+      if (CL.dataSettings.witness_list.indexOf(CL.dataSettings.base_text) === -1) {
+        CL.dataSettings.witness_list.push(CL.dataSettings.base_text);
+      }
+
+      CL.services.getUnitData(CL.context, CL.dataSettings.witness_list, function (collationData) {
+        const witnessesInData = [];
+        for (let entry of collationData.results) {
+          if (entry.witnesses === null) {  // this will be an om verse (single hand in the MS)
+            witnessesInData.push(entry.siglum);
+          } else {
+            for (let j = 0; j < entry.witnesses.length; j += 1) {
+              // collate just the hands we need
+              witId = entry.witnesses[j].id;
+              if (witId !== CL.data.overtext_name && witnesses.indexOf(witId) === -1) {
+                entry.witnesses[j] = null; // remove the witness if it isn't a witness in the overlap being removed
+              } else if (entry.witnesses[j].tokens.length === 0) { // then this hand is om_verse
+                entry.witnesses[j].tokens = null;              
+                if (lacOmDetails.indexOf(wordRanges[witId][2].join('|')) === -1) {
+                  lacOmDetails.push(wordRanges[witId][2].join('|'));
+                }
+                witnessesInData.push(witId);
+              } else if (witId !== CL.data.overtext_name && wordRanges[witId][2] !== null) { // this is lac or om for the chunk so don't collate
+                entry.witnesses[j].tokens = [];
+                entry.witnesses[j].gap_reading = 'for_fixing';
+                if (lacOmDetails.indexOf(wordRanges[witId][2].join('|')) === -1) {
+                  lacOmDetails.push(wordRanges[witId][2].join('|'));
+                }
+                witnessesInData.push(witId);
+              } else {
+                // collate just the text chunk we need
+                tokens = entry.witnesses[j].tokens.filter(
+                  x => parseInt(x.index) >= wordRanges[entry.witnesses[j].id][0] && parseInt(x.index) <= wordRanges[entry.witnesses[j].id][1]
+                );
+                entry.witnesses[j].tokens = tokens;
+                witnessesInData.push(witId);
+              }
+            }
+          } 
+        }
+        const lacWitnesses = {};
+        for (const wit of witnesses) {
+          if (witnessesInData.indexOf(wit) === -1) {
+            lacWitnesses[wit] = CL.data.hand_id_map[wit];
+          } 
+        }
+        if (lacOmDetails.length > 1) {
+          alert('This overlapping unit cannot be removed because it contains different types of empty readings.');
+          CL.data = originalData;
+          CL.dataSettings = originalSettings;
+          SV.showSetVariantsData();
+          document.getElementById('scroller').scrollLeft = scrollOffset[0];
+          document.getElementById('scroller').scrollTop = scrollOffset[1];
+          return;
+        }
+        const filteredCollationData = {'results': []};
+        for (let entry of collationData.results) {
+          if (entry.witnesses !== null) {
+            entry.witnesses = entry.witnesses.filter(x => x !== null)
+            if (entry.witnesses.length > 0) {         
+              filteredCollationData.results.push(entry);
+            }
+          }  else {
+            filteredCollationData.results.push(entry);
+          } 
+        }
+        CL.existingCollation = JSON.parse(JSON.stringify(CL.data));
+        CL.collateData = {
+          'data': filteredCollationData.results,
+          'lac_witnesses': lacWitnesses
+        };
+        RG.runCollation(CL.collateData, 'remove_overlap', 0, function(data) {
+          let before, after;
+          // set up
+          CL.data = data; // temporary assignment to allow all the cleaning functions to work.
+          /** Now sort out the gaps if we have an all gap chunk - they will always come back as lac but
+           * we need to check the original overlap info and change things accordingly.
+           * NB: If we have got this far then we only have a single category of gap reading to worry about.
+           */
+          if (data.special_categories && data.special_categories.length > 0) {
+            const newReading = {
+              'text': [],
+              'type': lacOmDetails[0].split('|')[0],
+              'witnesses': JSON.parse(JSON.stringify(data.special_categories[0].witnesses))
+            };
+            if (lacOmDetails[0].split('|')[1] !== '') {
+              newReading.details = lacOmDetails[0].split('|')[1];
+            }
+            for (const unit of data.apparatus) {
+              unit.readings.push(JSON.parse(JSON.stringify(newReading)));
+            }
+            for (const hand of data.special_categories[0].witnesses) {
+              if (data.lac_readings.indexOf(hand) !== -1) {
+                data.lac_readings.splice(data.lac_readings.indexOf(hand), 1);
+              }
+            }
+          }
+          CL.lacOmFix();
+
+          const originalApparatus = JSON.parse(JSON.stringify(CL.existingCollation.apparatus));
+          const preChunk = originalApparatus.slice(0, range[0]);
+          const postChunk = originalApparatus.slice(range[1]+ 1);
+          // just get the chunk we need to change
+          const chunk = CL.existingCollation.apparatus.slice(range[0], range[1] + 1);
+          // Check and renumber units in the odd space before the chunk if required (if they have been assigned 1 and
+          // the overlap being removed didn't start at 1 or 2)
+          let i = 0; 
+          if (preChunk.length > 0) {
+            while(data.apparatus[i].start === 1) {
+              if (preChunk[preChunk.length - 1].end > 1) {
+                if (preChunk[preChunk.length - 1].end % 2 === 0) {
+                  data.apparatus[i].start = preChunk[preChunk.length - 1].end + 1;
+                  data.apparatus[i].end = preChunk[preChunk.length - 1].end + 1;
+                  data.apparatus[i].first_word_index = data.apparatus[0].end + '.1';
+                } else {
+                  data.apparatus[i].start = preChunk[preChunk.length - 1].end;
+                  data.apparatus[i].end = preChunk[preChunk.length - 1].end;
+                  data.apparatus[i].first_word_index = SV._incrementSubIndex(preChunk[preChunk.length - 1].first_word_index, 1);
+                } 
+              }
+              i += 1;
+            }
+          }
+          // merge any units that would end up as additions before and after the chunk being combined
+          while (data.apparatus[0].start % 2 === 1 && data.apparatus[1].start % 2 === 1) {
+            SV._doCombineUnits([[0, 'apparatus'], [1, 'apparatus']], 'apparatus', undefined, false);
+          }
+          // one final combine to get it all in an even unit if possible and necessary
+          if (data.apparatus[0].start % 2 === 1 && data.apparatus.length > 1 && chunk[0].end % 2 !== 1) {
+            SV._doCombineUnits([[0, 'apparatus'], [1, 'apparatus']], 'apparatus', undefined, false);
+          }
+          while (data.apparatus[data.apparatus.length - 1].start % 2 === 1 &&
+                  data.apparatus[data.apparatus.length - 2].start % 2 === 1) {
+            SV._doCombineUnits(
+              [[data.apparatus.length - 2, 'apparatus'], [data.apparatus.length - 1, 'apparatus']],
+              'apparatus',
+              undefined,
+              false
+            );
+          }
+          // one final combine to get it all in an even unit if possible and necessary
+          if (data.apparatus.length > 1 && data.apparatus[data.apparatus.length - 1].start % 2 === 1 && chunk[chunk.length - 1].end % 2 !== 1) {
+            SV._doCombineUnits(
+              [[data.apparatus.length - 2, 'apparatus'], [data.apparatus.length - 1, 'apparatus']],
+              'apparatus',
+              undefined,
+              false
+            );
+          }
+          data = JSON.parse(JSON.stringify(CL.data));   
+          // add the data back in         
+          before = null;
+          after = null;
+          if (preChunk.length > 0) {
+            before = preChunk[preChunk.length - 1];
+          }
+          if (postChunk.length > 0) {
+            after = postChunk[0];
+          }
+          const baseCollationChunk = {
+            'structure': {
+              'apparatus': chunk, 'lac_readings': originalData.lac_readings, 'om_readings': originalData.om_readings
+            }
+          };
+          const mergedCollationChunk = CL._mergeCollationObjects(
+            baseCollationChunk,
+            data,
+            [],
+            data.apparatus[0].start - 1,
+            data.apparatus[data.apparatus.length - 1].end + 1,
+            [before, after]
+          );
+          CL.existingCollation.apparatus = preChunk.concat(mergedCollationChunk.structure.apparatus, postChunk);
+          CL.data = JSON.parse(JSON.stringify(CL.existingCollation));
+          CL.lacOmFix(); // call this again on the full collation
+          const options = {};
+          // add in any missing _ids attributes
+          if (SV.checkIds()[0]) {
+            CL.addUnitAndReadingIds();
+          }
+          SV.unprepareForOperation();
+          SV.checkBugStatus('loaded', 'saved version');
+          options.container = CL.container;
+          // restore the original data settings so we don't end up with a short witness list
+          CL.dataSettings = originalSettings;
+          CL._separateOverlapsInAddedUnits();
+          SV.showSetVariants(options);
+          document.getElementById('scroller').scrollLeft = scrollOffset[0];
+          document.getElementById('scroller').scrollTop = scrollOffset[1];
+        });
+      });
+    },
+
+    _getAppIdAndIndexByOverlapId: function(unitId) {
+      /* Given the id of an overlapping unit return its overlap line and position in that line. */
+      for (const key in CL.data) {
+        if (key !== 'apparatus' && key.startsWith('apparatus')) {
+          for (let i = 0; i < CL.data[key].length; i += 1) {
+            if (CL.data[key][i]._id === unitId) {
+              return([key, i]);
+            }
+          }       
+        }      
+      }
+    },
+
+    _isHandInOverlaps: function(hand, overlaps) {
+      /** Return whether or not the provided hand is in the list of witnesses in the overlap_details key of a top line
+       * unit. */
+      for (const key in overlaps) {
+        if (overlaps[key].indexOf(hand) !== -1) {
+          return true;
+        }
+      }
+      return false;
+    },
+
+    _getWitnessIndexesForHand: function(units, hand, range) {
+      /* Get the word index range in the requested hand that covers the full extent of the overlapping units provided */
+      const indexes = [null, null, null];
+      let currentIndex;
+      for (const unit of units) {
+        for (const reading of unit.readings) {
+          if (reading.witnesses.indexOf(hand) !== -1) { // this is the right reading
+            for (const word of reading.text) {
+              if (Object.prototype.hasOwnProperty.call(word, hand)) {
+                currentIndex = parseInt(word[hand].index)
+                if (indexes[0] === null) {
+                  indexes[0] = currentIndex;
+                  indexes[1] = currentIndex;
+                } else {
+                  if (currentIndex < indexes[0]) {
+                    indexes[0] = currentIndex;
+                  }
+                  if (currentIndex > indexes[1]) {
+                    indexes[1] = currentIndex;
+                  }
+                }
+              }
+            }
+            if (indexes[0] === null) {
+              // then this is lac or om and we need details
+              indexes[2] = [reading.type, reading.details];
+            }
+          }
+        }
+      }
+      for (let i = range[0]; i <= range[1]; i += 1) {
+        if (!SV._isHandInOverlaps(hand, CL.data.apparatus[i].overap_units)) {
+          for (const reading of CL.data.apparatus[i].readings) {
+            for (const word of reading.text) {
+              if (Object.prototype.hasOwnProperty.call(word, hand)) {
+                currentIndex = parseInt(word[hand].index)
+                if (indexes[0] === null) {
+                  indexes[0] = currentIndex;
+                  indexes[1] = currentIndex;
+                } else {
+                  if (word[hand].index < indexes[0]) {
+                    indexes[0] = currentIndex;
+                  }
+                  if (word[hand].index > indexes[1]) {
+                    indexes[1] = currentIndex;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      // check whether we have filled in the indexes[0] position on another pass and if so remove the lac/om details
+      if (indexes[0] !== null) {
+        indexes[2] = null;
+      }
+      return indexes;
+    },
+
+    _removeWitnessFromUnitAndSortRemainder: function(unit, hand, apparatus) {
+      let genuineReadingFound;
+      CL._removeWitnessFromUnit(unit, hand);
+      if (apparatus === 'apparatus') { // this is a main apparatus unit so delete if only om and lac readings remain
+        genuineReadingFound = false;
+        for (let j = 0; j < unit.readings.length; j += 1) {
+          if (unit.readings[j].text.length > 0 ||
+            Object.prototype.hasOwnProperty.call(unit.readings[j], 'SR_text')) {
+            genuineReadingFound = true;
+          }
+        }
+        if (genuineReadingFound === false) {
+          unit = null;
+        }
+      } else { // this is an overlapped unit so if only one reading remains delete it
+        if (unit.readings.length === 1) {
+          unit = null;
+        }
+      }
+      return unit;
+    },
+
+    _findOverlappedRange: function(overlappingId) {
+      let startIndex, endIndex;
+      startIndex = null;
+      endIndex = null;
+      for (let i = 0; i < CL.data.apparatus.length; i += 1) {
+        if (Object.prototype.hasOwnProperty.call(CL.data.apparatus[i], 'overlap_units') && Object.prototype.hasOwnProperty.call(CL.data.apparatus[i].overlap_units, overlappingId)) {
+          if (startIndex === null) {
+            startIndex = i;
+            endIndex = i;
+          } else {
+            endIndex = i;
+          }
+        }
+      }
+      return [startIndex, endIndex];
     },
 
     _addOverlappedEvent: function(id, flag) {
@@ -4804,9 +5523,9 @@ var SV = (function() {
     _addEvent: function(svRules, key) {
       //if this reading is not marked to be kept as a main reading then use stand_off marking
       if (!svRules[key][3]) {
-        $('#mark_as_' + svRules[key][1]).off('click.' + key + '_c');
-        $('#mark_as_' + svRules[key][1]).off('mouseover.' + key + '_mo');
-        $('#mark_as_' + svRules[key][1]).on('click.' + key + '_c', function() {
+        $('#mark-as-' + svRules[key][1]).off('click.' + key + '_c');
+        $('#mark-as-' + svRules[key][1]).off('mouseover.' + key + '_mo');
+        $('#mark-as-' + svRules[key][1]).on('click.' + key + '_c', function() {
           let readingText, tokenList;
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
@@ -4842,14 +5561,14 @@ var SV = (function() {
             'left': SimpleContextMenu._menuElement.style.left
           });
         });
-        $('#mark_as_' + svRules[key][1]).on('mouseover.' + key + '_mo', function() {
+        $('#mark-as-' + svRules[key][1]).on('mouseover.' + key + '_mo', function() {
           CL.hideTooltip();
         });
       } else {
         // else just add the marker and allow its removal
-        $('#mark_as_' + svRules[key][1]).off('click.' + key + '_c');
-        $('#mark_as_' + svRules[key][1]).off('mouseover.' + key + '_mo');
-        $('#mark_as_' + svRules[key][1]).on('click.' + key + '_c', function() {
+        $('#mark-as-' + svRules[key][1]).off('click.' + key + '_c');
+        $('#mark-as-' + svRules[key][1]).off('mouseover.' + key + '_mo');
+        $('#mark-as-' + svRules[key][1]).on('click.' + key + '_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -4864,7 +5583,7 @@ var SV = (function() {
           const reading = CL.data[appId][unitPos].readings[readingPos];
           SV._markReading(svRules[key][1], reading);
         });
-        $('#mark_as_' + svRules[key][1]).on('mouseover.' + key + '_mo', function() {
+        $('#mark-as-' + svRules[key][1]).on('mouseover.' + key + '_mo', function() {
           CL.hideTooltip();
         });
       }

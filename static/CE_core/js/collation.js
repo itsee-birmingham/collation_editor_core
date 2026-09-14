@@ -13,15 +13,15 @@ var CL = (function() {
   // TODO: look into why this is and if the deprecations can just be removed now.
 
   const addIndexHandlers = function() {
-    if (document.getElementById('switch_project_button') &&
+    if (document.getElementById('switch-project-button') &&
             Object.prototype.hasOwnProperty.call(CL.services, 'switchProject')) {
       CL.services.switchProject();
     }
-    if (document.getElementById('collation_settings')) {
-      $('#collation_settings').off('click.show_collation_settings');
-      $('#collation_settings').on('click.show_collation_settings', CL._showCollationSettings);
+    if (document.getElementById('collation-settings')) {
+      $('#collation-settings').off('click.show_collation_settings');
+      $('#collation-settings').on('click.show_collation_settings', CL._showCollationSettings);
     }
-    if (document.getElementById('project_summary')) {
+    if (document.getElementById('project-summary')) {
       CL.services.viewProjectSummary();
     }
     if (document.getElementById('collate')) {
@@ -40,9 +40,9 @@ var CL = (function() {
       //TODO: better error message - add others too?
       console.error('The collation editor requires a button with the id \'collate\' in order to work. This button is missing from this page.');
     }
-    if (document.getElementById('load_saved')) {
-      $('#load_saved').off('click.find_saved');
-      $('#load_saved').on('click.find_saved', function() {
+    if (document.getElementById('load-saved')) {
+      $('#load-saved').off('click.find_saved');
+      $('#load-saved').on('click.find_saved', function() {
         if (document.getElementById('settings')) {
           document.getElementById('settings').parentNode.removeChild(document.getElementById('settings'));
         }
@@ -77,7 +77,7 @@ var CL = (function() {
     }
     $.get(url, function(html) {
       CL.container.innerHTML = html;
-      document.getElementById('project_name').innerHTML = CL.project.name;
+      document.getElementById('project-name').innerHTML = CL.project.name;
       if (_contextInput && Object.prototype.hasOwnProperty.call(_contextInput, 'onload_function') && _contextInput.onload_function !== null) {
         CL.runFunction(_contextInput.onload_function, [CL.project]);
       } else {
@@ -86,13 +86,13 @@ var CL = (function() {
       }
       const footer = [];
       if (Object.prototype.hasOwnProperty.call(CL.services, 'switchProject')) {
-        footer.push('<input class="pure-button left_foot" type="button" id="switch_project_button" value="Switch project" />');
+        footer.push('<input class="pure-button left-foot" type="button" id="switch-project-button" value="Switch project" />');
       }
       if (Object.prototype.hasOwnProperty.call(CL.services, 'viewProjectSummary')) {
-        footer.push('<input class="pure-button right_foot" type="button" id="project_summary" value="View Project Page"/>');
+        footer.push('<input class="pure-button right-foot" type="button" id="project-summary" value="View Project Page"/>');
       }
 
-      footer.push('<input class="pure-button right_foot" id="collation_settings" type="button" value="Change Collation Settings"/>');
+      footer.push('<input class="pure-button right-foot" id="collation-settings" type="button" value="Change Collation Settings"/>');
 
       document.getElementById('footer').innerHTML = footer.join('');
       addIndexHandlers();
@@ -155,13 +155,12 @@ var CL = (function() {
           stage += ' - Witness Removing Mode';
         }
       }
-      html = '<h1 id="stage_id">' + stage + '</h1>' +
-        '<h1 id="verse_ref">' + context +
-        '</h1><h1 id="project_name">';
+      html = '<span id="stage-id" class="title">' + stage + '</span>' +
+        '<span id="unit-ref" class="title">' + context + '</span><span id="project-name" class="title">';
       if (Object.prototype.hasOwnProperty.call(CL.project, 'name')) {
         html += CL.project.name;
       }
-      html += '</h1><div id="message_panel"></div><div id="login_status"></div>';
+      html += '</span><div id="message-panel"></div><div id="login-status"></div>';
       return html;
     },
 
@@ -237,7 +236,8 @@ var CL = (function() {
         options = {};
       }
       text = [];
-      witnessText = [];
+      // eslint disabled because I think it is safer to assign a default here given the complex branching in this function
+      witnessText = [];  /* eslint-disable-line no-useless-assignment */
       // first fix the display of overlapped statuses
       if (Object.prototype.hasOwnProperty.call(reading, 'overlap_status') && reading.overlap_status !== 'duplicate') {
         if (test === true) {
@@ -594,8 +594,8 @@ var CL = (function() {
       const html = [];
       const words = CL._extractWordsForHeader(data);
       if (CL.witnessEditingMode === false) {
-        previousLinkHtml = '<td class="nav" id="previous_verse">&larr;</td>';
-        nextLinkHtml = '<td class="nav" id="next_verse">&rarr;</td>';
+        previousLinkHtml = '<td class="nav" id="previous-verse">&larr;</td>';
+        nextLinkHtml = '<td class="nav" id="next-verse">&rarr;</td>';
       } else {
         previousLinkHtml = '<td></td>';
         nextLinkHtml = '<td></td>';
@@ -619,16 +619,16 @@ var CL = (function() {
           }
           // if i is even add a word; if not add a blank cell
           if (i % 2 === 0) {
-            html.push('<th colspan="' + colspan + '" class="NAword redips-mark ' + words[j][1] + '" id="NA_' + (i) +
-                      '"><div id="NA_' + (i) + '_div">' + words[j][0] + '</div></th>');
+            html.push('<th colspan="' + colspan + '" class="overtext-word redips-mark ' + words[j][1] + '" id="overtext-' + (i) +
+                      '"><div id="overtext-' + (i) + '-div">' + words[j][0] + '</div></th>');
             j += 1;
           } else {
-            html.push('<th  colspan="' + colspan + '" id="NA_' + (i) + '" class="redips-mark"><div id="NA_' + (i) +
-                      '_div"></div></th>');
+            html.push('<th  colspan="' + colspan + '" id="overtext-' + (i) + '" class="redips-mark"><div id="overtext-' + (i) +
+                      '-div"></div></th>');
           }
         }
         html.push(nextLinkHtml + '</tr>');
-        html.push('<tr id="number_row" class="number_row"><td></td>');
+        html.push('<tr id="number-row" class="number-row"><td></td>');
         j = 1;
         for (let i = 1; i <= cols; i += 1) {
           if (Object.prototype.hasOwnProperty.call(colSpans, i)) {
@@ -637,13 +637,13 @@ var CL = (function() {
             colspan = 1;
           }
           if (i % 2 === 0) {
-            html.push('<td id="num_' + j + '" colspan="' + colspan + '" class="number redips-mark">' + j + '</td>');
+            html.push('<td id="num-' + j + '" colspan="' + colspan + '" class="number redips-mark">' + j + '</td>');
             j += 1;
           } else {
             if (numberSpaces === true) {
-              html.push('<td id="num_' + j + '" colspan="' + colspan + '" class="space">' + j + '</td>');
+              html.push('<td id="num-' + j + '" colspan="' + colspan + '" class="space">' + j + '</td>');
             } else {
-              html.push('<td id="num_' + j + '" colspan="' + colspan + '"></td>');
+              html.push('<td id="num-' + j + '" colspan="' + colspan + '"></td>');
             }
             j += 1;
           }
@@ -658,17 +658,17 @@ var CL = (function() {
         CL._collapseUnit(event.target.id, format);
         event.stopPropagation();
       });
-      if (document.getElementById('expand_collapse_button')) {
+      if (document.getElementById('expand-collapse-button')) {
         if (_collapsed === true) {
           CL._collapseAll(format);
-          document.getElementById('expand_collapse_button').value = 'expand all';
-          $('#expand_collapse_button').on('click.expand_all', function() {
+          document.getElementById('expand-collapse-button').value = 'expand all';
+          $('#expand-collapse-button').on('click.expand_all', function() {
             CL._expandAll(format);
           });
         } else {
           CL._expandAll(format);
-          document.getElementById('expand_collapse_button').value = 'collapse all';
-          $('#expand_collapse_button').on('click.collapse_all', function() {
+          document.getElementById('expand-collapse-button').value = 'collapse all';
+          $('#expand-collapse-button').on('click.collapse_all', function() {
             CL._collapseAll(format);
           });
         }
@@ -718,7 +718,7 @@ var CL = (function() {
         delete options.error_unit;
       }
       while (i <= overtextLength) {
-        tdId = app + '_' + i;
+        tdId = app + '-' + i;
         unitIndex = null;
         unit = apparatus[j];
         if (unit !== undefined) {
@@ -755,7 +755,7 @@ var CL = (function() {
               unit.readings = CL.sortReadings(unit.readings);
             }
             if (app > 1) {
-              idString = j + '_app_' + app;
+              idString = j + '-app-' + app;
             } else {
               idString = String(j);
             }
@@ -978,8 +978,8 @@ var CL = (function() {
       let scrollOffset;
       if (CL.showSubreadings === true) {
         // hide the subreadings (except the edition ones if we are have supplied baseSubreadingRules)
-        if (document.getElementById('show_hide_subreadings_button')) {
-          $('#show_hide_subreadings_button').on('click.hide_subreadings', function() {
+        if (document.getElementById('show-hide-subreadings-button')) {
+          $('#show-hide-subreadings-button').on('click.hide_subreadings', function() {
             scrollOffset = [document.getElementById('scroller').scrollLeft,
                             document.getElementById('scroller').scrollTop
             ];
@@ -1002,9 +1002,9 @@ var CL = (function() {
           });
         }
       } else {
-        if (document.getElementById('show_hide_subreadings_button')) {
+        if (document.getElementById('show-hide-subreadings-button')) {
           // show all the subreadings
-          $('#show_hide_subreadings_button').on('click.show_subreadings', function() {
+          $('#show-hide-subreadings-button').on('click.show_subreadings', function() {
             scrollOffset = [document.getElementById('scroller').scrollLeft,
                             document.getElementById('scroller').scrollTop];
             $(this).text($(this).text().replace('show', 'hide'));
@@ -1089,7 +1089,7 @@ var CL = (function() {
             }
 
             if (app > 1) {
-              idString = j + '_app_' + app;
+              idString = j + '-app-' + app;
             } else {
               idString = String(j);
             }
@@ -1232,7 +1232,7 @@ var CL = (function() {
       const transcriptionId = temp[0];
       const hand = temp[1];
       const text = [];
-      document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + hand +
+      document.getElementById('single-witness-reading').innerHTML = '<span class="highlighted-reading"><b>' + hand +
                               ':</b><img id="loadingbar" src="' + staticUrl + 'CE_core/images/loadingbar.gif"/></span>';
       CL.services.getUnitData(CL.context, [transcriptionId], function(response) {
         let unit;
@@ -1258,23 +1258,23 @@ var CL = (function() {
                       text.push('&lt;' + unit.witnesses[j].tokens[k].gap_details + '&gt;');
                     }
                   }
-                  document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' +
+                  document.getElementById('single-witness-reading').innerHTML = '<span class="highlighted-reading"><b>' +
                                 hand + ':</b> ' + CL.project.prepareDisplayString(text.join(' ')) + '</span>';
                   break;
                 }
               }
             } else {
               // om unit
-              document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' +
+              document.getElementById('single-witness-reading').innerHTML = '<span class="highlighted-reading"><b>' +
                                                                             hand + ':</b> no text</span>';
             }
           }
         } else {
           if (transcriptionId === 'none') {
-            document.getElementById('single_witness_reading').innerHTML = '';
+            document.getElementById('single-witness-reading').innerHTML = '';
           } else {
             // lac unit
-            document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' +
+            document.getElementById('single-witness-reading').innerHTML = '<span class="highlighted-reading"><b>' +
                                                                           hand + ':</b> no text</span>';
           }
         }
@@ -1439,24 +1439,24 @@ var CL = (function() {
     },
   
     addStageLinks: function() {
-      if (document.getElementById('stage_links') && Object.prototype.hasOwnProperty.call(CL.services, 'getSavedStageIds')) {
-        document.getElementById('stage_links').innerHTML = '<span id="R">Reg</span><span id="S">Set</span>' +
+      if (document.getElementById('stage-links') && Object.prototype.hasOwnProperty.call(CL.services, 'getSavedStageIds')) {
+        document.getElementById('stage-links').innerHTML = '<span id="R">Reg</span><span id="S">Set</span>' +
                                                            '<span id="O">Ord</span><span id="A">App</span>';
         CL.services.getSavedStageIds(CL.context, function(reg, set, ord, app) {
           if (reg) {
-            $('#R').addClass('saved_version');
+            $('#R').addClass('saved-version');
             CL._addNavEvent('R', reg);
           }
           if (set) {
-            $('#S').addClass('saved_version');
+            $('#S').addClass('saved-version');
             CL._addNavEvent('S', set);
           }
           if (ord) {
-            $('#O').addClass('saved_version');
+            $('#O').addClass('saved-version');
             CL._addNavEvent('O', ord);
           }
           if (app) {
-            $('#A').addClass('saved_version');
+            $('#A').addClass('saved-version');
             CL._addNavEvent('A', app);
           }
         });
@@ -1469,7 +1469,7 @@ var CL = (function() {
                 Object.prototype.hasOwnProperty.call(CL.project.extraFooterButtons, stage)) {
         for (let i = 0; i < CL.project.extraFooterButtons[stage].length; i += 1) {
           if (Object.prototype.hasOwnProperty.call(CL.project.extraFooterButtons[stage][i], 'id')) {
-            html.push('<input class="pure-button left_foot" type="button" id="' +
+            html.push('<input class="pure-button left-foot" type="button" id="' +
                       CL.project.extraFooterButtons[stage][i].id + '" value="');
             if (Object.prototype.hasOwnProperty.call(CL.project.extraFooterButtons[stage][i], 'label')) {
               html.push(CL.project.extraFooterButtons[stage][i].label);
@@ -1483,7 +1483,7 @@ var CL = (function() {
                       Object.prototype.hasOwnProperty.call(CL.services.extraFooterButtons, stage)) {
         for (let i = 0; i < CL.services.extraFooterButtons[stage].length; i += 1) {
           if (Object.prototype.hasOwnProperty.call(CL.services.extraFooterButtons[stage][i], 'id')) {
-            html.push('<input class="pure-button left_foot" type="button" id="' +
+            html.push('<input class="pure-button left-foot" type="button" id="' +
                       CL.services.extraFooterButtons[stage][i].id + '" value="');
             if (Object.prototype.hasOwnProperty.call(CL.services.extraFooterButtons[stage][i], 'label')) {
               html.push(CL.services.extraFooterButtons[stage][i].label);
@@ -1494,8 +1494,8 @@ var CL = (function() {
           }
         }
       }
-      if (document.getElementById('extra_buttons')) {
-        document.getElementById('extra_buttons').innerHTML = html.join('');
+      if (document.getElementById('extra-buttons')) {
+        document.getElementById('extra-buttons').innerHTML = html.join('');
         if (Object.prototype.hasOwnProperty.call(CL.services, 'addExtraFooterFunctions')) {
           CL.services.addExtraFooterFunctions();
         }
@@ -1505,10 +1505,10 @@ var CL = (function() {
 
     makeVerseLinks: function() {
       let ok;
-      if (document.getElementById('previous_verse') && Object.prototype.hasOwnProperty.call(CL.services, 'getAdjoiningUnit')) {
+      if (document.getElementById('previous-verse') && Object.prototype.hasOwnProperty.call(CL.services, 'getAdjoiningUnit')) {
         CL.services.getAdjoiningUnit(CL.context, true, function(verse) { // previous
           if (verse) {
-            $('#previous_verse').on('click', function() {
+            $('#previous-verse').on('click', function() {
               if (!Object.prototype.hasOwnProperty.call(RG, '_rules') || (Object.prototype.hasOwnProperty.call(RG, '_rules') && RG.allRuleStacksEmpty())) {
                 CL._findLatestStageVerse(verse);
               } else {
@@ -1522,14 +1522,14 @@ var CL = (function() {
               }
             });
           } else {
-            document.getElementById('previous_verse').innerHTML = '';
+            document.getElementById('previous-verse').innerHTML = '';
           }
         });
       }
-      if (document.getElementById('next_verse') && Object.prototype.hasOwnProperty.call(CL.services, 'getAdjoiningUnit')) {
+      if (document.getElementById('next-verse') && Object.prototype.hasOwnProperty.call(CL.services, 'getAdjoiningUnit')) {
         CL.services.getAdjoiningUnit(CL.context, false, function(verse) { // next
           if (verse) {
-            $('#next_verse').on('click', function() {
+            $('#next-verse').on('click', function() {
               if (!Object.prototype.hasOwnProperty.call(RG, '_rules') || (Object.prototype.hasOwnProperty.call(RG, '_rules') && RG.allRuleStacksEmpty())) {
                 CL._findLatestStageVerse(verse);
               } else {
@@ -1543,14 +1543,14 @@ var CL = (function() {
               }
             });
           } else {
-            document.getElementById('next_verse').innerHTML = '';
+            document.getElementById('next-verse').innerHTML = '';
           }
         });
       }
     },
 
     getUnitAppReading: function(id) {
-      const unitDetailsRegex = /(variant|drag)_unit_(\d+)(_app_)?(\d+)?(_reading_|_row_)?(\d+)?/;
+      const unitDetailsRegex = /(variant|drag)-unit-(\d+)(-app-)?(\d+)?(-reading-|-row-)?(\d+)?/;
       const m = id.match(unitDetailsRegex);
       if (m === null) {
         console.log(unitDetailsRegex);
@@ -1662,7 +1662,7 @@ var CL = (function() {
           }
           CL.services.saveCollation(CL.context, collation, confirmMessage, approvalSettings[0],
                                     approvalSettings[1], function(savedSuccessful) {
-            document.getElementById('message_panel').innerHTML = savedSuccessful ? successMessage : '';
+            document.getElementById('message-panel').innerHTML = savedSuccessful ? successMessage : '';
             // I don't know why this is needed - somewhere in the code show/hide subreadings must be called after suffixes have been added
             CL.data = collation.structure;
             if (savedSuccessful) { //only run success callback if successful!
@@ -1711,7 +1711,7 @@ var CL = (function() {
     },
 
     hideTooltip: function() {
-      document.getElementById('tool_tip').style.display = 'none';
+      document.getElementById('tool-tip').style.display = 'none';
     },
   
     addHoverEvents: function(row, witnesses) {
@@ -1743,22 +1743,22 @@ var CL = (function() {
       let menuHeight, left;
       left = menuPos.left;
       // if there is already an old menu hanging around remove it
-      if (document.getElementById('wit_form')) {
-        document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
+      if (document.getElementById('wit-form')) {
+        document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit-form'));
       }
       // show the select witnesses menu
       const witMenu = document.createElement('div');
-      witMenu.setAttribute('id', 'wit_form');
-      witMenu.setAttribute('class', 'wit_form dialogue_form');
+      witMenu.setAttribute('id', 'wit-form');
+      witMenu.setAttribute('class', 'wit-form dialogue-form');
       const witnesses = CL.sortWitnesses(CL.getAllReadingWitnesses(reading));
-      const witnessHtml = ['<div class="dialogue_form_header drag-zone">' + details.header + '</div><form id="select_wit_form">'];
+      const witnessHtml = ['<div class="dialogue-form-header drag-zone">' + details.header + '</div><form id="select-wit-form">'];
       witnessHtml.push('<label>Selected reading: </label><span>');
       witnessHtml.push(CL.extractWitnessText(reading));
       witnessHtml.push('</span>');
       if (witnesses.length > 1 && (!Object.prototype.hasOwnProperty.call(details, 'witness_select') || details.witness_select !== false)) {
-        witnessHtml.push('<div id="wit_scroller">');
+        witnessHtml.push('<div id="wit-scroller">');
         if (!Object.prototype.hasOwnProperty.call(details, 'just_split') || details.just_split !== true ) {
-          witnessHtml.push('<input type="checkbox" id="wit_select_all">Select All</input><br/>');
+          witnessHtml.push('<input type="checkbox" id="wit-select-all">Select All</input><br/>');
         }
         for (let i = 0; i < witnesses.length; i += 1) {
           if (witnesses[i] !== CL.dataSettings.base_text_siglum) {
@@ -1775,30 +1775,30 @@ var CL = (function() {
       if (details.type === 'overlap') {
         // squelch
       } else if (details.type === 'SVsubreading' || details.type === 'ORsubreading') {
-        witnessHtml.push('<label class="inline-label">Parent reading:</label><select name="parent_reading" id="parent_reading"></select><br/><br/>');
-        witnessHtml.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading_details"/><br/></br/>');
-        witnessHtml.push('<label>Subreading type: <select class="stringnotnull" name="subreading_type" id="subreading_select"></select></label><br/><br/>');
+        witnessHtml.push('<label class="inline-label">Parent reading:</label><select name="parent_reading" id="parent-reading"></select><br/><br/>');
+        witnessHtml.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading-details"/><br/></br/>');
+        witnessHtml.push('<label>Subreading type: <select class="stringnotnull" name="subreading_type" id="subreading-select"></select></label><br/><br/>');
       } else if (details.type === 'categoriseOm') {
-        witnessHtml.push('<label class="inline-label">Om Category:</label><select name="om_category" id="om_category"></select><br/>');
+        witnessHtml.push('<label class="inline-label">Om Category:</label><select name="om_category" id="om-category"></select><br/>');
       } else if (details.type !== 'duplicate') {
-        witnessHtml.push('<label class="inline-label">Parent reading:</label><select name="parent_reading" id="parent_reading"></select><br/>');
-        witnessHtml.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading_details"/><br/></br/>');
+        witnessHtml.push('<label class="inline-label">Parent reading:</label><select name="parent_reading" id="parent-reading"></select><br/>');
+        witnessHtml.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading-details"/><br/></br/>');
       }
-      witnessHtml.push('<input class="pure-button dialogue-form-button" id="close_button" type="button" value="Cancel"/>');
-      witnessHtml.push('<input class="pure-button dialogue-form-button" id="select_button" type="button" value="' + details.button + '"/></form>');
+      witnessHtml.push('<input class="pure-button dialogue-form-button" id="close-button" type="button" value="Cancel"/>');
+      witnessHtml.push('<input class="pure-button dialogue-form-button" id="select-button" type="button" value="' + details.button + '"/></form>');
       witMenu.innerHTML = witnessHtml.join('');
       document.getElementsByTagName('body')[0].appendChild(witMenu);
       left = parseInt(left) - document.getElementById('scroller').scrollLeft;
-      if (left + document.getElementById('wit_form').offsetWidth > window.innerWidth) {
-        left = left - document.getElementById('wit_form').offsetWidth;
+      if (left + document.getElementById('wit-form').offsetWidth > window.innerWidth) {
+        left = left - document.getElementById('wit-form').offsetWidth;
       }
       if (left < 0) {
         left = 4;
       }
-      document.getElementById('wit_form').style.left = left + 'px';
-      drag.initDraggable('wit_form', true, true);
-      const witFormHeight = document.getElementById('wit_form').offsetHeight - 43;
-      document.getElementById('select_wit_form').style.height = witFormHeight + 'px';
+      document.getElementById('wit-form').style.left = left + 'px';
+      drag.initDraggable('wit-form', true, true);
+      const witFormHeight = document.getElementById('wit-form').offsetHeight - 43;
+      document.getElementById('select-wit-form').style.height = witFormHeight + 'px';
       if (Object.prototype.hasOwnProperty.call(details, 'form_size') && details.form_size === 'small') {
         menuHeight = Math.max(witFormHeight - 100, 50);
       } else if (details.type === 'SVsubreading' || details.type === 'ORsubreading') {
@@ -1807,13 +1807,13 @@ var CL = (function() {
         menuHeight = Math.max(witFormHeight - 173, 50);
       }
       if (witnesses.length > 1 && (!Object.prototype.hasOwnProperty.call(details, 'witness_select') || details.witness_select !== false)) {
-        document.getElementById('wit_scroller').style.maxHeight = menuHeight + 'px';
+        document.getElementById('wit-scroller').style.maxHeight = menuHeight + 'px';
       }
-      $('#close_button').on('click', function() {
-        document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
+      $('#close-button').on('click', function() {
+        document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit-form'));
       });
-      if (document.getElementById('wit_select_all')) {
-        $('#wit_select_all').on('click', function(event) {
+      if (document.getElementById('wit-select-all')) {
+        $('#wit-select-all').on('click', function(event) {
           CL._checkWitnesses(event.target.id);
         });
       }
@@ -1862,10 +1862,10 @@ var CL = (function() {
       parents.push({'label': 'gap', 'value': 'gap'});
       parents.push({'label': 'other', 'value': 'other'});
 
-      cforms.populateSelect(parents, document.getElementById('parent_reading'),
+      cforms.populateSelect(parents, document.getElementById('parent-reading'),
                             {'value_key': 'value', 'text_keys': 'label'});
       // Populate the subreading type dropdown
-      if (document.getElementById('subreading_select')) {
+      if (document.getElementById('subreading-select')) {
         subreadingClasses = [];
         for (let i = 0; i < CL.ruleClasses.length; i += 1) {
           if (format === 'set_variants') {
@@ -1878,27 +1878,27 @@ var CL = (function() {
             }
           }
         }
-        cforms.populateSelect(subreadingClasses, document.getElementById('subreading_select'),
+        cforms.populateSelect(subreadingClasses, document.getElementById('subreading-select'),
                               {'value_key': 'value', 'text_keys': 'name', 'add_select': false});
       }
       //Add event handler to provide extra data box for gap and other
-      $('#parent_reading').on('change', function(event) {
+      $('#parent-reading').on('change', function(event) {
         if (event.target.value === 'gap') {
-          document.getElementById('reading_details').value = '';
-          document.getElementById('reading_details').removeAttribute('disabled');
+          document.getElementById('reading-details').value = '';
+          document.getElementById('reading-details').removeAttribute('disabled');
         } else if (event.target.value === 'other') {
-          document.getElementById('reading_details').value = '';
-          document.getElementById('reading_details').removeAttribute('disabled');
+          document.getElementById('reading-details').value = '';
+          document.getElementById('reading-details').removeAttribute('disabled');
         } else {
-          document.getElementById('reading_details').value = '';
-          document.getElementById('reading_details').setAttribute('disabled', 'disabled');
+          document.getElementById('reading-details').value = '';
+          document.getElementById('reading-details').setAttribute('disabled', 'disabled');
         }
       });
       // Add event handler to do the job
-      $('#select_button').on('click', function() {
+      $('#select-button').on('click', function() {
         let extraDetails;
         const unit = CL.data[readingDetails.app_id][readingDetails.unit_pos];
-        const data = cforms.serialiseForm('select_wit_form');
+        const data = cforms.serialiseForm('select-wit-form');
         if (data.parent_reading !== null) {
           const witnessList = [];
           for (const key in data) {
@@ -1946,7 +1946,7 @@ var CL = (function() {
                                               'reading_id': readingDetails.reading_id});
           }
           const callback = function() {
-            document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
+            document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit-form'));
           };
           if (format === 'set_variants') {
             SV.makeStandoffReading(type, readingDetails, data.parent_reading, callback);
@@ -2381,8 +2381,8 @@ var CL = (function() {
 
     setUpRemoveWitnessesForm: function(wits, data, stage, removeFunction) {
       let sigla;
-      document.getElementById('remove_witnesses_div').style.left = document.getElementById('scroller').offsetWidth -
-      document.getElementById('remove_witnesses_div').offsetWidth - 15 + 'px';
+      document.getElementById('remove-witnesses-div').style.left = document.getElementById('scroller').offsetWidth -
+      document.getElementById('remove-witnesses-div').offsetWidth - 15 + 'px';
       const transcriptionIds = {};
       for (let i = 0; i < wits.length; i += 1) {
         for (const key in data.hand_id_map) {
@@ -2397,45 +2397,45 @@ var CL = (function() {
       }
       const html = [];
       // add a select all option
-      html.push('<input class="boolean" type="checkbox" id="select_all" name="select_all"/><label>Select all</label><br/>');
+      html.push('<input class="boolean" type="checkbox" id="select-all" name="select_all"/><label>Select all</label><br/>');
       for (const key in transcriptionIds) {
         if (transcriptionIds[key].length > 1) {
           sigla = transcriptionIds[key].join('/');
-          html.push('<input class="witness_select" type="checkbox" id="' + key + '" value="' + transcriptionIds[key].join('|') +
+          html.push('<input class="witness-select" type="checkbox" id="' + key + '" value="' + transcriptionIds[key].join('|') +
             '" name="' + key + '"/>' + '<label>' + sigla + '</label><br/>');
         } else {
           sigla = transcriptionIds[key][0];
-          html.push('<input class="witness_select" type="checkbox" id="' + key + '" value="' + sigla +
+          html.push('<input class="witness-select" type="checkbox" id="' + key + '" value="' + sigla +
             '" name="' + key + '"/>' + '<label>' + sigla + '</label><br/>');
         }
 
       }
-      document.getElementById('witness_checkboxes').innerHTML = html.join('');
-      drag.initDraggable('remove_witnesses_div', true, true);
-      document.getElementById('remove_witnesses_content').style.height = document.getElementById('remove_witnesses_div').offsetHeight - 35 + 'px';
-      $('#select_all').on('click', function() {
+      document.getElementById('witness-checkboxes').innerHTML = html.join('');
+      drag.initDraggable('remove-witnesses-div', true, true);
+      document.getElementById('remove-witnesses-content').style.height = document.getElementById('remove-witnesses-div').offsetHeight - 35 + 'px';
+      $('#select-all').on('click', function() {
         if ($(this).is(':checked')) {
-          $('.witness_select').each(function() {
+          $('.witness-select').each(function() {
             $(this).prop('checked', true);
           });
         } else {
-          $('.witness_select').each(function() {
+          $('.witness-select').each(function() {
             $(this).prop('checked', false);
           });
         }
       });
-      $('.witness_select').on('click', function() {
+      $('.witness-select').on('click', function() {
         if (!$(this).is(':checked')) {
-          $('#select_all').prop('checked', false);
+          $('#select-all').prop('checked', false);
         }
-        if ($('.witness_select').length == $('.witness_select:checked').length) {
-          $('#select_all').prop('checked', true);
+        if ($('.witness-select').length == $('.witness-select:checked').length) {
+          $('#select-all').prop('checked', true);
         }
       });
       if (removeFunction !== undefined) {
-        $('#remove_selected_button').on('click', removeFunction);
+        $('#remove-selected-button').on('click', removeFunction);
       } else {
-        $('#remove_selected_button').on('click', function() {
+        $('#remove-selected-button').on('click', function() {
           const handsToRemove = CL.getRemoveWitnessDataFromForm();
           CL.removeWitnesses(handsToRemove, stage);
           CL.isDirty = true;
@@ -2446,7 +2446,7 @@ var CL = (function() {
     getRemoveWitnessDataFromForm: function() {
       let hands;
       const handsToRemove = [];
-      const data = cforms.serialiseForm('remove_witnesses_form');
+      const data = cforms.serialiseForm('remove-witnesses-form');
       for (const key in data) {
         if (Object.prototype.hasOwnProperty.call(data, key) && data[key] !== null && data[key] !== true) {
           hands = data[key].split('|');
@@ -2471,13 +2471,13 @@ var CL = (function() {
       if (ok) {
         //return to Table
         //remove the witness removal window if shown
-        if (document.getElementById('remove_witnesses_div')) {
-          document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
+        if (document.getElementById('remove-witnesses-div')) {
+          document.getElementById('remove-witnesses-div').parentNode.removeChild(document.getElementById('remove-witnesses-div'));
         }
         if (callback !== undefined) {
           callback();
         }
-        document.getElementById('container').innerHTML = '<div id="saved_collations_div"></div>';
+        document.getElementById('container').innerHTML = '<div id="saved-collations-div"></div>';
         CL._findSaved(CL.context);
       }
     },
@@ -2811,13 +2811,13 @@ var CL = (function() {
       if (document.getElementById('language')) {
         CL.dataSettings.language = document.getElementById('language').value;
       }
-      if (document.getElementById('base_text')) {
+      if (document.getElementById('base-text')) {
         // if a base text is given, check that the base_text is the same as the one in the saved collation
-        if (document.getElementById('base_text').value === existingCollation.data_settings.base_text) {
-          CL.dataSettings.base_text = document.getElementById('base_text').value;
+        if (document.getElementById('base-text').value === existingCollation.data_settings.base_text) {
+          CL.dataSettings.base_text = document.getElementById('base-text').value;
         } else {
           alert('You can only add witnesses if the project base text is currently the same as the one used for the ' +
-            'saved collation. This is not the case with yur data.\n\nTo add witnesses change the project base ' +
+            'saved collation. This is not the case with your data.\n\nTo add witnesses change the project base ' +
             'text to match the saved collations.');
           CL.returnToSummaryTable();
           return;
@@ -3124,8 +3124,8 @@ var CL = (function() {
       CL._includeJavascript(CL.services.localJavascript, function() {
         CL.services.getCurrentEditingProject(CL._initialiseProject);
       });
-      if (document.getElementById('tool_tip') === null) {
-        $('body').append($('<div id="tool_tip" class="tooltip"></div>'));
+      if (document.getElementById('tool-tip') === null) {
+        $('body').append($('<div id="tool-tip" class="tooltip"></div>'));
       }
     },
 
@@ -3245,6 +3245,15 @@ var CL = (function() {
       } else {
         // default is false
         CL.project.showSelectAllVariantsOption = false;
+      }
+      // setting for allowing overlap removal. On a setting because the call to collateX might not always be appropriate
+      if (Object.prototype.hasOwnProperty.call(project, 'allowOverlapRemoval')) {
+        CL.project.allowOverlapRemoval = project.allowOverlapRemoval;
+      } else if (Object.prototype.hasOwnProperty.call(CL.services, 'allowOverlapRemoval')) {
+        CL.project.allowOverlapRemoval = CL.services.allowOverlapRemoval;
+      } else {
+        // default is false (maintains existing behaviour)
+        CL.project.allowOverlapRemoval = false;
       }
       // settings for get apparatus button in approved view
       if (Object.prototype.hasOwnProperty.call(project, 'showGetApparatusButton')) {
@@ -3500,7 +3509,7 @@ var CL = (function() {
     _prepareCollation: function(output) {
       spinner.showLoadingOverlay();
       CL.dataSettings.language = document.getElementById('language').value;
-      CL.dataSettings.base_text = document.getElementById('base_text').value;
+      CL.dataSettings.base_text = document.getElementById('base-text').value;
       const context = CL._getContextFromInputForm();
       if (context && CL.dataSettings.base_text !== 'none') {
         CL.context = context;
@@ -3542,12 +3551,12 @@ var CL = (function() {
       if (Object.prototype.hasOwnProperty.call(CL.services, 'getWitnessesFromInputForm')) {
         return CL.services.getWitnessesFromInputForm();
       } else {
-        if (document.getElementById('preselected_witnesses')) {
-          return document.getElementById('preselected_witnesses').value.split(',');
+        if (document.getElementById('preselected-witnesses')) {
+          return document.getElementById('preselected-witnesses').value.split(',');
         } else {
           // TODO: test this
           witnessList = [];
-          data = cforms.serialiseForm('collation_form');
+          data = cforms.serialiseForm('collation-form');
           if (!$.isEmptyObject(data)) {
             for (const key in data) {
               if (Object.prototype.hasOwnProperty.call(data, key)) {
@@ -3666,11 +3675,11 @@ var CL = (function() {
       hasCollationsWithWitsToRemove = false;
       hasCollationsWithWitsToAdd = false;
       const html = [];
-      if (document.getElementById('collation_form')) {
-        document.getElementById('collation_form').style.display = 'none';
+      if (document.getElementById('collation-form')) {
+        document.getElementById('collation-form').style.display = 'none';
       }
-      html.push('<form id="saved_collation_form">');
-      html.push('<table id="saved_collations">');
+      html.push('<form id="saved-collation-form">');
+      html.push('<table id="saved-collations">');
       html.push('<th>User</th><th>Regularised</th><th>Variants Set</th><th>Ordered</th><th>Approved</th>');
       const userCount = Object.keys(byUser).length;
       firstRow = true;
@@ -3825,8 +3834,9 @@ var CL = (function() {
       if (document.getElementById('witnesses')) {
         document.getElementById('witnesses').innerHTML = '';
       }
-      document.getElementById('saved_collations_div').innerHTML = html.join('');
-      document.getElementById('header').innerHTML = CL.getHeaderHtml('Collation', context);
+      document.getElementById('saved-collations-div').innerHTML = html.join('');
+      document.getElementById('header').innerHTML = CL.getHeaderHtml('Collation', CL.context);
+      document.getElementById('unit-ref').textContent = context;
   
       if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
         CL.services.showLoginStatus();
@@ -3837,44 +3847,44 @@ var CL = (function() {
                   $(this).parent().hasClass('set')) &&
                     ($(this).hasClass('added') ||
                       $(this).hasClass('both'))) {
-            $('#load_saved_add_button').removeClass('pure-button-disabled');
+            $('#load-saved-add-button').removeClass('pure-button-disabled');
           } else {
-            $('#load_saved_add_button').addClass('pure-button-disabled');
+            $('#load-saved-add-button').addClass('pure-button-disabled');
           }
           if (($(this).parent().hasClass('regularised') ||
                     $(this).parent().hasClass('set')) &&
                       ($(this).hasClass('removed') ||
                         $(this).hasClass('both'))) {
-            $('#load_saved_remove_button').removeClass('pure-button-disabled');
+            $('#load-saved-remove-button').removeClass('pure-button-disabled');
           } else {
-            $('#load_saved_remove_button').addClass('pure-button-disabled');
+            $('#load-saved-remove-button').addClass('pure-button-disabled');
           }
         }
       });
       const footerHtml = [];
-      footerHtml.push('<input class="pure-button right_foot" id="load_saved_button" type="button" value="Load collation"/>');
+      footerHtml.push('<input class="pure-button right-foot" id="load-saved-button" type="button" value="Load collation"/>');
       if (hasCollationsWithWitsToAdd === true && CL.project.allowWitnessChangesInSavedCollations === true) {
-        footerHtml.push('<input class="pure-button pure-button-disabled right_foot" id="load_saved_add_button" ' +
+        footerHtml.push('<input class="pure-button pure-button-disabled right-foot" id="load-saved-add-button" ' +
                         'type="button" value="Load collation and add witnesses"/>');
       }
       if (hasCollationsWithWitsToRemove === true && CL.project.allowWitnessChangesInSavedCollations === true) {
-        footerHtml.push('<input class="pure-button pure-button-disabled right_foot" id="load_saved_remove_button" ' +
+        footerHtml.push('<input class="pure-button pure-button-disabled right-foot" id="load-saved-remove-button" ' +
                         'type="button" value="Load collation and remove witnesses"/>');
       }
       document.getElementById('footer').innerHTML = footerHtml.join('');
-      $('#load_saved_button').on('click', function() {
+      $('#load-saved-button').on('click', function() {
         CL.witnessEditingMode = false;
         CL.witnessAddingMode = false;
         CL.witnessRemovingMode = false;
         CL._loadSavedCollation();
       });
-      $('#load_saved_add_button').on('click', function() {
+      $('#load-saved-add-button').on('click', function() {
         CL.witnessEditingMode = true;
         CL.witnessAddingMode = true;
         CL.witnessRemovingMode = false;
         CL._addToSavedCollation();
       });
-      $('#load_saved_remove_button').on('click', function() {
+      $('#load-saved-remove-button').on('click', function() {
         CL.witnessEditingMode = true;
         CL.witnessAddingMode = false;
         CL.witnessRemovingMode = true;
@@ -3885,7 +3895,7 @@ var CL = (function() {
     _addToSavedCollation: function(id) {
       let data, collId;
       if (id === undefined) {
-        data = cforms.serialiseForm('saved_collation_form');
+        data = cforms.serialiseForm('saved-collation-form');
         collId = data.saved_collation;
       } else {
         collId = id;
@@ -3918,12 +3928,17 @@ var CL = (function() {
       }
     },
 
-    _mergeCollationObjects: function(mainCollation, newData, addedWits) {
+    _mergeCollationObjects: function(mainCollation, newData, addedWits, startIndex, endIndex, adjoiningUnits) {
+      /** This merges a new collation into an existing collation. This might be a full verse if we are in add witness
+      /* mode or a small chunk of a verse if we are removing an overlapping unit.
+      /* AddedWits should be an empty list if removing an overlapping unit.
+      /* start and end index must be supplied if we are merging a partial section (used when removing
+      /* overlappingreadings) for full verse merges we can calculate from the data. */
       let index, newUnit, existingUnit, newUnits, existingUnits, newReadingText,
         matchingReadingFound, unitQueue, nextUnits, unit1, unit2, tempUnit, omReading,
         existingWitnesses, before, after, beforeIds, afterIds,
         sharedIds, overlappedWitnesses;
-  
+
       for (let i = 0; i < addedWits.length; i += 1) {
         if (mainCollation.data_settings.witness_list.indexOf(addedWits[i]) === -1) {
           mainCollation.data_settings.witness_list.push(addedWits[i]);
@@ -3942,10 +3957,12 @@ var CL = (function() {
         }
       }
       // update hand_id_map
-      for (const key in newData.hand_id_map) {
-        if (Object.prototype.hasOwnProperty.call(newData.hand_id_map, key)) {
-          if (!Object.prototype.hasOwnProperty.call(mainCollation.structure.hand_id_map, key)) {
-            mainCollation.structure.hand_id_map[key] = newData.hand_id_map[key];
+      if (addedWits.length > 0) { // we don't need to do this for removing overlaps because we never change it
+        for (const key in newData.hand_id_map) {
+          if (Object.prototype.hasOwnProperty.call(newData.hand_id_map, key)) {
+            if (!Object.prototype.hasOwnProperty.call(mainCollation.structure.hand_id_map, key)) {
+              mainCollation.structure.hand_id_map[key] = newData.hand_id_map[key];
+            }
           }
         }
       }
@@ -3953,10 +3970,13 @@ var CL = (function() {
       // if in existing and not new add new as om/lac verse/om_verse
       // if in new and not existing all existing needs to be om lac verse/om verse
       // make reading for any combined or shared units and check against existing readings
-      index = 1;  // this refers to the position indicated by numbers under the basetext
-      while (index <= (newData.overtext[0].tokens.length * 2) + 1) {
-        // if new data has one then
-  
+      if (startIndex === undefined) {
+        index = 1; // this refers to the position indicated by numbers under the basetext
+        endIndex = (newData.overtext[0].tokens.length * 2) + 1
+      } else {
+        index = startIndex;
+      } 
+      while (index <= endIndex) {
         newUnits = CL._getUnitsByStartIndex(index, newData.apparatus);
         existingUnits = CL._getUnitsByStartIndex(index, mainCollation.structure.apparatus);
         if (newUnits.length === 0 && existingUnits.length === 0) {
@@ -3965,13 +3985,15 @@ var CL = (function() {
         for (let z = 0; z < Math.max(newUnits.length, existingUnits.length); z += 1) {
           newUnit = z < newUnits.length ? newUnits[z] : null;
           existingUnit = z < existingUnits.length ? existingUnits[z] : null;
+          // first handle the om and lac verse stuff
           if (existingUnit !== null && (newData.lac_readings.length > 0 || newData.om_readings.length > 0)) {
             CL._mergeNewLacOmVerseReadings(existingUnit, newData);
           }
+          // now move onto the readings
           if (newUnit === null && existingUnit === null) {
             index += 1;
           } else {
-            if (newUnit === null) {
+            if (newUnit === null) { // then these witnesses are added as oms (lacOmfix might change that later)
               omReading = null;
               for (let i = 0; i < existingUnit.readings.length; i += 1) {
                 // NB: this last condition should not be needed but before 26/09/21 the code was incorrectly
@@ -3981,9 +4003,9 @@ var CL = (function() {
                       !Object.prototype.hasOwnProperty.call(existingUnit.readings[i], 'overlap_status') &&
                       existingUnit.readings[i].text.length === 0) {
                   omReading = existingUnit.readings[i];
+                  break;  // if we don't break here then we might end up with regularised oms as the hit if the basetext is om
                 }
               }
-  
               if (omReading) {
                 // addedWits is identifiers rather than sigla for readings so use hand_id_map here instead
                 // we can assume that basetext is om in both cases as it is the same text so the check of exisitng
@@ -3997,12 +4019,18 @@ var CL = (function() {
                 }
                 index = existingUnit.end + 1;
               } else {
-                alert('The new witnesses could not be added this time due to a base text conflict.\n' +
+                if (addedWits.length > 0) { // then we are trying to add witnesses
+                  alert('The new witnesses could not be added this time due to a base text conflict.\n' +
                   'Please check that your current project base text is the same as that used for the saved ' +
                   'collations and then try again.');
-                spinner.removeLoadingOverlay();
-                CL.returnToSummaryTable();
-                return;
+                  spinner.removeLoadingOverlay();
+                  CL.returnToSummaryTable();
+                  return;
+                } else {
+                  alert('Something went wrong while trying to remove the overlap. You must reload this page and not continue editing.')
+                  spinner.removeLoadingOverlay();
+                  return;
+                }
               }
             } else if (existingUnit === null) {
               // then add a new unit and make sure any overlapped witnesses are separated appropriately
@@ -4072,6 +4100,7 @@ var CL = (function() {
               newUnit.added = true;
               mainCollation.structure.apparatus.push(newUnit);
               mainCollation.structure.apparatus.sort(SV.compareFirstWordIndexes);
+
               before = null;
               after = null;
               for (let i = 0; i < mainCollation.structure.apparatus.length; i += 1) {
@@ -4081,6 +4110,12 @@ var CL = (function() {
                 if (mainCollation.structure.apparatus[i].start === newUnit.start + 1) {
                   after = mainCollation.structure.apparatus[i];
                 }
+              }
+              if (before === null && adjoiningUnits !== undefined) {
+                before = adjoiningUnits[0];
+              }
+              if (after === null && adjoiningUnits !== undefined) {
+                after = adjoiningUnits[1];
               }
               if (before && after && Object.prototype.hasOwnProperty.call(before, 'overlap_units') &&
                       Object.prototype.hasOwnProperty.call(after, 'overlap_units')) {
@@ -4100,17 +4135,17 @@ var CL = (function() {
                 }
               }
               index = newUnit.end + 1;
-            } else {
+            } else { // we have a existing unit to add the new unit to
               if (newUnit.end == existingUnit.end) {
                 for (let j = 0; j < newUnit.readings.length; j += 1) {
                   matchingReadingFound = false;
                   newReadingText = CL.extractWitnessText(newUnit.readings[j]);
-  
                   for (let k = 0; k < existingUnit.readings.length; k += 1) {
                     if (!Object.prototype.hasOwnProperty.call(existingUnit.readings[k], 'overlap_status') &&
                       CL.extractWitnessText(existingUnit.readings[k]) === newReadingText) {
                       matchingReadingFound = true;
                       CL._mergeNewReading(existingUnit.readings[k], newUnit.readings[j]);
+                      break;  // if we don't break here then we might end up with a regularised reading as a hit
                     }
                   }
                   if (matchingReadingFound === false) {
@@ -4119,6 +4154,7 @@ var CL = (function() {
                     existingUnit.readings.push(newUnit.readings[j]);
                   }
                 }
+                SV.unsplitUnitWitnesses(undefined, 'apparatus', existingUnit);
                 index = newUnit.end + 1;
               } else {
                 // no end agreement
@@ -4151,6 +4187,7 @@ var CL = (function() {
                       CL.extractWitnessText(existingUnit.readings[k]) === newReadingText) {
                       matchingReadingFound = true;
                       CL._mergeNewReading(existingUnit.readings[k], unit1.readings[j]);
+                      break;  // if we don't break here then we might end up with a regularised reading as the hit
                     }
                   }
                   if (matchingReadingFound === false) {
@@ -4184,24 +4221,56 @@ var CL = (function() {
     },
 
     _mergeNewLacOmVerseReadings: function(unit, newData) {
-      for (let i = 0; i < unit.readings.length; i += 1) {
-        if (Object.prototype.hasOwnProperty.call(unit.readings[i], 'type')) {
-          if (unit.readings[i].type === 'lac_verse' && newData.lac_readings.length > 0) {
-            for (let j = 0; j < newData.lac_readings.length; j += 1) {
-              if (unit.readings[i].witnesses.indexOf(newData.lac_readings[j]) === -1) {
-                unit.readings[i].witnesses.push(newData.lac_readings[j]);
-              }
+      /** Merge any lac/om verse readings from the new data into the provided unit or add a new reading if no
+       * appropriate reading exists. */
+      let lacsAdded, omsAdded;
+      if (newData.lac_readings.length > 0) {
+        lacsAdded = false;
+        for (let i = 0; i < unit.readings.length; i += 1) {
+          if (Object.prototype.hasOwnProperty.call(unit.readings[i], 'type')) {
+            if (unit.readings[i].type === 'lac_verse') {
+              lacsAdded = true;
+              for (let j = 0; j < newData.lac_readings.length; j += 1) {
+                if (unit.readings[i].witnesses.indexOf(newData.lac_readings[j]) === -1) {
+                  unit.readings[i].witnesses.push(newData.lac_readings[j]);
+                }
+              }   
             }
+          }
+        }
+        if (!lacsAdded) {
+          // add a new reading
+          unit.readings.push({
+            'text': [],
+            'type': 'lac_verse',
+            'details': CL.project.lacUnitLabel,
+            'witnesses': JSON.parse(JSON.stringify(newData.lac_readings))
+          });
+        }
+      }
+      if (newData.om_readings.length > 0) {
+        omsAdded = false;
+        for (let i = 0; i < unit.readings.length; i += 1) {
+          if (unit.readings[i].type === 'om_verse') {
+            omsAdded = true;
             // untested but same code as above
             // om verse might want to look for an overlapped unit and add to that with duplicates in the top line for
             // user to deal with
-          } else if (unit.readings[i].type === 'om_verse' && newData.om_readings.length > 0) {
             for (let j = 0; j < newData.om_readings.length; j += 1) {
               if (unit.readings[i].witnesses.indexOf(newData.om_readings[j]) === -1) {
-                unit.readings[i].witnesses.push(newData.om_readings[j]);
+                unit.readings[i].witnesses.push(newData.om_readings[j]);      
               }
             }
           }
+        }
+        if (!omsAdded) {
+          // add a new reading
+          unit.readings.push({
+            'text': [],
+            'type': 'om_verse',
+            'details': CL.project.omUnitLabel,
+            'witnesses': JSON.parse(JSON.stringify(newData.om_readings))
+          });
         }
       }
     },
@@ -4221,7 +4290,7 @@ var CL = (function() {
       CL.isDirty = false;
       spinner.showLoadingOverlay();
       if (id === undefined) {
-        data = cforms.serialiseForm('saved_collation_form');
+        data = cforms.serialiseForm('saved-collation-form');
         collId = data.saved_collation;
       } else {
         collId = id;
@@ -4310,14 +4379,14 @@ var CL = (function() {
     },
 
     _collapseUnit: function(id, format) {
-      const idno = id.replace('toggle_variant_', '');
+      const idno = id.replace('toggle-variant-', '');
       if (format === 'table') {
-        $('#variant_unit_' + idno).find('TR:gt(1)').addClass('hidden');
+        $('#variant-unit-' + idno).find('TR:gt(1)').addClass('hidden');
       } else {
-        $('#variant_unit_' + idno).find('LI:first').removeClass('top');
-        $('#variant_unit_' + idno).find('LI:gt(0)').addClass('hidden');
+        $('#variant-unit-' + idno).find('LI:first').removeClass('top');
+        $('#variant-unit-' + idno).find('LI:gt(0)').addClass('hidden');
       }
-      const span = document.getElementById('toggle_variant_' + idno);
+      const span = document.getElementById('toggle-variant-' + idno);
       span.innerHTML = '&#9660;';
       $(span).off('click.collapse');
       $(span).on('click.expand', function(event) {
@@ -4327,14 +4396,14 @@ var CL = (function() {
     },
   
     _expandUnit: function(id, format) {
-      const idno = id.replace('toggle_variant_', '');
+      const idno = id.replace('toggle-variant-', '');
       if (format === 'table') {
-        $('#variant_unit_' + idno).find('TR').removeClass('hidden');
+        $('#variant-unit-' + idno).find('TR').removeClass('hidden');
       } else {
-        $('#variant_unit_' + idno).find('LI:first').addClass('top');
-        $('#variant_unit_' + idno).find('LI').removeClass('hidden');
+        $('#variant-unit-' + idno).find('LI:first').addClass('top');
+        $('#variant-unit-' + idno).find('LI').removeClass('hidden');
       }
-      const span = document.getElementById('toggle_variant_' + idno);
+      const span = document.getElementById('toggle-variant-' + idno);
       span.innerHTML = '&#9650;';
       $(span).off('click.expand');
       $(span).on('click.collapse', function(event) {
@@ -4348,8 +4417,8 @@ var CL = (function() {
       for (let i = 0; i < triangles.length; i += 1) {
         CL._expandUnit(triangles[i].id, format);
       }
-      $('#expand_collapse_button').off('click.expand_all');
-      $('#expand_collapse_button').on('click.expand_collapse_button', function() {
+      $('#expand-collapse-button').off('click.expand_all');
+      $('#expand-collapse-button').on('click.expand-collapse-button', function() {
         $(this).text('expand all');
         CL._collapseAll(format);
       });
@@ -4361,8 +4430,8 @@ var CL = (function() {
       for (let i = 0; i < triangles.length; i += 1) {
         CL._collapseUnit(triangles[i].id, format);
       }
-      $('#expand_collapse_button').off('click.collapse_all');
-      $('#expand_collapse_button').on('click.expand_all', function() {
+      $('#expand-collapse-button').off('click.collapse_all');
+      $('#expand-collapse-button').on('click.expand_all', function() {
         $(this).text('collapse all');
         CL._expandAll(format);
       });
@@ -4395,9 +4464,9 @@ var CL = (function() {
             }
           } else {
             if (options.dropable) {
-              cell = '<td' + idString + ' class="start_' + options.start + '" colspan="' + (options.end - options.start + 1) + '"></td>';
+              cell = '<td' + idString + ' class="start-' + options.start + '" colspan="' + (options.end - options.start + 1) + '"></td>';
             } else {
-              cell = '<td' + idString + ' class="mark start_' + options.start + '" colspan="' + (options.end - options.start + 1) + '"></td>';
+              cell = '<td' + idString + ' class="mark start-' + options.start + '" colspan="' + (options.end - options.start + 1) + '"></td>';
             }
           }
           break;
@@ -4405,14 +4474,14 @@ var CL = (function() {
           if (!Object.prototype.hasOwnProperty.call(options, 'start') || !Object.prototype.hasOwnProperty.call(options, 'end')) {
             cell = '<td class="mark"></td>';
           } else {
-            cell = '<td class="mark start_' + options.start + '" colspan="' + (options.end - options.start + 1) + '"></td>';
+            cell = '<td class="mark start-' + options.start + '" colspan="' + (options.end - options.start + 1) + '"></td>';
           }
           break;
         default:
           if (!Object.prototype.hasOwnProperty.call(options, 'start') || !Object.prototype.hasOwnProperty.call(options, 'end')) {
             cell = '<td></td>';
           } else {
-            cell = '<td class="start_' + options.start + '" colspan="' + (options.end - options.start + 1) + '"></td>';
+            cell = '<td class="start-' + options.start + '" colspan="' + (options.end - options.start + 1) + '"></td>';
           }
       }
       return cell;
@@ -4446,13 +4515,13 @@ var CL = (function() {
           delete rules[key];
         }
       }
-      html.push('<td class="mark start_' + start + ' " colspan="' + (end - start + 1) + '">');
-      html.push('<table class="variant_unit" id="variant_unit_' + id + '">');
+      html.push('<td class="mark start-' + start + ' " colspan="' + (end - start + 1) + '">');
+      html.push('<table class="variant-unit" id="variant-unit-' + id + '">');
       for (let i = 0; i < data.length; i += 1) {
-        rowId = 'variant_unit_' + id + '_row_' + i;
+        rowId = 'variant-unit-' + id + '-row-' + i;
         rowList.push(rowId);
         if (i === 0) {
-          html.push('<tr><td colspan="3" ><span id="toggle_variant_' + id +
+          html.push('<tr><td colspan="3" ><span id="toggle-variant-' + id +
                     '" class="triangle">&#9650;</span></td></tr>');
           if (data[i].witnesses.indexOf(hand) != -1) {
             html.push('<tr id="' + rowId + '" class="top highlighted">');
@@ -4474,9 +4543,9 @@ var CL = (function() {
         readingSuffix = CL.getReadingSuffix(data[i], rules);
   
         html.push('<td></td>');
-        html.push('<td id="' + rowId + '_label">' + readingLabel);
+        html.push('<td id="' + rowId + '-label">' + readingLabel);
         html.push('</td>');
-        html.push('<td class="main_reading">');
+        html.push('<td class="main-reading">');
         html.push(text);
         if (readingSuffix !== '') {
           html.push(' ' + readingSuffix);
@@ -5257,21 +5326,21 @@ var CL = (function() {
       }
       const settingsDiv = document.createElement('div');
       settingsDiv.setAttribute('id', 'settings');
-      settingsDiv.setAttribute('class', 'dialogue_form settings_dialogue');
-      settingsDiv.innerHTML = '<div class="dialogue_form_header"><span id="settings_title">Algorithm Settings</span></div><form id="settings_form">' +
+      settingsDiv.setAttribute('class', 'dialogue-form settings-dialogue');
+      settingsDiv.innerHTML = '<div class="dialogue-form-header"><span id="settings-title">Algorithm Settings</span></div><form id="settings-form">' +
         '<label class="inline-label" for="algorithm">Algorithm:</label><select id="algorithm" name="algorithm">' +
         '<option value="auto">Auto</option><option value="dekker">Dekker</option><option value="needleman-wunsch">Needleman-Wunsch</option>' +
         '</select><br/>' +
-        '<label class="inline-label" for="fuzzy_match">Use fuzzy matching:</label><input class="boolean" name="fuzzy_match" id="fuzzy_match" type="checkbox"/><br/>' +
+        '<label class="inline-label" for="fuzzy-match">Use fuzzy matching:</label><input class="boolean" name="fuzzy_match" id="fuzzy-match" type="checkbox"/><br/>' +
         '<label class="inline-label" for="distance">Distance:</label><input size="4" class="string" name="distance" id="distance" type="text"/><br/>' +
-        '<input class="pure-button dialogue-form-button" type="button" id="save_settings" value="Save"/>' +
-        '<input class="pure-button dialogue-form-button" type="button" id="close_settings" value="Cancel"/></form>';
+        '<input class="pure-button dialogue-form-button" type="button" id="save-settings" value="Save"/>' +
+        '<input class="pure-button dialogue-form-button" type="button" id="close-settings" value="Cancel"/></form>';
       document.getElementsByTagName('body')[0].appendChild(settingsDiv);
       if (document.getElementById('algorithm')) {
         document.getElementById('algorithm').value = CL.collationAlgorithmSettings.algorithm;
       }
-      if (document.getElementById('fuzzy_match')) {
-        document.getElementById('fuzzy_match').checked = CL.collationAlgorithmSettings.fuzzy_match;
+      if (document.getElementById('fuzzy-match')) {
+        document.getElementById('fuzzy-match').checked = CL.collationAlgorithmSettings.fuzzy_match;
         if (CL.collationAlgorithmSettings.fuzzy_match === false) {
           document.getElementById('distance').disabled = 'disabled';
         }
@@ -5279,15 +5348,15 @@ var CL = (function() {
       if (document.getElementById('distance')) {
         document.getElementById('distance').value = CL.collationAlgorithmSettings.distance;
       }
-      $('#fuzzy_match').on('click', function() {
-        if (document.getElementById('fuzzy_match').checked === true) {
+      $('#fuzzy-match').on('click', function() {
+        if (document.getElementById('fuzzy-match').checked === true) {
           document.getElementById('distance').removeAttribute('disabled');
         } else {
           document.getElementById('distance').disabled = 'disabled';
         }
       });
-      $('#save_settings').on('click', function() {
-        data = cforms.serialiseForm('settings_form');
+      $('#save-settings').on('click', function() {
+        data = cforms.serialiseForm('settings-form');
         for (const setting in CL.collationAlgorithmSettings) {
           if (Object.prototype.hasOwnProperty.call(CL.collationAlgorithmSettings, setting)) {
             if (Object.prototype.hasOwnProperty.call(data, setting)) {
@@ -5299,7 +5368,7 @@ var CL = (function() {
         }
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('settings'));
       });
-      $('#close_settings').on('click', function() {
+      $('#close-settings').on('click', function() {
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('settings'));
       });
     },
@@ -5357,7 +5426,7 @@ var CL = (function() {
     },
 
     _displayWitnessesHover: function(event, witnesses) {
-      const element = document.getElementById('tool_tip');
+      const element = document.getElementById('tool-tip');
       if (witnesses === undefined) {
         if (event.target.tagName === 'LI') {
           witnesses = CL._getWitnessesForReading(event.target.id);
@@ -5383,24 +5452,24 @@ var CL = (function() {
 
     _getWitnessesForReading: function(idString) {
       let unit, reading, app;
-      if (idString.indexOf('_app_') !== -1) {
-        app = 'apparatus' + idString.substring(idString.indexOf('app_') + 4, idString.indexOf('_row'));
+      if (idString.indexOf('-app-') !== -1) {
+        app = 'apparatus' + idString.substring(idString.indexOf('app-') + 4, idString.indexOf('-row'));
       } else {
         app = 'apparatus';
       }
-      if (idString.indexOf('variant_unit') !== -1) {
-        unit = parseInt(idString.substring(0, idString.indexOf('_row')).replace('variant_unit_', ''), 10);
-        reading = parseInt(idString.substring(idString.indexOf('row_') + 4), 10);
+      if (idString.indexOf('variant-unit') !== -1) {
+        unit = parseInt(idString.substring(0, idString.indexOf('-row')).replace('variant-unit-', ''), 10);
+        reading = parseInt(idString.substring(idString.indexOf('row-') + 4), 10);
         if (!isNaN(unit) && !isNaN(reading)) {
           return CL.getReadingWitnesses(CL.data[app][unit].readings[reading], app, CL.data[app][unit].start,
                                         CL.data[app][unit].end, CL.data[app][unit].first_word_index).join(', ');
         }
         return null;
       }
-      unit = parseInt(idString.substring(0, idString.indexOf('_row')).replace('subreading_unit_', ''), 10);
-      reading = parseInt(idString.substring(idString.indexOf('row_') + 4, idString.indexOf('_type_')), 10);
-      const type = idString.substring(idString.indexOf('type_') + 5, idString.indexOf('_subrow_'));
-      const subrow = parseInt(idString.substring(idString.indexOf('subrow_') + 7), 10);
+      unit = parseInt(idString.substring(0, idString.indexOf('-row')).replace('subreading-unit-', ''), 10);
+      reading = parseInt(idString.substring(idString.indexOf('row-') + 4, idString.indexOf('-type-')), 10);
+      const type = idString.substring(idString.indexOf('type-') + 5, idString.indexOf('-subrow-'));
+      const subrow = parseInt(idString.substring(idString.indexOf('subrow-') + 7), 10);
       if (!isNaN(unit) && !isNaN(reading) && !isNaN(subrow)) {
         return CL.getReadingWitnesses(CL.data[app][unit].readings[reading].subreadings[type][subrow], app,
                                       CL.data[app][unit].start, CL.data[app][unit].end,
@@ -5533,9 +5602,9 @@ var CL = (function() {
     _contextInputOnload: function (project) {
       //TODO: check we need language - I think it is optional
       document.getElementById('language').value = project.language;
-      document.getElementById('base_text').value = project.base_text;
+      document.getElementById('base-text').value = project.base_text;
       document.getElementById('project').value = project._id;
-      document.getElementById('preselected_witnesses').value = project.witnesses.join();
+      document.getElementById('preselected-witnesses').value = project.witnesses.join();
     },
 
     _getReadingHistory: function (classes, details, standoffReading, ruleDetails, type, subreadingTypes,

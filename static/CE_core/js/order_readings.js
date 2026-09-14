@@ -43,68 +43,68 @@ var OR = (function() {
         'preventDefault': true,
         'preventForms': false
       });
-      SimpleContextMenu.attach('main_reading', function() {
-        return OR._makeMenu('main_reading');
+      SimpleContextMenu.attach('main-reading', function() {
+        return OR._makeMenu('main-reading');
       });
-      SimpleContextMenu.attach('main_reading_joinable_backwards', function() {
-        return OR._makeMenu('main_reading', true, false);
+      SimpleContextMenu.attach('main-reading-joinable-backwards', function() {
+        return OR._makeMenu('main-reading', true, false);
       });
-      SimpleContextMenu.attach('main_reading_joinable_forwards', function() {
-        return OR._makeMenu('main_reading', false, true);
+      SimpleContextMenu.attach('main-reading-joinable-forwards', function() {
+        return OR._makeMenu('main-reading', false, true);
       });
-      SimpleContextMenu.attach('main_reading_joinable_backwards_joinable_forwards', function() {
-        return OR._makeMenu('main_reading', true, true);
+      SimpleContextMenu.attach('main-reading-joinable-backwards-joinable-forwards', function() {
+        return OR._makeMenu('main-reading', true, true);
       });
-      SimpleContextMenu.attach('main_reading_om', function() {
-        return OR._makeMenu('main_reading_om');
+      SimpleContextMenu.attach('main-reading-om', function() {
+        return OR._makeMenu('main-reading-om');
       });
-      SimpleContextMenu.attach('main_reading_om_joinable_backwards', function() {
-        return OR._makeMenu('main_reading_om', true, false);
+      SimpleContextMenu.attach('main-reading-om-joinable-backwards', function() {
+        return OR._makeMenu('main-reading-om', true, false);
       });
-      SimpleContextMenu.attach('main_reading_om_joinable_forwards', function() {
-        return OR._makeMenu('main_reading_om', false, true);
+      SimpleContextMenu.attach('main-reading-om-joinable-forwards', function() {
+        return OR._makeMenu('main-reading-om', false, true);
       });
-      SimpleContextMenu.attach('main_reading_om_joinable_backwards_joinable_forwards', function() {
-        return OR._makeMenu('main_reading_om', true, true);
+      SimpleContextMenu.attach('main-reading-om-joinable-backwards-joinable-forwards', function() {
+        return OR._makeMenu('main-reading-om', true, true);
       });
       SimpleContextMenu.attach('deletable', function() {
         return OR._makeMenu('deletable_unit');
       });
-      SimpleContextMenu.attach('overlap_main_reading', function() {
-        return OR._makeMenu('overlap_main_reading');
+      SimpleContextMenu.attach('overlap-main-reading', function() {
+        return OR._makeMenu('overlap-main-reading');
       });
-      SimpleContextMenu.attach('overlap_main_reading_joinable_backwards', function() {
-        return OR._makeMenu('overlap_main_reading', true, false);
+      SimpleContextMenu.attach('overlap-main-reading-joinable-backwards', function() {
+        return OR._makeMenu('overlap-main-reading', true, false);
       });
-      SimpleContextMenu.attach('overlap_main_reading_joinable_forwards', function() {
-        return OR._makeMenu('overlap_main_reading', false, true);
+      SimpleContextMenu.attach('overlap-main-reading-joinable-forwards', function() {
+        return OR._makeMenu('overlap-main-reading', false, true);
       });
-      SimpleContextMenu.attach('overlap_main_reading_joinable_backwards_joinable_forwards', function() {
-        return OR._makeMenu('overlap_main_reading', true, true);
+      SimpleContextMenu.attach('overlap-main-reading-joinable-backwards-joinable-forwards', function() {
+        return OR._makeMenu('overlap-main-reading', true, true);
       });
-      SimpleContextMenu.attach('overlap_main_reading_om', function() {
-        return OR._makeMenu('overlap_main_reading_om');
+      SimpleContextMenu.attach('overlap-main-reading-om', function() {
+        return OR._makeMenu('overlap-main-reading-om');
       });
-      SimpleContextMenu.attach('overlap_main_reading_om_joinable_backwards', function() {
-        return OR._makeMenu('overlap_main_reading_om', true, false);
+      SimpleContextMenu.attach('overlap-main-reading-om-joinable-backwards', function() {
+        return OR._makeMenu('overlap-main-reading-om', true, false);
       });
-      SimpleContextMenu.attach('overlap_main_reading_om_joinable_forwards', function() {
-        return OR._makeMenu('overlap_main_reading_om', false, true);
+      SimpleContextMenu.attach('overlap-main-reading-om-joinable-forwards', function() {
+        return OR._makeMenu('overlap-main-reading-om', false, true);
       });
-      SimpleContextMenu.attach('overlap_main_reading_om_joinable_backwards_joinable_forwards', function() {
-        return OR._makeMenu('overlap_main_reading_om', true, true);
+      SimpleContextMenu.attach('overlap-main-reading-om-joinable-backwards-joinable-forwards', function() {
+        return OR._makeMenu('overlap-main-reading-om', true, true);
       });
       SimpleContextMenu.attach('subreading', function() {
         return OR._makeMenu('subreading');
       });
-      SimpleContextMenu.attach('overlap_unit', function() {
-        return OR._makeMenu('overlap_unit');
+      SimpleContextMenu.attach('overlap-unit', function() {
+        return OR._makeMenu('overlap-unit');
       });
-      SimpleContextMenu.attach('topline_unit', function() {
-        return OR._makeMenu('topline_unit');
+      SimpleContextMenu.attach('topline-unit', function() {
+        return OR._makeMenu('topline-unit');
       });
-      SimpleContextMenu.attach('reading_label', function() {
-        return OR._makeMenu('reading_label');
+      SimpleContextMenu.attach('reading-label', function() {
+        return OR._makeMenu('reading-label');
       });
       const temp = CL.getUnitLayout(CL.data.apparatus, 1, 'reorder', options);
       const header = CL.getCollationHeader(CL.data, temp[1], false);
@@ -134,17 +134,17 @@ var OR = (function() {
         html.push.apply(html, overlaps[0]);
         temp[2].push.apply(temp[2], overlaps[1]);
       }
-      html.push('<ul id="context_menu" class="SimpleContextMenu"></ul>');
+      html.push('<ul id="context-menu" class="simple-context-menu"></ul>');
       document.getElementById('header').innerHTML = CL.getHeaderHtml('Order Readings', CL.context);
       if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
         CL.services.showLoginStatus();
       }
-      document.getElementById('header').className = 'reorder_header';
-      container.innerHTML = '<div id="scroller" class="fillPage"><table class="collation_overview">' +
-        html.join('') + '</table></div><div id="single_witness_reading"></div>';
+      document.getElementById('header').className = 'reorder-header';
+      container.innerHTML = '<div id="scroller" class="fillPage"><table class="collation-overview">' +
+        html.join('') + '</table></div><div id="single-witness-reading"></div>';
       CL.expandFillPageClients();
       if (OR.undoStack.length > 0) {
-        undoButton = '<button class="pure-button right_foot" id="undo_button">undo</button>';
+        undoButton = '<button class="pure-button right-foot" id="undo-button">undo</button>';
       } else {
         undoButton = '';
       }
@@ -156,19 +156,19 @@ var OR = (function() {
       }
       const footerHtml = [];
       if (Object.prototype.hasOwnProperty.call(CL.project, 'showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
-        footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+        footerHtml.push('<button class="pure-button left-foot" id="expand-collapse-button">collapse all</button>');
       }
       footerHtml.push(
-        '<button class="pure-button left_foot" id="show_hide_subreadings_button">' + showHideSubreadingsButtonText + '</button>'
+        '<button class="pure-button left-foot" id="show-hide-subreadings-button">' + showHideSubreadingsButtonText + '</button>'
       );
-      footerHtml.push('<span id="extra_buttons"></span>');
-      footerHtml.push('<span id="stage_links"></span>');
+      footerHtml.push('<span id="extra-buttons"></span>');
+      footerHtml.push('<span id="stage-links"></span>');
 
       if (CL.managingEditor === true) {
-        footerHtml.push('<button class="pure-button right_foot" id="approve">Approve</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="approve">Approve</button>');
       }
-      footerHtml.push('<button class="pure-button right_foot" id="save">Save</button>');
-      footerHtml.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
+      footerHtml.push('<button class="pure-button right-foot" id="save">Save</button>');
+      footerHtml.push('<select class="right-foot" id="highlighted" name="highlighted"></select>');
       footerHtml.push(undoButton);
       // this does the styling of the select elements in the footer using pure (they cannot be styled individually)
       $('#footer').addClass('pure-form');
@@ -202,23 +202,23 @@ var OR = (function() {
         });
       }
       for (let i = 0; i < highestUnit; i += 1) {
-        if (document.getElementById('drag_unit_' + i) !== null) {
-          OR.redipsInitOrderReadings('drag_unit_' + i);
+        if (document.getElementById('drag-unit-' + i) !== null) {
+          OR.redipsInitOrderReadings('drag-unit-' + i);
         }
       }
       for (const key in CL.data) {
         if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
           if (key.match(/apparatus\d/g) !== null) {
             for (let i = 0; i < CL.data[key].length; i += 1) {
-              if (document.getElementById('drag_unit_' + i + '_app_' + key.replace('apparatus', '')) !== null) {
-                OR.redipsInitOrderReadings('drag_unit_' + i + '_app_' + key.replace('apparatus', ''));
+              if (document.getElementById('drag-unit-' + i + '-app-' + key.replace('apparatus', '')) !== null) {
+                OR.redipsInitOrderReadings('drag-unit-' + i + '-app-' + key.replace('apparatus', ''));
               }
             }
           }
         }
       }
-      if (document.getElementById('undo_button')) {
-        $('#undo_button').on('click', function() {
+      if (document.getElementById('undo-button')) {
+        $('#undo-button').on('click', function() {
           spinner.showLoadingOverlay();
           OR._undo();
         });
@@ -277,9 +277,9 @@ var OR = (function() {
       if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
         CL.services.showLoginStatus();
       }
-      document.getElementById('header').className = 'approved_header';
-      container.innerHTML = '<div id="scroller" class="fillPage"><table class="collation_overview">' +
-                            html.join('') + '</table></div><div id="single_witness_reading"></div>';
+      document.getElementById('header').className = 'approved-header';
+      container.innerHTML = '<div id="scroller" class="fillPage"><table class="collation-overview">' +
+                            html.join('') + '</table></div><div id="single-witness-reading"></div>';
       CL.expandFillPageClients();
       // sort out footer stuff
       if (CL.showSubreadings === true) {
@@ -289,17 +289,17 @@ var OR = (function() {
       }
       footerHtml = [];
       if (Object.prototype.hasOwnProperty.call(CL.project, 'showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
-        footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+        footerHtml.push('<button class="pure-button left-foot" id="expand-collapse-button">collapse all</button>');
       }
       footerHtml.push(
-        '<button class="pure-button left_foot" id="show_hide_subreadings_button">' + showHideSubreadingsButtonText + '</button>'
+        '<button class="pure-button left-foot" id="show-hide-subreadings-button">' + showHideSubreadingsButtonText + '</button>'
       );
-      footerHtml.push('<span id="extra_buttons"></span>');
-      footerHtml.push('<span id="stage_links"></span>');
+      footerHtml.push('<span id="extra-buttons"></span>');
+      footerHtml.push('<span id="stage-links"></span>');
       if (CL.project.showGetApparatusButton === true) {
-        footerHtml.push('<button class="pure-button right_foot" id="get_apparatus">Get apparatus</button>');
+        footerHtml.push('<button class="pure-button right-foot" id="get-apparatus">Get apparatus</button>');
       }
-      footerHtml.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
+      footerHtml.push('<select class="right-foot" id="highlighted" name="highlighted"></select>');
       document.getElementById('footer').innerHTML = footerHtml.join('');
       CL.addExtraFooterButtons('approved');
       CL.addStageLinks();
@@ -320,9 +320,9 @@ var OR = (function() {
         OR._highlightWitness(event.target.value, 'approved');
       });
       CL.addSubreadingEvents('approved', CL.getRuleClasses('subreading', true, 'value', ['identifier', 'subreading']));
-      if (document.getElementById('get_apparatus')) {
-        $('#get_apparatus').off('click.download_link');
-        $('#get_apparatus').on('click.download_link', function() {
+      if (document.getElementById('get-apparatus')) {
+        $('#get-apparatus').off('click.download_link');
+        $('#get-apparatus').on('click.download_link', function() {
           OR._getApparatusForContext();
         });
       }
@@ -338,9 +338,8 @@ var OR = (function() {
       let temp, rowId, overlapped, hasContextMenu, readingClass, colspan, hand, readingLabel, readingSuffix, text, overlap;
       const html = [];
       const rowList = [];
-      hasContextMenu = true;
       overlap = false;
-      if (id.indexOf('_app_') !== -1) {
+      if (id.indexOf('-app-') !== -1) {
         overlap = true;
       }
       if (Object.prototype.hasOwnProperty.call(options, 'highlighted_wit')) {
@@ -361,16 +360,16 @@ var OR = (function() {
         }
       }
       if (OR._areAllEmptyReadings(data) && !Object.prototype.hasOwnProperty.call(options, 'created')) {
-        html.push('<td class="redips-mark start_' + start + ' " colspan="' + colspan + '">' +
-                  '<div class="drag_div deletable" id="drag_unit_' + id + '">');
+        html.push('<td class="redips-mark start-' + start + ' " colspan="' + colspan + '">' +
+                  '<div class="drag-div deletable" id="drag-unit-' + id + '">');
       } else {
-        html.push('<td class="redips-mark start_' + start + ' " colspan="' + colspan + '">' +
-                  '<div class="drag_div" id="drag_unit_' + id + '">');
+        html.push('<td class="redips-mark start-' + start + ' " colspan="' + colspan + '">' +
+                  '<div class="drag-div" id="drag-unit-' + id + '">');
       }
       if (!overlap) {
-        html.push('<table class="variant_unit topline_unit" id="variant_unit_' + id + '">');
+        html.push('<table class="variant-unit topline-unit" id="variant-unit-' + id + '">');
       } else {
-        html.push('<table class="variant_unit overlap_unit" id="variant_unit_' + id + '">');
+        html.push('<table class="variant-unit overlap-unit" id="variant-unit-' + id + '">');
       }
       for (let i = 0; i < data.length; i += 1) {
         // what is the reading text?
@@ -391,10 +390,10 @@ var OR = (function() {
         readingLabel = CL.getReadingLabel(i, data[i], orRules);
         readingSuffix = CL.getReadingSuffix(data[i], orRules);
         // what is the row id? (and add it to the list for adding events)
-        rowId = 'variant_unit_' + id + '_row_' + i;
+        rowId = 'variant-unit-' + id + '-row-' + i;
         rowList.push(rowId);
         if (i === 0) {
-          html.push('<tr><td colspan="3" class="redips-mark"><span id="toggle_variant_' + id +
+          html.push('<tr><td colspan="3" class="redips-mark"><span id="toggle-variant-' + id +
                     '" class="triangle">&#9650;</span></td></tr>');
           if (data[i].witnesses.indexOf(hand) != -1) {
             html.push('<tr id="' + rowId + '" class="top highlighted">');
@@ -410,13 +409,13 @@ var OR = (function() {
           }
           html.push('<td class="redips-rowhandler"><div class="redips-drag redips-row">+</div></td>');
         }
-        html.push('<td id="' + rowId + '_label" class="reading_label redips-mark"><div class="spanlike">' + readingLabel);
+        html.push('<td id="' + rowId + '-label" class="reading-label redips-mark"><div class="spanlike">' + readingLabel);
         html.push('</div></td>');
         readingClass = [];
         if (!overlap) {
-          readingClass.push('main_reading');
+          readingClass.push('main-reading');
         } else {
-          readingClass.push('overlap_main_reading');
+          readingClass.push('overlap-main-reading');
         }
         if (!hasContextMenu) {
           readingClass.push('ncm');
@@ -426,14 +425,14 @@ var OR = (function() {
           }
           if (i > 0) {
             if (Object.prototype.hasOwnProperty.call(options, 'joinable_backwards') && options.joinable_backwards === true) {
-              readingClass.push('joinable_backwards');
+              readingClass.push('joinable-backwards');
             }
             if (Object.prototype.hasOwnProperty.call(options, 'joinable_forwards') && options.joinable_forwards === true) {
-              readingClass.push('joinable_forwards');
+              readingClass.push('joinable-forwards');
             }
           }
         }
-        html.push('<td class="redips-mark ' + readingClass.join('_') + '">');
+        html.push('<td class="redips-mark ' + readingClass.join('-') + '">');
         html.push('<div class="spanlike">');
         if (Object.prototype.hasOwnProperty.call(data[i], 'join_backwards') && data[i].join_backwards === true) {
           html.push('⇇&nbsp;');
@@ -447,7 +446,7 @@ var OR = (function() {
         }
         html.push('</div>');
         if (Object.prototype.hasOwnProperty.call(data[i], 'subreadings')) {
-          html.push('<table class="subreading_unit" id="subreading_unit_' + id + '_row_' + i + '">');
+          html.push('<table class="subreading-unit" id="subreading-unit-' + id + '-row-' + i + '">');
           overlapped = false;
           if (Object.prototype.hasOwnProperty.call(data[i], 'overlap_status')) {
             overlapped = true;
@@ -758,12 +757,12 @@ var OR = (function() {
       const table = document.getElementById(rd.obj.id);
       const temp = table.getElementsByTagName('TR');
       const rows = [];
-      if (rd.obj.id.indexOf('_app_') === -1) {
+      if (rd.obj.id.indexOf('-app-') === -1) {
         app = 'apparatus';
-        unit = parseInt(rd.obj.id.replace('variant_unit_', ''), 10);
+        unit = parseInt(rd.obj.id.replace('variant-unit-', ''), 10);
       } else {
-        app = 'apparatus' + rd.obj.id.substring(rd.obj.id.indexOf('_app_') + 5);
-        unit = parseInt(rd.obj.id.substring(rd.obj.id.indexOf('unit_') + 5, rd.obj.id.indexOf('_app_')), 10);
+        app = 'apparatus' + rd.obj.id.substring(rd.obj.id.indexOf('-app-') + 5);
+        unit = parseInt(rd.obj.id.substring(rd.obj.id.indexOf('unit-') + 5, rd.obj.id.indexOf('-app-')), 10);
       }
       for (let i = 0; i < temp.length; i += 1) {
         if (temp[i].id.indexOf('subreading') === -1) {
@@ -774,7 +773,7 @@ var OR = (function() {
       for (let i = 0; i < rows.length; i += 1) {
         if (rows[i].id) {
           readingId = rows[i].id;
-          order.push(parseInt(readingId.substring(readingId.indexOf('row_') + 4), 10));
+          order.push(parseInt(readingId.substring(readingId.indexOf('row-') + 4), 10));
         }
       }
       readings = CL.data[app][unit].readings;
@@ -784,10 +783,13 @@ var OR = (function() {
       CL.data[app][unit].readings = readings;
     },
 
-    editLabel: function(rdgDetails, menuPos, saveFunction) {
+    editLabel: function(rdgDetails, menuPos, saveFunction, overruleZvSetting) {
       let left, top;
-      if (document.getElementById('label_form')) {
-        document.getElementsByTagName('body')[0].removeChild(document.getElementById('label_form'));
+      if (overruleZvSetting === undefined) {
+        overruleZvSetting = false;
+      }
+      if (document.getElementById('label-form')) {
+        document.getElementsByTagName('body')[0].removeChild(document.getElementById('label-form'));
       }
       left = menuPos.left;
       top = menuPos.top;
@@ -795,18 +797,18 @@ var OR = (function() {
       const reading = CL.data[rdgDetails[1]][rdgDetails[0]].readings[rdgDetails[2]];
       const currentLabel = reading.label;
       const currentParents = Object.prototype.hasOwnProperty.call(reading, 'parents') ? reading.parents : [];
-      labelForm.setAttribute('id', 'label_form');
-      labelForm.setAttribute('class', 'label_form');
+      labelForm.setAttribute('id', 'label-form');
+      labelForm.setAttribute('class', 'label-form');
       const html = [];
-      html.push('<div class="dialogue_form_header drag-zone">Edit Label</div>');
-      html.push('<form id="label_change_form">');
-      html.push('<label id="new_label_label" for="new_label">New label:<br/><input type="text" id="new_label" name="new_label"/></label><br/><br/>');
+      html.push('<div class="dialogue-form-header drag-zone">Edit Label</div>');
+      html.push('<form id="label-change-form">');
+      html.push('<label id="new-label-label" for="new-label">New label:<br/><input type="text" id="new-label" name="new_label"/></label><br/><br/>');
       if (CL.project.storeMultipleSupportLabelsAsParents === true) {
-        html.push('<label for="multiple_support">Multiple support: </label><input type="checkbox" id="multiple_support"/><br/>');
-        html.push('<label id="parent_select_label" for="parent_select" class="top_label disabled">Parents: </label><select class="disabled" disabled="disabled" id="parent_select" name="parent_select" multiple></select><br/><br/>');
+        html.push('<label for="multiple-support">Multiple support: </label><input type="checkbox" id="multiple-support"/><br/>');
+        html.push('<label id="parent-select-label" for="parent-select" class="top-label disabled">Parents: </label><select class="disabled" disabled="disabled" id="parent-select" name="parent_select" multiple></select><br/><br/>');
       }
-      html.push('<input class="pure-button dialogue-form-button" id="close_label_button" type="button" value="Cancel"/>');
-      html.push('<input class="pure-button dialogue-form-button" id="save_label_button" type="button" value="Save"/>');
+      html.push('<input class="pure-button dialogue-form-button" id="close-label-button" type="button" value="Cancel"/>');
+      html.push('<input class="pure-button dialogue-form-button" id="save-label-button" type="button" value="Save"/>');
       html.push('</form>');
       labelForm.innerHTML = html.join('');
       document.getElementsByTagName('body')[0].appendChild(labelForm);
@@ -819,65 +821,65 @@ var OR = (function() {
                                'reading': CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].text_string});
           }
         }
-        cforms.populateSelect(unitReadings, document.getElementById('parent_select'),
+        cforms.populateSelect(unitReadings, document.getElementById('parent-select'),
                               {'value_key': 'reading', 'text_keys': 'reading', 'add_select': false});
       }
-      document.getElementById('new_label').value = currentLabel; // populate field with current label value
+      document.getElementById('new-label').value = currentLabel; // populate field with current label value
       if (currentParents.length > 1) {
-        document.getElementById('multiple_support').setAttribute('checked', 'checked');
-        $('#parent_select_label').removeClass('disabled');
-        $('#parent_select').removeClass('disabled');
-        document.getElementById('parent_select').removeAttribute('disabled');
-        $('#new_label_label').addClass('disabled');
-        document.getElementById('new_label').setAttribute('disabled', 'disabled');
+        document.getElementById('multiple-support').setAttribute('checked', 'checked');
+        $('#parent-select-label').removeClass('disabled');
+        $('#parent-select').removeClass('disabled');
+        document.getElementById('parent-select').removeAttribute('disabled');
+        $('#new-label-label').addClass('disabled');
+        document.getElementById('new-label').setAttribute('disabled', 'disabled');
         // select the correct parents
         for (let i = 0; i < currentParents.length; i += 1) {
-          $('#parent_select option[value="' + currentParents[i] + '"]').prop('selected', true);
+          $('#parent-select option[value="' + currentParents[i] + '"]').prop('selected', true);
         }
-        $('#parent_select').focus();
+        $('#parent-select').focus();
       }
-      if (document.getElementById('multiple_support')) {
-        $('#multiple_support').on('click', function () {
-          if (document.getElementById('multiple_support').checked === true) {
-            $('#parent_select_label').removeClass('disabled');
-            $('#parent_select').removeClass('disabled');
-            document.getElementById('parent_select').removeAttribute('disabled');
-            $('#new_label_label').addClass('disabled');
-            document.getElementById('new_label').setAttribute('disabled', 'disabled');
+      if (document.getElementById('multiple-support')) {
+        $('#multiple-support').on('click', function () {
+          if (document.getElementById('multiple-support').checked === true) {
+            $('#parent-select-label').removeClass('disabled');
+            $('#parent-select').removeClass('disabled');
+            document.getElementById('parent-select').removeAttribute('disabled');
+            $('#new-label-label').addClass('disabled');
+            document.getElementById('new-label').setAttribute('disabled', 'disabled');
           } else {
-            $('#parent_select_label').addClass('disabled');
-            $('#parent_select').addClass('disabled');
-            document.getElementById('parent_select').setAttribute('disabled', 'disabled');
-            $('#new_label_label').removeClass('disabled');
-            document.getElementById('new_label').removeAttribute('disabled');
+            $('#parent-select-label').addClass('disabled');
+            $('#parent-select').addClass('disabled');
+            document.getElementById('parent-select').setAttribute('disabled', 'disabled');
+            $('#new-label-label').removeClass('disabled');
+            document.getElementById('new-label').removeAttribute('disabled');
             // unselect all parents
-            $('#parent_select option').prop('selected', false);
+            $('#parent-select option').prop('selected', false);
           }
         });
       }
-      if (document.getElementById('parent_select')) {
-        $('#parent_select').on('change', function () {
-          OR._updateLabel(rdgDetails);
+      if (document.getElementById('parent-select')) {
+        $('#parent-select').on('change', function () {
+          OR._updateLabel(rdgDetails, overruleZvSetting);
         });
       }
       // the +25 here is to move it out of the way of the other labels and readings so you can still see them
       left = parseInt(left) - document.getElementById('scroller').scrollLeft + 25;
       top = parseInt(top) - document.getElementById('scroller').scrollTop;
-      document.getElementById('label_form').style.left = left + 'px';
-      document.getElementById('label_form').style.top = top + 'px';
-      drag.initDraggable('label_form', true, true);
-      $('#close_label_button').on('click', function() {
-        document.getElementsByTagName('body')[0].removeChild(document.getElementById('label_form'));
+      document.getElementById('label-form').style.left = left + 'px';
+      document.getElementById('label-form').style.top = top + 'px';
+      drag.initDraggable('label-form', true, true);
+      $('#close-label-button').on('click', function() {
+        document.getElementsByTagName('body')[0].removeChild(document.getElementById('label-form'));
       });
       if (saveFunction !== undefined) {
-        $('#save_label_button').on('click', function() {
+        $('#save-label-button').on('click', function() {
           saveFunction();
         });
       } else {
-        $('#save_label_button').on('click', function() {
-          const data = cforms.serialiseForm('label_change_form');
+        $('#save-label-button').on('click', function() {
+          const data = cforms.serialiseForm('label-change-form');
           const newParents = data.parent_select;
-          const newLabel = document.getElementById('new_label').value.replace(/\s+/g, '');
+          const newLabel = document.getElementById('new-label').value.replace(/\s+/g, '');
           if (newLabel !== '') {
             OR._manualChangeLabel(rdgDetails, newLabel, newParents);
           }
@@ -954,8 +956,6 @@ var OR = (function() {
             OR._numberEditionSubreadings();
           }
           OR._getSiglaSuffixes();
-          // TODO: fosilise the reading suffixes and main reading label suffixes here
-          // then make output dependent on these not being present
           OR._getMainReadingSpecialClasses();
           // The following comment is no longer true as we do have that button in the approved screen!
           // at this point the saved approved version always and only ever has the correct subreadings shown we
@@ -989,34 +989,36 @@ var OR = (function() {
     },
 
     _getMainReadingSpecialClasses: function () {
-      let unit, reading;
-      const ruleClasses = CL.getRuleClasses('keep_as_main_reading', true, 'value', ['identifier', 'suffixed_label',
-                                                                                    'suffixed_reading']);
+      const ruleClasses = CL.getRuleClasses(
+        'keep_as_main_reading', true, 'value', ['identifier', 'suffixed_label', 'suffixed_reading']
+      );
       if ($.isEmptyObject(ruleClasses)) {
           return;
       }
       for (const key in CL.data) {
         if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
           if (key.indexOf('apparatus') != -1) {
-            for (let i = 0; i < CL.data[key].length; i += 1) {
-              unit = CL.data[key][i];
-              for (let j = 0; j < unit.readings.length; j += 1) {
-                reading = unit.readings[j];
+            for (let unit of CL.data[key]) {
+              for (let reading of unit.readings) {
                 if (Object.prototype.hasOwnProperty.call(reading, 'reading_classes') && reading.reading_classes.length > 0) {
-                  for (let k = 0; k < reading.reading_classes.length; k += 1) {
-                    if (Object.prototype.hasOwnProperty.call(ruleClasses, reading.reading_classes[k])) {
-                      if (ruleClasses[reading.reading_classes[k]][1] === true) {
+                  for (let readingClass of reading.reading_classes) {
+                    if (Object.prototype.hasOwnProperty.call(ruleClasses, readingClass)) {
+                      if (ruleClasses[readingClass][1] === true) {
                         if (Object.prototype.hasOwnProperty.call(reading, 'label_suffix')) {
-                          reading.label_suffix = reading.label_suffix + ruleClasses[reading.reading_classes[k]][0];
+                          if (reading.label_suffix.indexOf(ruleClasses[readingClass][0]) === -1) {
+                            reading.label_suffix = reading.label_suffix + ruleClasses[readingClass][0];
+                          }
                         } else {
-                          reading.label_suffix = ruleClasses[reading.reading_classes[k]][0];
+                          reading.label_suffix = ruleClasses[readingClass][0];
                         }
                       }
-                      if (ruleClasses[reading.reading_classes[k]][2] === true) {
+                      if (ruleClasses[readingClass][2] === true) {
                         if (Object.prototype.hasOwnProperty.call(reading, 'reading_suffix')) {
-                          reading.reading_suffix = reading.reading_suffix + ruleClasses[reading.reading_classes[k]][0];
+                          if (reading.reading_suffix.indexOf(ruleClasses[readingClass][0])) {
+                            reading.reading_suffix = reading.reading_suffix + ruleClasses[readingClass][0];
+                          }
                         } else {
-                          reading.reading_suffix = ruleClasses[reading.reading_classes[k]][0];
+                          reading.reading_suffix = ruleClasses[readingClass][0];
                         }
                       }
                     }
@@ -1133,8 +1135,8 @@ var OR = (function() {
       for (const type in data) {
         if (Object.prototype.hasOwnProperty.call(data, type)) {
           for (let i = 0; i < data[type].length; i += 1) {
-            subRowId = 'subreading_unit_' + parentId + '_row_' + parentIndex + '_type_' + type + '_' +
-                       rowTypeId + '_' + i;
+            subRowId = 'subreading-unit-' + parentId + '-row-' + parentIndex + '-type-' + type + '-' +
+                       rowTypeId + '-' + i;
             rowList.push(subRowId);
             if (data[type][i].witnesses.indexOf(hand) != -1) {
               html.push('<tr class="' + subtype + ' highlighted" id="' + subRowId + '">');
@@ -1158,14 +1160,14 @@ var OR = (function() {
       return [html, rowList];
     },
 
-    _updateLabel: function (rdgDetails) {
+    _updateLabel: function (rdgDetails, overruleZvSetting) {
       let supportsAll;
       const readings = [];
       const labels = [];
-      for (let i = 0; i < document.getElementById('parent_select').selectedOptions.length; i += 1) {
-        readings.push(document.getElementById('parent_select').selectedOptions[i].value);
+      for (let i = 0; i < document.getElementById('parent-select').selectedOptions.length; i += 1) {
+        readings.push(document.getElementById('parent-select').selectedOptions[i].value);
       }
-      if (readings.length === document.getElementById('parent_select').length) {
+      if (readings.length === document.getElementById('parent-select').length) {
         supportsAll = true;
       } else {
         supportsAll = false;
@@ -1175,10 +1177,10 @@ var OR = (function() {
           labels.push(CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].label);
         }
       }
-      if (supportsAll === true && CL.project.useZvForAllReadingsSupport == true) {
-        document.getElementById('new_label').value = 'zv';
+      if (supportsAll === true && (CL.project.useZvForAllReadingsSupport === true && overruleZvSetting === false)) {
+        document.getElementById('new-label').value = 'zv';
       } else {
-        document.getElementById('new_label').value = labels.join('/');
+        document.getElementById('new-label').value = labels.join('/');
       } 
     },
 
@@ -1194,7 +1196,7 @@ var OR = (function() {
       if (parents === undefined) {
         delete reading.parents;
       }
-      document.getElementsByTagName('body')[0].removeChild(document.getElementById('label_form'));
+      document.getElementsByTagName('body')[0].removeChild(document.getElementById('label-form'));
       OR.showOrderReadings({'container': CL.container});
       document.getElementById('scroller').scrollLeft = scrollOffset[0];
       document.getElementById('scroller').scrollTop = scrollOffset[1];
@@ -1220,20 +1222,20 @@ var OR = (function() {
     _makeMenu: function(menuName, addBackwardsJoin, addForwardsJoin) {
       // menus for full units
       if (menuName === 'subreading') {
-        document.getElementById('context_menu').innerHTML = '<li id="unmark_sub"><span>Make main reading</span></li>';
+        document.getElementById('context-menu').innerHTML = '<li id="unmark-sub"><span>Make main reading</span></li>';
       } else if (menuName === 'deletable_unit') {
-        document.getElementById('context_menu').innerHTML = '<li id="delete_unit"><span>Delete unit</span></li>';
-      } else if (menuName === 'main_reading' || menuName === 'overlap_main_reading' || menuName === 'main_reading_om' || menuName === 'overlap_main_reading_om') {
+        document.getElementById('context-menu').innerHTML = '<li id="delete-unit"><span>Delete unit</span></li>';
+      } else if (menuName === 'main-reading' || menuName === 'overlap-main-reading' || menuName === 'main-reading-om' || menuName === 'overlap-main-reading-om') {
         const menu = [];
-        menu.push('<li id="split_witnesses"><span>Split Witnesses</span></li>');
-        if (menuName.indexOf('_om') !== -1 && CL.project.omCategories.length > 0) {
-          menu.push('<li id="categorise_om"><span>Categorise Om</span></li>');
+        menu.push('<li id="split-witnesses"><span>Split Witnesses</span></li>');
+        if (menuName.indexOf('-om') !== -1 && CL.project.omCategories.length > 0) {
+          menu.push('<li id="categorise-om"><span>Categorise Om</span></li>');
         }
         if (addBackwardsJoin) {
-          menu.push('<li id="backwards_join"><span>Add/Remove Join ⇇</span></li>');
+          menu.push('<li id="backwards-join"><span>Add/Remove Join ⇇</span></li>');
         }
         if (addForwardsJoin) {
-          menu.push('<li id="forwards_join"><span>Add/Remove Join ⇉</span></li>');
+          menu.push('<li id="forwards-join"><span>Add/Remove Join ⇉</span></li>');
         }
         const subreadings = [];
         const orRules = CL.getRuleClasses('create_in_OR', true, 'name', ['subreading', 'value', 'identifier',
@@ -1241,7 +1243,7 @@ var OR = (function() {
         for (const key in orRules) {
           if (Object.prototype.hasOwnProperty.call(orRules, key)) {
             if (orRules[key][3]) {
-              menu.push('<li id="mark_as_' + orRules[key][1] + '"><span>Mark/Unmark as ' + key + '</span></li>');
+              menu.push('<li id="mark-as-' + orRules[key][1] + '"><span>Mark/Unmark as ' + key + '</span></li>');
             } else {
               subreadings.push([key, orRules[key][1], orRules[key][2]]);
             }
@@ -1249,26 +1251,26 @@ var OR = (function() {
         }
         if (subreadings.length === 1) {
           if (typeof subreadings[0][2] !== 'undefined') {
-            menu.push('<li id="mark_as_' + subreadings[0][1] + '"><span>Mark as ' + subreadings[0][0] + ' (' +
+            menu.push('<li id="mark-as-' + subreadings[0][1] + '"><span>Mark as ' + subreadings[0][0] + ' (' +
                       subreadings[0][2] + ')</span></li>');
           } else {
-            menu.push('<li id="mark_as_' + subreadings[0][1] + '"><span>Mark as ' + subreadings[0][0] + '</span></li>');
+            menu.push('<li id="mark-as-' + subreadings[0][1] + '"><span>Mark as ' + subreadings[0][0] + '</span></li>');
           }
         } else if (subreadings.length > 1) {
-          menu.push('<li id="mark_as_ORsubreading"><span>Mark as subreading</span></li>');
+          menu.push('<li id="mark-as-or-subreading"><span>Mark as subreading</span></li>');
         }
-        document.getElementById('context_menu').innerHTML = menu.join('');
-      } else if (menuName === 'overlap_unit') {
-        document.getElementById('context_menu').innerHTML = '<li id="move_up"><span>Move unit up</span></li>' +
-                                                            '<li id="move_down"><span>Move unit down</span></li>' +
-                                                            '<li id="merge_shared_readings"><span>Merge shared readings</span></li>';
-      } else if (menuName === 'topline_unit') {
-        document.getElementById('context_menu').innerHTML = '<li id="merge_shared_readings"><span>Merge shared readings</span></li>';
-      } else if (menuName === 'reading_label') {
-        document.getElementById('context_menu').innerHTML = '<li id="edit_label"><span>Edit label</span></li>';
+        document.getElementById('context-menu').innerHTML = menu.join('');
+      } else if (menuName === 'overlap-unit') {
+        document.getElementById('context-menu').innerHTML = '<li id="move-up"><span>Move unit up</span></li>' +
+                                                            '<li id="move-down"><span>Move unit down</span></li>' +
+                                                            '<li id="merge-shared-readings"><span>Merge shared readings</span></li>';
+      } else if (menuName === 'topline-unit') {
+        document.getElementById('context-menu').innerHTML = '<li id="merge-shared-readings"><span>Merge shared readings</span></li>';
+      } else if (menuName === 'reading-label') {
+        document.getElementById('context-menu').innerHTML = '<li id="edit-label"><span>Edit label</span></li>';
       }
       OR._addContextMenuHandlers();
-      return 'context_menu';
+      return 'context-menu';
     },
 
     _makeMainReading: function(idString) {
@@ -1276,17 +1278,17 @@ var OR = (function() {
       const scrollOffset = [document.getElementById('scroller').scrollLeft,
                             document.getElementById('scroller').scrollTop];
       OR.addToUndoStack(CL.data);
-      if (idString.indexOf('_app_') === -1) {
+      if (idString.indexOf('-app-') === -1) {
         appId = 'apparatus';
-        unitNumber = parseInt(idString.substring(idString.indexOf('unit_') + 5, idString.indexOf('_row_')));
+        unitNumber = parseInt(idString.substring(idString.indexOf('unit-') + 5, idString.indexOf('-row-')));
       } else {
-        unitNumber = parseInt(idString.substring(idString.indexOf('unit_') + 5, idString.indexOf('_app_')));
-        appId = 'apparatus' + idString.substring(idString.indexOf('_app_') + 5, idString.indexOf('_row_'));
+        unitNumber = parseInt(idString.substring(idString.indexOf('unit-') + 5, idString.indexOf('-app-')));
+        appId = 'apparatus' + idString.substring(idString.indexOf('-app-') + 5, idString.indexOf('-row-'));
       }
       const unit = CL.data[appId][unitNumber];
-      const subtype = idString.substring(idString.indexOf('_type_') + 6, idString.indexOf('_subrow_'));
-      const parentPos = parseInt(idString.substring(idString.indexOf('_row_') + 5, idString.indexOf('_type_')));
-      const subreadingPos = parseInt(idString.substring(idString.indexOf('_subrow_') + 8));
+      const subtype = idString.substring(idString.indexOf('-type-') + 6, idString.indexOf('-subrow-'));
+      const parentPos = parseInt(idString.substring(idString.indexOf('-row-') + 5, idString.indexOf('-type-')));
+      const subreadingPos = parseInt(idString.substring(idString.indexOf('-subrow-') + 8));
       const parentReading = unit.readings[parentPos];
       const options = {'delete_offset': true};
       CL.makeMainReading(unit, parentReading, subtype, subreadingPos, options);
@@ -1426,11 +1428,11 @@ var OR = (function() {
         selectData.push({'value': 'om', 'label': 'om.'});
       }
       cforms.populateSelect(selectData,
-                            document.getElementById('om_category'),
+                            document.getElementById('om-category'),
                             {'value_key': 'value', 'text_keys': 'label'});
-      $('#select_button').on('click', function() {
+      $('#select-button').on('click', function() {
         witnessList = [];
-        data = cforms.serialiseForm('select_wit_form');
+        data = cforms.serialiseForm('select-wit-form');
         if (!$.isEmptyObject(data)) {
           witnessList = [];
           for (const key in data) {
@@ -1443,7 +1445,7 @@ var OR = (function() {
         }
         newReadingId = SV.doSplitReadingWitnesses(readingDetails[0], readingDetails[2], witnessList, readingDetails[1]);
         OR._doCategoriseOm(readingDetails[0], newReadingId, readingDetails[1], scrollOffset);
-        document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
+        document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit-form'));
       });
     },
 
@@ -1455,12 +1457,12 @@ var OR = (function() {
           reading = unit.readings[i];
         }
       }
-      if (document.getElementById('om_category').value == 'om') {
+      if (document.getElementById('om-category').value == 'om') {
         delete reading.details;
-      } else if (document.getElementById('om_category').value == 'om_verse') {
+      } else if (document.getElementById('om-category').value == 'om_verse') {
         reading.details = 'om verse';
       } else {
-        reading.details = document.getElementById('om_category').value;
+        reading.details = document.getElementById('om-category').value;
       }
       // now we need to check if we have a standoff marked reading which needs the om details changing
       if (Object.prototype.hasOwnProperty.call(reading, 'created') && reading.created == true &&
@@ -1469,7 +1471,7 @@ var OR = (function() {
           for (let i = 0; i < reading.standoff_subreadings.length; i += 1) {
             standoffEntry = SR.getMatchingStandoffReading(reading.standoff_subreadings[i], unit);
             // change the parent_text value
-            standoffEntry.parent_text = '&lt;' + document.getElementById('om_category').value +'&gt;';
+            standoffEntry.parent_text = '&lt;' + document.getElementById('om-category').value +'&gt;';
           }
       }
       OR.relabelReadings(CL.data[apparatus][unitNumber].readings, true);
@@ -1482,9 +1484,9 @@ var OR = (function() {
     _addEvent: function(orRules, key) {
       // if this reading is not marked to be kept as a main reading then use stand_off marking
       if (!orRules[key][3]) {
-        $('#mark_as_' + orRules[key][1]).off('click.' + key + '_c');
-        $('#mark_as_' + orRules[key][1]).off('mouseover.' + key + '_mo');
-        $('#mark_as_' + orRules[key][1]).on('click.' + key + '_c', function() {
+        $('#mark-as-' + orRules[key][1]).off('click.' + key + '_c');
+        $('#mark-as-' + orRules[key][1]).off('mouseover.' + key + '_mo');
+        $('#mark-as-' + orRules[key][1]).on('click.' + key + '_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'TR');
           const rdgDetails = CL.getUnitAppReading(div.id);
@@ -1503,14 +1505,14 @@ var OR = (function() {
             'left': SimpleContextMenu._menuElement.style.left
           });
         });
-        $('#mark_as_' + orRules[key][1]).on('mouseover.' + key + '_mo', function() {
+        $('#mark-as-' + orRules[key][1]).on('mouseover.' + key + '_mo', function() {
           CL.hideTooltip();
         });
       } else {
         // else just add the marker and allow its removal
-        $('#mark_as_' + orRules[key][1]).off('click.' + key + '_c');
-        $('#mark_as_' + orRules[key][1]).off('mouseover.' + key + '_mo');
-        $('#mark_as_' + orRules[key][1]).on('click.' + key + '_c', function() {
+        $('#mark-as-' + orRules[key][1]).off('click.' + key + '_c');
+        $('#mark-as-' + orRules[key][1]).off('mouseover.' + key + '_mo');
+        $('#mark-as-' + orRules[key][1]).on('click.' + key + '_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'TR');
           const rdgDetails = CL.getUnitAppReading(div.id);
@@ -1520,29 +1522,29 @@ var OR = (function() {
           const reading = CL.data[appId][unitPos].readings[readingPos];
           OR._markReading(orRules[key][1], reading);
         });
-        $('#mark_as_' + orRules[key][1]).on('mouseover.' + key + '_mo', function() {
+        $('#mark-as-' + orRules[key][1]).on('mouseover.' + key + '_mo', function() {
           CL.hideTooltip();
         });
       }
     },
 
     _addContextMenuHandlers: function() {
-      if (document.getElementById('unmark_sub')) {
-        $('#unmark_sub').off('click.ums_c');
-        $('#unmark_sub').off('mouseover.ums_mo');
-        $('#unmark_sub').on('click.ums_c', function() {
+      if (document.getElementById('unmark-sub')) {
+        $('#unmark-sub').off('click.ums_c');
+        $('#unmark-sub').off('mouseover.ums_mo');
+        $('#unmark-sub').on('click.ums_c', function() {
           const element = SimpleContextMenu._target_element;
           const rowElem = CL.getSpecifiedAncestor(element, 'TR');
           OR._makeMainReading(rowElem.id);
         });
-        $('#unmark_sub').on('mouseover.ums_mo', function() {
+        $('#unmark-sub').on('mouseover.ums_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('split_witnesses')) {
-        $('#split_witnesses').off('click.sw_c');
-        $('#split_witnesses').off('mouseover.sw_mo');
-        $('#split_witnesses').on('click.sw_c', function() {
+      if (document.getElementById('split-witnesses')) {
+        $('#split-witnesses').off('click.sw_c');
+        $('#split-witnesses').off('mouseover.sw_mo');
+        $('#split-witnesses').on('click.sw_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'TR');
           const readingDetails = CL.getUnitAppReading(div.id);
@@ -1551,14 +1553,14 @@ var OR = (function() {
             'left': SimpleContextMenu._menuElement.style.left
           });
         });
-        $('#split_witnesses').on('mouseover.sw_mo', function() {
+        $('#split-witnesses').on('mouseover.sw_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('categorise_om')) {
-        $('#categorise_om').off('click.co_c');
-        $('#categorise_om').off('mouseover.co_mo');
-        $('#categorise_om').on('click.co_c', function() {
+      if (document.getElementById('categorise-om')) {
+        $('#categorise-om').off('click.co_c');
+        $('#categorise-om').off('mouseover.co_mo');
+        $('#categorise-om').on('click.co_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'TR');
           const readingDetails = CL.getUnitAppReading(div.id);
@@ -1567,14 +1569,14 @@ var OR = (function() {
             'left': SimpleContextMenu._menuElement.style.left
           });
         });
-        $('#categorise_om').on('mouseover.co_mo', function() {
+        $('#categorise-om').on('mouseover.co_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('backwards_join')) {
-        $('#backwards_join').off('click.bj_c');
-        $('#backwards_join').off('mouseover.bj_mo');
-        $('#backwards_join').on('click.bj_c', function() {
+      if (document.getElementById('backwards-join')) {
+        $('#backwards-join').off('click.bj_c');
+        $('#backwards-join').off('mouseover.bj_mo');
+        $('#backwards-join').on('click.bj_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'TR');
           const rdgDetails = CL.getUnitAppReading(div.id);
@@ -1590,14 +1592,14 @@ var OR = (function() {
           document.getElementById('scroller').scrollLeft = scrollOffset[0];
           document.getElementById('scroller').scrollTop = scrollOffset[1];
         });
-        $('#backwards_join').on('mouseover.bj_mo', function() {
+        $('#backwards-join').on('mouseover.bj_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('forwards_join')) {
-        $('#forwards_join').off('click.fj_c');
-        $('#forwards_join').off('mouseover.fj_mo');
-        $('#forwards_join').on('click.fj_c', function() {
+      if (document.getElementById('forwards-join')) {
+        $('#forwards-join').off('click.fj_c');
+        $('#forwards-join').off('mouseover.fj_mo');
+        $('#forwards-join').on('click.fj_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'TR');
           const rdgDetails = CL.getUnitAppReading(div.id);
@@ -1613,14 +1615,14 @@ var OR = (function() {
           document.getElementById('scroller').scrollLeft = scrollOffset[0];
           document.getElementById('scroller').scrollTop = scrollOffset[1];
         });
-        $('#forwards_join').on('mouseover.fj_mo', function() {
+        $('#forwards-join').on('mouseover.fj_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('move_up')) {
-        $('#move_up').off('click.mu_c');
-        $('#move_up').off('mouseover.mu_mo');
-        $('#move_up').on('click.mu_c', function() {
+      if (document.getElementById('move-up')) {
+        $('#move-up').off('click.mu_c');
+        $('#move-up').off('mouseover.mu_mo');
+        $('#move-up').on('click.mu_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -1630,14 +1632,14 @@ var OR = (function() {
           });
           OR._moveOverlapUp(div);
         });
-        $('#move_up').on('mouseover.mu_mo', function() {
+        $('#move-up').on('mouseover.mu_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('move_down')) {
-        $('#move_down').off('click.md_c');
-        $('#move_down').off('mouseover.md_mo');
-        $('#move_down').on('click.md_c', function() {
+      if (document.getElementById('move-down')) {
+        $('#move-down').off('click.md_c');
+        $('#move-down').off('mouseover.md_mo');
+        $('#move-down').on('click.md_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -1647,52 +1649,52 @@ var OR = (function() {
           });
           OR._moveOverlapDown(div);
         });
-        $('#move_down').on('mouseover.md_mo', function() {
+        $('#move-down').on('mouseover.md_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('merge_shared_readings')) {
-        $('#merge_shared_readings').off('click.msr_c');
-        $('#merge_shared_readings').off('mouseover.msr_mo');
-        $('#merge_shared_readings').on('click.msr_c', function() {
+      if (document.getElementById('merge-shared-readings')) {
+        $('#merge-shared-readings').off('click.msr_c');
+        $('#merge-shared-readings').off('mouseover.msr_mo');
+        $('#merge-shared-readings').on('click.msr_c', function() {
           let idString, appId, unitNumber;
           const element = SimpleContextMenu._target_element;
           const table = CL.getSpecifiedAncestor(element, 'TABLE');
           idString = table.id;
-          if (idString.indexOf('_app_') === -1) {
+          if (idString.indexOf('-app-') === -1) {
             appId = 'apparatus';
-            unitNumber = parseInt(idString.substring(idString.indexOf('unit_') + 5));
+            unitNumber = parseInt(idString.substring(idString.indexOf('unit-') + 5));
           } else {
-            unitNumber = parseInt(idString.substring(idString.indexOf('unit_') + 5, idString.indexOf('_app_')));
-            appId = 'apparatus' + idString.substring(idString.indexOf('_app_') + 5);
+            unitNumber = parseInt(idString.substring(idString.indexOf('unit-') + 5, idString.indexOf('-app-')));
+            appId = 'apparatus' + idString.substring(idString.indexOf('-app-') + 5);
           }
           SV.prepareForOperation();
           SV.unsplitUnitWitnesses(unitNumber, appId);
           SV.unprepareForOperation();
           OR.showOrderReadings({'container': CL.container});
         });
-        $('#merge_shared_readings').on('mouseover.msr_mo', function() {
+        $('#merge-shared-readings').on('mouseover.msr_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('edit_label')) {
-        $('#edit_label').off('click.el_c');
-        $('#edit_label').off('mouseover.el_mo');
-        $('#edit_label').on('click.el_c', function() {
+      if (document.getElementById('edit-label')) {
+        $('#edit-label').off('click.el_c');
+        $('#edit-label').off('mouseover.el_mo');
+        $('#edit-label').on('click.el_c', function() {
           const element = SimpleContextMenu._target_element;
           const labelCell = CL.getSpecifiedAncestor(element, 'TD');
           const rdgDetails = CL.getUnitAppReading(labelCell.id);
           OR.editLabel(rdgDetails, {'top': SimpleContextMenu._menuElement.style.top,
                                     'left': SimpleContextMenu._menuElement.style.left});
         });
-        $('#edit_label').on('mouseover.el_mo', function() {
+        $('#edit-label').on('mouseover.el_mo', function() {
           CL.hideTooltip();
         });
       }
-      if (document.getElementById('delete_unit')) {
-        $('#delete_unit').off('click.du_c');
-        $('#delete_unit').off('mouseover.du_mo');
-        $('#delete_unit').on('click.du_c', function() {
+      if (document.getElementById('delete-unit')) {
+        $('#delete-unit').off('click.du_c');
+        $('#delete-unit').off('mouseover.du_mo');
+        $('#delete-unit').on('click.du_c', function() {
           const element = SimpleContextMenu._target_element;
           const div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
             if ($(e).hasClass('spanlike')) {
@@ -1702,7 +1704,7 @@ var OR = (function() {
           });
           OR._getDeleteUnit(div);
         });
-        $('#delete_unit').on('mouseover.du_mo', function() {
+        $('#delete-unit').on('mouseover.du_mo', function() {
           CL.hideTooltip();
         });
       }
@@ -1712,18 +1714,17 @@ var OR = (function() {
       for (const key in orRules) {
         if (Object.prototype.hasOwnProperty.call(orRules, key)) {
           if (!orRules[key][0]) {
-            if (document.getElementById('mark_as_' + orRules[key][1])) {
+            if (document.getElementById('mark-as-' + orRules[key][1])) {
               OR._addEvent(orRules, key);
             }
           }
         }
       }
-      if (document.getElementById('mark_as_ORsubreading')) {
-        //make menu for mark_as_ORsubreading
-        const key = 'ORsubreading';
-        $('#mark_as_' + key).off('click.' + key + '_c');
-        $('#mark_as_' + key).off('mouseover.' + key + '_mo');
-        $('#mark_as_' + key).on('click.' + key + '_c', function() {
+      if (document.getElementById('mark-as-or-subreading')) {
+        //make menu for mark-as-or-subreading
+        $('#mark-as-or-subreading').off('click.or-subreading_c');
+        $('#mark-as-or-subreading').off('mouseover.or-subreading_mo');
+        $('#mark-as-or-subreading').on('click.or-subreading_c', function() {
           var element, appId, div, unit, unitPos, rdgDetails, readingPos, reading, readingDetails;
           element = SimpleContextMenu._target_element;
           div = CL.getSpecifiedAncestor(element, 'TR');
@@ -1742,12 +1743,12 @@ var OR = (function() {
                             'unit_pos': unitPos,
                             'reading_pos': readingPos,
                             'reading_id': reading._id};
-          CL.markStandoffReading(key, 'Subreading', readingDetails, 'order_readings', {
+          CL.markStandoffReading('ORsubreading', 'Subreading', readingDetails, 'order_readings', {
             'top': SimpleContextMenu._menuElement.style.top,
             'left': SimpleContextMenu._menuElement.style.left
           });
         });
-        $('#mark_as_' + key).on('mouseover.' + key + '_mo', function() {
+        $('#mark-as-or-subreading').on('mouseover.or-subreading_mo', function() {
           CL.hideTooltip();
         });
       } else {
@@ -1755,13 +1756,13 @@ var OR = (function() {
         for (const key in orRules) {
           if (Object.prototype.hasOwnProperty.call(orRules, key)) {
             if (orRules[key][0]) {
-              if (document.getElementById('mark_as_' + orRules[key][1])) {
+              if (document.getElementById('mark-as-' + orRules[key][1])) {
                 rule = JSON.parse(JSON.stringify(orRules[key]));
                 ruleName = key;
                 //mark the reading as subreading
-                $('#mark_as_' + orRules[key][1]).off('click.' + key + '_c');
-                $('#mark_as_' + orRules[key][1]).off('mouseover.' + key + '_mo');
-                $('#mark_as_' + orRules[key][1]).on('click.' + key + '_c', function() {
+                $('#mark-as-' + orRules[key][1]).off('click.' + key + '_c');
+                $('#mark-as-' + orRules[key][1]).off('mouseover.' + key + '_mo');
+                $('#mark-as-' + orRules[key][1]).on('click.' + key + '_c', function() {
                   const element = SimpleContextMenu._target_element;
                   const div = CL.getSpecifiedAncestor(element, 'TR');
                   const rdgDetails = CL.getUnitAppReading(div.id);
@@ -1785,7 +1786,7 @@ var OR = (function() {
                     'left': SimpleContextMenu._menuElement.style.left
                   });
                 });
-                $('#mark_as_' + orRules[key][1]).on('mouseover.' + key + '_mo', function() {
+                $('#mark-as-' + orRules[key][1]).on('mouseover.' + key + '_mo', function() {
                   CL.hideTooltip();
                 });
               }

@@ -22,6 +22,7 @@ This example of the minimum code required for this service is taken from a Djang
 from collation.core.exceptions import DataInputException
 from collation.core.preprocessor import PreProcessor
 
+
 def collate(request):
 
     options = json.loads(request.POST.get('options'))    
@@ -48,6 +49,7 @@ This example of the minimum code required for this service is taken from a Djang
 
 ```python
 from collation.core.settings_applier import SettingsApplier
+
 
 def apply_settings(request):
     data = json.loads(request.POST.get('data'))
@@ -81,6 +83,7 @@ examples are provided in the contrib repository.
 
 ```python
 from collation.core.exporter_factory import ExporterFactory
+
 
 def get_apparatus(request):
     data = json.loads(request.POST.get('data'))

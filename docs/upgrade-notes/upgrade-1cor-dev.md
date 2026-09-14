@@ -4,6 +4,11 @@ title: Changelog for 1cor-dev branch
 sidebar_label: 1cor-dev branch
 ---
 
+## Additional optional sevice and project level settings
+
+- The option to allow users to remove overlap units and merge the text back into the top line at the set variants stage.
+The setting `allowOverlapRemoval` is explained in the [services_file documentation]((services_file/optional-variables.md#allowoverlapremoval)).
+
 ## html and css
 
 + The ids and class names which previously used underscores in the values have been changed to use dashes. If you are using 

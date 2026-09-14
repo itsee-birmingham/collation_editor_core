@@ -246,7 +246,7 @@ This is a boolean variable which only has an impact on the collation editor if *
 
 The default is false.
 
-## `numberEditionSubreadings``
+## `numberEditionSubreadings`
 
 **This variable can be overridden in individual project settings**
 
@@ -261,6 +261,15 @@ The default is false.
 This is a boolean variable. If set to true the user is given the option to add a flag to readings at the extremities of collation units to indicate that the reading should be joined to the corresponding reading in the previous or following unit. The collation editor only sets flags on the readings (join_backwards and join_forwards) which are set to true if the join has been made. All exporters must respect these flags in the exporting if they are used. There is no sanity checking on this, it requires the editor to make the joins accurately.
 
 The default is false.
+
+## `allowOverlapRemoval`
+
+**This variable can be overridden in individual project settings**
+
+This is a boolean variable. If it is set to true the user will have the option to remove an existing overlapping unit and merge its text back into the top line. The option will appear on the right click context menu for the overlapping unit. This is a very complex process and the results should be carefully monitored by users which is why this is on a setting.
+
+The default is false.
+
 
 ## `approvalSettings`
 

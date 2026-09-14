@@ -52,6 +52,8 @@ then the project level settings are used.
 - [`ruleClasses`](services_file/optional-variables.html#ruleclasses)
 - [`ruleConditions`](services_file/optional-variables.html#ruleconditions)
 - [`exporterSettings`](services_file/optional-variables.html#exportersettings)
+- [`numberEditionSubreadings`](services_file/optional-variables.md#numberEditionSubreadings)
+- [`allowOverlapRemoval`](services_file/optional-variables.md#allowoverlapremoval)
 
 ### Functions
 

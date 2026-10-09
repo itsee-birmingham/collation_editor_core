@@ -135,7 +135,11 @@ var OR = (function() {
         temp[2].push.apply(temp[2], overlaps[1]);
       }
       html.push('<ul id="context-menu" class="simple-context-menu"></ul>');
-      document.getElementById('header').innerHTML = CL.getHeaderHtml('Order Readings', CL.context);
+      document.getElementById('header').innerHTML = CL.getHeaderHtml('Order Readings');
+      if (Object.hasOwn(CL.project, 'name')) {
+        document.getElementById('project-name').textContent = CL.project.name;
+      }
+      document.getElementById('unit-ref').textContent = CL.context;
       if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
         CL.services.showLoginStatus();
       }
@@ -273,7 +277,11 @@ var OR = (function() {
         html.push.apply(html, overlaps[0]);
         temp[2].push.apply(temp[2], overlaps[1]);
       }
-      document.getElementById('header').innerHTML = CL.getHeaderHtml('Approved', CL.context);
+      document.getElementById('header').innerHTML = CL.getHeaderHtml('Approved');
+      if (Object.hasOwn(CL.project, 'name')) {
+        document.getElementById('project-name').textContent = CL.project.name;
+      }
+      document.getElementById('unit-ref').textContent = CL.context;
       if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
         CL.services.showLoginStatus();
       }

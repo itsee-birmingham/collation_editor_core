@@ -784,7 +784,7 @@ var OR = (function() {
     },
 
     editLabel: function(rdgDetails, menuPos, saveFunction, overruleZvSetting) {
-      let left, top;
+      let left, top, textToCompare;
       if (overruleZvSetting === undefined) {
         overruleZvSetting = false;
       }
@@ -817,8 +817,12 @@ var OR = (function() {
         for (let i = 0; i < CL.data[rdgDetails[1]][rdgDetails[0]].readings.length; i += 1) {
           const label = CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].label;
           if (i !== rdgDetails[2] && label !== 'zz' && label !== 'zu' && label !== 'zv' && label.indexOf('/') === -1) {
+            textToCompare = CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].text_string;
+            if (textToCompare === '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;') {
+              textToCompare = 'om.';
+            }
             unitReadings.push({'label': label,
-                               'reading': CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].text_string});
+                               'reading': textToCompare});
           }
         }
         cforms.populateSelect(unitReadings, document.getElementById('parent-select'),
@@ -1161,7 +1165,7 @@ var OR = (function() {
     },
 
     _updateLabel: function (rdgDetails, overruleZvSetting) {
-      let supportsAll;
+      let supportsAll, textToCompare;
       const readings = [];
       const labels = [];
       for (let i = 0; i < document.getElementById('parent-select').selectedOptions.length; i += 1) {
@@ -1173,7 +1177,11 @@ var OR = (function() {
         supportsAll = false;
       }
       for (let i = 0; i < CL.data[rdgDetails[1]][rdgDetails[0]].readings.length; i += 1) {
-        if (readings.indexOf(CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].text_string) !== -1) {
+        textToCompare = CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].text_string;
+        if (textToCompare === '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;') {
+          textToCompare = 'om.';
+        }
+        if (readings.indexOf(textToCompare) !== -1) {
           labels.push(CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].label);
         }
       }

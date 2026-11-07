@@ -319,7 +319,11 @@ var RG = (function () {
       const html = header[0];
       html.push.apply(html, temp[0]);
       html.push('<ul id="context-menu" class="simple-context-menu"></ul>');
-      document.getElementById('header').innerHTML = CL.getHeaderHtml('Regulariser', CL.context);
+      document.getElementById('header').innerHTML = CL.getHeaderHtml('Regulariser');
+      if (Object.hasOwn(CL.project, 'name')) {
+        document.getElementById('project-name').textContent = CL.project.name;
+      }
+      document.getElementById('unit-ref').textContent = CL.context;
       //TODO: this might need to be improved everywhere it has been done if it turns out we need this in the services
       if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
         CL.services.showLoginStatus();

@@ -146,7 +146,7 @@ var CL = (function() {
       });
     },
   
-    getHeaderHtml: function(stage, context) {
+    getHeaderHtml: function(stage) {
       let html;
       if (['Regulariser', 'Set Variants'].indexOf(stage) !== -1 && CL.witnessEditingMode === true) {
         if (CL.witnessAddingMode === true) {
@@ -156,11 +156,8 @@ var CL = (function() {
         }
       }
       html = '<span id="stage-id" class="title">' + stage + '</span>' +
-        '<span id="unit-ref" class="title">' + context + '</span><span id="project-name" class="title">';
-      if (Object.prototype.hasOwnProperty.call(CL.project, 'name')) {
-        html += CL.project.name;
-      }
-      html += '</span><div id="message-panel"></div><div id="login-status"></div>';
+        '<span id="unit-ref" class="title"></span><span id="project-name" class="title">' +
+        '</span><div id="message-panel"></div><div id="login-status"></div>';
       return html;
     },
 
@@ -3684,11 +3681,11 @@ var CL = (function() {
       const userCount = Object.keys(byUser).length;
       firstRow = true;
       for (const user in byUser) {
-        if (Object.prototype.hasOwnProperty.call(byUser, user)) {
+        if (Object.hasOwn(byUser, user)) {
           if (users !== undefined) {
-            if (Object.prototype.hasOwnProperty.call(users, user)) {
+            if (Object.hasOwn(users, user)) {
               html.push('<tr><td>' + users[user] + '</td>');
-            } else if (Object.prototype.hasOwnProperty.call(users, String(user))) {
+            } else if (Object.hasOwn(users, String(user))) {
               html.push('<tr><td>' + users[String(user)] + '</td>');
             } else {
               html.push('<tr><td>' + user + '</td>');
@@ -3696,7 +3693,7 @@ var CL = (function() {
           } else {
             html.push('<tr><td>' + user + '</td>');
           }
-          if (Object.prototype.hasOwnProperty.call(byUser[user], 'regularised')) {
+          if (Object.hasOwn(byUser[user], 'regularised')) {
             if (CL.project.allowWitnessChangesInSavedCollations === true) {
               if (byUser[user].regularised.witness_comparison[0] === false) {
                 witnessComparisonClass = byUser[user].regularised.witness_comparison[1];
@@ -3726,7 +3723,7 @@ var CL = (function() {
           } else {
             html.push('<td></td>');
           }
-          if (Object.prototype.hasOwnProperty.call(byUser[user], 'set')) {
+          if (Object.hasOwn(byUser[user], 'set')) {
             if (CL.project.allowWitnessChangesInSavedCollations === true) {
               if (byUser[user].set.witness_comparison[0] === false) {
                 witnessComparisonClass = byUser[user].set.witness_comparison[1];
@@ -3756,7 +3753,7 @@ var CL = (function() {
           } else {
             html.push('<td></td>');
           }
-          if (Object.prototype.hasOwnProperty.call(byUser[user], 'ordered')) {
+          if (Object.hasOwn(byUser[user], 'ordered')) {
             if (CL.project.allowWitnessChangesInSavedCollations === true) {
               if (byUser[user].ordered.witness_comparison[0] === false) {
                 witnessComparisonClass = byUser[user].ordered.witness_comparison[1];
@@ -3835,10 +3832,13 @@ var CL = (function() {
         document.getElementById('witnesses').innerHTML = '';
       }
       document.getElementById('saved-collations-div').innerHTML = html.join('');
-      document.getElementById('header').innerHTML = CL.getHeaderHtml('Collation', CL.context);
+      document.getElementById('header').innerHTML = CL.getHeaderHtml('Collation');
+      if (Object.hasOwn(CL.project, 'name')) {
+        document.getElementById('project-name').textContent = CL.project.name;
+      }
       document.getElementById('unit-ref').textContent = context;
   
-      if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
+      if (Object.hasOwn(CL.services, 'showLoginStatus')) {
         CL.services.showLoginStatus();
       }
       $(':radio').on('click', function() {

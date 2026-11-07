@@ -92,7 +92,11 @@ var SV = (function() {
       }
 
       // sort out header and main page
-      document.getElementById('header').innerHTML = CL.getHeaderHtml('Set Variants', CL.context);
+      document.getElementById('header').innerHTML = CL.getHeaderHtml('Set Variants');
+      if (Object.hasOwn(CL.project, 'name')) {
+        document.getElementById('project-name').textContent = CL.project.name;
+      }
+      document.getElementById('unit-ref').textContent = CL.context;
       document.getElementById('header').className = 'set-variants-header';
       if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
         CL.services.showLoginStatus();

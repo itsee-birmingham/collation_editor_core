@@ -69,7 +69,8 @@ class RestructureExportDataMixin(object):
         """
         # first check that we don't have any unfixable missing data because if we do we may as well stop now
         if len(reading['witnesses']) > 0 and 'suffixes' not in reading:
-            raise MissingSuffixesException()
+            if not self.add_missing_suffixes:
+                raise MissingSuffixesException()
 
         self._supply_missing_reading_data(reading)
         # remove the stuff we don't need

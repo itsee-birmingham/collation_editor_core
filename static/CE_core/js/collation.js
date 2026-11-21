@@ -4036,9 +4036,15 @@ var CL = (function() {
               // then add a new unit and make sure any overlapped witnesses are separated appropriately
               // get all the witnesses
               existingWitnesses = [];
-              for (let i = 0; i < mainCollation.structure.apparatus[0].readings.length; i += 1) {
-                existingWitnesses.push.apply(existingWitnesses,
-                                             mainCollation.structure.apparatus[0].readings[i].witnesses);
+              for (let reading of mainCollation.structure.apparatus[0].readings) {
+                existingWitnesses.push.apply(existingWitnesses, reading.witnesses);
+                if (Object.hasOwn(reading, 'subreadings')) {
+                  for (let type in reading.subreadings) {
+                    for (let subreading of reading.subreadings[type]) {
+                      existingWitnesses.push.apply(existingWitnesses, subreading.witnesses);
+                    }
+                  }
+                }
               }
               if (mainCollation.structure.lac_readings.length > 0) {
                 newUnit.readings.push({

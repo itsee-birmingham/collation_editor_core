@@ -488,7 +488,7 @@ class RuleConditions(object):
     def match_nomsac(self, token, decision):
         if (
             'only_nomsac' in decision['conditions'].keys()
-            and decision['conditions']['only_nomsac'] == True 
+            and decision['conditions']['only_nomsac'] == True
             and ('nomSac' not in token.keys() or token['nomSac'] == False)
         ):
             return False

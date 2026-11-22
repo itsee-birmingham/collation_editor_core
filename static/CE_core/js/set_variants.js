@@ -1791,6 +1791,8 @@ var SV = (function() {
       if (typeof index1 === 'undefined' || typeof index2 === 'undefined') {
         return false;
       }
+      index1 = String(index1)
+      index2 = String(index2)
       if (index1.indexOf('.') !== -1) {
         index1Main = parseInt(index1.split('.')[0]);
         index1Sub = parseInt(index1.split('.')[1]);

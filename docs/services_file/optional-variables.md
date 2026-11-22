@@ -402,7 +402,6 @@ An example of the python functions can be seen in the [default_implementations.p
 
 ```python
 class ApplySettings(object):
-
     def expand_abbreviations(self, token):
         if 'n' in token:  # applied rules override this setting
             token['interface'] = token['n']
@@ -486,17 +485,19 @@ An example of the python functions can be seen in the [default_implementations.p
 
 ```python
 class RuleConditions(object):
-
     def match_nomsac(self, token, decision):
-        if 'only_nomsac' in decision['conditions'].keys() and decision['conditions']['only_nomsac'] == True \
-            and ('nomSac' not in token.keys() or token['nomSac'] == False):
+        if (
+            'only_nomsac' in decision['conditions'].keys()
+            and decision['conditions']['only_nomsac'] == True 
+            and ('nomSac' not in token.keys() or token['nomSac'] == False)
+        ):
             return False
         return True
 
     def ignore_supplied(self, decision_word, token_words):
         decision_word = re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', decision_word))
         token_words = [re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', w)) for w in token_words]
-        return(decision_word, token_words)
+        return (decision_word, token_words)
 ```
 
 ## `exporterSettings`

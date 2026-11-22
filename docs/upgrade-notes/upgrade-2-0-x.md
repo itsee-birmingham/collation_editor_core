@@ -101,10 +101,10 @@ Only one of the changes, the addition of the `get_lemma_text()` function, is lik
 def get_lemma_text(self, overtext, start, end):
     if start == end and start % 2 == 1:
         return ['', 'om']
-    real_start = int(start/2)-1
-    real_end = int(end/2)-1
+    real_start = int(start / 2) - 1
+    real_end = int(end / 2) - 1
     word_list = [x['t'] for x in overtext['tokens']]
-    return [' '.join(word_list[real_start:real_end+1])]
+    return [' '.join(word_list[real_start : real_end + 1])]
 ```
 
 The XML declaration returned by the Exporter class now uses double rather than single quotes. This will only break things if you ever have to remove it using a string match which is sometimes necessary for python XML processors. If this is the case then the match string will need to account for this change.

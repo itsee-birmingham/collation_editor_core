@@ -25,7 +25,7 @@ from collation.core.preprocessor import PreProcessor
 
 def collate(request):
 
-    options = json.loads(request.POST.get('options'))    
+    options = json.loads(request.POST.get('options'))
     p = PreProcessor(options['configs'])
     try:
         output = p.process_witness_list(options['data'])
@@ -90,5 +90,4 @@ def get_apparatus(request):
     exporter_settings = request.POST.get('settings', None)
     exf = ExporterFactory(exporter_settings, options=exporter_settings['options'])
     app = exf.export_data(data)
-
 ```

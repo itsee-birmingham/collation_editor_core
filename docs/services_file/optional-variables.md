@@ -32,6 +32,9 @@ The method will be provided with the data to collate in the JSON format required
 
 The referenced python function should return the JSON output from collateX or equivalent.
 
+Internally this is the `local` collation engine (`engines/collate_service.py`); when it is configured it is used in
+preference to every other engine.
+
 ## `collatexHost`
 
 **There is a default in the core code which is explained below**
@@ -48,6 +51,11 @@ This variable is used to set the starting point for the algorithm settings to be
 
 - **algorithm** *[string]* - The name of the algorithm to use for collateX. This can be any algorithm supported by the version of collateX you are running. You can also use the string 'auto' which will allow the collation preprocessor to make a decision for you. This is probably not optimised for any projects other than the Greek New Testament and should be avoided outside this field.
 - **fuzzy_match** *[boolean]* - A boolean to tell collateX whether or not to use fuzzy matching
+- **engine** *[string]* - Optional. The registered collation engine to use: `collatex` (the Java microservices,
+  the default) or any engine the services have registered with
+  `register_engine()`, for example `collatex-python` from `contrib/engines/` (the `collatex` Python package,
+  in-process). When absent, an algorithm name that matches a registered engine selects that engine; anything else
+  goes to the default.
 - **distance** *[integer]* - The value to be used for the fuzzy match distance (this will only be used if the fuzzy match boolean is also true).
 
 The default setting in the code will use the Dekker algorithm with fuzzy matching turned on and a distance of 2.

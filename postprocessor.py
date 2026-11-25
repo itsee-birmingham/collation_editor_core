@@ -26,6 +26,8 @@ class PostProcessor(Regulariser, SettingsApplier):
         local_python_functions (_type_): _description_
         rule_conditions_config (_type_): _description_
         split_single_reading_units (bool): _description_
+        preserve_column_groups (bool): If True, keep the engine's column groups as delivered and skip
+            the unit-splitting post-processing. Defaults to False.
 
     """
 
@@ -43,6 +45,7 @@ class PostProcessor(Regulariser, SettingsApplier):
         local_python_functions,
         rule_conditions_config,
         split_single_reading_units,
+        preserve_column_groups=False,
     ):
         self.alignment_table = alignment_table
         self.overtext_name = overtext_name
@@ -59,6 +62,7 @@ class PostProcessor(Regulariser, SettingsApplier):
         else:
             self.local_python_functions = None
         self.split_single_reading_units = split_single_reading_units
+        self.preserve_column_groups = preserve_column_groups
         Regulariser.__init__(self, rule_conditions_config, local_python_functions)
         SettingsApplier.__init__(
             self, {'display_settings': self.display_settings, 'display_settings_config': self.display_settings_config}
@@ -238,6 +242,8 @@ class PostProcessor(Regulariser, SettingsApplier):
 
     def _check_unit_splits(self, readings):
         """Work out whether any units need further splitting and if so send them off to restructure_unit."""
+        if self.preserve_column_groups:
+            return [readings]
         # if we have at least two actual readings (not including empty readings)
         if (len(readings.keys()) > 1 and ('_' not in readings.keys())) or (
             len(readings.keys()) > 2 and ('_' in readings.keys())

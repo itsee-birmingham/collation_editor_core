@@ -1533,6 +1533,13 @@ var RG = (function () {
       rd.enableDrag(true, element);
     },
 
+    // exported for programmatic rule staging (e.g. accepting a suggested rule from
+    // a services layer); same code path as the drag-to-regularise UI. The reverse
+    // is deleteUnappliedRule(element).
+    stageRule: function (wordId, rules) {
+      _rules[wordId] = rules;
+    },
+
     _scheduleSelectedRulesDeletion: function () {
       $('tr.selected-rule').each(function () {
         RG._scheduleRuleDeletion(this);
